@@ -6,9 +6,10 @@ export default class Title extends React.Component {
     return (
       <div className="header">
         <p>
-          <a href="#">organisation</a> / <a href="#">repository</a>
+          <a href="#">{this.props.username}</a> /{" "}
+          <a href="#">{this.props.reponame}</a>
         </p>
-        <p>master</p>
+        <p style={{ fontSize: "10px" }}>master</p>
       </div>
     );
   }

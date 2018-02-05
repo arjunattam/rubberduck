@@ -1,4 +1,4 @@
-console.log("hello world from webpage.js");
+console.log("hello world from content.js");
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // Do something with the message!

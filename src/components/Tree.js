@@ -6,13 +6,16 @@ export default class Tree extends React.Component {
     data: []
   };
 
-  componentDidMount() {
-    getFilesTree().then(response => {
-      console.log(response);
-      this.setState({
-        data: response.data.tree
+  componentDidUpdate() {
+    getFilesTree(this.props.username, this.props.reponame)
+      .then(response => {
+        this.setState({
+          data: response.data.tree
+        });
+      })
+      .catch(error => {
+        console.log("Error in API call");
       });
-    });
   }
 
   render() {
@@ -20,7 +23,7 @@ export default class Tree extends React.Component {
       <div style={{ paddingLeft: "10px", overflow: "auto" }}>
         {this.state.data.map(element => {
           return (
-            <div style={{ marginTop: "6px" }}>
+            <div style={{ marginTop: "6px" }} key={element.path}>
               <a href="#">{element.path}</a>
             </div>
           );
