@@ -22,8 +22,8 @@ class Sidebar extends React.Component {
 }
 
 const anchor = document.createElement("div");
-anchor.id = "mercuryContainer";
+anchor.id = "mercury-sidebar";
 document.body.insertBefore(anchor, document.body.childNodes[0]);
 
-ReactDOM.render(<Sidebar />, document.getElementById("mercuryContainer"));
+ReactDOM.render(<Sidebar />, document.getElementById("mercury-sidebar"));
 // registerServiceWorker();
