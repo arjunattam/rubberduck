@@ -2,4 +2,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+
+  /* Add these guys. */
+  min-width: 300px;
+  min-height: 500px;
 }

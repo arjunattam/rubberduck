@@ -1,15 +1,17 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
-  "icons": [
+  "name": "mercury",
+  "description": "Chrome extension for mercury",
+  "version": "0.0.1",
+  "browser_action": {
+    "default_icon": "favicon.ico",
+    "default_popup": "index.html"
+  },
+  "content_scripts": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "matches": ["<all_urls>"],
+      "js": ["webpage.js"]
     }
   ],
-  "start_url": "./index.html",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "permissions": ["tabs"],
+  "manifest_version": 2
 }

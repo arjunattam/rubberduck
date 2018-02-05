@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
 
 class App extends Component {
   render() {
@@ -19,3 +19,12 @@ class App extends Component {
 }
 
 export default App;
+
+/* eslint-disable no-undef */
+chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+  chrome.tabs.sendMessage(tabs[0].id, { greeting: "hello" }, function(
+    response
+  ) {
+    // do something with the response if you want.
+  });
+});
