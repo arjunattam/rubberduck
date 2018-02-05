@@ -1,0 +1,12 @@
+.header {
+  height: 40px;
+  padding: 4px;
+  padding-left: 10px;
+  background: rgb(250, 251, 252);
+  border-bottom: 1px solid #ccc;
+}
+
+.header p {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}

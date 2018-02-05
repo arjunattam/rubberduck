@@ -1,21 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-// import App from "./App";
-import registerServiceWorker from "./registerServiceWorker";
+import Title from "./components/Title";
+import Tree from "./components/Tree";
+// import registerServiceWorker from "./registerServiceWorker";
 
 class Sidebar extends React.Component {
   render() {
     return (
-      <div
-        style={{
-          width: "200px",
-          background: "#000",
-          color: "#fff",
-          height: "100%"
-        }}
-      >
-        Sidebar
+      <div style={{ overflow: "auto", height: "100%" }}>
+        <Title />
+        <Tree />
       </div>
     );
   }
