@@ -20,11 +20,11 @@ class App extends Component {
 
 export default App;
 
-/* eslint-disable no-undef */
-chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-  chrome.tabs.sendMessage(tabs[0].id, { greeting: "hello" }, function(
-    response
-  ) {
-    // do something with the response if you want.
-  });
-});
+// /* eslint-disable no-undef */
+// chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+//   chrome.tabs.sendMessage(tabs[0].id, { greeting: "hello" }, function(
+//     response
+//   ) {
+//     // do something with the response if you want.
+//   });
+// });

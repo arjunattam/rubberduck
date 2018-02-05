@@ -6,12 +6,21 @@
     "default_icon": "favicon.ico",
     "default_popup": "index.html"
   },
+  "background": {
+    "persistent": false,
+    "scripts": ["background.js"]
+  },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["webpage.js"]
+      "matches": ["https://github.com/*", "https://bitbucket.org/*"],
+      "js": ["content.js"]
     }
   ],
-  "permissions": ["tabs"],
+  "permissions": [
+    "https://developer.chrome.com/*",
+    "https://github.com/*",
+    "https://bitbucket.org/*",
+    "storage"
+  ],
   "manifest_version": 2
 }

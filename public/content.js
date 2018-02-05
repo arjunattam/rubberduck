@@ -1,8 +1,8 @@
-console.log("hello world");
+console.log("hello world from webpage.js");
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // Do something with the message!
-  alert(request.greeting);
+  console.log("received", request.greeting);
 
   // And respond back to the sender.
   sendResponse("got your message, thanks!");
