@@ -16,11 +16,6 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": [
-    "https://developer.chrome.com/*",
-    "https://github.com/*",
-    "https://bitbucket.org/*",
-    "storage"
-  ],
+  "permissions": ["https://github.com/*", "https://bitbucket.org/*", "storage"],
   "manifest_version": 2
 }
