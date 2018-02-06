@@ -21,3 +21,9 @@ This repo is the chrome extension for the mercury project.
    ```
    npm run build
    ```
+
+4. To distribute binary file, pack the code into a .crx file. Current version is located at `dist/mercury.crx`.
+
+   ```
+   npm run pack
+   ```

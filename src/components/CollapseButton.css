@@ -1,5 +1,5 @@
 .collapse-container {
-  position: absolute;
+  position: fixed;
   background: yellow;
   height: 20px;
   width: 30px;
@@ -10,6 +10,7 @@
 }
 
 .shown {
+  /* When sidebar is shown */
   top: 15px;
   left: 180px;
 }
