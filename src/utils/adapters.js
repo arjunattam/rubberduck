@@ -75,5 +75,9 @@ export const getChildren = (reponame, tree) => {
 export const constructPath = (subPath, orgname, reponame, typeId) => {
   // return relative path which follows a domain name, like
   // github.com, from given sub-path
+  if (typeId == undefined) {
+    typeId = "master";
+  }
+
   return "/" + orgname + "/" + reponame + "/blob/" + typeId + "/" + subPath;
 };
