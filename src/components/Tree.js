@@ -118,6 +118,7 @@ export default class Tree extends React.Component {
         });
       })
       .catch(error => {
+        // TODO(arjun): this needs to be better communicated
         console.log("Error in API call");
       });
   };

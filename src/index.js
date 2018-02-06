@@ -13,6 +13,7 @@ class Sidebar extends React.Component {
   state = {
     isVisible: false, // changed by toggleCollapse
     // This state is inferred from the window url
+    // TODO(arjun): default state is a problem when we are on a non-repo github page
     username: "requests",
     reponame: "requests",
     type: "blob",

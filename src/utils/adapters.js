@@ -6,6 +6,7 @@ const GH_CONTAINERS = ["container", "container-responsive"]; // class names
 export const getRepoFromPath = () => {
   try {
     // (username)/(reponame)[/(type)][/(typeId)]
+    // TODO(arjun): breaks on settings/applications page
     const match = window.location.pathname.match(
       /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?/
     );
