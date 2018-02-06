@@ -6,7 +6,7 @@ import Tree from "./components/Tree";
 import StatusBar from "./components/StatusBar";
 import CollapseButton from "./components/CollapseButton";
 // import registerServiceWorker from "./registerServiceWorker";
-import { getRepoFromPath } from "./utils/adapters";
+import { getRepoFromPath, updateLayout } from "./utils/adapters";
 import { getValue, setValue, setLocal, getLocal } from "./utils/storage";
 
 class Sidebar extends React.Component {
@@ -42,18 +42,20 @@ class Sidebar extends React.Component {
   };
 
   render() {
+    updateLayout(this.state.isVisible, 232);
+
     if (this.state.isVisible) {
       return (
         <div className="container">
           <Title {...this.state}>
-            <CollapseButton onClick={this.toggleCollapse} text={"hide"} />
+            <CollapseButton onClick={this.toggleCollapse} isVisible={true} />
           </Title>
           <Tree {...this.state} />
           <StatusBar />
         </div>
       );
     } else {
-      return <CollapseButton onClick={this.toggleCollapse} text={"show"} />;
+      return <CollapseButton onClick={this.toggleCollapse} isVisible={false} />;
     }
   }
 }
