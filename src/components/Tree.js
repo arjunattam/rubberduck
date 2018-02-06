@@ -1,6 +1,31 @@
 import React from "react";
 import { getFilesTree } from "./../utils/api";
-import { getChildren } from "./../utils/adapters";
+import { getChildren, constructPath } from "./../utils/adapters";
+
+const renderChildren = (children, depth, parentProps) => {
+  // The parentProps are required to pass org/repo information down
+  // the component chain, so that we can construct the link href. Can this be avoided?
+  children
+    .sort(function(a, b) {
+      return a.name > b.name;
+    })
+    .sort(function(a, b) {
+      return a.children.length == 0;
+    });
+  return (
+    <div>
+      {children.map(element => {
+        if (element.children.length > 0) {
+          // Ordering of props is important since the element needs to override
+          // the parentProps
+          return <Folder {...parentProps} {...element} depth={depth + 1} />;
+        } else {
+          return <File {...parentProps} {...element} depth={depth + 1} />;
+        }
+      })}
+    </div>
+  );
+};
 
 class Folder extends React.Component {
   state = {
@@ -8,7 +33,7 @@ class Folder extends React.Component {
   };
 
   getPadding = () => {
-    // function of depth
+    // padding is a function of depth
     return this.props.depth * 12;
   };
 
@@ -18,62 +43,48 @@ class Folder extends React.Component {
 
   render() {
     const pl = this.getPadding();
-    if (this.state.isCollapsed) {
-      return (
-        <div style={{ marginTop: "6px" }} key={this.props.name}>
-          <a
-            href="#"
-            onClick={this.toggleCollapsed}
-            style={{ paddingLeft: pl, fontFamily: "Consolas" }}
-          >
-            +
-          </a>{" "}
-          <a href="#">{this.props.name}</a>
-        </div>
-      );
-    } else {
-      const children = this.props.children
-        .sort(function(a, b) {
-          return a.name > b.name;
-        })
-        .sort(function(a, b) {
-          return a.children.length == 0;
-        });
-      console.log(this.props);
-      return (
-        <div style={{ marginTop: "6px" }} key={this.props.name}>
-          <a
-            href="#"
-            onClick={this.toggleCollapsed}
-            style={{ paddingLeft: pl, fontFamily: "monospace" }}
-          >
-            -
-          </a>{" "}
-          <a href="#">{this.props.name}</a>
-          {children.map(element => {
-            if (element.children.length > 0) {
-              return <Folder {...element} depth={this.props.depth + 1} />;
-            } else {
-              return <File {...element} depth={this.props.depth + 1} />;
-            }
-          })}
-        </div>
-      );
-    }
+    const children = this.props.children;
+    const renderedChildren = renderChildren(
+      children,
+      this.props.depth,
+      this.props
+    );
+
+    return (
+      <div style={{ marginTop: "6px" }}>
+        <a
+          href="#"
+          onClick={this.toggleCollapsed}
+          style={{ paddingLeft: pl, fontFamily: "monospace" }}
+        >
+          {this.state.isCollapsed ? "+" : "-"}
+        </a>{" "}
+        <a href="#" onClick={this.toggleCollapsed}>
+          {this.props.name}
+        </a>
+        {this.state.isCollapsed ? "" : renderedChildren}
+      </div>
+    );
   }
 }
 
 class File extends React.Component {
   getPadding = () => {
-    // function of depth
+    // padding is a function of depth
     return (this.props.depth + 1) * 12;
   };
 
   render() {
     const pl = this.getPadding();
+    const path = constructPath(
+      this.props.path,
+      this.props.username,
+      this.props.reponame,
+      this.props.typeId
+    );
     return (
       <div style={{ marginTop: "6px" }} key={this.props.name}>
-        <a href="#" style={{ paddingLeft: pl }}>
+        <a href={path} style={{ paddingLeft: pl }}>
           {this.props.name}
         </a>
       </div>
@@ -103,24 +114,12 @@ export default class Tree extends React.Component {
   render() {
     // data is a recursive tree structure, where every element
     // has children, that denote the subtree
-    const children = this.state.data.children
-      .sort(function(a, b) {
-        return a.name > b.name;
-      })
-      .sort(function(a, b) {
-        return a.children.length == 0;
-      });
-    console.log(children);
+    const children = this.state.data.children;
+    const renderedChildren = renderChildren(children, 0, this.props);
 
     return (
       <div style={{ paddingLeft: "10px", overflow: "auto" }}>
-        {children.map(element => {
-          if (element.children.length > 0) {
-            return <Folder {...element} depth={0} />;
-          } else {
-            return <File {...element} depth={0} />;
-          }
-        })}
+        {renderedChildren}
       </div>
     );
   }
