@@ -110,6 +110,7 @@ export default class Tree extends React.Component {
   };
 
   updateTree = () => {
+    // TODO(arjun): add proper loader
     getFilesTree(this.props.username, this.props.reponame)
       .then(response => {
         this.setState({

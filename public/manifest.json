@@ -11,12 +11,6 @@
     "persistent": false,
     "scripts": ["background.js"]
   },
-  "content_scripts": [
-    {
-      "matches": ["https://github.com/*", "https://bitbucket.org/*"],
-      "js": ["content.js"]
-    }
-  ],
   "permissions": [
     "https://github.com/*",
     "https://bitbucket.org/*",
