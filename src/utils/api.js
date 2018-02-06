@@ -24,12 +24,3 @@ export const getFilesTree = (username, reponame) => {
     headers: { Authorization: "token 111ab37ff1337fc2ab25cc86c96f01981a8e7c4f" }
   });
 };
-
-export const getToken = code => {
-  const uri = "https://github.com/login/oauth/access_token";
-  return axios.post(uri, {
-    client_id: "6e58defbed2f902a8429",
-    client_secret: "b4eafefe8127ce9616af448a65cc83ba6a06a649",
-    code: code
-  });
-};
