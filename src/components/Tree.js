@@ -10,7 +10,7 @@ const renderChildren = (children, depth, parentProps) => {
       return a.name > b.name;
     })
     .sort(function(a, b) {
-      return a.children.length == 0;
+      return a.children.length === 0;
     });
   return (
     <div>
@@ -18,9 +18,23 @@ const renderChildren = (children, depth, parentProps) => {
         if (element.children.length > 0) {
           // Ordering of props is important since the element needs to override
           // the parentProps
-          return <Folder {...parentProps} {...element} depth={depth + 1} />;
+          return (
+            <Folder
+              {...parentProps}
+              {...element}
+              depth={depth + 1}
+              key={element.path}
+            />
+          );
         } else {
-          return <File {...parentProps} {...element} depth={depth + 1} />;
+          return (
+            <File
+              {...parentProps}
+              {...element}
+              depth={depth + 1}
+              key={element.path}
+            />
+          );
         }
       })}
     </div>
@@ -59,9 +73,7 @@ class Folder extends React.Component {
         >
           {this.state.isCollapsed ? "+" : "-"}
         </a>{" "}
-        <a href="#" onClick={this.toggleCollapsed}>
-          {this.props.name}
-        </a>
+        <a onClick={this.toggleCollapsed}>{this.props.name}</a>
         {this.state.isCollapsed ? "" : renderedChildren}
       </div>
     );
@@ -114,7 +126,7 @@ export default class Tree extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps != this.props) {
+    if (prevProps !== this.props) {
       this.updateTree();
     }
   }

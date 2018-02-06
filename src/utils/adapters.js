@@ -77,7 +77,7 @@ export const getChildren = (reponame, tree) => {
 export const constructPath = (subPath, orgname, reponame, typeId) => {
   // return relative path which follows a domain name, like
   // github.com, from given sub-path
-  if (typeId == undefined) {
+  if (typeId === undefined) {
     typeId = "master";
   }
 
@@ -96,10 +96,19 @@ export const updateLayout = (isSidebarVisible, width) => {
       return [...document.getElementsByClassName(name)];
     })
   );
-  const containerWidth = containerElements.reduce(
-    (max, b) => Math.max(max, b.offsetWidth),
-    containerElements[0].offsetWidth
-  );
+  let defaultWidth = 0;
+
+  if (containerElements.length > 0) {
+    defaultWidth = containerElements[0].offsetWidth;
+  }
+
+  const containerWidth = containerElements.reduce((max, b) => {
+    if (b.offsetWidth !== undefined) {
+      return Math.max(max, b.offsetWidth);
+    } else {
+      return defaultWidth;
+    }
+  }, defaultWidth);
   const autoMarginLeft = (documentWidth - containerWidth) / 2;
   const shouldPushLeft = isSidebarVisible && autoMarginLeft < width + SPACING;
   // Modifying page styles

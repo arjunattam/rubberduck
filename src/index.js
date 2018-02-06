@@ -7,7 +7,7 @@ import StatusBar from "./components/StatusBar";
 import CollapseButton from "./components/CollapseButton";
 // import registerServiceWorker from "./registerServiceWorker";
 import { getRepoFromPath, updateLayout } from "./utils/adapters";
-import { getValue, setValue, setLocal, getLocal } from "./utils/storage";
+import { setLocal, getLocal } from "./utils/storage";
 
 class Sidebar extends React.Component {
   state = {
@@ -23,7 +23,7 @@ class Sidebar extends React.Component {
     this.getVisibleState();
     const repo = getRepoFromPath();
 
-    if (repo != {}) {
+    if (repo !== {}) {
       this.setState({ ...repo });
     }
   }
