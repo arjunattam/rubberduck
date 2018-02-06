@@ -17,6 +17,11 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["https://github.com/*", "https://bitbucket.org/*", "storage"],
+  "permissions": [
+    "https://github.com/*",
+    "https://bitbucket.org/*",
+    "storage",
+    "identity"
+  ],
   "update_url": "http://www.example.com/update.xml"
 }
