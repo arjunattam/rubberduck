@@ -10,6 +10,7 @@ export default class Title extends React.Component {
           <a href="#">{this.props.reponame}</a>
         </p>
         <p style={{ fontSize: "10px" }}>master</p>
+        <div>{this.props.children}</div>
       </div>
     );
   }

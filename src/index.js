@@ -4,11 +4,14 @@ import "./index.css";
 import Title from "./components/Title";
 import Tree from "./components/Tree";
 import StatusBar from "./components/StatusBar";
+import CollapseButton from "./components/CollapseButton";
 // import registerServiceWorker from "./registerServiceWorker";
 import { getRepoFromPath } from "./utils/adapters";
+import { getValue, setValue, setLocal, getLocal } from "./utils/storage";
 
 class Sidebar extends React.Component {
   state = {
+    isVisible: false, // changed by toggleCollapse
     // This state is inferred from the window url
     username: "requests",
     reponame: "requests",
@@ -17,6 +20,7 @@ class Sidebar extends React.Component {
   };
 
   componentDidMount() {
+    this.getVisibleState();
     const repo = getRepoFromPath();
 
     if (repo != {}) {
@@ -24,14 +28,33 @@ class Sidebar extends React.Component {
     }
   }
 
+  toggleCollapse = () => {
+    setLocal("isVisible", !this.state.isVisible);
+    this.setState({
+      isVisible: !this.state.isVisible
+    });
+  };
+
+  getVisibleState = () => {
+    getLocal("isVisible", value => {
+      this.setState({ isVisible: value });
+    });
+  };
+
   render() {
-    return (
-      <div style={{ overflow: "auto", height: "100%" }}>
-        <Title {...this.state} />
-        <Tree {...this.state} />
-        <StatusBar />
-      </div>
-    );
+    if (this.state.isVisible) {
+      return (
+        <div className="container">
+          <Title {...this.state}>
+            <CollapseButton onClick={this.toggleCollapse} text={"hide"} />
+          </Title>
+          <Tree {...this.state} />
+          <StatusBar />
+        </div>
+      );
+    } else {
+      return <CollapseButton onClick={this.toggleCollapse} text={"show"} />;
+    }
   }
 }
 

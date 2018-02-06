@@ -97,17 +97,25 @@ export default class Tree extends React.Component {
     data: { children: [] }
   };
 
+  updateTree = () => {
+    getFilesTree(this.props.username, this.props.reponame)
+      .then(response => {
+        this.setState({
+          data: getChildren(this.props.reponame, response.data.tree)
+        });
+      })
+      .catch(error => {
+        console.log("Error in API call");
+      });
+  };
+
+  componentDidMount() {
+    this.updateTree();
+  }
+
   componentDidUpdate(prevProps) {
     if (prevProps != this.props) {
-      getFilesTree(this.props.username, this.props.reponame)
-        .then(response => {
-          this.setState({
-            data: getChildren(this.props.reponame, response.data.tree)
-          });
-        })
-        .catch(error => {
-          console.log("Error in API call");
-        });
+      this.updateTree();
     }
   }
 

@@ -3,6 +3,6 @@ import "./StatusBar.css";
 
 export default class StatusBar extends React.Component {
   render() {
-    return <div class="status">status bar</div>;
+    return <div className="status">status bar</div>;
   }
 }
