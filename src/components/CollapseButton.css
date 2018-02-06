@@ -1,0 +1,16 @@
+.collapse-container {
+  position: fixed;
+  background: yellow;
+  height: 20px;
+  width: 30px;
+  z-index: 10001;
+  top: 50px;
+  padding: 5px;
+  font-size: 10px;
+}
+
+.shown {
+  /* When sidebar is shown */
+  top: 15px;
+  left: 180px;
+}

@@ -5,22 +5,39 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   chrome.tabs.executeScript(
     tabId,
     {
-      file: JS_ASSET_LOCATION,
+      code:
+        "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;",
       runAt: "document_start"
     },
     res => {
-      console.log("JS loaded");
-    }
-  );
+      if (
+        chrome.runtime.lastError || // don't continue if error (i.e. page isn't in permission list)
+        res[0]
+      )
+        // value of `injected` above: don't inject twice
+        return;
 
-  chrome.tabs.insertCSS(
-    tabId,
-    {
-      file: CSS_ASSET_LOCATION,
-      runAt: "document_start"
-    },
-    res => {
-      console.log("CSS loaded");
+      chrome.tabs.executeScript(
+        tabId,
+        {
+          file: JS_ASSET_LOCATION,
+          runAt: "document_start"
+        },
+        res => {
+          console.log("JS loaded");
+        }
+      );
+
+      chrome.tabs.insertCSS(
+        tabId,
+        {
+          file: CSS_ASSET_LOCATION,
+          runAt: "document_start"
+        },
+        res => {
+          console.log("CSS loaded");
+        }
+      );
     }
   );
 });

@@ -1,7 +1,8 @@
 {
+  "manifest_version": 2,
   "name": "mercury",
   "description": "Chrome extension for mercury",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "browser_action": {
     "default_icon": "favicon.ico",
     "default_popup": "index.html"
@@ -17,5 +18,5 @@
     }
   ],
   "permissions": ["https://github.com/*", "https://bitbucket.org/*", "storage"],
-  "manifest_version": 2
+  "update_url": "http://www.example.com/update.xml"
 }

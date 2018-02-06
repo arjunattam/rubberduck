@@ -1,8 +1,13 @@
 body {
-  font-family: sans-serif;
+  font-family: sans-serif; /* Required for local testing */
 }
 
-#mercury-sidebar {
+#mercury-sidebar * {
+  /* Overriding github default */
+  box-sizing: content-box;
+}
+
+#mercury-sidebar .container {
   position: fixed;
   top: 0;
   bottom: 0;
@@ -12,9 +17,6 @@ body {
   background: #fff;
   border-right: #ccc solid 1px;
   font-size: 13px;
-  overflow: visible;
-}
-
-#mercury-sidebar * {
-  box-sizing: content-box;
+  height: 100%;
+  overflow: auto;
 }
