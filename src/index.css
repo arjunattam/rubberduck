@@ -7,7 +7,7 @@ body {
   box-sizing: content-box;
 }
 
-#mercury-sidebar .container {
+#mercury-sidebar .mercury-container {
   position: fixed;
   top: 0;
   bottom: 0;

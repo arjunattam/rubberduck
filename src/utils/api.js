@@ -20,6 +20,7 @@ export const getFilesTree = (username, reponame) => {
   const uri =
     "/repos/" + username + "/" + reponame + "/git/trees/master?recursive=1";
   return axios.get("https://api.github.com" + uri, {
+    // TODO(arjun): replace this with the github token
     headers: { Authorization: "token 111ab37ff1337fc2ab25cc86c96f01981a8e7c4f" }
   });
 };
