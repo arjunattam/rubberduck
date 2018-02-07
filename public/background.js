@@ -10,37 +10,48 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       runAt: "document_start"
     },
     res => {
-      if (
-        chrome.runtime.lastError || // don't continue if error (i.e. page isn't in permission list)
-        res[0]
-      )
-        // value of `injected` above: don't inject twice
+      if (chrome.runtime.lastError || res[0])
+        // Don't continue if error (i.e. page isn't in permission list)
+        // Or if the value of `injected` above: we don't want to inject twice
         return;
 
-      chrome.tabs.executeScript(
-        tabId,
-        {
-          file: JS_ASSET_LOCATION,
-          runAt: "document_start"
-        },
-        res => {
-          console.log("JS loaded");
-        }
-      );
+      chrome.tabs.executeScript(tabId, {
+        file: JS_ASSET_LOCATION, // will be replaced with actual location by script
+        runAt: "document_start"
+      });
 
-      chrome.tabs.insertCSS(
-        tabId,
-        {
-          file: CSS_ASSET_LOCATION,
-          runAt: "document_start"
-        },
-        res => {
-          console.log("CSS loaded");
-        }
-      );
+      chrome.tabs.insertCSS(tabId, {
+        file: CSS_ASSET_LOCATION, // will be replaced with actual location by script
+        runAt: "document_start"
+      });
     }
   );
 });
 
-// Can also use this for message passing later
-chrome.runtime.onMessage.addListener((req, sender, sendRes) => {});
+// Listener for messages from the content script
+chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
+  console.log("Message received", req);
+  // Define message types and handlers
+  const handlers = {
+    TRIGGER_AUTH: triggerAuthFlow
+  };
+  handlers[req.message](req.data, sendRes);
+  // Return true to inform that we will send response async
+  return true;
+});
+
+// Handler for the launch auth flow message
+const triggerAuthFlow = (data, callback) => {
+  chrome.identity.launchWebAuthFlow(
+    {
+      url: data.url,
+      interactive: true
+    },
+    function(redirectUrl) {
+      // Send redirect url back to the content script
+      // We could potentially just consume it here, but for now
+      // the background is kept to be lightweight.
+      callback(redirectUrl);
+    }
+  );
+};

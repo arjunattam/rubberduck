@@ -11,12 +11,11 @@
     "persistent": false,
     "scripts": ["background.js"]
   },
-  "content_scripts": [
-    {
-      "matches": ["https://github.com/*", "https://bitbucket.org/*"],
-      "js": ["content.js"]
-    }
+  "permissions": [
+    "https://github.com/*",
+    "https://bitbucket.org/*",
+    "storage",
+    "identity"
   ],
-  "permissions": ["https://github.com/*", "https://bitbucket.org/*", "storage"],
   "update_url": "http://www.example.com/update.xml"
 }

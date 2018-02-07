@@ -11,8 +11,10 @@ import { setLocal, getLocal } from "./utils/storage";
 
 class Sidebar extends React.Component {
   state = {
+    isValidPage: true,
     isVisible: false, // changed by toggleCollapse
     // This state is inferred from the window url
+    // TODO(arjun): default state is a problem when we are on a non-repo github page
     username: "requests",
     reponame: "requests",
     type: "blob",
@@ -22,9 +24,12 @@ class Sidebar extends React.Component {
   componentDidMount() {
     this.getVisibleState();
     const repo = getRepoFromPath();
+    const isEmpty = Object.keys(repo).length == 0;
 
-    if (repo !== {}) {
+    if (!isEmpty) {
       this.setState({ ...repo });
+    } else {
+      // this.setState({ isValidPage: false });
     }
   }
 
@@ -44,9 +49,13 @@ class Sidebar extends React.Component {
   render() {
     updateLayout(this.state.isVisible, 232);
 
+    if (!this.state.isValidPage) {
+      return null;
+    }
+
     if (this.state.isVisible) {
       return (
-        <div className="container">
+        <div className="mercury-container">
           <Title {...this.state}>
             <CollapseButton onClick={this.toggleCollapse} isVisible={true} />
           </Title>
