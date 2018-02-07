@@ -1,4 +1,6 @@
 // Methods to use chrome local storage to maintain high level state
+import { sendMessage, constructMessage } from "./chrome";
+
 const keyPrefix = "mercury.";
 
 export const setLocal = (key, val, cb) => {
@@ -26,4 +28,16 @@ export const getLocal = (key, cb) => {
       return val;
     }
   }
+};
+
+export const setInStore = (key, val, cb) => {
+  // Send message to background page to set value in chrome.storage
+  const message = constructMessage("STORAGE_SET", { key: key, value: val });
+  sendMessage(message, cb);
+};
+
+export const getFromStore = (key, cb) => {
+  // Send message to background page to get value from chrome.storage
+  const message = constructMessage("STORAGE_GET", { key: key });
+  sendMessage(message, cb);
 };

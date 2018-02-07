@@ -1,3 +1,4 @@
+import { sendMessage, constructMessage } from "./chrome";
 const axios = require("axios");
 
 export const encodeQueryData = data => {
@@ -23,4 +24,20 @@ export const getFilesTree = (username, reponame) => {
     // TODO(arjun): replace this with the github token
     headers: { Authorization: "token 111ab37ff1337fc2ab25cc86c96f01981a8e7c4f" }
   });
+};
+
+export const issueToken = clientId => {
+  const uri = "http://staging.codeview.io/api/token_issue/";
+  return axios.post(uri, { client_id: clientId });
+};
+
+export const backgroundPost = (url, data, cb) => {
+  // Send message to background page to make HTTP call
+  const message = constructMessage("HTTP_POST", { url: url, data: data });
+  sendMessage(message, cb);
+};
+
+export const issueTokenBackground = (clientId, cb) => {
+  const uri = "http://staging.codeview.io/api/token_issue/";
+  return backgroundPost(uri, { client_id: clientId }, cb);
 };

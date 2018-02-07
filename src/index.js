@@ -7,6 +7,7 @@ import StatusBar from "./components/StatusBar";
 import CollapseButton from "./components/CollapseButton";
 // import registerServiceWorker from "./registerServiceWorker";
 import { getRepoFromPath, updateLayout } from "./utils/adapters";
+// TODO(arjun): move local storage to chrome.storage.local
 import { setLocal, getLocal } from "./utils/storage";
 
 class Sidebar extends React.Component {
