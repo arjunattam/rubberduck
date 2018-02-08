@@ -4,15 +4,19 @@
   "private": true,
   "dependencies": {
     "axios": "^0.17.1",
+    "jsonwebtoken": "^8.1.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts": "1.1.0"
   },
+  "config": {
+    "pack": "build/. -p test_key.pem -o dist/mercury.crx"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build && node update-manifest.js",
-    "pack":
-      "npm run build && ./node_modules/.bin/crx pack build/. -p test_key.pem -o dist/mercury.crx",
+    "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",
+    "pack": "npm run build && npm run gen-crx",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },

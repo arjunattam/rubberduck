@@ -2,19 +2,22 @@
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
 
+  // To ensure we don't inject the extension twice
+  const injectFlagCode =
+    "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;";
+
   chrome.tabs.executeScript(
     tabId,
-    {
-      code:
-        "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;",
-      runAt: "document_start"
-    },
+    { code: injectFlagCode, runAt: "document_start" },
     res => {
       if (chrome.runtime.lastError || res[0])
         // Don't continue if error (i.e. page isn't in permission list)
         // Or if the value of `injected` above: we don't want to inject twice
         return;
 
+      // TODO(arjun): there is an insertBefore sporadic issue that breaks
+      // because document.body is not loaded. Need to investigate. Might have to
+      // change document_start runAt flag.
       chrome.tabs.executeScript(tabId, {
         file: JS_ASSET_LOCATION, // will be replaced with actual location by script
         runAt: "document_start"
@@ -32,8 +35,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   console.log("Message received", req);
   // Define message types and handlers
+  // TODO(arjun): handle runtime.lastError for each of these handlers
+  // https://developer.chrome.com/apps/runtime#property-lastError
   const handlers = {
-    TRIGGER_AUTH: triggerAuthFlow
+    AUTH_TRIGGER: triggerAuthFlow,
+    STORAGE_SET: saveToStorage,
+    STORAGE_GET: getFromStorage,
+    HTTP_GET: getAjax,
+    HTTP_POST: postAjax
   };
   handlers[req.message](req.data, sendRes);
   // Return true to inform that we will send response async
@@ -42,9 +51,11 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
 
 // Handler for the launch auth flow message
 const triggerAuthFlow = (data, callback) => {
+  // data must have url
+  const { url } = data;
   chrome.identity.launchWebAuthFlow(
     {
-      url: data.url,
+      url: url,
       interactive: true
     },
     function(redirectUrl) {
@@ -52,6 +63,70 @@ const triggerAuthFlow = (data, callback) => {
       // We could potentially just consume it here, but for now
       // the background is kept to be lightweight.
       callback(redirectUrl);
+      // TODO(arjun): if there is an error, refresh the JWT
     }
   );
 };
+
+// Handler for saving to storage
+const saveToStorage = (data, callback) => {
+  // data must have key and value, callback will not have any args
+  // Save it using the Chrome extension storage sync API
+  // Docs: https://developer.chrome.com/apps/storage
+  const { key, value } = data;
+  const dataToSave = {};
+  dataToSave[key] = value;
+  chrome.storage.sync.set(dataToSave, function() {
+    callback();
+  });
+};
+
+// Handler for getting from storage
+const getFromStorage = (data, callback) => {
+  // data must have key, callback will be called with value
+  const { key } = data;
+  chrome.storage.sync.get(key, function(value) {
+    callback(value[key]);
+  });
+};
+
+// Plain js network calls
+function postAjax(fulldata, success) {
+  const { url, data } = fulldata;
+  var params =
+    typeof data == "string"
+      ? data
+      : Object.keys(data)
+          .map(function(k) {
+            return encodeURIComponent(k) + "=" + encodeURIComponent(data[k]);
+          })
+          .join("&");
+
+  var xhr = window.XMLHttpRequest
+    ? new XMLHttpRequest()
+    : new ActiveXObject("Microsoft.XMLHTTP");
+  xhr.open("POST", url);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState > 3 && xhr.status == 200) {
+      success(JSON.parse(xhr.responseText));
+    }
+  };
+  xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.send(params);
+  return xhr;
+}
+
+function getAjax(data, success) {
+  const { url } = data;
+  var xhr = window.XMLHttpRequest
+    ? new XMLHttpRequest()
+    : new ActiveXObject("Microsoft.XMLHTTP");
+  xhr.open("GET", url);
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState > 3 && xhr.status == 200) success(xhr.responseText);
+  };
+  xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+  xhr.send();
+  return xhr;
+}

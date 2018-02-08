@@ -36,6 +36,10 @@ The extension has two components
 
 2. [Content script](src/index.js): this is the script that is injected in the page using [programmatic injection](https://developer.chrome.com/extensions/content_scripts#pi). Since the injected script renders elements, this is built using React.
 
+### Docs
+
+1. [Authentication](docs/AUTHENTICATION.md)
+
 ## Some issues
 
 1. We need an icon and a landing page on a website. Perhaps a new name?

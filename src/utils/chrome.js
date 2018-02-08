@@ -5,7 +5,13 @@
 /* Define global to fix linter error */
 /* global chrome */
 
-const MESSAGE_TYPES = ["TRIGGER_AUTH"];
+const MESSAGE_TYPES = [
+  "AUTH_TRIGGER",
+  "STORAGE_SET",
+  "STORAGE_GET",
+  "HTTP_POST",
+  "HTTP_GET"
+];
 
 export const constructMessage = (type, data) => {
   // Check if this is a valid type
