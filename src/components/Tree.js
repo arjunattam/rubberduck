@@ -5,13 +5,23 @@ import { getChildren, constructPath } from "./../utils/adapters";
 const renderChildren = (children, depth, parentProps) => {
   // The parentProps are required to pass org/repo information down
   // the component chain, so that we can construct the link href. Can this be avoided?
-  children
-    .sort(function(a, b) {
-      return a.name > b.name;
+  const parents = children
+    .filter(element => {
+      return element.children.length > 0;
     })
     .sort(function(a, b) {
-      return a.children.length === 0;
+      return a.name.localeCompare(b.name);
     });
+  const onlyChildren = children
+    .filter(element => {
+      return element.children.length == 0;
+    })
+    .sort(function(a, b) {
+      return a.name.localeCompare(b.name);
+    });
+  // Expected ordering is first folders, then files, each alphabetical
+  children = parents.concat(onlyChildren);
+
   return (
     <div>
       {children.map(element => {
@@ -110,6 +120,7 @@ export default class Tree extends React.Component {
   };
 
   updateTree = () => {
+    // TODO(arjun): add proper loader
     getFilesTree(this.props.username, this.props.reponame)
       .then(response => {
         this.setState({
@@ -117,6 +128,7 @@ export default class Tree extends React.Component {
         });
       })
       .catch(error => {
+        // TODO(arjun): this needs to be better communicated
         console.log("Error in API call");
       });
   };
