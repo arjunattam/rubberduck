@@ -7,7 +7,7 @@ import {
   issueTokenBackground
 } from "./../utils/api";
 import { setInStore, getFromStore } from "./../utils/storage";
-import { getRandomToken, triggerOAuthFlow, parseJWT } from "./../utils/auth";
+import { getRandomToken, triggerOAuthFlow, decodeJWT } from "./../utils/auth";
 
 const jwt = require("jsonwebtoken");
 
@@ -61,7 +61,7 @@ export default class StatusBar extends React.Component {
 
   receivedToken = token => {
     // When token has been received, we will save to storage
-    parseJWT(token);
+    console.log(decodeJWT(token));
     this.setState({ token: token });
   };
 
@@ -97,15 +97,40 @@ export default class StatusBar extends React.Component {
   };
 
   render() {
-    return (
-      <div className="status">
-        <p>
-          <a href="#" onClick={this.launchOAuthFlow}>
-            Login
-          </a>{" "}
-          {this.state.token ? "JWT found" : "JWT missing"}
-        </p>
-      </div>
-    );
+    // Three possible situations: token unavailable, token available but no github login
+    // and token and github login
+    const decodedJWT = this.state.token ? decodeJWT(this.state.token) : {};
+    const githubUser = decodedJWT.github_username;
+    const hasToken = this.state.token !== null;
+    const hasBoth = githubUser !== undefined && githubUser !== "";
+
+    if (hasBoth) {
+      return (
+        <div className="status">
+          <p>
+            Logged in as {githubUser}{" "}
+            <a href="#" onClick={this.launchOAuthFlow}>
+              Reauthenticate
+            </a>
+          </p>
+        </div>
+      );
+    } else if (hasToken) {
+      return (
+        <div className="status">
+          <p>
+            <a href="#" onClick={this.launchOAuthFlow}>
+              Login with Github
+            </a>
+          </p>
+        </div>
+      );
+    } else {
+      return (
+        <div className="status">
+          <p>No token found</p>
+        </div>
+      );
+    }
   }
 }

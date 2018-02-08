@@ -20,6 +20,6 @@ export const triggerOAuthFlow = (jwt, cb) => {
   sendMessage(message, cb);
 };
 
-export const parseJWT = token => {
-  console.log(jwt.decode(token));
+export const decodeJWT = token => {
+  return jwt.decode(token);
 };
