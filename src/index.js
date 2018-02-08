@@ -5,6 +5,7 @@ import Title from "./components/Title";
 import Tree from "./components/Tree";
 import StatusBar from "./components/StatusBar";
 import CollapseButton from "./components/CollapseButton";
+import HoverListener from "./components/HoverListener";
 // import registerServiceWorker from "./registerServiceWorker";
 import { getRepoFromPath, updateLayout } from "./utils/adapters";
 // TODO(arjun): move local storage to chrome.storage.local
@@ -25,7 +26,7 @@ class Sidebar extends React.Component {
   componentDidMount() {
     this.getVisibleState();
     const repo = getRepoFromPath();
-    const isEmpty = Object.keys(repo).length == 0;
+    const isEmpty = Object.keys(repo).length === 0;
 
     if (!isEmpty) {
       this.setState({ ...repo });
@@ -61,6 +62,7 @@ class Sidebar extends React.Component {
             <CollapseButton onClick={this.toggleCollapse} isVisible={true} />
           </Title>
           <Tree {...this.state} />
+          <HoverListener />
           <StatusBar />
         </div>
       );

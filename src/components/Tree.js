@@ -14,7 +14,7 @@ const renderChildren = (children, depth, parentProps) => {
     });
   const onlyChildren = children
     .filter(element => {
-      return element.children.length == 0;
+      return element.children.length === 0;
     })
     .sort(function(a, b) {
       return a.name.localeCompare(b.name);

@@ -1,15 +1,12 @@
 import React from "react";
 import "./StatusBar.css";
 import {
-  encodeQueryData,
   getParameterByName,
   issueToken,
   issueTokenBackground
 } from "./../utils/api";
 import { setInStore, getFromStore } from "./../utils/storage";
 import { getRandomToken, triggerOAuthFlow, decodeJWT } from "./../utils/auth";
-
-const jwt = require("jsonwebtoken");
 
 export default class StatusBar extends React.Component {
   // TODO(arjun): update the login url and response handling
