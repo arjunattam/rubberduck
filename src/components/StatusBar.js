@@ -104,8 +104,8 @@ export default class StatusBar extends React.Component {
     if (hasBoth) {
       return (
         <div className="status">
+          <p> Logged in as {githubUser}</p>
           <p>
-            Logged in as {githubUser}{" "}
             <a href="#" onClick={this.launchOAuthFlow}>
               Reauthenticate
             </a>

@@ -41,16 +41,26 @@ const getCharNumber = (node, mouseX) => {
   return Math.round(charInPixels / (fontAspectRatio * lineHeight));
 };
 
+const isValidResult = result => {
+  return !Object.keys(result).some(function(k) {
+    return result[k] === -1;
+  });
+};
+
 const parseCommonAncestor = (element, x, y, callback) => {
   const node = element.parentNode;
   const { typeId } = getRepoFromPath(); // sha id from window url
-  callback({
+  const result = {
     elementText: element.nodeValue,
     filePath: getFileUri(node, typeId),
     fileSha: typeId,
-    lineNumber: getLineNumber(node), // TODO(arjun): handle -1
+    lineNumber: getLineNumber(node),
     charNumber: getCharNumber(node, x)
-  });
+  };
+
+  if (isValidResult(result)) {
+    callback(result);
+  }
 };
 
 const stripPx = value => {

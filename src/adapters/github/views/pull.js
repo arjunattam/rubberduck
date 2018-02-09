@@ -99,14 +99,24 @@ const getHeadOrBase = element => {
   }
 };
 
+const isValidResult = result => {
+  return !Object.keys(result).some(function(k) {
+    return result[k] === -1;
+  });
+};
+
 const parseCommonAncestor = (element, x, y, callback) => {
-  callback({
+  const result = {
     elementText: element.nodeValue,
     filePath: getFileUri(element),
     fileSha: getHeadOrBase(element),
     lineNumber: getLineNumber(element),
     charNumber: getCharNumber(element, x)
-  });
+  };
+
+  if (isValidResult(result)) {
+    callback(result);
+  }
 };
 
 const stripPx = value => {
