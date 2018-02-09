@@ -6,10 +6,11 @@ import Tree from "./components/Tree";
 import StatusBar from "./components/StatusBar";
 import CollapseButton from "./components/CollapseButton";
 import HoverListener from "./components/HoverListener";
-// import registerServiceWorker from "./registerServiceWorker";
-import { getRepoFromPath, updateLayout } from "./utils/adapters";
+import { getRepoFromPath } from "./adapters/github/path";
+import { updateLayout } from "./adapters/github/layout";
 // TODO(arjun): move local storage to chrome.storage.local
 import { setLocal, getLocal } from "./utils/storage";
+// import registerServiceWorker from "./registerServiceWorker";
 
 class Sidebar extends React.Component {
   state = {

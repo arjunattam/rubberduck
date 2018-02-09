@@ -1,6 +1,7 @@
 import React from "react";
 import { getFilesTree } from "./../utils/api";
-import { getChildren, constructPath } from "./../utils/adapters";
+import { getChildren } from "./../utils/data";
+import { constructPath } from "./../adapters/github/path";
 
 const renderChildren = (children, depth, parentProps) => {
   // The parentProps are required to pass org/repo information down
