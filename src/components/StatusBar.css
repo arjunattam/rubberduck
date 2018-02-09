@@ -5,8 +5,8 @@
   border-top: 1px #ccc solid;
   border-right: 1px solid #ccc;
   background: rgb(250, 251, 252);
-  padding: 10px;
-  width: 212px; /* Can this be inherited from parent? */
+  padding: 5px 0px 5px 10px;
+  width: 222px; /* Can this be inherited from parent? */
 }
 
 .status p {

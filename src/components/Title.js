@@ -11,7 +11,7 @@ export default class Title extends React.Component {
             {this.props.reponame}
           </a>
         </p>
-        <p style={{ fontSize: "10px" }}>master</p>
+        <p className="branch">{this.props.typeId}</p>
         <div>{this.props.children}</div>
       </div>
     );

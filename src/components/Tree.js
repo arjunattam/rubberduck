@@ -2,6 +2,7 @@ import React from "react";
 import { getFilesTree } from "./../utils/api";
 import { getChildren } from "./../utils/data";
 import { constructPath } from "./../adapters/github/path";
+import "./Tree.css";
 
 const renderChildren = (children, depth, parentProps) => {
   // The parentProps are required to pass org/repo information down
@@ -76,16 +77,12 @@ class Folder extends React.Component {
     );
 
     return (
-      <div style={{ marginTop: "6px" }}>
-        <a
-          href="#"
-          onClick={this.toggleCollapsed}
-          style={{ paddingLeft: pl, fontFamily: "monospace" }}
-        >
-          {this.state.isCollapsed ? "+" : "-"}
-        </a>{" "}
-        <a onClick={this.toggleCollapsed}>{this.props.name}</a>
-        {this.state.isCollapsed ? "" : renderedChildren}
+      <div className="file-container">
+        <a onClick={this.toggleCollapsed} style={{ paddingLeft: pl }}>
+          <span className="mono">{this.state.isCollapsed ? "+ " : "- "}</span>
+          {this.props.name}
+        </a>
+        {this.state.isCollapsed ? null : renderedChildren}
       </div>
     );
   }
@@ -106,7 +103,7 @@ class File extends React.Component {
       this.props.typeId
     );
     return (
-      <div style={{ marginTop: "6px" }} key={this.props.name}>
+      <div className="file-container" key={this.props.name}>
         <a href={path} style={{ paddingLeft: pl }}>
           {this.props.name}
         </a>
@@ -117,7 +114,8 @@ class File extends React.Component {
 
 export default class Tree extends React.Component {
   state = {
-    data: { children: [] }
+    data: { children: [] },
+    isVisible: true
   };
 
   updateTree = () => {
@@ -144,16 +142,35 @@ export default class Tree extends React.Component {
     }
   }
 
+  toggleVisibility = () => {
+    this.setState({
+      isVisible: !this.state.isVisible
+    });
+  };
+
   render() {
     // data is a recursive tree structure, where every element
     // has children, that denote the subtree
-    const children = this.state.data.children;
-    const renderedChildren = renderChildren(children, 0, this.props);
+    if (this.state.isVisible) {
+      const children = this.state.data.children;
+      const renderedChildren = renderChildren(children, 0, this.props);
 
-    return (
-      <div style={{ paddingLeft: "10px", overflow: "auto" }}>
-        {renderedChildren}
-      </div>
-    );
+      return (
+        <div className="tree-container">
+          <div className="tree-header" onClick={this.toggleVisibility}>
+            ▼ Files tree
+          </div>
+          <div className="tree-content">{renderedChildren}</div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="tree-container">
+          <div className="tree-header" onClick={this.toggleVisibility}>
+            ▷ Files tree
+          </div>
+        </div>
+      );
+    }
   }
 }
