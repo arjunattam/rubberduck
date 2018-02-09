@@ -1,11 +1,11 @@
 // Github blob (file view) view handler
 // Exports a hover listener method with a callback param
 // Callback gets object: filePath, fileSha, lineNumber, charNumber, elementText
+import { getRepoFromPath } from "../path";
 
-const getFileUri = node => {
+const getFileUri = (node, shaId) => {
   const uri = node.baseURI;
-  // TODO(arjun): replace master with sha
-  const parsed = uri.replace("#", "").split("master");
+  const parsed = uri.replace("#", "").split(shaId);
   return parsed[1].slice(1);
 };
 
@@ -43,10 +43,11 @@ const getCharNumber = (node, mouseX) => {
 
 const parseCommonAncestor = (element, x, y, callback) => {
   const node = element.parentNode;
+  const { typeId } = getRepoFromPath(); // sha id from window url
   callback({
     elementText: element.nodeValue,
-    filePath: getFileUri(node),
-    fileSha: "master", // TODO(arjun): fix sha
+    filePath: getFileUri(node, typeId),
+    fileSha: typeId,
     lineNumber: getLineNumber(node), // TODO(arjun): handle -1
     charNumber: getCharNumber(node, x)
   });

@@ -25,19 +25,23 @@ export default class HoverListener extends React.Component {
 
   setupListener = () => {
     const isFileView = window.location.href.indexOf("blob") >= 0;
-    const isPRView = window.location.href.indexOf("pulls") >= 0;
+    const isPRView = window.location.href.indexOf("pull") >= 0;
     let listener = null;
 
     if (isFileView) {
       listener = blobListener;
-    } else {
+    } else if (isPRView) {
       listener = pullListener;
     }
 
-    const that = this;
-    document.body.onmouseover = e => {
-      listener(e, that.receiver);
-    };
+    if (listener !== null) {
+      const that = this;
+      document.body.onmouseover = e => {
+        listener(e, that.receiver);
+      };
+    } else {
+      document.body.onmouseover = null;
+    }
   };
 
   componentDidMount() {

@@ -27,6 +27,7 @@ class Sidebar extends React.Component {
   componentDidMount() {
     this.getVisibleState();
     const repo = getRepoFromPath();
+    // TODO(arjun): branches with '/' are breaking (feature/accounts eg)
     const isEmpty = Object.keys(repo).length === 0;
 
     if (!isEmpty) {
@@ -50,8 +51,7 @@ class Sidebar extends React.Component {
   };
 
   render() {
-    updateLayout(this.state.isVisible, 232);
-
+    updateLayout(this.state.isVisible, 232); // 232 = sidebar width in pixels
     if (!this.state.isValidPage) {
       return null;
     }
@@ -63,7 +63,7 @@ class Sidebar extends React.Component {
             <CollapseButton onClick={this.toggleCollapse} isVisible={true} />
           </Title>
           <Tree {...this.state} />
-          <HoverListener />
+          <HoverListener url={window.location.pathname} />
           <StatusBar />
         </div>
       );
