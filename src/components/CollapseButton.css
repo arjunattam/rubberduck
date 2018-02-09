@@ -1,16 +1,21 @@
 .collapse-container {
   position: fixed;
-  background: yellow;
   height: 20px;
-  width: 30px;
+  width: 20px;
   z-index: 10001;
   top: 50px;
-  padding: 5px;
-  font-size: 10px;
+  padding: 5px 5px 7px 5px;
+  background: #f1f8ff;
+  border: 1px solid #c8e1ff;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  color: #0365d6;
 }
 
 .shown {
   /* When sidebar is shown */
-  top: 15px;
-  left: 180px;
+  top: 10px;
+  left: 190px;
 }

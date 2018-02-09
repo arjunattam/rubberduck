@@ -1,15 +1,12 @@
 import React from "react";
 import "./StatusBar.css";
 import {
-  encodeQueryData,
   getParameterByName,
   issueTokenBackground,
   refreshTokenBackground
 } from "./../utils/api";
 import { setInStore, getFromStore } from "./../utils/storage";
 import { getRandomToken, triggerOAuthFlow, decodeJWT } from "./../utils/auth";
-
-const jwt = require("jsonwebtoken");
 
 export default class StatusBar extends React.Component {
   // TODO(arjun): update the login url and response handling
@@ -122,8 +119,8 @@ export default class StatusBar extends React.Component {
     if (hasBoth) {
       return (
         <div className="status">
+          <p> Logged in as {githubUser}</p>
           <p>
-            Logged in as {githubUser}{" "}
             <a href="#" onClick={this.launchOAuthFlow}>
               Reauthenticate
             </a>
