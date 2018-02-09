@@ -3,8 +3,8 @@ import "./StatusBar.css";
 import {
   encodeQueryData,
   getParameterByName,
-  issueToken,
-  issueTokenBackground
+  issueTokenBackground,
+  refreshTokenBackground
 } from "./../utils/api";
 import { setInStore, getFromStore } from "./../utils/storage";
 import { getRandomToken, triggerOAuthFlow, decodeJWT } from "./../utils/auth";
@@ -48,12 +48,11 @@ export default class StatusBar extends React.Component {
           /* issueToken(clientId) */
           issueTokenBackground(clientId, response => {
             const token = response.token;
-            setInStore(key, token, () => {
-              resolve(token);
-            });
+            resolve(token);
           });
         } else {
-          resolve(value);
+          // We found a token in the chrome storage, and will refresh it
+          this.refreshToken(value, resolve);
         }
       });
     });
@@ -62,14 +61,30 @@ export default class StatusBar extends React.Component {
   receivedToken = token => {
     // When token has been received, we will save to storage
     console.log(decodeJWT(token));
-    this.setState({ token: token });
+    const key = "token";
+    setInStore(key, token, () => {
+      this.setState({ token: token });
+    });
+  };
+
+  refreshToken = (existingToken, callback) => {
+    // Use the existing jwt to get a refreshed token, with
+    // an extended expiry. To be safe, this is triggered on every component
+    // load for now. The jwt expiry is set at 3 days in the backend.
+    refreshTokenBackground(existingToken, response => {
+      const token = response.token;
+      console.log("Successful token refresh");
+      callback(token);
+    });
+    // TODO(arjun): this will raise an error if the refresh fails,
+    // in which case we will have to re-issue the token flow.
   };
 
   componentDidMount() {
     // See docs/AUTHENTICATION.md for flow
     // 1. Get client id from the storage. If not found, then set it up
     // 2. Get the jwt from the storage. If not found, then make API call to get it
-    // 3. Manage refresh for the jwt - TODO(arjun)
+    // 3. Manage refresh for the jwt
     // 4. On login with github, trigger oauth flow, and get new jwt
     this.getClientId()
       .then(this.getJWT)

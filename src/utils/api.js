@@ -41,3 +41,8 @@ export const issueTokenBackground = (clientId, cb) => {
   const uri = "http://staging.codeview.io/api/token_issue/";
   return backgroundPost(uri, { client_id: clientId }, cb);
 };
+
+export const refreshTokenBackground = (token, cb) => {
+  const uri = "http://staging.codeview.io/api/token_refresh/";
+  return backgroundPost(uri, { token: token }, cb);
+};
