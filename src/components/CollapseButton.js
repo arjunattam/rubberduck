@@ -6,14 +6,15 @@ export default class CollapseButton extends React.Component {
   // the page scrolls up. This needs to be fixed.
 
   render() {
-    const text = this.props.isVisible ? "hide" : "show";
+    const text = this.props.isVisible ? "←" : "→";
     const classMod = this.props.isVisible ? "shown" : "";
 
     return (
-      <div className={"collapse-container " + classMod}>
-        <a href="#" onClick={this.props.onClick}>
-          {text}
-        </a>
+      <div
+        className={"collapse-container " + classMod}
+        onClick={this.props.onClick}
+      >
+        {text}
       </div>
     );
   }

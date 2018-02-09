@@ -16,7 +16,7 @@ const MESSAGE_TYPES = [
 export const constructMessage = (type, data) => {
   // Check if this is a valid type
   if (MESSAGE_TYPES.indexOf(type) < 0) {
-    throw "Not a valid message type.";
+    throw new Error("Not a valid message type.");
   }
 
   return {
