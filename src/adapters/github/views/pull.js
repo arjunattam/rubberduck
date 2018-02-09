@@ -57,11 +57,53 @@ const getCharNumber = (element, mouseX) => {
   }
 };
 
+const getHeadOrBase = element => {
+  // Similar to blob calculation
+  let codeTd = element.parentNode.closest("td.code-review");
+
+  if (codeTd === null) {
+    codeTd = element.parentNode.closest("td.blob-code");
+  }
+
+  if (codeTd !== null) {
+    if (codeTd.classList.contains("blob-code-deletion")) {
+      // Deletions can only belong in base
+      return "base";
+    } else if (codeTd.classList.contains("blob-code-addition")) {
+      // Additions can only belong in head
+      return "head";
+    } else {
+      // This depends on the unified/split view
+      const isUnifiedView = codeTd.parentNode.childNodes.length === 7;
+
+      if (isUnifiedView) {
+        // We return line number for head by convention, so this will also be head
+        return "head";
+      } else {
+        // This is the split view
+        const lineNumber = getLineNumber(element) + 1;
+        const lineTd = codeTd.previousSibling.previousSibling;
+
+        if (lineTd.id.indexOf("L" + lineNumber) >= 0) {
+          // Left side
+          return "base";
+        } else if (lineTd.id.indexOf("R" + lineNumber) >= 0) {
+          return "head";
+        } else {
+          return -1;
+        }
+      }
+    }
+  } else {
+    return -1;
+  }
+};
+
 const parseCommonAncestor = (element, x, y, callback) => {
   callback({
     elementText: element.nodeValue,
     filePath: getFileUri(element),
-    // fileSha: typeId,
+    fileSha: getHeadOrBase(element),
     lineNumber: getLineNumber(element),
     charNumber: getCharNumber(element, x)
   });
