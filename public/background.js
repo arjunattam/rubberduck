@@ -1,3 +1,6 @@
+const jsLocation = JS_ASSET_LOCATION; // will be replaced with actual location by script
+const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location by script
+
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
@@ -18,15 +21,20 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       // TODO(arjun): there is an insertBefore sporadic issue that breaks
       // because document.body is not loaded. Need to investigate. Might have to
       // change document_start runAt flag.
-      chrome.tabs.executeScript(tabId, {
-        file: JS_ASSET_LOCATION, // will be replaced with actual location by script
-        runAt: "document_start"
-      });
 
-      chrome.tabs.insertCSS(tabId, {
-        file: CSS_ASSET_LOCATION, // will be replaced with actual location by script
-        runAt: "document_start"
-      });
+      if (jsLocation !== null) {
+        chrome.tabs.executeScript(tabId, {
+          file: jsLocation,
+          runAt: "document_start"
+        });
+      }
+
+      if (cssLocation !== null) {
+        chrome.tabs.insertCSS(tabId, {
+          file: cssLocation,
+          runAt: "document_start"
+        });
+      }
     }
   );
 });
