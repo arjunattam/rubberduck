@@ -10,19 +10,13 @@ This repo is the chrome extension for the mercury project.
    yarn
    ```
 
-2. For local development, and then open localhost:3000
+2. For development, we will run the dev server, and load an unpacked extension on Chrome. See [how to](https://developer.chrome.com/extensions/getstarted#unpacked). Open an [example github url](https://github.com/pallets/flask) to see this in action.
 
    ```
    npm run start
    ```
 
-3. For local deployment as chrome extension, build and then load an unpacked extension. See [how to](https://developer.chrome.com/extensions/getstarted#unpacked).
-
-   ```
-   npm run build
-   ```
-
-4. To distribute binary file, pack the code into a .crx file. Current version is located at `dist/mercury.crx`.
+3. To distribute binary file, we pack the extension into a crx file, located at `dist/mercury.crx`. Generate new crx using the command:
 
    ```
    npm run pack
@@ -39,6 +33,7 @@ The extension has two components
 ### Docs
 
 1. [Authentication](docs/AUTHENTICATION.md)
+2. [Development](docs/DEVELOPMENT.md)
 
 ## Some issues
 

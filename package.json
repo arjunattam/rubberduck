@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build && node update-manifest.js",
+    "build": "react-app-rewired build && node scripts/helpers.js",
     "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",
     "pack": "npm run build && npm run gen-crx",
     "test": "react-app-rewired test --env=jsdom",

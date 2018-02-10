@@ -1,6 +1,14 @@
-// Small script that reads the ./build/asset-manifest.json file
-// and updates the ./build/background.js accordingly.
-// From: https://github.com/facebook/create-react-app/issues/3805
+/*
+Helper script for two tasks:
+
+1. Update asset (css/js) asset locations inside `build/background.js`.
+   For context, see https://github.com/facebook/create-react-app/issues/3805
+
+2. Update public key value inside `build/manifest.json` to maintain
+   extension id during development. See: https://developer.chrome.com/apps/app_identity#copy_key
+
+These methods are called during `npm run start` and `npm run build`.
+*/
 
 const fs = require("fs");
 const manifestKey =
