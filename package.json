@@ -13,14 +13,16 @@
     "pack": "build/. -p test_key.pem -o dist/mercury.crx"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build && node update-manifest.js",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build && node scripts/helpers.js",
     "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",
     "pack": "npm run build && npm run gen-crx",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "test": "react-app-rewired test --env=jsdom",
+    "eject": "react-app-rewired eject"
   },
   "devDependencies": {
-    "crx": "^3.2.1"
+    "crx": "^3.2.1",
+    "react-app-rewired": "^1.4.1",
+    "write-file-webpack-plugin": "^4.2.0"
   }
 }
