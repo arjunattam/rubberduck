@@ -1,5 +1,6 @@
 body {
-  font-family: sans-serif; /* Required for local testing */
+  /* Required for localhost:3000 */
+  font-family: sans-serif;
 }
 
 #mercury-sidebar * {

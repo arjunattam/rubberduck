@@ -111,11 +111,19 @@ const parseCommonAncestor = (element, x, y, callback) => {
     filePath: getFileUri(element),
     fileSha: getHeadOrBase(element),
     lineNumber: getLineNumber(element),
-    charNumber: getCharNumber(element, x)
+    charNumber: getCharNumber(element, x),
+    mouseX: x,
+    mouseY: y
   };
 
   if (isValidResult(result)) {
     callback(result);
+  } else {
+    // To make the hover box disappear from the view :(
+    callback({
+      mouseX: -1000,
+      mouseY: -1000
+    });
   }
 };
 
