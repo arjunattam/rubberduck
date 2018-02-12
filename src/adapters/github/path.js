@@ -99,12 +99,12 @@ export const getRepoFromPath = () => {
   };
 };
 
-export const constructPath = (subPath, orgname, reponame, typeId) => {
+export const constructPath = (subPath, orgname, reponame, branch) => {
   // return relative path which follows a domain name, like
   // github.com, from given sub-path
-  if (typeId === undefined) {
-    typeId = "master";
+  if (branch === undefined) {
+    branch = "master";
   }
 
-  return "/" + orgname + "/" + reponame + "/blob/" + typeId + "/" + subPath;
+  return "/" + orgname + "/" + reponame + "/blob/" + branch + "/" + subPath;
 };

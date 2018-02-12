@@ -100,7 +100,7 @@ class File extends React.Component {
       this.props.path,
       this.props.username,
       this.props.reponame,
-      this.props.typeId
+      this.props.branch
     );
     return (
       <div className="file-container" key={this.props.name}>
