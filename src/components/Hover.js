@@ -14,6 +14,18 @@ const docstring =
   "\nReturns:" +
   "\n    The return value. True for success, False otherwise.";
 
+export const getDocstringJSX = docstring => {
+  const jsx = docstring.split("\n").map((line, index) => {
+    return (
+      <span key={index}>
+        {line}
+        <br />
+      </span>
+    );
+  });
+  return jsx;
+};
+
 class HoverBox extends React.Component {
   static propTypes = {
     elementText: PropTypes.string,
@@ -27,14 +39,6 @@ class HoverBox extends React.Component {
 
   render() {
     const padding = 20;
-    const docstringJSX = docstring.split("\n").map((line, index) => {
-      return (
-        <span key={index}>
-          {line}
-          <br />
-        </span>
-      );
-    });
     return (
       <div
         className="hover-box"
@@ -43,8 +47,8 @@ class HoverBox extends React.Component {
           top: this.props.mouseY + padding
         }}
       >
-        <div className="title">{this.props.elementText}</div>
-        <div className="docstring">{docstringJSX}</div>
+        <div className="title monospace">{this.props.elementText}</div>
+        <div className="docstring">{getDocstringJSX(docstring)}</div>
         <div className="filename">{this.props.filePath}</div>
         <div className="meta">
           {"Line: " +

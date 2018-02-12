@@ -7,7 +7,8 @@
     "jsonwebtoken": "^8.1.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.1.0"
+    "react-scripts": "1.1.0",
+    "react-syntax-highlighter": "^7.0.0"
   },
   "config": {
     "pack": "build/. -p test_key.pem -o dist/mercury.crx"

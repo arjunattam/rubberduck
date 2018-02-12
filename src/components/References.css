@@ -1,0 +1,11 @@
+.reference-item {
+  padding: 2px;
+  margin: 4px;
+  border: 1px solid #c8e1ff;
+  min-height: 90px;
+  width: 218px;
+}
+
+.reference-item p {
+  margin-bottom: 2px;
+}

@@ -21,3 +21,8 @@ body {
   height: 100%;
   overflow: auto;
 }
+
+.monospace {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
+    monospace;
+}

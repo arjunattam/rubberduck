@@ -6,6 +6,7 @@ import Tree from "./components/Tree";
 import StatusBar from "./components/StatusBar";
 import CollapseButton from "./components/CollapseButton";
 import References from "./components/References";
+import Definitions from "./components/Definitions";
 import HoverListener from "./components/Hover";
 import { getRepoFromPath } from "./adapters/github/path";
 import { updateLayout } from "./adapters/github/layout";
@@ -58,6 +59,7 @@ class Sidebar extends React.Component {
           </Title>
           <Tree {...this.state} />
           <References />
+          <Definitions />
           <HoverListener />
           <StatusBar />
         </div>
