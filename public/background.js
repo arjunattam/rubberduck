@@ -11,7 +11,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
   chrome.tabs.executeScript(
     tabId,
-    { code: injectFlagCode, runAt: "document_start" },
+    { code: injectFlagCode, runAt: "document_end" },
     res => {
       if (chrome.runtime.lastError || res[0])
         // Don't continue if error (i.e. page isn't in permission list)

@@ -1,11 +1,44 @@
-.reference-item {
-  padding: 2px;
-  margin: 4px;
-  border: 1px solid #c8e1ff;
-  min-height: 90px;
-  width: 218px;
+.reference-container {
+  margin: 5px 0px 5px 0px;
 }
 
-.reference-item p {
-  margin-bottom: 2px;
+.reference-title {
+  height: 24px;
+  padding: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.reference-name {
+  font-weight: bold;
+}
+
+.reference-count {
+  color: #666;
+}
+
+.reference-line {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding: 5px 0px 5px 0px;
+}
+
+.reference-item {
+  min-height: 50px;
+  cursor: pointer;
+  border-top: 1px solid #c8e1ff;
+}
+
+.reference-item-line {
+  padding: 0px 0 5px 0;
+  width: 232px;
+}
+
+.reference-item-name {
+  padding: 5px;
+}
+
+.reference-item-file {
+  padding: 5px 5px 10px 5px;
+  color: #999;
 }
