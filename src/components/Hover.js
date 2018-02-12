@@ -21,15 +21,15 @@ class HoverBox extends React.Component {
     charNumber: PropTypes.number,
     filePath: PropTypes.string,
     fileSha: PropTypes.string,
-    mouseX: PropTypes.integer,
-    mouseY: PropTypes.integer
+    mouseX: PropTypes.number,
+    mouseY: PropTypes.number
   };
 
   render() {
     const padding = 20;
-    const docstringJSX = docstring.split("\n").map(line => {
+    const docstringJSX = docstring.split("\n").map((line, index) => {
       return (
-        <span>
+        <span key={index}>
           {line}
           <br />
         </span>
