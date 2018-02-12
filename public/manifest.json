@@ -15,7 +15,7 @@
     "https://github.com/*",
     "https://bitbucket.org/*",
     "http://localhost:8000/*",
-    "http://staging.codeview.io/*",
+    "https://www.codeview.io/*",
     "storage",
     "identity"
   ],
