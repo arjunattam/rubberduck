@@ -15,7 +15,6 @@ import { setLocal, getLocal } from "./utils/storage";
 
 class Sidebar extends React.Component {
   state = {
-    isValidPage: true,
     isVisible: false, // changed by toggleCollapse
     // This state is inferred from the window url
     // TODO(arjun): default state is a problem when we are on a non-repo github page
@@ -28,13 +27,10 @@ class Sidebar extends React.Component {
   componentDidMount() {
     this.getVisibleState();
     const repo = getRepoFromPath();
-    // TODO(arjun): branches with '/' are breaking (feature/accounts eg)
     const isEmpty = Object.keys(repo).length === 0;
 
     if (!isEmpty) {
       this.setState({ ...repo });
-    } else {
-      // this.setState({ isValidPage: false });
     }
   }
 
@@ -53,9 +49,6 @@ class Sidebar extends React.Component {
 
   render() {
     updateLayout(this.state.isVisible, 232); // 232 = sidebar width in pixels
-    if (!this.state.isValidPage) {
-      return null;
-    }
 
     if (this.state.isVisible) {
       return (
