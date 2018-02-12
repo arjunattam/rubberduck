@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "mercury",
   "description": "Chrome extension for mercury",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "browser_action": {
     "default_icon": "favicon.ico",
     "default_popup": "index.html"
