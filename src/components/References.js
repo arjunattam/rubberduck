@@ -1,9 +1,10 @@
 import React from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { github as githubStyle } from "react-syntax-highlighter/styles/hljs";
-import Octicon from "react-component-octicons";
+
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
+import CodeNode from "./common/CodeNode";
 import "./References.css";
 
 const references = [
@@ -59,19 +60,18 @@ class ReferenceItem extends React.Component {
         onMouseLeave={this.handleMouseHover}
         ref={"container"}
       >
-        <div className="reference-item-name">
-          <span class="monospace">{this.props.name}</span>
-        </div>
+        <CodeNode {...this.props} />
 
-        <div className="reference-item-file">
-          <Octicon name="file" /> {this.props.file}
-        </div>
-
-        <div className="reference-item-line">
-          <SyntaxHighlighter language={"python"} style={githubStyle}>
+        {/* <div className="reference-item-line">
+          <SyntaxHighlighter
+            language={"python"}
+            style={githubStyle}
+            showLineNumbers={true}
+            startingLineNumber={this.props.lineNumber}
+          >
             {this.props.lineTrimmed}
           </SyntaxHighlighter>
-        </div>
+        </div> */}
 
         {this.state.isHovering ? (
           <ExpandedCode

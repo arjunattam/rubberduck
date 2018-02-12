@@ -3,18 +3,8 @@
   cursor: pointer;
 }
 
-.definition-name {
-  margin-top: 5px;
-  padding: 5px;
-  border-bottom: 1px solid #c8e1ff;
-}
-
 .definition-docstring {
   background: #f1f8ff;
   padding: 10px 5px 10px 5px;
   border-bottom: 1px solid #c8e1ff;
-}
-
-.definition-filepath {
-  padding: 5px;
 }

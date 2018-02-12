@@ -1,0 +1,20 @@
+.code-node-name {
+  padding: 0px 0px 5px 20px;
+  font-size: 15px;
+}
+
+.code-node-file {
+  padding: 12px 5px 0px 5px;
+  color: #999;
+  font-size: 11px;
+}
+
+.code-node-button {
+  background: #eee;
+  width: 75px;
+  text-align: center;
+  border-radius: 10px;
+  padding: 1px 4px 1px 4px;
+  font-size: 12px;
+  margin: 0px 0px 12px 20px;
+}

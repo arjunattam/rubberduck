@@ -17,12 +17,6 @@
   color: #666;
 }
 
-.reference-line {
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  padding: 5px 0px 5px 0px;
-}
-
 .reference-item {
   min-height: 50px;
   cursor: pointer;
@@ -32,13 +26,4 @@
 .reference-item-line {
   padding: 0px 0 5px 0;
   width: 232px;
-}
-
-.reference-item-name {
-  padding: 5px;
-}
-
-.reference-item-file {
-  padding: 5px 5px 10px 5px;
-  color: #999;
 }

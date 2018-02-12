@@ -2,11 +2,12 @@ import React from "react";
 import { getDocstringJSX } from "./Hover";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
+import CodeNode from "./common/CodeNode";
 import "./Definitions.css";
 
 const definitionName = "PythonLSClient";
-
 const baseName = "BaseLSClient";
+const filepath = "apps/ls_clients/python.py";
 
 const definitionDocstring =
   "Class that maintains the client and server lifecycle\n" +
@@ -44,18 +45,18 @@ class DefinitionItem extends React.Component {
         onMouseLeave={this.handleMouseHover}
         ref={"container"}
       >
-        <div className="definition-name monospace">{definitionName}</div>
+        <CodeNode name={definitionName} file={filepath} />
+
         <div className="definition-docstring">
           {getDocstringJSX(definitionDocstring)}
         </div>
-        <div className="definition-filepath">{"apps/ls_clients/python.py"}</div>
 
         {this.state.isHovering ? (
           <ExpandedCode
             codeBase64={codeSnippet}
             top={this.getTop()}
             startLine={25}
-            filepath={"apps/ls_clients/python.py"}
+            filepath={filepath}
           />
         ) : null}
       </div>
@@ -65,7 +66,7 @@ class DefinitionItem extends React.Component {
 
 export default class Definitions extends React.Component {
   state = {
-    isVisible: false
+    isVisible: true
   };
 
   toggleVisibility = () => {
