@@ -5,7 +5,7 @@ import "./CodeNode.css";
 export default class CodeNode extends React.Component {
   render() {
     return (
-      <div>
+      <div className="code-node-container">
         <div className="code-node-file">
           <Octicon name="file" style={{ height: 12 }} /> {this.props.file}
         </div>

@@ -15,7 +15,7 @@ body {
   left: 0;
   width: 232px;
   z-index: 10000;
-  background: #fff;
+  background: rgb(250, 251, 252);
   border-right: #ccc solid 1px;
   font-size: 13px;
   height: 100%;

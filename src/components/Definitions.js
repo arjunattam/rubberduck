@@ -45,11 +45,11 @@ class DefinitionItem extends React.Component {
         onMouseLeave={this.handleMouseHover}
         ref={"container"}
       >
-        <CodeNode name={definitionName} file={filepath} />
-
-        <div className="definition-docstring">
-          {getDocstringJSX(definitionDocstring)}
-        </div>
+        <CodeNode name={definitionName} file={filepath}>
+          <div className="definition-docstring">
+            {getDocstringJSX(definitionDocstring)}
+          </div>
+        </CodeNode>
 
         {this.state.isHovering ? (
           <ExpandedCode
