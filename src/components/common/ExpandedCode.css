@@ -1,0 +1,42 @@
+.expanded-code {
+  width: 640px;
+  position: fixed;
+  top: 40px;
+  left: 236px;
+  z-index: 10000;
+  border: 1px solid #c8e1ff;
+  cursor: text;
+}
+
+.expanded-content {
+  min-height: 150px;
+  max-height: 400px;
+  overflow: auto;
+  background: #fff;
+}
+
+.expanded-title {
+  background: #f1f8ff;
+  border-bottom: 1px solid #c8e1ff;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: text;
+  display: flex;
+  justify-content: space-between;
+  color: #333;
+}
+
+.expanded-filepath {
+  padding-top: 1px;
+}
+
+.expanded-button {
+  background: #eee;
+  width: 75px;
+  text-align: center;
+  border-radius: 10px;
+  padding: 1px 4px 1px 4px;
+  font-size: 12px;
+  cursor: pointer;
+}

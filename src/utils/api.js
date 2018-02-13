@@ -27,7 +27,7 @@ export const getFilesTree = (username, reponame) => {
 };
 
 export const issueToken = clientId => {
-  const uri = "http://staging.codeview.io/api/token_issue/";
+  const uri = "https://www.codeview.io/api/token_issue/";
   return axios.post(uri, { client_id: clientId });
 };
 
@@ -38,11 +38,11 @@ export const backgroundPost = (url, data, cb) => {
 };
 
 export const issueTokenBackground = (clientId, cb) => {
-  const uri = "http://staging.codeview.io/api/token_issue/";
+  const uri = "https://www.codeview.io/api/token_issue/";
   return backgroundPost(uri, { client_id: clientId }, cb);
 };
 
 export const refreshTokenBackground = (token, cb) => {
-  const uri = "http://staging.codeview.io/api/token_refresh/";
+  const uri = "https://www.codeview.io/api/token_refresh/";
   return backgroundPost(uri, { token: token }, cb);
 };

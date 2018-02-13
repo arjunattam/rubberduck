@@ -37,54 +37,74 @@ const checkIfSkipped = () => {
   return false;
 };
 
-export const getRepoFromPath = () => {
-  try {
-    // (username)/(reponame)[/(type)][/(typeId)]
-    const match = window.location.pathname.match(
-      /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?/
-    );
+const getBranch = () => {
+  // Get branch by inspecting page, quite fragile so provide multiple fallbacks
+  // From https://github.com/buunguyen/octotree/blob/master/src/adapters/github.js#L116
+  // There are some more handled cases in Octotree
+  const codePageSelector = document.querySelector(
+    ".branch-select-menu .select-menu-item.selected"
+  );
+  let codePageBranch = null;
 
-    if (checkIfSkipped()) {
-      return {};
-    }
-
-    const username = match[1];
-    const reponame = match[2];
-    const type = match[3];
-    const typeId = match[4];
-
-    if (
-      ~GH_RESERVED_USER_NAMES.indexOf(username) ||
-      ~GH_RESERVED_REPO_NAMES.indexOf(reponame)
-    ) {
-      // Not a repository, skip
-      return {};
-    }
-
-    // Check if this is a PR and whether we should show changes
-    const isPR = type === "pull";
-    const pullNumber = isPR ? typeId : null;
-
-    return {
-      username: username,
-      reponame: reponame,
-      type: type,
-      typeId: typeId
-    };
-  } catch (err) {
-    // This happens when we open the react page for development
-    // before loading the extension
-    console.log("getRepoFromPath crashed");
-    return {};
+  if (codePageSelector !== null) {
+    codePageBranch = codePageSelector.getAttribute("data-name");
   }
+
+  const prPageSelector = document.querySelector(".commit-ref.base-ref");
+  let prPageBranch = null;
+
+  if (prPageSelector !== null) {
+    prPageBranch = prPageSelector.getAttribute("title");
+  }
+
+  return codePageBranch || prPageBranch;
 };
 
-export const constructPath = (subPath, orgname, reponame, typeId) => {
-  // return relative path which follows a domain name, like
-  // github.com, from given sub-path
-  if (typeId === undefined) {
-    typeId = "master";
+export const getRepoFromPath = () => {
+  // (username)/(reponame)[/(type)][/(typeId)][/(filePath)]
+  const match = window.location.pathname.match(
+    // /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?(?:\/(.+))?/
+    /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?/
+  );
+
+  if (checkIfSkipped()) {
+    return {};
   }
 
-  return "/" + orgname + "/" + reponame + "/blob/" + typeId + "/" + subPath;
+  const username = match[1];
+  const reponame = match[2];
+  const type = match[3];
+  const typeId = match[4];
+  const path = match[5];
+
+  if (
+    ~GH_RESERVED_USER_NAMES.indexOf(username) ||
+    ~GH_RESERVED_REPO_NAMES.indexOf(reponame)
+  ) {
+    // Not a repository, skip
+    return {};
+  }
+
+  // Check if this is a PR and whether we should show changes
+  const isPR = type === "pull";
+  const pullNumber = isPR ? typeId : null;
+
+  return {
+    username: username,
+    reponame: reponame,
+    type: type,
+    typeId: typeId,
+    branch: getBranch(),
+    path: path
+  };
+};
+
+export const constructPath = (subPath, orgname, reponame, branch) => {
+  // return relative path which follows a domain name, like
+  // github.com, from given sub-path
+  if (branch === undefined) {
+    branch = "master";
+  }
+
+  return "/" + orgname + "/" + reponame + "/blob/" + branch + "/" + subPath;
 };

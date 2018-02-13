@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "mercury",
   "description": "Chrome extension for mercury",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "browser_action": {
     "default_icon": "favicon.ico",
     "default_popup": "index.html"
@@ -15,7 +15,7 @@
     "https://github.com/*",
     "https://bitbucket.org/*",
     "http://localhost:8000/*",
-    "http://staging.codeview.io/*",
+    "https://www.codeview.io/*",
     "storage",
     "identity"
   ],

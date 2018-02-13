@@ -1,29 +1,15 @@
 .tree-container {
   overflow-x: hidden;
+  background: #fff;
 }
 
 .tree-content {
   margin-bottom: 10px;
 }
 
-.tree-header {
-  text-transform: uppercase;
-  font-size: 11px;
-  height: 15px;
-  padding: 2px 0px 2px 10px;
-  font-weight: bold;
-  background: #f1f8ff;
-  border-top: 1px solid #c8e1ff;
-  border-bottom: 1px solid #c8e1ff;
-  cursor: pointer;
-}
-
 .file-container {
-  margin-top: 6px;
-}
-
-.file-container .mono {
-  font-family: monospace;
+  font-size: 14px;
+  margin-top: 1px;
 }
 
 .file-container a {
@@ -37,18 +23,4 @@
 .file-container a:hover {
   background: #eee;
   text-decoration: none;
-}
-
-.reference-item {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-    monospace;
-  padding: 2px;
-  margin: 4px;
-  border: 1px solid #c8e1ff;
-  min-height: 90px;
-  width: 218px;
-}
-
-.reference-item p {
-  margin-bottom: 2px;
 }

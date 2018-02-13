@@ -1,0 +1,23 @@
+.definitions-section {
+  background: rgb(250, 251, 252);
+  padding-bottom: 20px;
+}
+
+.definition-item {
+  background: #fff;
+  min-height: 90px;
+  cursor: pointer;
+  border-top: 1px solid #f1f8ff;
+  border-bottom: 1px solid #f1f8ff;
+}
+
+.definition-item:hover {
+  border-top: 1px solid #c8e1ff;
+  border-bottom: 1px solid #c8e1ff;
+}
+
+.definition-docstring {
+  background: #f1f8ff;
+  padding: 10px;
+  margin: 5px 0px 5px 0px;
+}
