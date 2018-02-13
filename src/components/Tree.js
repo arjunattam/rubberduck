@@ -1,5 +1,5 @@
 import React from "react";
-import { getFilesTree } from "./../utils/api";
+import { API } from "./../utils/api";
 import { getChildren } from "./../utils/data";
 import { constructPath } from "./../adapters/github/path";
 import SectionHeader from "./common/Section";
@@ -123,7 +123,7 @@ export default class Tree extends React.Component {
 
   updateTree = () => {
     // TODO(arjun): add proper loader
-    getFilesTree(this.props.username, this.props.reponame)
+    API.getFilesTree(this.props.username, this.props.reponame)
       .then(response => {
         this.setState({
           data: getChildren(this.props.reponame, response.data.tree)
