@@ -34,7 +34,7 @@ class DefinitionItem extends React.Component {
   };
 
   getTop = () => {
-    return this.refs.container.getBoundingClientRect().top - 4;
+    return this.refs.container.getBoundingClientRect().top;
   };
 
   render() {
