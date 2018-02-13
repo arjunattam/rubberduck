@@ -2,7 +2,10 @@ import React from "react";
 import PropTypes from "prop-types";
 import { listener as blobListener } from "./../adapters/github/views/blob";
 import { listener as pullListener } from "./../adapters/github/views/pull";
+import { API } from "./../utils/api";
 import "./Hover.css";
+
+const sessionId = "abcd";
 
 const docstring =
   "Example function with PEP 484 type annotations." +
@@ -71,7 +74,26 @@ export default class HoverListener extends React.Component {
 
   receiver = result => {
     // Callback for the hover listener
-    this.setState(result);
+    const isValidResult =
+      result.hasOwnProperty("fileSha") && result.hasOwnProperty("lineNumber");
+
+    if (isValidResult) {
+      API.getHover(
+        sessionId,
+        result.fileSha,
+        result.filePath,
+        result.lineNumber,
+        result.charNumber
+      )
+        .then(response => {
+          console.log("response", response);
+          this.setState(result);
+          // TODO(arjun): handle response
+        })
+        .catch(error => {
+          console.log("Error in API call", error);
+        });
+    }
   };
 
   setupListener = () => {

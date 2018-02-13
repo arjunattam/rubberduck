@@ -16,6 +16,7 @@ export const getParameterByName = (name, url) => {
   if (!results[2]) return "";
   return decodeURIComponent(results[2].replace(/\+/g, " "));
 };
+
 export class BaseRequest {
   baseRequest;
   constructor() {
@@ -27,9 +28,9 @@ export class BaseRequest {
 
   getAPIUrl() {
     let baseURL = `http://localhost:8000/api/`;
-    if (process.env.NODE_ENV === "production") {
-      baseURL = `https://www.codeview.io/api/`;
-    }
+    // if (process.env.NODE_ENV === "production") {
+    baseURL = `https://www.codeview.io/api/`;
+    // }
     return baseURL;
   }
 
@@ -103,6 +104,40 @@ export class BaseAPI {
   createSession(pull_request_id, organisation, name) {
     const uri = "/session/";
     return this.baseRequest.post(uri, { pull_request_id, organisation, name });
+  }
+
+  getHover(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
+    const queryParams = {
+      is_base_repo: baseOrHead === "base" ? "true" : "false",
+      location_id: `${filePath}#L${lineNumber}#C${charNumber}`
+    };
+    const uri = `sessions/${sessionId}/hover/?${encodeQueryData(queryParams)}`;
+    console.log(uri);
+    return this.baseRequest.fetch(uri);
+  }
+
+  getReferences(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
+    const queryParams = {
+      is_base_repo: baseOrHead === "base" ? "true" : "false",
+      location_id: `${filePath}#L${lineNumber}#C${charNumber}`
+    };
+    const uri = `sessions/${sessionId}/references/?${encodeQueryData(
+      queryParams
+    )}`;
+    console.log(uri);
+    return this.baseRequest.fetch(uri);
+  }
+
+  getDefinition(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
+    const queryParams = {
+      is_base_repo: baseOrHead === "base" ? "true" : "false",
+      location_id: `${filePath}#L${lineNumber}#C${charNumber}`
+    };
+    const uri = `sessions/${sessionId}/definition/?${encodeQueryData(
+      queryParams
+    )}`;
+    console.log(uri);
+    return this.baseRequest.fetch(uri);
   }
 }
 

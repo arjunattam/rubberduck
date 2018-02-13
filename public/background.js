@@ -134,3 +134,24 @@ function getAjax(data, success) {
   xhr.send();
   return xhr;
 }
+
+// Setup context menu for references/definitions
+chrome.contextMenus.create({
+  title: "Find references",
+  id: "find-references",
+  contexts: ["page", "selection"]
+});
+
+chrome.contextMenus.create({
+  title: "Peek definition",
+  id: "peek-definition",
+  contexts: ["page", "selection"]
+});
+
+chrome.contextMenus.onClicked.addListener(function(info, tab) {
+  if (info.menuItemId === "find-references") {
+    console.log("yay!");
+  } else if (info.menuItemId === "peek-definition") {
+    console.log("nay!");
+  }
+});

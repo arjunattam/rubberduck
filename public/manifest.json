@@ -17,7 +17,8 @@
     "http://localhost:8000/*",
     "https://www.codeview.io/*",
     "storage",
-    "identity"
+    "identity",
+    "contextMenus"
   ],
   "update_url": "http://www.example.com/update.xml"
 }
