@@ -58,7 +58,7 @@ class Sidebar extends React.Component {
             <CollapseButton onClick={this.toggleCollapse} isVisible={true} />
           </Title>
           <Tree {...this.state} />
-          <References />
+          <References selectionX={606} selectionY={448} />
           <Definitions />
           <HoverListener />
           <StatusBar />

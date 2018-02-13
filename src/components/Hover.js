@@ -87,12 +87,15 @@ export default class HoverListener extends React.Component {
       )
         .then(response => {
           console.log("response", response);
-          this.setState(result);
           // TODO(arjun): handle response
         })
         .catch(error => {
           console.log("Error in API call", error);
+          // Use dummy data for now
+          this.setState(result);
         });
+    } else {
+      this.setState({ mouseX: -1000, mouseY: -1000 });
     }
   };
 

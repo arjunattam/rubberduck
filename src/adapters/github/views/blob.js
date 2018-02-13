@@ -47,7 +47,7 @@ const isValidResult = result => {
   });
 };
 
-const parseCommonAncestor = (element, x, y, callback) => {
+const parseCommonAncestor = (element, x, y) => {
   const node = element.parentNode;
   const { typeId } = getRepoFromPath(); // sha id from window url
   const result = {
@@ -61,13 +61,9 @@ const parseCommonAncestor = (element, x, y, callback) => {
   };
 
   if (isValidResult(result)) {
-    callback(result);
+    return result;
   } else {
-    // To make the hover box disappear from the view :(
-    callback({
-      mouseX: -1000,
-      mouseY: -1000
-    });
+    return {};
   }
 };
 
@@ -76,8 +72,13 @@ const stripPx = value => {
   return +value.replace("px", "");
 };
 
-export const listener = (event, callback) => {
-  const range = document.caretRangeFromPoint(event.x, event.y);
+export const readXY = (mouseX, mouseY) => {
+  const range = document.caretRangeFromPoint(mouseX, mouseY);
   const rangeElement = range.commonAncestorContainer;
-  parseCommonAncestor(rangeElement, event.x, event.y, callback);
+  return parseCommonAncestor(rangeElement, mouseX, mouseY);
+};
+
+export const listener = (event, callback) => {
+  const result = readXY(event.x, event.y);
+  callback(result);
 };

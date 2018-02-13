@@ -1,10 +1,12 @@
 import React from "react";
+import PropTypes from "prop-types";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { github as githubStyle } from "react-syntax-highlighter/styles/hljs";
-
+import { readXY } from "./../adapters/github/views/pull";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import CodeNode from "./common/CodeNode";
+import { API } from "./../utils/api";
 import "./References.css";
 
 const references = [
@@ -88,8 +90,49 @@ class ReferenceItem extends React.Component {
 }
 
 export default class References extends React.Component {
+  // This gets x and y of the selected text, constructs the
+  // API call payload by reading DOM, and then display the
+  // result of the API call.
+  static propTypes = {
+    selectionX: PropTypes.number.isRequired,
+    selectionY: PropTypes.number.isRequired
+  };
+
   state = {
-    isVisible: false
+    isVisible: true,
+    references: []
+  };
+
+  getSelectionData = () => {
+    // Assumes PR view and gets file name, line number etc
+    // from selection x and y
+    const result = readXY(this.props.selectionX, this.props.selectionY);
+
+    const isValidResult =
+      result.hasOwnProperty("fileSha") && result.hasOwnProperty("lineNumber");
+
+    if (isValidResult) {
+      API.getReferences(
+        "abcd",
+        result.fileSha,
+        result.filePath,
+        result.lineNumber,
+        result.charNumber
+      )
+        .then(response => {
+          console.log("response", response);
+        })
+        .catch(error => {
+          console.log("error", error);
+          // Use dummy data for now
+          this.setState({ references: references });
+        });
+    }
+  };
+
+  componentDidMount = () => {
+    // We have props, so we will make an API call to get data
+    this.getSelectionData();
   };
 
   toggleVisibility = () => {
@@ -99,7 +142,7 @@ export default class References extends React.Component {
   };
 
   render() {
-    const referenceItems = references.map((reference, index) => {
+    const referenceItems = this.state.references.map((reference, index) => {
       return <ReferenceItem {...reference} key={index} />;
     });
 
