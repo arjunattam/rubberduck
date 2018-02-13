@@ -53,6 +53,16 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   return true;
 });
 
+const sendMessageToCurrentTab = (action, data) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.sendMessage(
+      tabs[0].id,
+      { action: action, data: data },
+      res => {}
+    );
+  });
+};
+
 // Handler for the launch auth flow message
 const triggerAuthFlow = (data, callback) => {
   // data must have url
