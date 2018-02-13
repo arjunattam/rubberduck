@@ -4,6 +4,7 @@ import { listener as blobListener } from "./../adapters/github/views/blob";
 import { listener as pullListener } from "./../adapters/github/views/pull";
 import { API } from "./../utils/api";
 import "./Hover.css";
+import Docstring from "./common/Docstring";
 
 const sessionId = "abcd";
 
@@ -16,18 +17,6 @@ const docstring =
   "\n" +
   "\nReturns:" +
   "\n    The return value. True for success, False otherwise.";
-
-export const getDocstringJSX = docstring => {
-  const jsx = docstring.split("\n").map((line, index) => {
-    return (
-      <span key={index}>
-        {line}
-        <br />
-      </span>
-    );
-  });
-  return jsx;
-};
 
 class HoverBox extends React.Component {
   static propTypes = {
@@ -51,7 +40,7 @@ class HoverBox extends React.Component {
         }}
       >
         <div className="title monospace">{this.props.elementText}</div>
-        <div className="docstring">{getDocstringJSX(docstring)}</div>
+        <div className="docstring">{Docstring(docstring)}</div>
         <div className="filename">{this.props.filePath}</div>
         <div className="meta">
           {"Line: " +

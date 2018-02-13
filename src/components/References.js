@@ -1,7 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { github as githubStyle } from "react-syntax-highlighter/styles/hljs";
 import { readXY } from "./../adapters/github/views/pull";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
@@ -63,17 +61,6 @@ class ReferenceItem extends React.Component {
         ref={"container"}
       >
         <CodeNode {...this.props} />
-
-        {/* <div className="reference-item-line">
-          <SyntaxHighlighter
-            language={"python"}
-            style={githubStyle}
-            showLineNumbers={true}
-            startingLineNumber={this.props.lineNumber}
-          >
-            {this.props.lineTrimmed}
-          </SyntaxHighlighter>
-        </div> */}
 
         {this.state.isHovering ? (
           <ExpandedCode

@@ -59,7 +59,7 @@ class Sidebar extends React.Component {
           </Title>
           <Tree {...this.state} />
           <References selectionX={606} selectionY={448} />
-          <Definitions />
+          <Definitions selectionX={606} selectionY={448} />
           <HoverListener />
           <StatusBar />
         </div>
