@@ -8,8 +8,6 @@
 }
 
 .hover-box .title {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
-    monospace;
   background: #fff;
   padding: 10px;
   border-bottom: solid 1px #c8e1ff;

@@ -43,6 +43,12 @@ const updateBackground = () => {
   });
 };
 
+const getGitBranch = () => {
+  return require("child_process")
+    .execSync("git rev-parse --abbrev-ref HEAD", { encoding: "utf-8" })
+    .replace(/\s+/, "");
+};
+
 const updateManifestKey = () => {
   // Add manifest key to the manifest.json file so that we
   // preserve extension id during development cycles
@@ -50,6 +56,8 @@ const updateManifestKey = () => {
   const manifest = "./build/manifest.json";
   let manifestContents = JSON.parse(fs.readFileSync(manifest, "utf8"));
   manifestContents.key = manifestKey;
+  manifestContents.version_name =
+    manifestContents.version + " " + getGitBranch();
   // Write back new object
   fs.writeFile(manifest, JSON.stringify(manifestContents), function(err) {
     if (err) {

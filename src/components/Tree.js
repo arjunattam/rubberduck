@@ -2,6 +2,7 @@ import React from "react";
 import { getFilesTree } from "./../utils/api";
 import { getChildren } from "./../utils/data";
 import { constructPath } from "./../adapters/github/path";
+import SectionHeader from "./common/Section";
 import "./Tree.css";
 
 const renderChildren = (children, depth, parentProps) => {
@@ -79,7 +80,9 @@ class Folder extends React.Component {
     return (
       <div className="file-container">
         <a onClick={this.toggleCollapsed} style={{ paddingLeft: pl }}>
-          <span className="mono">{this.state.isCollapsed ? "+ " : "- "}</span>
+          <span className="monospace">
+            {this.state.isCollapsed ? "+ " : "- "}
+          </span>
           {this.props.name}
         </a>
         {this.state.isCollapsed ? null : renderedChildren}
@@ -115,7 +118,7 @@ class File extends React.Component {
 export default class Tree extends React.Component {
   state = {
     data: { children: [] },
-    isVisible: true
+    isVisible: false
   };
 
   updateTree = () => {
@@ -151,26 +154,20 @@ export default class Tree extends React.Component {
   render() {
     // data is a recursive tree structure, where every element
     // has children, that denote the subtree
-    if (this.state.isVisible) {
-      const children = this.state.data.children;
-      const renderedChildren = renderChildren(children, 0, this.props);
+    const children = this.state.data.children;
+    const renderedChildren = renderChildren(children, 0, this.props);
 
-      return (
-        <div className="tree-container">
-          <div className="tree-header" onClick={this.toggleVisibility}>
-            ▼ Files tree
-          </div>
+    return (
+      <div className="tree-container">
+        <SectionHeader
+          onClick={this.toggleVisibility}
+          isVisible={this.state.isVisible}
+          name={"Files tree"}
+        />
+        {this.state.isVisible ? (
           <div className="tree-content">{renderedChildren}</div>
-        </div>
-      );
-    } else {
-      return (
-        <div className="tree-container">
-          <div className="tree-header" onClick={this.toggleVisibility}>
-            ▷ Files tree
-          </div>
-        </div>
-      );
-    }
+        ) : null}
+      </div>
+    );
   }
 }

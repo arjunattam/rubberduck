@@ -11,28 +11,24 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
   chrome.tabs.executeScript(
     tabId,
-    { code: injectFlagCode, runAt: "document_start" },
+    { code: injectFlagCode, runAt: "document_end" },
     res => {
       if (chrome.runtime.lastError || res[0])
         // Don't continue if error (i.e. page isn't in permission list)
         // Or if the value of `injected` above: we don't want to inject twice
         return;
 
-      // TODO(arjun): there is an insertBefore sporadic issue that breaks
-      // because document.body is not loaded. Need to investigate. Might have to
-      // change document_start runAt flag.
-
       if (jsLocation !== null) {
         chrome.tabs.executeScript(tabId, {
           file: jsLocation,
-          runAt: "document_start"
+          runAt: "document_end"
         });
       }
 
       if (cssLocation !== null) {
         chrome.tabs.insertCSS(tabId, {
           file: cssLocation,
-          runAt: "document_start"
+          runAt: "document_end"
         });
       }
     }
