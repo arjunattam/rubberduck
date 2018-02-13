@@ -1,10 +1,6 @@
 import React from "react";
 import "./StatusBar.css";
-import {
-  getParameterByName,
-  issueTokenBackground,
-  refreshTokenBackground
-} from "./../utils/api";
+import { API, getParameterByName } from "./../utils/api";
 import { setInStore, getFromStore } from "./../utils/storage";
 import { getRandomToken, triggerOAuthFlow, decodeJWT } from "./../utils/auth";
 
@@ -43,7 +39,7 @@ export default class StatusBar extends React.Component {
         if (value === null) {
           // Cannot use axios http call because domain is not https
           /* issueToken(clientId) */
-          issueTokenBackground(clientId, response => {
+          API.issueTokenBackground(clientId, response => {
             const token = response.token;
             resolve(token);
           });
@@ -68,7 +64,7 @@ export default class StatusBar extends React.Component {
     // Use the existing jwt to get a refreshed token, with
     // an extended expiry. To be safe, this is triggered on every component
     // load for now. The jwt expiry is set at 3 days in the backend.
-    refreshTokenBackground(existingToken, response => {
+    API.refreshTokenBackground(existingToken, response => {
       const token = response.token;
       console.log("Successful token refresh");
       callback(token);
