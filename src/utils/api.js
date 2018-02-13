@@ -26,7 +26,7 @@ export class BaseRequest {
   }
 
   getAPIUrl() {
-    let baseURL = `http://${window.location.hostname}:8000/api/`;
+    let baseURL = `http://localhost:8000/api/`;
     if (process.env.NODE_ENV === "production") {
       baseURL = `https://www.codeview.io/api/`;
     }
@@ -68,6 +68,12 @@ export class BaseAPI {
     this.baseURI = this.baseRequest.getAPIUrl();
   }
 
+  backgroundPost(url, data, cb) {
+    // Send message to background page to make HTTP call
+    const message = constructMessage("HTTP_POST", { url: url, data: data });
+    sendMessage(message, cb);
+  }
+
   getFilesTree(username, reponame) {
     const uri =
       "/repos/" + username + "/" + reponame + "/git/trees/master?recursive=1";
@@ -79,25 +85,24 @@ export class BaseAPI {
     });
   }
 
+  issueTokenBackground(clientId, cb) {
+    const uri = `${this.baseURI}token_issue/`;
+    return this.backgroundPost(uri, { client_id: clientId }, cb);
+  }
+
+  refreshTokenBackground(token, cb) {
+    const uri = `${this.baseURI}token_refresh/`;
+    return this.backgroundPost(uri, { token: token }, cb);
+  }
+
   issueToken(clientId) {
     const uri = "/token_issue/";
     return this.baseRequest.post(uri, { client_id: clientId });
   }
 
-  backgroundPost(url, data, cb) {
-    // Send message to background page to make HTTP call
-    const message = constructMessage("HTTP_POST", { url: url, data: data });
-    sendMessage(message, cb);
-  }
-
-  issueTokenBackground(clientId, cb) {
-    const uri = `${this.baseURI()}token_issue/`;
-    return this.backgroundPost(uri, { client_id: clientId }, cb);
-  }
-
-  refreshTokenBackground(token, cb) {
-    const uri = `${this.baseURI()}token_refresh/`;
-    return this.backgroundPost(uri, { token: token }, cb);
+  createSession(pull_request_id, organisation, name) {
+    const uri = "/session/";
+    return this.baseRequest.post(uri, { pull_request_id, organisation, name });
   }
 }
 
