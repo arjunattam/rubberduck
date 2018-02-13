@@ -89,7 +89,7 @@ class ReferenceItem extends React.Component {
 
 export default class References extends React.Component {
   state = {
-    isVisible: true
+    isVisible: false
   };
 
   toggleVisibility = () => {

@@ -118,7 +118,7 @@ class File extends React.Component {
 export default class Tree extends React.Component {
   state = {
     data: { children: [] },
-    isVisible: false
+    isVisible: true
   };
 
   updateTree = () => {

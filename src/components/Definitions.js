@@ -66,7 +66,7 @@ class DefinitionItem extends React.Component {
 
 export default class Definitions extends React.Component {
   state = {
-    isVisible: true
+    isVisible: false
   };
 
   toggleVisibility = () => {
