@@ -107,7 +107,7 @@ const isValidResult = result => {
 
 const parseCommonAncestor = (element, x, y) => {
   const result = {
-    elementText: element.nodeValue,
+    name: element.nodeValue,
     filePath: getFileUri(element),
     fileSha: getHeadOrBase(element),
     lineNumber: getLineNumber(element),

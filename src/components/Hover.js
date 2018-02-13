@@ -20,7 +20,7 @@ const docstring =
 
 class HoverBox extends React.Component {
   static propTypes = {
-    elementText: PropTypes.string,
+    name: PropTypes.string,
     lineNumber: PropTypes.number,
     charNumber: PropTypes.number,
     filePath: PropTypes.string,
@@ -39,7 +39,7 @@ class HoverBox extends React.Component {
           top: this.props.mouseY + padding
         }}
       >
-        <div className="title monospace">{this.props.elementText}</div>
+        <div className="title monospace">{this.props.name}</div>
         <div className="docstring">{Docstring(docstring)}</div>
         <div className="filename">{this.props.filePath}</div>
         <div className="meta">

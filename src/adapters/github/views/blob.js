@@ -1,6 +1,6 @@
 // Github blob (file view) view handler
 // Exports a hover listener method with a callback param
-// Callback gets object: filePath, fileSha, lineNumber, charNumber, elementText
+// Callback gets object: filePath, fileSha, lineNumber, charNumber, name
 import { getRepoFromPath } from "../path";
 
 const getFileUri = (node, shaId) => {
@@ -51,7 +51,7 @@ const parseCommonAncestor = (element, x, y) => {
   const node = element.parentNode;
   const { typeId } = getRepoFromPath(); // sha id from window url
   const result = {
-    elementText: element.nodeValue,
+    name: element.nodeValue,
     filePath: getFileUri(node, typeId),
     fileSha: typeId,
     lineNumber: getLineNumber(node),
