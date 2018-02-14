@@ -26,6 +26,14 @@ export class BaseRequest {
     });
   }
 
+  updateDefaultHeader(token) {
+    if (token) {
+      this.baseRequest.defaults.headers.common[
+        "Authorization"
+      ] = `token ${token}`;
+    }
+  }
+
   getAPIUrl() {
     let baseURL = `http://localhost:8000/api/`;
     // if (process.env.NODE_ENV === "production") {
@@ -67,6 +75,12 @@ export class BaseAPI {
   constructor() {
     this.baseRequest = new BaseRequest();
     this.baseURI = this.baseRequest.getAPIUrl();
+    Store.subscribe(() => this.updateBaseRequest());
+  }
+
+  updateBaseRequest() {
+    let token = Store.getState().auth.jwt;
+    this.baseRequest.updateDefaultHeader(token);
   }
 
   backgroundPost(url, data, cb) {

@@ -4,7 +4,7 @@ const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
-
+  console.log("Change info", changeInfo);
   // To ensure we don't inject the extension twice
   const injectFlagCode =
     "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;";
@@ -148,7 +148,6 @@ function postAjax(fulldata, success) {
       success(JSON.parse(xhr.responseText));
     }
   };
-  xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
   xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   xhr.send(params);
   return xhr;
@@ -163,7 +162,6 @@ function getAjax(data, success) {
   xhr.onreadystatechange = function() {
     if (xhr.readyState > 3 && xhr.status == 200) success(xhr.responseText);
   };
-  xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
   xhr.send();
   return xhr;
 }

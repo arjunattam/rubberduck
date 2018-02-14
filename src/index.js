@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
 import Sidebar from "./components/Sidebar";
+import store from "./store.js";
 // import registerServiceWorker from "./registerServiceWorker";
 
 const createSidebarContainer = () => {
@@ -13,7 +15,9 @@ export const renderSidebar = openSection => {
   const containerId = "mercury-sidebar";
 
   ReactDOM.render(
-    <Sidebar openSection={openSection} />,
+    <Provider store={store}>
+      <Sidebar openSection={openSection} />
+    </Provider>,
     document.getElementById(containerId)
   );
 };
