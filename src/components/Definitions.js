@@ -8,6 +8,8 @@ import Docstring from "./common/Docstring";
 import { API } from "./../utils/api";
 import "./Definitions.css";
 
+const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
+
 const definitionSample = {
   name: "PythonLSClient",
   baseName: "BaseLSClient",
@@ -46,7 +48,7 @@ class DefinitionItem extends React.Component {
           <div className="definition-docstring">
             {this.props.docstring
               ? Docstring(atob(this.props.docstring))
-              : null}
+              : "docstring goes here"}
           </div>
         </CodeNode>
 
@@ -101,26 +103,33 @@ export default class Definitions extends React.Component {
   getSelectionData = () => {
     // Assumes PR view and gets file name, line number etc
     // from selection x and y
-    const result = readXY(this.props.selectionX, this.props.selectionY);
+    const hoverResult = readXY(this.props.selectionX, this.props.selectionY);
 
     const isValidResult =
-      result.hasOwnProperty("fileSha") && result.hasOwnProperty("lineNumber");
+      hoverResult.hasOwnProperty("fileSha") &&
+      hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
       API.getDefinition(
-        "abcd",
-        result.fileSha,
-        result.filePath,
-        result.lineNumber,
-        result.charNumber
+        sessionId,
+        hoverResult.fileSha,
+        hoverResult.filePath,
+        hoverResult.lineNumber,
+        hoverResult.charNumber
       )
         .then(response => {
           console.log("response", response);
+          const definition = {
+            name: hoverResult.name,
+            filePath: response.result.definition.location.path,
+            lineNumber: response.result.definition.location.range.start.line,
+            docstring: response.result.docstring,
+            codeSnippet: response.result.definition.contents
+          };
+          this.setState({ definition: definition });
         })
         .catch(error => {
-          // console.log("error", error);
-          // Use dummy data for now
-          this.setState({ definition: definitionSample });
+          console.log("Error in API call", error);
         });
     }
   };
