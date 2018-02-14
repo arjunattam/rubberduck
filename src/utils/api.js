@@ -1,4 +1,5 @@
 import { sendMessage, constructMessage } from "./chrome";
+import Store from "../store";
 const axios = require("axios");
 
 export const encodeQueryData = data => {

@@ -1,5 +1,4 @@
 import { bindActionCreators } from "redux";
-const dispatch = Store.dispatch;
 
 export function updateJWT(data) {
   return {
