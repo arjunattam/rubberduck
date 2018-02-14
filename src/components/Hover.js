@@ -6,21 +6,12 @@ import { API } from "./../utils/api";
 import "./Hover.css";
 import Docstring from "./common/Docstring";
 
-const sessionId = "abcd";
-
-const docstring =
-  "Example function with PEP 484 type annotations." +
-  "\n" +
-  "\nArgs:" +
-  "\n    param1: The first parameter." +
-  "\n    param2: The second parameter." +
-  "\n" +
-  "\nReturns:" +
-  "\n    The return value. True for success, False otherwise.";
+const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
 
 class HoverBox extends React.Component {
   static propTypes = {
     name: PropTypes.string,
+    docstring: PropTypes.string,
     lineNumber: PropTypes.number,
     charNumber: PropTypes.number,
     filePath: PropTypes.string,
@@ -40,16 +31,10 @@ class HoverBox extends React.Component {
         }}
       >
         <div className="title monospace">{this.props.name}</div>
-        <div className="docstring">{Docstring(docstring)}</div>
-        <div className="filename">{this.props.filePath}</div>
-        <div className="meta">
-          {"Line: " +
-            this.props.lineNumber +
-            " Char: " +
-            this.props.charNumber +
-            " SHA: " +
-            this.props.fileSha}
+        <div className="docstring">
+          {Docstring(atob(this.props.docstring || ""))}
         </div>
+        <div className="filename">{this.props.filePath}</div>
       </div>
     );
   }
@@ -61,27 +46,32 @@ export default class HoverListener extends React.Component {
     mouseY: -1000
   };
 
-  receiver = result => {
+  receiver = hoverResult => {
     // Callback for the hover listener
     const isValidResult =
-      result.hasOwnProperty("fileSha") && result.hasOwnProperty("lineNumber");
+      hoverResult.hasOwnProperty("fileSha") &&
+      hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
       API.getHover(
         sessionId,
-        result.fileSha,
-        result.filePath,
-        result.lineNumber,
-        result.charNumber
+        hoverResult.fileSha,
+        hoverResult.filePath,
+        hoverResult.lineNumber,
+        hoverResult.charNumber
       )
         .then(response => {
-          console.log("response", response);
-          // TODO(arjun): handle response
+          this.setState({
+            name: response.result.name,
+            type: response.result.type,
+            docstring: response.result.docstring,
+            filePath: response.result.definition.location.path,
+            mouseX: hoverResult.mouseX,
+            mouseY: hoverResult.mouseY
+          });
         })
         .catch(error => {
-          // console.log("Error in API call", error);
-          // Use dummy data for now
-          this.setState(result);
+          console.log("Error in API call", error);
         });
     } else {
       this.setState({ mouseX: -1000, mouseY: -1000 });

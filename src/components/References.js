@@ -7,6 +7,8 @@ import CodeNode from "./common/CodeNode";
 import { API } from "./../utils/api";
 import "./References.css";
 
+const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
+
 const references = [
   {
     name: "send_shutdown",
@@ -90,30 +92,43 @@ export default class References extends React.Component {
     references: []
   };
 
+  getReferenceItems = apiResponse => {
+    return apiResponse.references.map(reference => {
+      return {
+        name: reference.parent.name,
+        file: reference.location.path,
+        lineNumber: reference.location.range.start.line,
+        codeSnippet: reference.contents
+      };
+    });
+  };
+
   getSelectionData = () => {
     // Assumes PR view and gets file name, line number etc
     // from selection x and y
-    const result = readXY(this.props.selectionX, this.props.selectionY);
-    console.log(result);
+    const hoverResult = readXY(this.props.selectionX, this.props.selectionY);
 
     const isValidResult =
-      result.hasOwnProperty("fileSha") && result.hasOwnProperty("lineNumber");
+      hoverResult.hasOwnProperty("fileSha") &&
+      hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
       API.getReferences(
-        "abcd",
-        result.fileSha,
-        result.filePath,
-        result.lineNumber,
-        result.charNumber
+        sessionId,
+        hoverResult.fileSha,
+        hoverResult.filePath,
+        hoverResult.lineNumber,
+        hoverResult.charNumber
       )
         .then(response => {
-          console.log("response", response);
+          this.setState({
+            name: hoverResult.name,
+            count: response.result.count,
+            references: this.getReferenceItems(response.result)
+          });
         })
         .catch(error => {
-          // console.log("error", error);
-          // Use dummy data for now
-          this.setState({ references: references });
+          console.log("Error in API call", error);
         });
     }
   };
@@ -154,8 +169,10 @@ export default class References extends React.Component {
         {this.state.isVisible ? (
           <div className="reference-container">
             <div className="reference-title">
-              <div className="reference-name monospace">send_message</div>
-              <div className="reference-count">3 references</div>
+              <div className="reference-name monospace">{this.state.name}</div>
+              <div className="reference-count">
+                {this.state.count} references
+              </div>
             </div>
             <div>{referenceItems}</div>{" "}
           </div>
