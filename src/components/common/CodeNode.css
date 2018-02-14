@@ -5,6 +5,9 @@
 .code-node-name {
   padding-left: 20px;
   font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .code-node-file {

@@ -46,6 +46,12 @@ export default class HoverListener extends React.Component {
     mouseY: -1000
   };
 
+  isOverlappingWithCurrent = (x, y) => {
+    const xdiff = Math.abs(x - this.state.currentMouseX);
+    const ydiff = Math.abs(y - this.state.currentMouseY);
+    return xdiff < 5 && ydiff < 5;
+  };
+
   receiver = hoverResult => {
     // Callback for the hover listener
     const isValidResult =
@@ -61,14 +67,23 @@ export default class HoverListener extends React.Component {
         hoverResult.charNumber
       )
         .then(response => {
-          this.setState({
-            name: response.result.name,
-            type: response.result.type,
-            docstring: response.result.docstring,
-            filePath: response.result.definition.location.path,
-            mouseX: hoverResult.mouseX,
-            mouseY: hoverResult.mouseY
-          });
+          if (
+            this.isOverlappingWithCurrent(
+              hoverResult.mouseX,
+              hoverResult.mouseY
+            )
+          ) {
+            // We will set state only if the current
+            // mouse location overlaps with the response
+            this.setState({
+              name: response.result.name,
+              type: response.result.type,
+              docstring: response.result.docstring,
+              filePath: response.result.definition.location.path,
+              mouseX: hoverResult.mouseX,
+              mouseY: hoverResult.mouseY
+            });
+          }
         })
         .catch(error => {
           console.log("Error in API call", error);
@@ -93,6 +108,10 @@ export default class HoverListener extends React.Component {
       const that = this;
       document.body.onmouseover = e => {
         listener(e, that.receiver);
+        this.setState({
+          currentMouseX: e.x,
+          currentMouseY: e.y
+        });
       };
     } else {
       document.body.onmouseover = null;
