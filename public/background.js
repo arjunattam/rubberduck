@@ -56,20 +56,20 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
 // Setup context menu for references/definitions
 chrome.contextMenus.create({
   title: "Find references",
-  id: "find-references",
+  id: "REFERENCES_TRIGGER",
   contexts: ["page", "selection"]
 });
 
 chrome.contextMenus.create({
   title: "Peek definition",
-  id: "peek-definition",
+  id: "DEFINITIONS_TRIGGER",
   contexts: ["page", "selection"]
 });
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
   if (
-    info.menuItemId === "find-references" ||
-    info.menuItemId === "peek-definition"
+    info.menuItemId === "REFERENCES_TRIGGER" ||
+    info.menuItemId === "DEFINITIONS_TRIGGER"
   ) {
     sendMessageToCurrentTab(info.menuItemId, {});
   }

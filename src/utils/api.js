@@ -112,7 +112,6 @@ export class BaseAPI {
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
     const uri = `sessions/${sessionId}/hover/?${encodeQueryData(queryParams)}`;
-    console.log(uri);
     return this.baseRequest.fetch(uri);
   }
 
@@ -124,7 +123,6 @@ export class BaseAPI {
     const uri = `sessions/${sessionId}/references/?${encodeQueryData(
       queryParams
     )}`;
-    console.log(uri);
     return this.baseRequest.fetch(uri);
   }
 
@@ -136,7 +134,6 @@ export class BaseAPI {
     const uri = `sessions/${sessionId}/definition/?${encodeQueryData(
       queryParams
     )}`;
-    console.log(uri);
     return this.baseRequest.fetch(uri);
   }
 }

@@ -81,12 +81,12 @@ export default class References extends React.Component {
   // API call payload by reading DOM, and then display the
   // result of the API call.
   static propTypes = {
-    selectionX: PropTypes.number.isRequired,
-    selectionY: PropTypes.number.isRequired
+    selectionX: PropTypes.number,
+    selectionY: PropTypes.number
   };
 
   state = {
-    isVisible: true,
+    isVisible: false,
     references: []
   };
 
@@ -94,6 +94,7 @@ export default class References extends React.Component {
     // Assumes PR view and gets file name, line number etc
     // from selection x and y
     const result = readXY(this.props.selectionX, this.props.selectionY);
+    console.log(result);
 
     const isValidResult =
       result.hasOwnProperty("fileSha") && result.hasOwnProperty("lineNumber");
@@ -110,17 +111,27 @@ export default class References extends React.Component {
           console.log("response", response);
         })
         .catch(error => {
-          console.log("error", error);
+          // console.log("error", error);
           // Use dummy data for now
           this.setState({ references: references });
         });
     }
   };
 
-  componentDidMount = () => {
-    // We have props, so we will make an API call to get data
-    this.getSelectionData();
-  };
+  componentWillReceiveProps(newProps) {
+    if (newProps.isVisible !== this.state.isVisible) {
+      this.setState({ isVisible: newProps.isVisible });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps.selectionX !== this.props.selectionX ||
+      prevProps.selectionY !== this.props.selectionY
+    ) {
+      this.getSelectionData();
+    }
+  }
 
   toggleVisibility = () => {
     this.setState({

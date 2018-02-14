@@ -79,7 +79,7 @@ export default class HoverListener extends React.Component {
           // TODO(arjun): handle response
         })
         .catch(error => {
-          console.log("Error in API call", error);
+          // console.log("Error in API call", error);
           // Use dummy data for now
           this.setState(result);
         });

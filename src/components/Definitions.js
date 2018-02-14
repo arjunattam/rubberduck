@@ -44,7 +44,9 @@ class DefinitionItem extends React.Component {
       >
         <CodeNode name={this.props.name} file={this.props.filePath}>
           <div className="definition-docstring">
-            {Docstring(atob(this.props.docstring))}
+            {this.props.docstring
+              ? Docstring(atob(this.props.docstring))
+              : null}
           </div>
         </CodeNode>
 
@@ -66,8 +68,8 @@ export default class Definitions extends React.Component {
   // API call payload by reading DOM, and then display the
   // result of the API call.
   static propTypes = {
-    selectionX: PropTypes.number.isRequired,
-    selectionY: PropTypes.number.isRequired
+    selectionX: PropTypes.number,
+    selectionY: PropTypes.number
   };
 
   state = {
@@ -80,6 +82,21 @@ export default class Definitions extends React.Component {
       isVisible: !this.state.isVisible
     });
   };
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.isVisible !== this.state.isVisible) {
+      this.setState({ isVisible: newProps.isVisible });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps.selectionX !== this.props.selectionX ||
+      prevProps.selectionY !== this.props.selectionY
+    ) {
+      this.getSelectionData();
+    }
+  }
 
   getSelectionData = () => {
     // Assumes PR view and gets file name, line number etc
@@ -101,7 +118,7 @@ export default class Definitions extends React.Component {
           console.log("response", response);
         })
         .catch(error => {
-          console.log("error", error);
+          // console.log("error", error);
           // Use dummy data for now
           this.setState({ definition: definitionSample });
         });
