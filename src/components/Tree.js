@@ -140,10 +140,9 @@ export default class Tree extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    // console.log("updating state", newProps);
-    if (newProps !== this.props) {
+    if (newProps.isVisible !== this.state.isVisible) {
       this.setState({ isVisible: newProps.isVisible });
-      // this.updateTree();
+      this.updateTree();
     }
   }
 
