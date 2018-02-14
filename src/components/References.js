@@ -95,7 +95,7 @@ export default class References extends React.Component {
   getReferenceItems = apiResponse => {
     return apiResponse.references.map(reference => {
       return {
-        name: reference.parent.name,
+        name: reference.parent.name || "parent node",
         file: reference.location.path,
         lineNumber: reference.location.range.start.line,
         codeSnippet: reference.contents

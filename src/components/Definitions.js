@@ -48,7 +48,7 @@ class DefinitionItem extends React.Component {
           <div className="definition-docstring">
             {this.props.docstring
               ? Docstring(atob(this.props.docstring))
-              : null}
+              : "docstring goes here"}
           </div>
         </CodeNode>
 
