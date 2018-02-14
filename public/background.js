@@ -53,6 +53,29 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   return true;
 });
 
+// Setup context menu for references/definitions
+chrome.contextMenus.create({
+  title: "Find references",
+  id: "REFERENCES_TRIGGER",
+  contexts: ["page", "selection"]
+});
+
+chrome.contextMenus.create({
+  title: "Peek definition",
+  id: "DEFINITIONS_TRIGGER",
+  contexts: ["page", "selection"]
+});
+
+chrome.contextMenus.onClicked.addListener(function(info, tab) {
+  if (
+    info.menuItemId === "REFERENCES_TRIGGER" ||
+    info.menuItemId === "DEFINITIONS_TRIGGER"
+  ) {
+    sendMessageToCurrentTab(info.menuItemId, {});
+  }
+});
+
+// Helper method to send message to the content script.
 const sendMessageToCurrentTab = (action, data) => {
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
     chrome.tabs.sendMessage(

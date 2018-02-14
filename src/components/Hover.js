@@ -2,7 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 import { listener as blobListener } from "./../adapters/github/views/blob";
 import { listener as pullListener } from "./../adapters/github/views/pull";
+import { API } from "./../utils/api";
 import "./Hover.css";
+import Docstring from "./common/Docstring";
+
+const sessionId = "abcd";
 
 const docstring =
   "Example function with PEP 484 type annotations." +
@@ -14,21 +18,9 @@ const docstring =
   "\nReturns:" +
   "\n    The return value. True for success, False otherwise.";
 
-export const getDocstringJSX = docstring => {
-  const jsx = docstring.split("\n").map((line, index) => {
-    return (
-      <span key={index}>
-        {line}
-        <br />
-      </span>
-    );
-  });
-  return jsx;
-};
-
 class HoverBox extends React.Component {
   static propTypes = {
-    elementText: PropTypes.string,
+    name: PropTypes.string,
     lineNumber: PropTypes.number,
     charNumber: PropTypes.number,
     filePath: PropTypes.string,
@@ -47,8 +39,8 @@ class HoverBox extends React.Component {
           top: this.props.mouseY + padding
         }}
       >
-        <div className="title monospace">{this.props.elementText}</div>
-        <div className="docstring">{getDocstringJSX(docstring)}</div>
+        <div className="title monospace">{this.props.name}</div>
+        <div className="docstring">{Docstring(docstring)}</div>
         <div className="filename">{this.props.filePath}</div>
         <div className="meta">
           {"Line: " +
@@ -71,7 +63,29 @@ export default class HoverListener extends React.Component {
 
   receiver = result => {
     // Callback for the hover listener
-    this.setState(result);
+    const isValidResult =
+      result.hasOwnProperty("fileSha") && result.hasOwnProperty("lineNumber");
+
+    if (isValidResult) {
+      API.getHover(
+        sessionId,
+        result.fileSha,
+        result.filePath,
+        result.lineNumber,
+        result.charNumber
+      )
+        .then(response => {
+          console.log("response", response);
+          // TODO(arjun): handle response
+        })
+        .catch(error => {
+          // console.log("Error in API call", error);
+          // Use dummy data for now
+          this.setState(result);
+        });
+    } else {
+      this.setState({ mouseX: -1000, mouseY: -1000 });
+    }
   };
 
   setupListener = () => {

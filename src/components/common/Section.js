@@ -3,7 +3,7 @@ import Octicon from "react-component-octicons";
 import "./Section.css";
 
 const SectionHeaderIcon = props => {
-  const iconStyle = { height: 12, marginRight: "5px" };
+  const iconStyle = { height: 12, marginRight: "5px", width: 12 };
 
   if (props.isOpen) {
     return <Octicon name="triangle-down" style={iconStyle} />;

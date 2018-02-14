@@ -118,7 +118,7 @@ class File extends React.Component {
 export default class Tree extends React.Component {
   state = {
     data: { children: [] },
-    isVisible: true
+    isVisible: this.props.isVisible
   };
 
   updateTree = () => {
@@ -139,8 +139,9 @@ export default class Tree extends React.Component {
     this.updateTree();
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps !== this.props) {
+  componentWillReceiveProps(newProps) {
+    if (newProps.isVisible !== this.state.isVisible) {
+      this.setState({ isVisible: newProps.isVisible });
       this.updateTree();
     }
   }

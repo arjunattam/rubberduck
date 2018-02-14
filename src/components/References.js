@@ -1,10 +1,10 @@
 import React from "react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { github as githubStyle } from "react-syntax-highlighter/styles/hljs";
-
+import PropTypes from "prop-types";
+import { readXY } from "./../adapters/github/views/pull";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import CodeNode from "./common/CodeNode";
+import { API } from "./../utils/api";
 import "./References.css";
 
 const references = [
@@ -62,17 +62,6 @@ class ReferenceItem extends React.Component {
       >
         <CodeNode {...this.props} />
 
-        {/* <div className="reference-item-line">
-          <SyntaxHighlighter
-            language={"python"}
-            style={githubStyle}
-            showLineNumbers={true}
-            startingLineNumber={this.props.lineNumber}
-          >
-            {this.props.lineTrimmed}
-          </SyntaxHighlighter>
-        </div> */}
-
         {this.state.isHovering ? (
           <ExpandedCode
             language={"python"}
@@ -88,9 +77,61 @@ class ReferenceItem extends React.Component {
 }
 
 export default class References extends React.Component {
-  state = {
-    isVisible: false
+  // This gets x and y of the selected text, constructs the
+  // API call payload by reading DOM, and then display the
+  // result of the API call.
+  static propTypes = {
+    selectionX: PropTypes.number,
+    selectionY: PropTypes.number
   };
+
+  state = {
+    isVisible: false,
+    references: []
+  };
+
+  getSelectionData = () => {
+    // Assumes PR view and gets file name, line number etc
+    // from selection x and y
+    const result = readXY(this.props.selectionX, this.props.selectionY);
+    console.log(result);
+
+    const isValidResult =
+      result.hasOwnProperty("fileSha") && result.hasOwnProperty("lineNumber");
+
+    if (isValidResult) {
+      API.getReferences(
+        "abcd",
+        result.fileSha,
+        result.filePath,
+        result.lineNumber,
+        result.charNumber
+      )
+        .then(response => {
+          console.log("response", response);
+        })
+        .catch(error => {
+          // console.log("error", error);
+          // Use dummy data for now
+          this.setState({ references: references });
+        });
+    }
+  };
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.isVisible !== this.state.isVisible) {
+      this.setState({ isVisible: newProps.isVisible });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps.selectionX !== this.props.selectionX ||
+      prevProps.selectionY !== this.props.selectionY
+    ) {
+      this.getSelectionData();
+    }
+  }
 
   toggleVisibility = () => {
     this.setState({
@@ -99,7 +140,7 @@ export default class References extends React.Component {
   };
 
   render() {
-    const referenceItems = references.map((reference, index) => {
+    const referenceItems = this.state.references.map((reference, index) => {
       return <ReferenceItem {...reference} key={index} />;
     });
 

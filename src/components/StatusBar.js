@@ -53,7 +53,7 @@ export default class StatusBar extends React.Component {
 
   receivedToken = token => {
     // When token has been received, we will save to storage
-    console.log(decodeJWT(token));
+    const decoded = decodeJWT(token);
     const key = "token";
     setInStore(key, token, () => {
       this.setState({ token: token });
@@ -66,7 +66,6 @@ export default class StatusBar extends React.Component {
     // load for now. The jwt expiry is set at 3 days in the backend.
     API.refreshTokenBackground(existingToken, response => {
       const token = response.token;
-      console.log("Successful token refresh");
       callback(token);
     });
     // TODO(arjun): this will raise an error if the refresh fails,
