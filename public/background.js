@@ -4,6 +4,12 @@ const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
+  if (changeInfo.url) {
+    chrome.tabs.sendMessage(tabId, {
+      action: "URL_UPDATE",
+      data: changeInfo.url
+    });
+  }
   console.log("Change info", changeInfo);
   // To ensure we don't inject the extension twice
   const injectFlagCode =

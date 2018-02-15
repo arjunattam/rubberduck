@@ -116,9 +116,13 @@ export class BaseAPI {
     return this.baseRequest.post(uri, { client_id: clientId });
   }
 
-  createSession(pull_request_id, organisation, name) {
-    const uri = "/session/";
-    return this.baseRequest.post(uri, { pull_request_id, organisation, name });
+  createSession(pull_request_id, organisation, reponame) {
+    const uri = "/sessions/";
+    return this.baseRequest.post(uri, {
+      pull_request_id,
+      organisation,
+      name: reponame
+    });
   }
 
   getHover(sessionId, baseOrHead, filePath, lineNumber, charNumber) {

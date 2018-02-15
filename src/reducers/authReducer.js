@@ -2,7 +2,8 @@ import { createReducer } from "redux-create-reducer";
 
 const initialState = {
   jwt: "",
-  clientId: ""
+  clientId: "",
+  session: {}
 };
 
 export default createReducer(initialState, {
@@ -16,6 +17,16 @@ export default createReducer(initialState, {
     return {
       ...state,
       clientId: action.payload
+    };
+  },
+  ["UPDATE_SESSION_FULFILLED"](state, action) {
+    console.log("Action", state, action);
+    return {
+      ...state,
+      session: {
+        ...state.session,
+        [action.payload.data]: action.payload.response
+      }
     };
   }
 });

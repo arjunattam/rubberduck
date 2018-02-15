@@ -47,19 +47,22 @@ export default class Sidebar extends React.Component {
         DEFINITIONS_TRIGGER: "definitions"
       };
 
-      const selectionRects = document
-        .getSelection()
-        .getRangeAt(0)
-        .getClientRects();
+      const selection = document.getSelection();
+      if (selection && selection.rangeCount > 0 && actionSections[action]) {
+        const selectionRects = document
+          .getSelection()
+          .getRangeAt(0)
+          .getClientRects();
 
-      if (selectionRects.length > 0) {
-        const rect = selectionRects[0];
-        const x = rect.left + (rect.right - rect.left) / 2;
-        const y = rect.top + (rect.bottom - rect.top) / 2;
-        this.setState({
-          openSection: actionSections[action],
-          textSelection: { x: x, y: y }
-        });
+        if (selectionRects.length > 0) {
+          const rect = selectionRects[0];
+          const x = rect.left + (rect.right - rect.left) / 2;
+          const y = rect.top + (rect.bottom - rect.top) / 2;
+          this.setState({
+            openSection: actionSections[action],
+            textSelection: { x: x, y: y }
+          });
+        }
       }
     });
   };
