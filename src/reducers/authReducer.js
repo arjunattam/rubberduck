@@ -7,6 +7,12 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
+  ["UPDATE_DATA"](state, action) {
+    return {
+      ...state,
+      ...action.payload
+    };
+  },
   ["UPDATE_JWT"](state, action) {
     return {
       ...state,

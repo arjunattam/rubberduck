@@ -11,9 +11,17 @@ export class AuthUtils {
 
   initialize(storeDispatch) {
     this.dispatch = storeDispatch;
-    this.getClientId()
-      .then(clientId => this.getJWT(clientId))
-      .then(token => this.updateJWT(token));
+    this.getClientId().then(clientId => {
+      return this.getJWT(clientId).then(jwt => {
+        return {
+          clientId,
+          jwt
+        };
+      });
+    });
+    // this.getClientId()
+    //   .then(clientId => this.getJWT(clientId))
+    //   .then(token => this.updateJWT(token));
   }
 
   generateClientId() {
@@ -47,12 +55,10 @@ export class AuthUtils {
           // This means we need to create a value and store it in redux and chrome store.
           const clientId = this.generateClientId();
           setInStore(key, clientId, () => {
-            this.dispatch(AuthActions.updateClientId(clientId));
             resolve(clientId);
           });
         } else {
           // Value exists, we can just update it in store and resolve it
-          this.dispatch(AuthActions.updateClientId(value));
           resolve(value);
         }
       });

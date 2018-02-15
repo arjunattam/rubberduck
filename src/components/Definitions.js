@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { readXY } from "./../adapters/github/views/pull";
 import SectionHeader from "./common/Section";
@@ -7,6 +8,7 @@ import CodeNode from "./common/CodeNode";
 import Docstring from "./common/Docstring";
 import { API } from "./../utils/api";
 import "./Definitions.css";
+import * as SessionUtils from "../utils/session";
 
 const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
 
@@ -65,7 +67,7 @@ class DefinitionItem extends React.Component {
   }
 }
 
-export default class Definitions extends React.Component {
+class Definitions extends React.Component {
   // This gets x and y of the selected text, constructs the
   // API call payload by reading DOM, and then display the
   // result of the API call.
@@ -111,7 +113,7 @@ export default class Definitions extends React.Component {
 
     if (isValidResult) {
       API.getDefinition(
-        sessionId,
+        SessionUtils.getCurrentSession(this.props.data.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
@@ -154,3 +156,12 @@ export default class Definitions extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(Definitions);

@@ -8,6 +8,8 @@ import { addChromeListener } from "./../utils/chrome";
 import { Authorization } from "./../utils/authorization";
 import * as Session from "./../utils/session";
 import * as GitPathAdapter from "../adapters/github/path";
+import * as StorageUtils from "./../utils/storage";
+
 class StatusBar extends React.Component {
   // TODO(arjun): update the login url and response handling
   constructor(props) {
@@ -22,19 +24,13 @@ class StatusBar extends React.Component {
     // 2. Get the jwt from the storage. If not found, then make API call to get it
     // 3. Manage refresh for the jwt
     // 4. On login with github, trigger oauth flow, and get new jwt
-    Authorization.initialize(this.props.dispatch);
-    this.setupChromeListener();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.props.auth.jwt && nextProps.auth.jwt) {
-      this.updateSession();
-    }
-  }
+  componentWillReceiveProps(nextProps) {}
 
   launchOAuthFlow = () => {
     // If token already exists we probably need to do any of this
-    let token = this.props.auth.jwt;
+    let token = this.props.storage.token;
     Authorization.triggerOAuthFlow(token, response => {
       // response is the redirected url. It is possible that it is null,
       // when the background page throws an error. In that case we should
@@ -46,47 +42,19 @@ class StatusBar extends React.Component {
       } else {
         // Successful OAuth flow, save refreshed token
         const refreshedToken = getParameterByName("token", response);
-        Authorization.updateJWT(refreshedToken);
+        StorageUtils.setAllInStore({ token, token });
       }
     });
   };
-
-  setupChromeListener = () => {
-    // Setup the chrome message passing listener for
-    // messages from the background.
-    addChromeListener(action => {
-      if (action === "URL_UPDATE") {
-        this.updateSession();
-      }
-    });
-  };
-
-  updateSession() {
-    let urlDetail = GitPathAdapter.getRepoFromPath();
-    let pageType = urlDetail.type;
-    let organization = urlDetail.username;
-    let repoName = urlDetail.reponame;
-    let pullRequestId = urlDetail.typeId;
-    if (pageType === "pull" && organization && repoName && pullRequestId) {
-      let pr = `${organization}/${repoName}/${pullRequestId}`;
-      if (!this.props.auth.session[pr]) {
-        this.AuthActions.updateSession({
-          pullRequestId,
-          organization,
-          repoName
-        });
-      }
-    }
-  }
 
   render() {
     // Three possible situations: token unavailable, token available but no github login
     // and token and github login
-    const decodedJWT = this.props.auth.jwt
-      ? Authorization.decodeJWT(this.props.auth.jwt)
+    const decodedJWT = this.props.storage.token
+      ? Authorization.decodeJWT(this.props.storage.token)
       : {};
     const githubUser = decodedJWT.github_username;
-    const hasToken = this.props.auth.jwt !== null;
+    const hasToken = this.props.storage.token !== null;
     const hasBoth = githubUser !== undefined && githubUser !== "";
 
     if (hasBoth) {
@@ -94,7 +62,7 @@ class StatusBar extends React.Component {
         <div className="status">
           <p> Logged in as {githubUser}</p>
           <p>
-            <a href="#" onClick={this.launchOAuthFlow}>
+            <a href="#" onClick={() => this.launchOAuthFlow()}>
               Reauthenticate
             </a>
           </p>
@@ -104,7 +72,7 @@ class StatusBar extends React.Component {
       return (
         <div className="status">
           <p>
-            <a href="#" onClick={this.launchOAuthFlow}>
+            <a href="#" onClick={() => this.launchOAuthFlow()}>
               Login with Github
             </a>
           </p>
@@ -121,9 +89,10 @@ class StatusBar extends React.Component {
 }
 
 function mapStateToProps(state) {
-  const { auth } = state;
+  const { data, storage } = state;
   return {
-    auth
+    data,
+    storage
   };
 }
 export default connect(mapStateToProps)(StatusBar);

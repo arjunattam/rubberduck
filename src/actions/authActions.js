@@ -1,4 +1,12 @@
 import { API } from "../utils/api";
+
+export function updateData(data) {
+  return {
+    type: "UPDATE_DATA",
+    payload: data
+  };
+}
+
 export function updateJWT(data) {
   return {
     type: "UPDATE_JWT",

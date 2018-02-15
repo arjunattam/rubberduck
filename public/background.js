@@ -1,16 +1,24 @@
 const jsLocation = JS_ASSET_LOCATION; // will be replaced with actual location by script
 const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location by script
-
+const CONTEXT_MENUS = [
+  {
+    title: "Find references",
+    id: "REFERENCES_TRIGGER",
+    contexts: ["page", "selection"]
+  },
+  {
+    title: "Peek definition",
+    id: "DEFINITIONS_TRIGGER",
+    contexts: ["page", "selection"]
+  }
+];
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
+  // Send message on every URL change to content script
   if (changeInfo.url) {
-    chrome.tabs.sendMessage(tabId, {
-      action: "URL_UPDATE",
-      data: changeInfo.url
-    });
+    sendMessageToTab(tabId, "URL_UPDATE", changeInfo.url);
   }
-  console.log("Change info", changeInfo);
   // To ensure we don't inject the extension twice
   const injectFlagCode =
     "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;";
@@ -41,6 +49,18 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   );
 });
 
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  let storageChanges = {};
+  for (key in changes) {
+    let storageChange = changes[key];
+    storageChanges = {
+      ...storageChanges,
+      [key]: storageChange.newValue
+    };
+  }
+  sendMessageToAllTabs("STORAGE_UPDATED", storageChanges);
+});
+
 // Listener for messages from the content script
 chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   console.log("Message received", req);
@@ -49,8 +69,10 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   // https://developer.chrome.com/apps/runtime#property-lastError
   const handlers = {
     AUTH_TRIGGER: triggerAuthFlow,
-    STORAGE_SET: saveToStorage,
+    STORAGE_SET: saveKeyToStorage,
     STORAGE_GET: getFromStorage,
+    STORAGE_SET_ALL: saveToStorage,
+    STORAGE_GET_ALL: getAllFromStorage,
     HTTP_GET: getAjax,
     HTTP_POST: postAjax
   };
@@ -60,16 +82,8 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
 });
 
 // Setup context menu for references/definitions
-chrome.contextMenus.create({
-  title: "Find references",
-  id: "REFERENCES_TRIGGER",
-  contexts: ["page", "selection"]
-});
-
-chrome.contextMenus.create({
-  title: "Peek definition",
-  id: "DEFINITIONS_TRIGGER",
-  contexts: ["page", "selection"]
+CONTEXT_MENUS.forEach(contextMenu => {
+  chrome.contextMenus.create(contextMenu);
 });
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
@@ -81,14 +95,30 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
   }
 });
 
-// Helper method to send message to the content script.
+// Helper method to send message to specific tab(by id) in content script.
+const sendMessageToTab = (tabId, action, data) => {
+  chrome.tabs.sendMessage(
+    tabId,
+    {
+      action: action,
+      data: data
+    },
+    res => {}
+  );
+};
+
+// Helper method to send message to the current tab in content script.
 const sendMessageToCurrentTab = (action, data) => {
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    chrome.tabs.sendMessage(
-      tabs[0].id,
-      { action: action, data: data },
-      res => {}
-    );
+    sendMessageToTab(tabs[0].id, action, data);
+  });
+};
+
+const sendMessageToAllTabs = (action, data) => {
+  chrome.tabs.query({}, function(tabs) {
+    for (let i = 0; i < tabs.length; ++i) {
+      sendMessageToTab(tabs[i].id, action, data);
+    }
   });
 };
 
@@ -111,8 +141,18 @@ const triggerAuthFlow = (data, callback) => {
   );
 };
 
-// Handler for saving to storage
+// Handler for saving multiple keys to storage
 const saveToStorage = (data, callback) => {
+  // data must have key and value, callback will not have any args
+  // Save it using the Chrome extension storage sync API
+  // Docs: https://developer.chrome.com/apps/storage
+  chrome.storage.sync.set(data, function() {
+    callback();
+  });
+};
+
+// Handler for saving to storage
+const saveKeyToStorage = (data, callback) => {
   // data must have key and value, callback will not have any args
   // Save it using the Chrome extension storage sync API
   // Docs: https://developer.chrome.com/apps/storage
@@ -121,6 +161,14 @@ const saveToStorage = (data, callback) => {
   dataToSave[key] = value;
   chrome.storage.sync.set(dataToSave, function() {
     callback();
+  });
+};
+
+// Handler for getting from storage
+const getAllFromStorage = (data, callback) => {
+  // data must have key, callback will be called with value
+  chrome.storage.sync.get(null, function(storageData) {
+    callback(storageData);
   });
 };
 

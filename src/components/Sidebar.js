@@ -18,10 +18,6 @@ export default class Sidebar extends React.Component {
     isVisible: false, // changed by toggleCollapse
     // This state is inferred from the window url
     // TODO(arjun): default state is a problem when we are on a non-repo github page
-    username: "requests",
-    reponame: "requests",
-    type: "blob",
-    typeId: "master",
     // TODO(arjun): clean up this state, move repo data to an object
     openSection: this.props.openSection,
     textSelection: {}
@@ -29,7 +25,7 @@ export default class Sidebar extends React.Component {
 
   componentDidMount() {
     this.getVisibleState();
-    this.setupChromeListener();
+    // this.setupChromeListener();
     const repo = getRepoFromPath();
     const isEmpty = Object.keys(repo).length === 0;
 
@@ -105,7 +101,12 @@ export default class Sidebar extends React.Component {
         </div>
       );
     } else {
-      return <CollapseButton onClick={this.toggleCollapse} isVisible={false} />;
+      return (
+        <CollapseButton
+          onClick={() => this.toggleCollapse()}
+          isVisible={false}
+        />
+      );
     }
   }
 }

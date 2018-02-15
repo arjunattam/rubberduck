@@ -1,4 +1,5 @@
 import React from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { readXY } from "./../adapters/github/views/pull";
 import SectionHeader from "./common/Section";
@@ -6,6 +7,7 @@ import ExpandedCode from "./common/ExpandedCode";
 import CodeNode from "./common/CodeNode";
 import { API } from "./../utils/api";
 import "./References.css";
+import * as SessionUtils from "../utils/session";
 
 const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
 
@@ -78,7 +80,7 @@ class ReferenceItem extends React.Component {
   }
 }
 
-export default class References extends React.Component {
+class References extends React.Component {
   // This gets x and y of the selected text, constructs the
   // API call payload by reading DOM, and then display the
   // result of the API call.
@@ -114,7 +116,7 @@ export default class References extends React.Component {
 
     if (isValidResult) {
       API.getReferences(
-        sessionId,
+        SessionUtils.getCurrentSession(this.props.data.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
@@ -181,3 +183,12 @@ export default class References extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(References);

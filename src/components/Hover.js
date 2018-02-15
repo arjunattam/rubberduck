@@ -1,10 +1,12 @@
 import React from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { listener as blobListener } from "./../adapters/github/views/blob";
 import { listener as pullListener } from "./../adapters/github/views/pull";
 import { API } from "./../utils/api";
 import "./Hover.css";
 import Docstring from "./common/Docstring";
+import * as SessionUtils from "../utils/session";
 
 const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
 
@@ -40,7 +42,7 @@ class HoverBox extends React.Component {
   }
 }
 
-export default class HoverListener extends React.Component {
+class HoverListener extends React.Component {
   state = {
     mouseX: -1000,
     mouseY: -1000
@@ -60,7 +62,7 @@ export default class HoverListener extends React.Component {
 
     if (isValidResult) {
       API.getHover(
-        sessionId,
+        SessionUtils.getCurrentSession(this.props.data.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
@@ -126,3 +128,12 @@ export default class HoverListener extends React.Component {
     return <HoverBox {...this.state} />;
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(HoverListener);
