@@ -16,8 +16,7 @@ const GH_RESERVED_USER_NAMES = [ // These cannot be usernames
   ]
 const GH_RESERVED_REPO_NAMES = ["followers", "following", "repositories"];
 const GH_404_SEL = "#parallax_wrapper";
-const GH_PJAX_CONTAINER_SEL =
-  "#js-repo-pjax-container, .context-loader-container, [data-pjax-container]";
+
 const GH_RAW_CONTENT = "body > pre";
 
 const checkIfSkipped = () => {

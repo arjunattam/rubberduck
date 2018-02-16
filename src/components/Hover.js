@@ -1,12 +1,12 @@
 import React from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { listener as blobListener } from "./../adapters/github/views/blob";
 import { listener as pullListener } from "./../adapters/github/views/pull";
 import { API } from "./../utils/api";
 import "./Hover.css";
 import Docstring from "./common/Docstring";
-
-const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
+import * as SessionUtils from "../utils/session";
 
 class HoverBox extends React.Component {
   static propTypes = {
@@ -40,7 +40,7 @@ class HoverBox extends React.Component {
   }
 }
 
-export default class HoverListener extends React.Component {
+class HoverListener extends React.Component {
   state = {
     mouseX: -1000,
     mouseY: -1000
@@ -60,7 +60,7 @@ export default class HoverListener extends React.Component {
 
     if (isValidResult) {
       API.getHover(
-        sessionId,
+        SessionUtils.getCurrentSessionId(this.props.data.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
@@ -93,6 +93,14 @@ export default class HoverListener extends React.Component {
     }
   };
 
+  onMouseOverListener(e, listener) {
+    listener(e, this.receiver);
+    this.setState({
+      currentMouseX: e.x,
+      currentMouseY: e.y
+    });
+  }
+
   setupListener = () => {
     const isFileView = window.location.href.indexOf("blob") >= 0;
     const isPRView = window.location.href.indexOf("pull") >= 0;
@@ -105,13 +113,8 @@ export default class HoverListener extends React.Component {
     }
 
     if (listener !== null) {
-      const that = this;
       document.body.onmouseover = e => {
-        listener(e, that.receiver);
-        this.setState({
-          currentMouseX: e.x,
-          currentMouseY: e.y
-        });
+        this.onMouseOverListener(e, listener);
       };
     } else {
       document.body.onmouseover = null;
@@ -122,7 +125,20 @@ export default class HoverListener extends React.Component {
     this.setupListener();
   }
 
+  componentWillUnmount() {
+    document.body.onmouseover = null;
+  }
+
   render() {
     return <HoverBox {...this.state} />;
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(HoverListener);

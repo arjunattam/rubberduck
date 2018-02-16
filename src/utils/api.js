@@ -1,4 +1,5 @@
 import { sendMessage, constructMessage } from "./chrome";
+import Store from "../store";
 const axios = require("axios");
 
 export const encodeQueryData = data => {
@@ -24,6 +25,14 @@ export class BaseRequest {
     this.baseRequest = axios.create({
       baseURL: baseURL
     });
+  }
+
+  updateDefaultHeader(token) {
+    if (token) {
+      this.baseRequest.defaults.headers.common[
+        "Authorization"
+      ] = `token ${token}`;
+    }
   }
 
   getAPIUrl() {
@@ -67,6 +76,12 @@ export class BaseAPI {
   constructor() {
     this.baseRequest = new BaseRequest();
     this.baseURI = this.baseRequest.getAPIUrl();
+    Store.subscribe(() => this.updateBaseRequest());
+  }
+
+  updateBaseRequest() {
+    let token = Store.getState().storage.token;
+    this.baseRequest.updateDefaultHeader(token);
   }
 
   backgroundPost(url, data, cb) {
@@ -86,24 +101,23 @@ export class BaseAPI {
     });
   }
 
-  issueTokenBackground(clientId, cb) {
-    const uri = `${this.baseURI}token_issue/`;
-    return this.backgroundPost(uri, { client_id: clientId }, cb);
-  }
-
-  refreshTokenBackground(token, cb) {
-    const uri = `${this.baseURI}token_refresh/`;
-    return this.backgroundPost(uri, { token: token }, cb);
-  }
-
   issueToken(clientId) {
-    const uri = "/token_issue/";
+    const uri = `/token_issue/`;
     return this.baseRequest.post(uri, { client_id: clientId });
   }
 
-  createSession(pull_request_id, organisation, name) {
-    const uri = "/session/";
-    return this.baseRequest.post(uri, { pull_request_id, organisation, name });
+  refreshTokenBackground(token) {
+    const uri = `/token_refresh/`;
+    return this.baseRequest.post(uri, { token: token });
+  }
+
+  createSession(pull_request_id, organisation, reponame) {
+    const uri = "/sessions/";
+    return this.baseRequest.post(uri, {
+      pull_request_id,
+      organisation,
+      name: reponame
+    });
   }
 
   getHover(sessionId, baseOrHead, filePath, lineNumber, charNumber) {

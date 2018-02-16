@@ -5,12 +5,24 @@
 /* Define global to fix linter error */
 /* global chrome */
 
-const SEND_MESSAGE_TYPES = [
+export const SEND_MESSAGE_TYPES = [
   "AUTH_TRIGGER",
   "STORAGE_SET",
   "STORAGE_GET",
+  "STORAGE_GET_ALL",
+  "STORAGE_SET_ALL",
   "HTTP_POST",
   "HTTP_GET"
+];
+
+export const CONTEXT_MENU_MESSAGE_TYPES = [
+  "REFERENCES_TRIGGER",
+  "DEFINITIONS_TRIGGER"
+];
+
+export const RECEIVE_MESSAGE_TYPES = [
+  ...CONTEXT_MENU_MESSAGE_TYPES,
+  "URL_UPDATE"
 ];
 
 export const constructMessage = (type, data) => {
@@ -27,13 +39,15 @@ export const constructMessage = (type, data) => {
 
 export const sendMessage = (message, callback) => {
   chrome.runtime.sendMessage(message, function(response) {
-    callback(response);
+    if (callback) {
+      callback(response);
+    }
   });
 };
 
 // Handler for messages from background.js
 export const addChromeListener = cb => {
   chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
-    cb(req.action);
+    cb(req.action, req.data);
   });
 };
