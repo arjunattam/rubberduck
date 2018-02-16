@@ -119,11 +119,12 @@ class File extends React.Component {
 class Tree extends React.Component {
   state = {
     data: { children: [] },
-    isVisible: true
+    isVisible: this.props.isVisible
   };
 
-  updateTree = (repoDetails = this.props.data.repoDetails) => {
+  updateTree = () => {
     // TODO(arjun): add proper loader
+    let repoDetails = this.props.data.repoDetails;
     if (repoDetails.username && repoDetails.reponame) {
       API.getFilesTree(repoDetails.username, repoDetails.reponame)
         .then(response => {
@@ -142,17 +143,17 @@ class Tree extends React.Component {
     this.updateTree();
   }
 
-  hasRepoDetails(props = this.props) {
-    return props.data.repoDetails.username && props.data.repoDetails.reponame;
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isVisible !== nextProps.isVisible) {
+      this.setState({
+        isVisible: nextProps.isVisible
+      });
+    }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (
-      (this.props.data.openSection !== "tree" &&
-        nextProps.data.openSection === "tree") ||
-      (!this.hasRepoDetails(this.props) && this.hasRepoDetails(nextProps))
-    ) {
-      this.updateTree(nextProps.data.repoDetails);
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.isVisible && this.state.isVisible) {
+      this.updateTree();
     }
   }
 

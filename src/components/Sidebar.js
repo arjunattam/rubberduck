@@ -30,6 +30,13 @@ class Sidebar extends React.Component {
     });
   }
 
+  hasRepoDetails() {
+    return (
+      this.props.data.repoDetails.username &&
+      this.props.data.repoDetails.reponame
+    );
+  }
+
   renderCollapseButton() {
     return (
       <CollapseButton
@@ -51,7 +58,9 @@ class Sidebar extends React.Component {
   }
 
   renderTree() {
-    return <Tree />;
+    if (this.hasRepoDetails()) {
+      return <Tree isVisible={this.props.data.openSection === "tree"} />;
+    }
   }
 
   renderReferences() {
