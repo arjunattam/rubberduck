@@ -10,8 +10,6 @@ import { API } from "./../utils/api";
 import "./Definitions.css";
 import * as SessionUtils from "../utils/session";
 
-const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
-
 const definitionSample = {
   name: "PythonLSClient",
   baseName: "BaseLSClient",
@@ -113,7 +111,7 @@ class Definitions extends React.Component {
 
     if (isValidResult) {
       API.getDefinition(
-        SessionUtils.getCurrentSession(this.props.data.sessions),
+        SessionUtils.getCurrentSessionId(this.props.data.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,

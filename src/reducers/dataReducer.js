@@ -2,11 +2,14 @@ import { createReducer } from "redux-create-reducer";
 
 const initialState = {
   sessions: {},
-  repoDetails: {}
+  repoDetails: {},
+  openSection: "tree",
+  textSelection: {},
+  isSidebarVisible: true
 };
 
 export default createReducer(initialState, {
-  ["CREATE_SESSION_FULFILLED"](state, action) {
+  CREATE_SESSION_FULFILLED: (state, action) => {
     return {
       ...state,
       sessions: {
@@ -15,7 +18,13 @@ export default createReducer(initialState, {
       }
     };
   },
-  ["SET_REPO_DETAILS"](state, action) {
+  CREATE_SESSION_REJECTED: (state, action) => {
+    console.log("Session creation failed", action.payload);
+    return {
+      ...state
+    };
+  },
+  SET_REPO_DETAILS: (state, action) => {
     return {
       ...state,
       repoDetails: {
@@ -24,7 +33,7 @@ export default createReducer(initialState, {
       }
     };
   },
-  ["UPDATE_DATA"](state, action) {
+  UPDATE_DATA: (state, action) => {
     return {
       ...state,
       ...action.payload

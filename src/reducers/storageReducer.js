@@ -7,14 +7,14 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  ["SET_FROM_CHROME_STORAGE"](state, action) {
+  SET_FROM_CHROME_STORAGE: (state, action) => {
     return {
       ...state,
       ...action.payload,
       initialized: true
     };
   },
-  ["UPDATE_FROM_CHROME_STORAGE"](state, action) {
+  UPDATE_FROM_CHROME_STORAGE: (state, action) => {
     return {
       ...state,
       ...action.payload

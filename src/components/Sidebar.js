@@ -1,5 +1,9 @@
 import React from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import "./../index.css";
+import * as DataActions from "../actions/dataActions";
+import * as StorageActions from "../actions/storageActions";
 import Title from "./Title";
 import Tree from "./Tree";
 import StatusBar from "./StatusBar";
@@ -7,95 +11,79 @@ import CollapseButton from "./CollapseButton";
 import References from "./References";
 import Definitions from "./Definitions";
 import HoverListener from "./Hover";
-import { getRepoFromPath } from "./../adapters/github/path";
-import { updateLayout } from "./../adapters/github/layout";
-// TODO(arjun): move local storage to chrome.storage.local
-import { setLocal, getLocal } from "./../utils/storage";
-import { addChromeListener } from "./../utils/chrome";
+import * as GithubLayout from "./../adapters/github/layout";
 
-export default class Sidebar extends React.Component {
-  state = {
-    isVisible: false, // changed by toggleCollapse
-    // This state is inferred from the window url
-    // TODO(arjun): default state is a problem when we are on a non-repo github page
-    // TODO(arjun): clean up this state, move repo data to an object
-    openSection: this.props.openSection,
-    textSelection: {}
-  };
-
-  componentDidMount() {
-    this.getVisibleState();
-    // this.setupChromeListener();
-    const repo = getRepoFromPath();
-    const isEmpty = Object.keys(repo).length === 0;
-
-    if (!isEmpty) {
-      this.setState({ ...repo });
-    }
+class Sidebar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
+    this.StorageActions = bindActionCreators(
+      StorageActions,
+      this.props.dispatch
+    );
   }
 
-  setupChromeListener = () => {
-    // Setup the chrome message passing listener for
-    // messages from the background.
-    addChromeListener(action => {
-      const actionSections = {
-        REFERENCES_TRIGGER: "references",
-        DEFINITIONS_TRIGGER: "definitions"
-      };
-
-      const selection = document.getSelection();
-      if (selection && selection.rangeCount > 0 && actionSections[action]) {
-        const selectionRects = document
-          .getSelection()
-          .getRangeAt(0)
-          .getClientRects();
-
-        if (selectionRects.length > 0) {
-          const rect = selectionRects[0];
-          const x = rect.left + (rect.right - rect.left) / 2;
-          const y = rect.top + (rect.bottom - rect.top) / 2;
-          this.setState({
-            openSection: actionSections[action],
-            textSelection: { x: x, y: y }
-          });
-        }
-      }
+  toggleCollapse() {
+    this.DataActions.updateData({
+      isSidebarVisible: !this.props.data.isSidebarVisible
     });
-  };
+  }
 
-  toggleCollapse = () => {
-    setLocal("isVisible", !this.state.isVisible);
-    this.setState({
-      isVisible: !this.state.isVisible
-    });
-  };
+  renderCollapseButton() {
+    return (
+      <CollapseButton
+        onClick={() => this.toggleCollapse()}
+        isVisible={this.props.data.isSidebarVisible}
+      />
+    );
+  }
 
-  getVisibleState = () => {
-    getLocal("isVisible", value => {
-      this.setState({ isVisible: value });
-    });
-  };
+  renderTitle() {
+    return (
+      <Title>
+        <CollapseButton
+          onClick={() => this.toggleCollapse()}
+          isVisible={this.props.data.isSidebarVisible}
+        />
+      </Title>
+    );
+  }
+
+  renderTree() {
+    return <Tree />;
+  }
+
+  renderReferences() {
+    return (
+      <References
+        isVisible={this.props.data.openSection === "references"}
+        selectionX={this.props.data.textSelection.x}
+        selectionY={this.props.data.textSelection.y}
+      />
+    );
+  }
+
+  renderDefinitions() {
+    return (
+      <Definitions
+        isVisible={this.props.data.openSection === "definitions"}
+        selectionX={this.props.data.textSelection.x}
+        selectionY={this.props.data.textSelection.y}
+      />
+    );
+  }
 
   render() {
-    updateLayout(this.state.isVisible, 232); // 232 = sidebar width in pixels
+    GithubLayout.updateLayout(this.props.data.isSidebarVisible, 232); // 232 = sidebar width in pixels
 
-    if (this.state.isVisible) {
+    if (this.props.data.isSidebarVisible) {
       return (
         <div className="mercury-container">
-          <Title {...this.state}>
-            <CollapseButton onClick={this.toggleCollapse} isVisible={true} />
-          </Title>
-          <Tree {...this.state} isVisible={this.state.openSection === "tree"} />
-          <References
-            isVisible={this.state.openSection === "references"}
-            selectionX={this.state.textSelection.x}
-            selectionY={this.state.textSelection.y}
-          />
-          <Definitions
-            isVisible={this.state.openSection === "definitions"}
-            selectionX={this.state.textSelection.x}
-            selectionY={this.state.textSelection.y}
-          />
+          {this.renderTitle()}
+          {this.renderTree()}
+          {this.renderReferences()}
+          {this.renderDefinitions()}
           <HoverListener />
           <StatusBar />
         </div>
@@ -110,3 +98,12 @@ export default class Sidebar extends React.Component {
     }
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(Sidebar);

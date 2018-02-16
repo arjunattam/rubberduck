@@ -23,6 +23,7 @@ class Extension extends React.Component {
   }
 
   componentDidMount() {
+    this.updateRepoDetailsFromPath();
     this.setupChromeListener();
     this.initializeStorage();
   }
@@ -66,7 +67,7 @@ class Extension extends React.Component {
         this.handleTokenUpdate(response.token, clientId);
       });
     } else {
-      API.issueTokenBackground(clientId).then(response => {
+      API.issueToken(clientId).then(response => {
         this.handleTokenUpdate(response.token, clientId);
       });
     }
@@ -86,9 +87,13 @@ class Extension extends React.Component {
     this.handleSessionInitialization();
   }
 
+  updateRepoDetailsFromPath() {
+    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
+  }
+
   handleSessionInitialization() {
+    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
     let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
-    this.DataActions.setRepoDetails({ type, typeId, username, reponame });
     if (type === "pull" && username && reponame && typeId) {
       let prId = btoa(`${username}/${reponame}/${typeId}`);
       if (!this.props.data.sessions[prId] && this.props.storage.token) {
@@ -119,7 +124,7 @@ class Extension extends React.Component {
       const rect = selectionRects[0];
       const x = rect.left + (rect.right - rect.left) / 2;
       const y = rect.top + (rect.bottom - rect.top) / 2;
-      this.setState({
+      this.DataActions.updateData({
         openSection: actionSections[action],
         textSelection: { x: x, y: y }
       });
@@ -127,7 +132,7 @@ class Extension extends React.Component {
   }
 
   render() {
-    return <Sidebar openSection="tree" />;
+    return <Sidebar />;
   }
 }
 

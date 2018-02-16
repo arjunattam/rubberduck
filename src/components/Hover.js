@@ -8,8 +8,6 @@ import "./Hover.css";
 import Docstring from "./common/Docstring";
 import * as SessionUtils from "../utils/session";
 
-const sessionId = "7b8ccbba-3db0-40e5-a7af-6e4a3e69f40d";
-
 class HoverBox extends React.Component {
   static propTypes = {
     name: PropTypes.string,
@@ -62,7 +60,7 @@ class HoverListener extends React.Component {
 
     if (isValidResult) {
       API.getHover(
-        SessionUtils.getCurrentSession(this.props.data.sessions),
+        SessionUtils.getCurrentSessionId(this.props.data.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
@@ -95,6 +93,14 @@ class HoverListener extends React.Component {
     }
   };
 
+  onMouseOverListener(e, listener) {
+    listener(e, this.receiver);
+    this.setState({
+      currentMouseX: e.x,
+      currentMouseY: e.y
+    });
+  }
+
   setupListener = () => {
     const isFileView = window.location.href.indexOf("blob") >= 0;
     const isPRView = window.location.href.indexOf("pull") >= 0;
@@ -107,13 +113,8 @@ class HoverListener extends React.Component {
     }
 
     if (listener !== null) {
-      const that = this;
       document.body.onmouseover = e => {
-        listener(e, that.receiver);
-        this.setState({
-          currentMouseX: e.x,
-          currentMouseY: e.y
-        });
+        this.onMouseOverListener(e, listener);
       };
     } else {
       document.body.onmouseover = null;
@@ -122,6 +123,10 @@ class HoverListener extends React.Component {
 
   componentDidMount() {
     this.setupListener();
+  }
+
+  componentWillUnmount() {
+    document.body.onmouseover = null;
   }
 
   render() {

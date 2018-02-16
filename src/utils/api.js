@@ -101,21 +101,14 @@ export class BaseAPI {
     });
   }
 
-  issueTokenBackground(clientId, cb) {
+  issueToken(clientId) {
     const uri = `/token_issue/`;
     return this.baseRequest.post(uri, { client_id: clientId });
-    // return this.backgroundPost(uri, { client_id: clientId }, cb);
   }
 
-  refreshTokenBackground(token, cb) {
+  refreshTokenBackground(token) {
     const uri = `/token_refresh/`;
     return this.baseRequest.post(uri, { token: token });
-    // return this.backgroundPost(uri, { token: token }, cb);
-  }
-
-  issueToken(clientId) {
-    const uri = "/token_issue/";
-    return this.baseRequest.post(uri, { client_id: clientId });
   }
 
   createSession(pull_request_id, organisation, reponame) {

@@ -8,7 +8,7 @@ export const getPullRequestIdFromPath = () => {
   return null;
 };
 
-export const getCurrentSession = sessions => {
+export const getCurrentSessionId = sessions => {
   let currentPullRequestId = getPullRequestIdFromPath();
   if (currentPullRequestId) {
     return sessions[currentPullRequestId] && sessions[currentPullRequestId].id;

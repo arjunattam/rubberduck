@@ -1,13 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import * as AuthActions from "../actions/authActions";
 import "./StatusBar.css";
 import { getParameterByName } from "./../utils/api";
-import { addChromeListener } from "./../utils/chrome";
 import { Authorization } from "./../utils/authorization";
-import * as Session from "./../utils/session";
-import * as GitPathAdapter from "../adapters/github/path";
 import * as StorageUtils from "./../utils/storage";
 
 class StatusBar extends React.Component {
@@ -15,18 +10,7 @@ class StatusBar extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    this.AuthActions = bindActionCreators(AuthActions, this.props.dispatch);
   }
-
-  componentDidMount() {
-    // See docs/AUTHENTICATION.md for flow
-    // 1. Get client id from the storage. If not found, then set it up
-    // 2. Get the jwt from the storage. If not found, then make API call to get it
-    // 3. Manage refresh for the jwt
-    // 4. On login with github, trigger oauth flow, and get new jwt
-  }
-
-  componentWillReceiveProps(nextProps) {}
 
   launchOAuthFlow = () => {
     // If token already exists we probably need to do any of this
@@ -42,7 +26,7 @@ class StatusBar extends React.Component {
       } else {
         // Successful OAuth flow, save refreshed token
         const refreshedToken = getParameterByName("token", response);
-        StorageUtils.setAllInStore({ token, token });
+        StorageUtils.setAllInStore({ token: refreshedToken });
       }
     });
   };

@@ -39,7 +39,9 @@ export const constructMessage = (type, data) => {
 
 export const sendMessage = (message, callback) => {
   chrome.runtime.sendMessage(message, function(response) {
-    callback ? callback(response) : null;
+    if (callback) {
+      callback(response);
+    }
   });
 };
 
