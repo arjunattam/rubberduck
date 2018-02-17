@@ -101,7 +101,7 @@ const getHeadOrBase = element => {
 
 const isValidResult = result => {
   return !Object.keys(result).some(function(k) {
-    return result[k] === -1;
+    return result[k] < 0;
   });
 };
 
@@ -116,7 +116,16 @@ const parseCommonAncestor = (element, x, y) => {
     mouseY: y
   };
 
-  if (isValidResult(result)) {
+  // Compute if there is text below the element
+  // Get the bounding box of the element
+  const boundRect = element.parentElement.getBoundingClientRect();
+  let hasTextOnMouse = true;
+  if (boundRect.x + boundRect.width < x) {
+    // In this case, the mouse does not have text below
+    hasTextOnMouse = false;
+  }
+
+  if (isValidResult(result) && hasTextOnMouse) {
     return result;
   } else {
     return {};

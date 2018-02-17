@@ -53,12 +53,14 @@ class HoverListener extends React.Component {
   };
 
   receiver = hoverResult => {
-    // Callback for the hover listener
-    const isValidResult =
+    // Callback for the hover listener. API call is made if the
+    // mouse locations were correctly infered by the view adapter,
+    // and there is text below the mouse.
+    const hasValidMouseLocation =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
-    if (isValidResult) {
+    if (hasValidMouseLocation) {
       API.getHover(
         SessionUtils.getCurrentSessionId(this.props.data.sessions),
         hoverResult.fileSha,
