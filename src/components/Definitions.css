@@ -9,6 +9,7 @@
   cursor: pointer;
   border-top: 1px solid #f1f8ff;
   border-bottom: 1px solid #f1f8ff;
+  margin-top: 10px;
 }
 
 .definition-item:hover {

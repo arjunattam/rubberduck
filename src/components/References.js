@@ -1,11 +1,13 @@
 import React from "react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { github as githubStyle } from "react-syntax-highlighter/styles/hljs";
-
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import { readXY } from "./../adapters/github/views/pull";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import CodeNode from "./common/CodeNode";
+import { API } from "./../utils/api";
 import "./References.css";
+import * as SessionUtils from "../utils/session";
 
 const references = [
   {
@@ -62,17 +64,6 @@ class ReferenceItem extends React.Component {
       >
         <CodeNode {...this.props} />
 
-        {/* <div className="reference-item-line">
-          <SyntaxHighlighter
-            language={"python"}
-            style={githubStyle}
-            showLineNumbers={true}
-            startingLineNumber={this.props.lineNumber}
-          >
-            {this.props.lineTrimmed}
-          </SyntaxHighlighter>
-        </div> */}
-
         {this.state.isHovering ? (
           <ExpandedCode
             language={"python"}
@@ -87,10 +78,75 @@ class ReferenceItem extends React.Component {
   }
 }
 
-export default class References extends React.Component {
-  state = {
-    isVisible: true
+class References extends React.Component {
+  // This gets x and y of the selected text, constructs the
+  // API call payload by reading DOM, and then display the
+  // result of the API call.
+  static propTypes = {
+    selectionX: PropTypes.number,
+    selectionY: PropTypes.number
   };
+
+  state = {
+    isVisible: false,
+    references: []
+  };
+
+  getReferenceItems = apiResponse => {
+    return apiResponse.references.map(reference => {
+      return {
+        name: reference.parent.name || "parent node",
+        file: reference.location.path,
+        lineNumber: reference.location.range.start.line,
+        codeSnippet: reference.contents
+      };
+    });
+  };
+
+  getSelectionData = () => {
+    // Assumes PR view and gets file name, line number etc
+    // from selection x and y
+    const hoverResult = readXY(this.props.selectionX, this.props.selectionY);
+
+    const isValidResult =
+      hoverResult.hasOwnProperty("fileSha") &&
+      hoverResult.hasOwnProperty("lineNumber");
+
+    if (isValidResult) {
+      API.getReferences(
+        SessionUtils.getCurrentSessionId(this.props.data.sessions),
+        hoverResult.fileSha,
+        hoverResult.filePath,
+        hoverResult.lineNumber,
+        hoverResult.charNumber
+      )
+        .then(response => {
+          this.setState({
+            name: hoverResult.name,
+            count: response.result.count,
+            references: this.getReferenceItems(response.result)
+          });
+        })
+        .catch(error => {
+          console.log("Error in API call", error);
+        });
+    }
+  };
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.isVisible !== this.state.isVisible) {
+      this.setState({ isVisible: newProps.isVisible });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps.selectionX !== this.props.selectionX ||
+      prevProps.selectionY !== this.props.selectionY
+    ) {
+      this.getSelectionData();
+    }
+  }
 
   toggleVisibility = () => {
     this.setState({
@@ -99,7 +155,7 @@ export default class References extends React.Component {
   };
 
   render() {
-    const referenceItems = references.map((reference, index) => {
+    const referenceItems = this.state.references.map((reference, index) => {
       return <ReferenceItem {...reference} key={index} />;
     });
 
@@ -113,8 +169,10 @@ export default class References extends React.Component {
         {this.state.isVisible ? (
           <div className="reference-container">
             <div className="reference-title">
-              <div className="reference-name monospace">send_message</div>
-              <div className="reference-count">3 references</div>
+              <div className="reference-name monospace">{this.state.name}</div>
+              <div className="reference-count">
+                {this.state.count} references
+              </div>
             </div>
             <div>{referenceItems}</div>{" "}
           </div>
@@ -123,3 +181,12 @@ export default class References extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(References);

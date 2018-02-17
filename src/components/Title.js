@@ -1,14 +1,17 @@
 import React from "react";
+import { connect } from "react-redux";
 import "./Title.css";
 
-export default class Title extends React.Component {
+class Title extends React.Component {
   render() {
+    let repoDetails = this.props.data.repoDetails;
+
     return (
       <div className="header">
         <p>
-          <a href={"/" + this.props.username}>{this.props.username}</a> /{" "}
-          <a href={"/" + this.props.username + "/" + this.props.reponame}>
-            {this.props.reponame}
+          <a href={"/" + repoDetails.username}>{repoDetails.username}</a> /{" "}
+          <a href={"/" + repoDetails.username + "/" + repoDetails.reponame}>
+            {repoDetails.reponame}
           </a>
         </p>
         <p className="branch">{this.props.branch}</p>
@@ -17,3 +20,12 @@ export default class Title extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(Title);

@@ -1,5 +1,6 @@
 import React from "react";
-import { getFilesTree } from "./../utils/api";
+import { connect } from "react-redux";
+import { API } from "./../utils/api";
 import { getChildren } from "./../utils/data";
 import { constructPath } from "./../adapters/github/path";
 import SectionHeader from "./common/Section";
@@ -115,40 +116,58 @@ class File extends React.Component {
   }
 }
 
-export default class Tree extends React.Component {
+class Tree extends React.Component {
   state = {
     data: { children: [] },
-    isVisible: false
+    isVisible: this.props.isVisible
   };
 
   updateTree = () => {
     // TODO(arjun): add proper loader
-    getFilesTree(this.props.username, this.props.reponame)
-      .then(response => {
-        this.setState({
-          data: getChildren(this.props.reponame, response.data.tree)
+    let repoDetails = this.props.data.repoDetails;
+    if (repoDetails.username && repoDetails.reponame) {
+      API.getFilesTree(repoDetails.username, repoDetails.reponame)
+        .then(response => {
+          this.setState({
+            data: getChildren(repoDetails.reponame, response.data.tree)
+          });
+        })
+        .catch(error => {
+          // TODO(arjun): this needs to be better communicated
+          console.log("Error in API call");
         });
-      })
-      .catch(error => {
-        // TODO(arjun): this needs to be better communicated
-        console.log("Error in API call");
-      });
+    }
   };
 
   componentDidMount() {
     this.updateTree();
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps !== this.props) {
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isVisible !== nextProps.isVisible) {
+      this.setState({
+        isVisible: nextProps.isVisible
+      });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.isVisible && this.state.isVisible) {
       this.updateTree();
     }
   }
 
   toggleVisibility = () => {
-    this.setState({
-      isVisible: !this.state.isVisible
-    });
+    this.setState(
+      {
+        isVisible: !this.state.isVisible
+      },
+      () => {
+        if (this.state.isVisible) {
+          this.updateTree();
+        }
+      }
+    );
   };
 
   render() {
@@ -160,7 +179,7 @@ export default class Tree extends React.Component {
     return (
       <div className="tree-container">
         <SectionHeader
-          onClick={this.toggleVisibility}
+          onClick={() => this.toggleVisibility()}
           isVisible={this.state.isVisible}
           name={"Files tree"}
         />
@@ -171,3 +190,12 @@ export default class Tree extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(Tree);

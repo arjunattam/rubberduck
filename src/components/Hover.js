@@ -1,34 +1,17 @@
 import React from "react";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { listener as blobListener } from "./../adapters/github/views/blob";
 import { listener as pullListener } from "./../adapters/github/views/pull";
+import { API } from "./../utils/api";
 import "./Hover.css";
-
-const docstring =
-  "Example function with PEP 484 type annotations." +
-  "\n" +
-  "\nArgs:" +
-  "\n    param1: The first parameter." +
-  "\n    param2: The second parameter." +
-  "\n" +
-  "\nReturns:" +
-  "\n    The return value. True for success, False otherwise.";
-
-export const getDocstringJSX = docstring => {
-  const jsx = docstring.split("\n").map((line, index) => {
-    return (
-      <span key={index}>
-        {line}
-        <br />
-      </span>
-    );
-  });
-  return jsx;
-};
+import Docstring from "./common/Docstring";
+import * as SessionUtils from "../utils/session";
 
 class HoverBox extends React.Component {
   static propTypes = {
-    elementText: PropTypes.string,
+    name: PropTypes.string,
+    docstring: PropTypes.string,
     lineNumber: PropTypes.number,
     charNumber: PropTypes.number,
     filePath: PropTypes.string,
@@ -47,32 +30,78 @@ class HoverBox extends React.Component {
           top: this.props.mouseY + padding
         }}
       >
-        <div className="title monospace">{this.props.elementText}</div>
-        <div className="docstring">{getDocstringJSX(docstring)}</div>
-        <div className="filename">{this.props.filePath}</div>
-        <div className="meta">
-          {"Line: " +
-            this.props.lineNumber +
-            " Char: " +
-            this.props.charNumber +
-            " SHA: " +
-            this.props.fileSha}
+        <div className="title monospace">{this.props.name}</div>
+        <div className="docstring">
+          {Docstring(atob(this.props.docstring || ""))}
         </div>
+        <div className="filename">{this.props.filePath}</div>
       </div>
     );
   }
 }
 
-export default class HoverListener extends React.Component {
+class HoverListener extends React.Component {
   state = {
     mouseX: -1000,
     mouseY: -1000
   };
 
-  receiver = result => {
-    // Callback for the hover listener
-    this.setState(result);
+  isOverlappingWithCurrent = (x, y) => {
+    const xdiff = Math.abs(x - this.state.currentMouseX);
+    const ydiff = Math.abs(y - this.state.currentMouseY);
+    return xdiff < 5 && ydiff < 5;
   };
+
+  receiver = hoverResult => {
+    // Callback for the hover listener. API call is made if the
+    // mouse locations were correctly infered by the view adapter,
+    // and there is text below the mouse.
+    const hasValidMouseLocation =
+      hoverResult.hasOwnProperty("fileSha") &&
+      hoverResult.hasOwnProperty("lineNumber");
+
+    if (hasValidMouseLocation) {
+      API.getHover(
+        SessionUtils.getCurrentSessionId(this.props.data.sessions),
+        hoverResult.fileSha,
+        hoverResult.filePath,
+        hoverResult.lineNumber,
+        hoverResult.charNumber
+      )
+        .then(response => {
+          if (
+            this.isOverlappingWithCurrent(
+              hoverResult.mouseX,
+              hoverResult.mouseY
+            )
+          ) {
+            // We will set state only if the current
+            // mouse location overlaps with the response
+            this.setState({
+              name: response.result.name,
+              type: response.result.type,
+              docstring: response.result.docstring,
+              filePath: response.result.definition.location.path,
+              mouseX: hoverResult.mouseX,
+              mouseY: hoverResult.mouseY
+            });
+          }
+        })
+        .catch(error => {
+          console.log("Error in API call", error);
+        });
+    } else {
+      this.setState({ mouseX: -1000, mouseY: -1000 });
+    }
+  };
+
+  onMouseOverListener(e, listener) {
+    listener(e, this.receiver);
+    this.setState({
+      currentMouseX: e.x,
+      currentMouseY: e.y
+    });
+  }
 
   setupListener = () => {
     const isFileView = window.location.href.indexOf("blob") >= 0;
@@ -86,9 +115,8 @@ export default class HoverListener extends React.Component {
     }
 
     if (listener !== null) {
-      const that = this;
       document.body.onmouseover = e => {
-        listener(e, that.receiver);
+        this.onMouseOverListener(e, listener);
       };
     } else {
       document.body.onmouseover = null;
@@ -99,7 +127,20 @@ export default class HoverListener extends React.Component {
     this.setupListener();
   }
 
+  componentWillUnmount() {
+    document.body.onmouseover = null;
+  }
+
   render() {
     return <HoverBox {...this.state} />;
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(HoverListener);
