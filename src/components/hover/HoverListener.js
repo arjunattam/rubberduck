@@ -60,7 +60,6 @@ export default class HoverListener extends React.Component {
   };
 
   componentDidMount() {
-    console.log("listener did mount");
     this.setupListener();
   }
 

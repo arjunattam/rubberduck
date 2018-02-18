@@ -1,20 +1,43 @@
 import React from "react";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as DataActions from "../../actions/dataActions";
 import { API } from "../../utils/api";
 import * as SessionUtils from "../../utils/session";
 import HoverBox from "./HoverBox";
 
 class HoverElement extends React.Component {
   // Makes the API call and shows the presentiation component: HoverBox
+  constructor(props) {
+    super(props);
+    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
+  }
+
   state = {
-    mouseX: -1000,
-    mouseY: -1000,
+    x: -1000,
+    y: -1000,
     hoverResult: {}
   };
+
   isOverlappingWithCurrent = (x, y, prevProps) => {
     const xdiff = Math.abs(x - prevProps.currentMouseX);
     const ydiff = Math.abs(y - prevProps.currentMouseY);
     return xdiff < 5 && ydiff < 5;
+  };
+
+  triggerAction = actionName => {
+    this.DataActions.updateData({
+      openSection: actionName,
+      textSelection: { x: this.state.x, y: this.state.y }
+    });
+  };
+
+  onReferences = () => {
+    this.triggerAction("references");
+  };
+
+  onDefinition = () => {
+    this.triggerAction("definitions");
   };
 
   callAPI = prevProps => {
@@ -26,12 +49,11 @@ class HoverElement extends React.Component {
       this.props.hoverResult.charNumber
     )
       .then(response => {
-        // const isForCurrentMouse = this.isOverlappingWithCurrent(
-        //   this.props.hoverResult.mouseX,
-        //   this.props.hoverResult.mouseY,
-        //   prevProps
-        // );
-        console.log("response", response);
+        const isForCurrentMouse = this.isOverlappingWithCurrent(
+          this.props.hoverResult.mouseX,
+          this.props.hoverResult.mouseY,
+          prevProps
+        );
         if (true) {
           // We will set state only if the current
           // mouse location overlaps with the response
@@ -44,8 +66,8 @@ class HoverElement extends React.Component {
             type: response.result.type,
             docstring: response.result.docstring,
             filePath: definitionPath,
-            mouseX: this.props.hoverResult.mouseX,
-            mouseY: this.props.hoverResult.mouseY
+            x: this.props.hoverResult.mouseX,
+            y: this.props.hoverResult.mouseY
           });
         }
       })
@@ -65,12 +87,11 @@ class HoverElement extends React.Component {
   }
 
   render() {
-    // console.log(this.props, this.state);
     return (
       <HoverBox
         {...this.state}
-        mouseX={this.state.mouseX}
-        mouseY={this.state.mouseY}
+        onReferences={() => this.onReferences()}
+        onDefinition={() => this.onDefinition()}
       />
     );
   }

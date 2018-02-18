@@ -12,18 +12,19 @@ export default class HoverBox extends React.Component {
     charNumber: PropTypes.number,
     filePath: PropTypes.string,
     fileSha: PropTypes.string,
-    mouseX: PropTypes.number,
-    mouseY: PropTypes.number
+    x: PropTypes.number,
+    y: PropTypes.number,
+    onReferences: PropTypes.func,
+    onDefinition: PropTypes.func
   };
 
   render() {
-    const padding = 20;
     return (
       <div
         className="hover-box"
         style={{
-          left: this.props.mouseX + padding,
-          top: this.props.mouseY + padding
+          left: this.props.x,
+          bottom: window.innerHeight - this.props.y
         }}
       >
         <div className="title monospace">{this.props.name}</div>
@@ -31,6 +32,14 @@ export default class HoverBox extends React.Component {
           {Docstring(atob(this.props.docstring || ""))}
         </div>
         <div className="filename">{this.props.filePath}</div>
+        <div className="buttons">
+          <a className="button" onClick={this.props.onReferences}>
+            See usages
+          </a>{" "}
+          <a className="button" onClick={this.props.onDefinition}>
+            Open definition
+          </a>
+        </div>
       </div>
     );
   }
