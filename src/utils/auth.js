@@ -16,6 +16,7 @@ export const getRandomToken = () => {
 
 export const triggerOAuthFlow = (jwt, cb) => {
   const url = "https://www.codeview.io/github_oauth/?token=" + jwt;
+  // const url = "http://www.localhost:8000/github_oauth/?token=" + jwt;
   const message = constructMessage("AUTH_TRIGGER", { url: url });
   sendMessage(message, cb);
 };

@@ -36,7 +36,7 @@ export class BaseRequest {
   }
 
   getAPIUrl() {
-    let baseURL = `http://localhost:8000/api/`;
+    // let baseURL = `http://localhost:8000/api/`;
     // if (process.env.NODE_ENV === "production") {
     baseURL = `https://www.codeview.io/api/`;
     // }
