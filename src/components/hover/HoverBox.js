@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Docstring from "../common/Docstring";
+import CodeNode from "../common/CodeNode";
 import "./Hover.css";
 
 export default class HoverBox extends React.Component {
@@ -27,14 +28,19 @@ export default class HoverBox extends React.Component {
           bottom: window.innerHeight - this.props.y
         }}
       >
-        <div className="title monospace">{this.props.name}</div>
+        <div className="title">
+          <CodeNode
+            name={this.props.name}
+            file={this.props.filePath}
+            showButton={false}
+          />
+        </div>
         <div className="docstring">
           {Docstring(atob(this.props.docstring || ""))}
         </div>
-        <div className="filename">{this.props.filePath}</div>
-        <div className="buttons">
+        <div className="button-container">
           <a className="button" onClick={this.props.onReferences}>
-            See usages
+            Find usages
           </a>{" "}
           <a className="button" onClick={this.props.onDefinition}>
             Open definition

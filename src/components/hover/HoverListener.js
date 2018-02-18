@@ -31,12 +31,33 @@ export default class HoverListener extends React.Component {
     }
   };
 
+  filterForHoverBox = (x, y) => {
+    // Return true if x and y lie inside the hover box
+    // We will not remove the hover box if that is the case
+    const elements = document.getElementsByClassName("hover-box");
+
+    if (elements.length > 0) {
+      const hoverElement = elements[0];
+      const rect = hoverElement.getBoundingClientRect();
+      const padding = 10;
+
+      return (
+        rect.x - padding <= x &&
+        x <= rect.x + rect.width + padding &&
+        rect.y - padding <= y &&
+        y <= rect.y + rect.height + padding
+      );
+    }
+  };
+
   onMouseOverListener(e, listener) {
-    listener(e, this.receiver);
-    this.setState({
-      currentMouseX: e.x,
-      currentMouseY: e.y
-    });
+    if (!this.filterForHoverBox(e.x, e.y)) {
+      listener(e, this.receiver);
+      this.setState({
+        currentMouseX: e.x,
+        currentMouseY: e.y
+      });
+    }
   }
 
   setupListener = () => {

@@ -4,6 +4,9 @@ import "./CodeNode.css";
 
 export default class CodeNode extends React.Component {
   render() {
+    const showButton =
+      this.props.showButton === undefined || this.props.showButton;
+
     return (
       <div className="code-node-container">
         <div className="code-node-file">
@@ -16,7 +19,9 @@ export default class CodeNode extends React.Component {
 
         {this.props.children}
 
-        <div className="code-node-button">Browse code </div>
+        {showButton ? (
+          <div className="code-node-button">Browse code</div>
+        ) : null}
       </div>
     );
   }

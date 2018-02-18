@@ -3,7 +3,7 @@
   position: fixed;
   top: 40px;
   left: 236px;
-  z-index: 10000;
+  z-index: 10010;
   border: 1px solid #c8e1ff;
   cursor: text;
 }

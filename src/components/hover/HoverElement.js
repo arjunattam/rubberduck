@@ -19,9 +19,9 @@ class HoverElement extends React.Component {
     hoverResult: {}
   };
 
-  isOverlappingWithCurrent = (x, y, prevProps) => {
-    const xdiff = Math.abs(x - prevProps.currentMouseX);
-    const ydiff = Math.abs(y - prevProps.currentMouseY);
+  isOverlappingWithCurrent = (x, y) => {
+    const xdiff = Math.abs(x - this.state.x);
+    const ydiff = Math.abs(y - this.state.y);
     return xdiff < 5 && ydiff < 5;
   };
 
@@ -40,7 +40,11 @@ class HoverElement extends React.Component {
     this.triggerAction("definitions");
   };
 
-  callAPI = prevProps => {
+  callAPI = () => {
+    const hoverXY = {
+      x: this.props.hoverResult.mouseX,
+      y: this.props.hoverResult.mouseY
+    };
     API.getHover(
       SessionUtils.getCurrentSessionId(this.props.data.sessions),
       this.props.hoverResult.fileSha,
@@ -50,11 +54,10 @@ class HoverElement extends React.Component {
     )
       .then(response => {
         const isForCurrentMouse = this.isOverlappingWithCurrent(
-          this.props.hoverResult.mouseX,
-          this.props.hoverResult.mouseY,
-          prevProps
+          hoverXY.x,
+          hoverXY.y
         );
-        if (true) {
+        if (isForCurrentMouse) {
           // We will set state only if the current
           // mouse location overlaps with the response
           let definitionPath = "";
@@ -81,9 +84,13 @@ class HoverElement extends React.Component {
       this.props.hoverResult.lineNumber !== prevProps.hoverResult.lineNumber ||
       this.props.hoverResult.charNumber !== prevProps.hoverResult.charNumber
     ) {
-      // Props have been updated, so make API call
+      // Props have been updated, so make API call if we are on new line/char
       this.callAPI(prevProps);
     }
+  }
+
+  componentWillReceiveProps(newProps) {
+    this.setState({ x: newProps.mouseX, y: newProps.mouseY, hover: {} });
   }
 
   render() {

@@ -8,8 +8,7 @@
 
 .hover-box .title {
   background: #fff;
-  padding: 10px;
-  height: 20px;
+  height: 55px;
   border-bottom: solid 1px #c8e1ff;
 }
 
@@ -17,17 +16,10 @@
   padding: 10px;
   border-bottom: solid 1px #c8e1ff;
   overflow: auto;
-  height: 170px;
+  max-height: 150px;
 }
 
-.hover-box .filename {
-  padding: 10px;
-  height: 20px;
-  border-bottom: solid 1px #c8e1ff;
-  background: #fff;
-}
-
-.hover-box .buttons {
+.hover-box .button-container {
   display: flex;
   justify-content: space-around;
   padding: 7px 0px;
