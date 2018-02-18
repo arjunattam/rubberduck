@@ -1,0 +1,15 @@
+.small-code {
+  width: 230px;
+  margin: 12px 0;
+}
+
+.small-code pre code span * {
+  display: inline-block;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.small-code pre code span {
+  word-wrap: break-word;
+  white-space: normal;
+}

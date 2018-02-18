@@ -20,7 +20,7 @@ export default class CodeNode extends React.Component {
         {this.props.children}
 
         {showButton ? (
-          <div className="code-node-button">Browse code</div>
+          <div className="code-node-button">Expand code</div>
         ) : null}
       </div>
     );
