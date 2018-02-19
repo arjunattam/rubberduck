@@ -90,7 +90,11 @@ class HoverElement extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
-    this.setState({ x: newProps.mouseX, y: newProps.mouseY, hover: {} });
+    this.setState({
+      x: newProps.mouseX,
+      y: newProps.mouseY,
+      hover: {}
+    });
   }
 
   render() {

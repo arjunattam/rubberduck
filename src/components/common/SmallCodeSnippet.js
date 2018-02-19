@@ -6,7 +6,19 @@ import "./SmallCodeSnippet.css";
 export default class SmallCodeSnippet extends React.Component {
   getMiddleLine = content => {
     const lines = content.split("\n");
-    return lines[Math.round(lines.length / 2) - 1];
+    let line = "";
+
+    if (this.props.lineNumber !== null) {
+      line = lines[this.props.lineNumber];
+    } else {
+      line = lines[Math.round(lines.length / 2) - 1];
+    }
+
+    if (line !== undefined) {
+      return line;
+    } else {
+      return "";
+    }
   };
 
   render() {

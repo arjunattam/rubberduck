@@ -4,7 +4,6 @@
 }
 
 .small-code pre code span * {
-  display: inline-block;
   word-wrap: break-word;
   white-space: normal;
 }

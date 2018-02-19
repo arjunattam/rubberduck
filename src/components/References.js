@@ -34,7 +34,10 @@ class ReferenceItem extends React.Component {
         ref={"container"}
       >
         <CodeNode {...this.props}>
-          <SmallCodeSnippet contents={this.props.codeSnippet} />
+          <SmallCodeSnippet
+            contents={this.props.codeSnippet}
+            lineNumber={this.props.lineNumber - this.props.startLineNumber}
+          />
         </CodeNode>
 
         {this.state.isHovering ? (
@@ -42,7 +45,7 @@ class ReferenceItem extends React.Component {
             language={"python"}
             codeBase64={this.props.codeSnippet}
             top={this.getTop()}
-            startLine={this.props.lineNumber}
+            startLine={this.props.startLineNumber}
             filepath={this.props.file}
           />
         ) : null}
@@ -67,11 +70,21 @@ class References extends React.Component {
 
   getReferenceItems = apiResponse => {
     return apiResponse.references.map(reference => {
+      const parent = reference.parent;
+      let parentName = "";
+
+      if (parent !== null) {
+        parentName = parent.name;
+      } else {
+        parentName = reference.location.path.split("/").slice(-1)[0];
+      }
+
       return {
-        name: reference.parent.name || "parent node",
+        name: parentName,
         file: reference.location.path,
         lineNumber: reference.location.range.start.line,
-        codeSnippet: reference.contents
+        codeSnippet: reference.contents,
+        startLineNumber: reference.contents_start_line
       };
     });
   };
