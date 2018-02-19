@@ -8,7 +8,6 @@ import Sidebar from "./Sidebar";
 import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
-import * as Session from "./../utils/session";
 import * as GitPathAdapter from "../adapters/github/path";
 
 class Extension extends React.Component {

@@ -1,43 +1,14 @@
 import React from "react";
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { readXY } from "./../adapters/github/views/pull";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
+import SmallCodeSnippet from "./common/SmallCodeSnippet";
 import CodeNode from "./common/CodeNode";
 import { API } from "./../utils/api";
-import "./References.css";
 import * as SessionUtils from "../utils/session";
-
-const references = [
-  {
-    name: "send_shutdown",
-    codeSnippet:
-      "ICAgIGRlZiBzZW5kX3NodXRkb3duKHNlbGYpOg0KICAgICAgICAnJycNCiAgICAgICAgU2VuZHMgYSBzaHV0ZG93biBtZXNzYWdlIHRvIHRoZSBzZXJ2ZXIgZnJvbSB0aGUgY2xpZW50DQogICAgICAgIHdoaWNoIHNodXRzIGRvd24gdGhlIHNlcnZlci4gVGhpcyBtZXRob2QgaXMgY2FsbGVkIHdpdGgNCiAgICAgICAgdGhlIF9fZXhpdF9fKCkgbWV0aG9kLg0KICAgICAgICAnJycNCiAgICAgICAgbXNnX2lkID0gc2VsZi5zZW5kX21lc3NhZ2UoJ3NodXRkb3duJywge30pDQogICAgICAgIHJldHVybiBzZWxmLmdldF9yZXNwb25zZShtc2dfaWQp",
-    file: "apps/ls_clients/base.py",
-    line: "msg_id = self.send_message('shutdown', {})",
-    lineTrimmed: "send_message('shutdown', {})",
-    lineNumber: 24
-  },
-  {
-    name: "send_file_did_close",
-    codeSnippet:
-      "ICAgIGRlZiBzZW5kX2ZpbGVfZGlkX2Nsb3NlKHNlbGYsIGZpbGVfcGF0aCk6DQogICAgICAgICcnJw0KICAgICAgICBTZW5kIGZpbGUgY2xvc2UgcmVxdWVzdCB0byB0aGUgc2VydmVyDQogICAgICAgICcnJw0KICAgICAgICBtc2dfaWQgPSBzZWxmLnNlbmRfbWVzc2FnZSgndGV4dERvY3VtZW50L2RpZENsb3NlJywgew0KICAgICAgICAgICAgJ3RleHREb2N1bWVudCc6IHsNCiAgICAgICAgICAgICAgICAjIFRleHREb2N1bWVudElkZW50aWZpZXIgaW50ZXJmYWNlDQogICAgICAgICAgICAgICAgJ3VyaSc6IGdldF91cmlfZnJvbV9maWxlX3BhdGgoZmlsZV9wYXRoKSwNCiAgICAgICAgICAgIH0NCiAgICAgICAgfSkNCiAgICAgICAgcmV0dXJuIHNlbGYuZ2V0X3Jlc3BvbnNlKG1zZ19pZCk=",
-    file: "apps/ls_clients/base.py",
-    line: "msg_id = self.send_message('textDocument/didClose', {",
-    lineTrimmed: "send_message('textDocument...",
-    lineNumber: 34
-  },
-  {
-    name: "send_document_symbols",
-    codeSnippet:
-      "ICAgIGRlZiBzZW5kX2RvY3VtZW50X3N5bWJvbHMoc2VsZiwgZmlsZV9wYXRoKToNCiAgICAgICAgJycnDQogICAgICAgIFNlbmQgdGV4dERvY3VtZW50L2RvY3VtZW50U3ltYm9sIG1lc3NhZ2UgdG8gZ2V0DQogICAgICAgIHN5bWJvbHMgb2YgdGhlIGRvY3VtZW50LiBXaGVuIHRoaXMgaXMgY2FsbGVkLCBlbnN1cmUNCiAgICAgICAgdGhhdCB0aGUgZG9jdW1lbnRzIGFyZSBvcGVuZWQgYW5kIGNsb3NlZCBvbiB0aGUgc2VydmVyLg0KICAgICAgICAnJycNCiAgICAgICAgbXNnX2lkID0gc2VsZi5zZW5kX21lc3NhZ2UoJ3RleHREb2N1bWVudC9kb2N1bWVudFN5bWJvbCcsIHsNCiAgICAgICAgICAgICMgVGV4dERvY3VtZW50SWRlbnRpZmllciBpbnRlcmZhY2UNCiAgICAgICAgICAgICd0ZXh0RG9jdW1lbnQnOiB7DQogICAgICAgICAgICAgICAgJ3VyaSc6IGdldF91cmlfZnJvbV9maWxlX3BhdGgoZmlsZV9wYXRoKQ0KICAgICAgICAgICAgfQ0KICAgICAgICB9KQ0KICAgICAgICByZXR1cm4gc2VsZi5nZXRfcmVzcG9uc2UobXNnX2lkKQ==",
-    file: "apps/ls_clients/base.py",
-    line: "msg_id = self.send_message('textDocument/documentSymbol', {",
-    lineTrimmed: "send_message('textDocument...",
-    lineNumber: 48
-  }
-];
+import "./References.css";
 
 class ReferenceItem extends React.Component {
   state = {
@@ -62,14 +33,19 @@ class ReferenceItem extends React.Component {
         onMouseLeave={this.handleMouseHover}
         ref={"container"}
       >
-        <CodeNode {...this.props} />
+        <CodeNode {...this.props}>
+          <SmallCodeSnippet
+            contents={this.props.codeSnippet}
+            lineNumber={this.props.lineNumber - this.props.startLineNumber}
+          />
+        </CodeNode>
 
         {this.state.isHovering ? (
           <ExpandedCode
             language={"python"}
             codeBase64={this.props.codeSnippet}
             top={this.getTop()}
-            startLine={this.props.lineNumber}
+            startLine={this.props.startLineNumber}
             filepath={this.props.file}
           />
         ) : null}
@@ -94,11 +70,21 @@ class References extends React.Component {
 
   getReferenceItems = apiResponse => {
     return apiResponse.references.map(reference => {
+      const parent = reference.parent;
+      let parentName = "";
+
+      if (parent !== null) {
+        parentName = parent.name;
+      } else {
+        parentName = reference.location.path.split("/").slice(-1)[0];
+      }
+
       return {
-        name: reference.parent.name || "parent node",
+        name: parentName,
         file: reference.location.path,
         lineNumber: reference.location.range.start.line,
-        codeSnippet: reference.contents
+        codeSnippet: reference.contents,
+        startLineNumber: reference.contents_start_line
       };
     });
   };

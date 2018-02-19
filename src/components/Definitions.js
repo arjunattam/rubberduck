@@ -10,17 +10,6 @@ import { API } from "./../utils/api";
 import "./Definitions.css";
 import * as SessionUtils from "../utils/session";
 
-const definitionSample = {
-  name: "PythonLSClient",
-  baseName: "BaseLSClient",
-  filePath: "apps/ls_clients/python.py",
-  lineNumber: 25,
-  docstring:
-    "Q2xhc3MgdGhhdCBtYWludGFpbnMgdGhlIGNsaWVudCBhbmQgc2VydmVyIGxpZmVjeWNsZQ0KZm9yIHRoZSBsYW5ndWFnZSBzZXJ2ZXIuIFRvIHVzZSwgdXNlIHRoZSBgd2l0aGAga2V5d29yZA0KDQp3aXRoIFB5dGhvbkxTQ2xpZW50KCkgYXMgcGxzOg0KLi4uDQoNClRoaXMgd2lsbCBlbnN1cmUgdGhhdCB0aGUgY2xpZW50L3NlcnZlciBhcmUgc2h1dGRvd24NCnByb3Blcmx5IGF0IHRoZSBlbmQgb2YgdGhlIGV4ZWN1dGlvbi4=",
-  codeSnippet:
-    "DQpjbGFzcyBQeXRob25MU0NsaWVudChCYXNlTFNDbGllbnQpOg0KICAgICcnJw0KICAgIENsYXNzIHRoYXQgbWFpbnRhaW5zIHRoZSBjbGllbnQgYW5kIHNlcnZlciBsaWZlY3ljbGUNCiAgICBmb3IgdGhlIGxhbmd1YWdlIHNlcnZlci4gVG8gdXNlLCB1c2UgdGhlIGB3aXRoYCBrZXl3b3JkDQogICAgd2l0aCBQeXRob25MU0NsaWVudCgpIGFzIHBsczoNCiAgICAgICAgLi4uDQogICAgVGhpcyB3aWxsIGVuc3VyZSB0aGF0IHRoZSBjbGllbnQvc2VydmVyIGFyZSBzaHV0ZG93bg0KICAgIHByb3Blcmx5IGF0IHRoZSBlbmQgb2YgdGhlIGV4ZWN1dGlvbi4NCiAgICAnJycNCiAgICBMQU5HVUFHRV9JRCA9ICdweXRob24nDQogICAgRklMRV9FWFRFTlNJT04gPSAnLnB5Jw0KDQogICAgZGVmIF9faW5pdF9fKHNlbGYsIHByb2plY3RfcGF0aCk6DQogICAgICAgICcnJw0KICAgICAgICBTZXRzIHVwIHR3byB0aHJlYWRzLCBvbmUgZm9yIHRoZSBjbGllbnQsIGFuZCBvdGhlcg0KICAgICAgICBmb3IgdGhlIHNlcnZlci4gQWxzbyBzZXRzIHVwIHRoZSB1bml4IHNvY2tldHMgYmV0d2Vlbg0KICAgICAgICB0aGVzZSB0d28uDQogICAgICAgICcnJw0KICAgICAgICBzZWxmLlBST0pFQ1RfUEFUSCA9IHByb2plY3RfcGF0aA0KICAgICAgICBjc3IsIGNzdyA9IG9zLnBpcGUoKSAgIyBDbGllbnQgdG8gU2VydmVyIHBpcGUNCiAgICAgICAgc2NyLCBzY3cgPSBvcy5waXBlKCkgICMgU2VydmVyIHRvIENsaWVudCBwaXBlDQogICAgICAgIHNlcnZlciA9IFRocmVhZCh0YXJnZXQ9c3RhcnRfaW9fbGFuZ19zZXJ2ZXIsIGFyZ3M9KA0KICAgICAgICAgICAgb3MuZmRvcGVuKGNzciwgJ3JiJyksIG9zLmZkb3BlbihzY3csICd3YicpLCBQeXRob25MYW5ndWFnZVNlcnZlcg0KICAgICAgICApKQ0KICAgICAgICBzZXJ2ZXIuZGFlbW9uID0gVHJ1ZQ0KICAgICAgICBzZXJ2ZXIuc3RhcnQoKQ0KICAgICAgICBjbGllbnQgPSBKU09OUlBDQ2xpZW50KG9zLmZkb3BlbihzY3IsICdyYicpLCBvcy5mZG9wZW4oY3N3LCAnd2InKSkNCiAgICAgICAgc2VsZi5zZXJ2ZXIgPSBzZXJ2ZXINCiAgICAgICAgc2VsZi5jbGllbnQgPSBjbGllbnQNCiAgICAgICAgc2VsZi5zZW5kX2luaXRpYWxpemUoKQ0KDQogICAgZGVmIGNsb3NlKHNlbGYpOg0KICAgICAgICAnJycNCiAgICAgICAgU2VuZCBzaHV0ZG93biB0byB0aGUgbGFuZ3VhZ2Ugc2VydmVyDQogICAgICAgICcnJw0KICAgICAgICBzZWxmLnNlbmRfc2h1dGRvd24oKQ0KICAgICAgICBzZWxmLmNsaWVudC5ub3RpZnkoJ2V4aXQnKQ=="
-};
-
 class DefinitionItem extends React.Component {
   state = {
     isHovering: false
@@ -118,9 +107,8 @@ class Definitions extends React.Component {
         hoverResult.charNumber
       )
         .then(response => {
-          console.log("response", response);
           const definition = {
-            name: hoverResult.name,
+            name: response.result.name,
             filePath: response.result.definition.location.path,
             lineNumber: response.result.definition.location.range.start.line,
             docstring: response.result.docstring,
