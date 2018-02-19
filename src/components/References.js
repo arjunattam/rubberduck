@@ -100,7 +100,7 @@ class References extends React.Component {
 
     if (isValidResult) {
       API.getReferences(
-        SessionUtils.getCurrentSessionId(this.props.data.sessions),
+        SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
