@@ -32,6 +32,9 @@ class Extension extends React.Component {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
     }
+    if (!prevProps.storage.token && this.props.storage.token) {
+      this.handleSessionInitialization();
+    }
   }
 
   setupChromeListener() {
@@ -80,6 +83,7 @@ class Extension extends React.Component {
   }
 
   handleStorageUpdate(data) {
+    console.log("Storage changes via listener", data);
     this.StorageActions.updateFromChromeStorage(data);
   }
 
@@ -96,11 +100,16 @@ class Extension extends React.Component {
     let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
     if (type === "pull" && username && reponame && typeId) {
       let prId = btoa(`${username}/${reponame}/${typeId}`);
-      if (!this.props.data.sessions[prId] && this.props.storage.token) {
-        this.DataActions.createSession({
-          prNumber: typeId,
-          username,
-          reponame
+      if (!this.props.storage.sessions[prId] && this.props.storage.token) {
+        API.createSession(typeId, username, reponame).then(response => {
+          let prId = btoa(`${username}/${reponame}/${typeId}`);
+          let sessions = {
+            ...this.props.storage.sessions,
+            [prId]: { ...response }
+          };
+          StorageUtils.setAllInStore({ sessions }, res => {
+            console.log("Sessions set in store", sessions, res);
+          });
         });
       }
     }

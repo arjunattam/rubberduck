@@ -111,7 +111,7 @@ class Definitions extends React.Component {
 
     if (isValidResult) {
       API.getDefinition(
-        SessionUtils.getCurrentSessionId(this.props.data.sessions),
+        SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,

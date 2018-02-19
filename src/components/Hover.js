@@ -62,7 +62,7 @@ class HoverListener extends React.Component {
 
     if (hasValidMouseLocation) {
       API.getHover(
-        SessionUtils.getCurrentSessionId(this.props.data.sessions),
+        SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
@@ -81,7 +81,9 @@ class HoverListener extends React.Component {
               name: response.result.name,
               type: response.result.type,
               docstring: response.result.docstring,
-              filePath: response.result.definition.location.path,
+              filePath:
+                response.result.definition.location &&
+                response.result.definition.location.path,
               mouseX: hoverResult.mouseX,
               mouseY: hoverResult.mouseY
             });
