@@ -26,7 +26,7 @@ export default class ExpandedCode extends React.Component {
             startingLineNumber={this.props.startLine}
             lineNumberStyle={{ color: "rgba(27,31,35,0.3)" }}
             lineProps={lineNo => {
-              if (lineNo === 2) {
+              if (lineNo > 0) {
                 return {
                   style: {
                     backgroundColor: "red"

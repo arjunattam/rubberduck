@@ -46,7 +46,7 @@ class HoverElement extends React.Component {
       y: this.props.hoverResult.mouseY
     };
     API.getHover(
-      SessionUtils.getCurrentSessionId(this.props.data.sessions),
+      SessionUtils.getCurrentSessionId(this.props.storage.sessions),
       this.props.hoverResult.fileSha,
       this.props.hoverResult.filePath,
       this.props.hoverResult.lineNumber,
