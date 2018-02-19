@@ -16,11 +16,16 @@ export default class ExpandedCode extends React.Component {
   }
 
   getHighligtedLineStyle(lineNo) {
-    if (lineNo === 1) {
+    let highlightedLineNo;
+    if (this.props.lineNumber && this.props.startLine) {
+      highlightedLineNo = this.props.lineNumber - this.props.startLine;
+    }
+    if (highlightedLineNo && highlightedLineNo === lineNo) {
       return {
         backgroundColor: "#ffecec"
       };
     }
+    return {};
   }
 
   render() {
@@ -46,7 +51,7 @@ export default class ExpandedCode extends React.Component {
             lineNumberStyle={{ color: "rgba(27,31,35,0.3)" }}
             wrapLines={true}
             lineStyle={lineNo => {
-              this.getHighligtedLineStyle(lineNo);
+              return this.getHighligtedLineStyle(lineNo);
             }}
           >
             {decodedCode}

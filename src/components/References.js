@@ -46,6 +46,7 @@ class ReferenceItem extends React.Component {
             codeBase64={this.props.codeSnippet}
             top={this.getTop()}
             startLine={this.props.startLineNumber}
+            lineNumber={this.props.lineNumber}
             filepath={this.props.file}
           />
         ) : null}
