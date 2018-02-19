@@ -107,9 +107,12 @@ class Definitions extends React.Component {
         hoverResult.charNumber
       )
         .then(response => {
+          let filePath = response.result.definition.location
+            ? response.result.definition.location.path
+            : "";
           const definition = {
             name: response.result.name,
-            filePath: response.result.definition.location.path,
+            filePath: filePath,
             lineNumber: response.result.definition.location.range.start.line,
             docstring: response.result.docstring,
             codeSnippet: response.result.definition.contents
