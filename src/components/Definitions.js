@@ -43,9 +43,11 @@ class DefinitionItem extends React.Component {
 
         {this.state.isHovering ? (
           <ExpandedCode
+            language={"python"}
             codeBase64={this.props.codeSnippet}
             top={this.getTop()}
-            startLine={this.props.lineNumber}
+            startLine={this.props.startLineNumber}
+            lineNumber={this.props.lineNumber}
             filepath={this.props.filePath}
           />
         ) : null}
@@ -113,6 +115,7 @@ class Definitions extends React.Component {
           const definition = {
             name: response.result.name,
             filePath: filePath,
+            startLineNumber: response.result.definition.contents_start_line,
             lineNumber: response.result.definition.location.range.start.line,
             docstring: response.result.docstring,
             codeSnippet: response.result.definition.contents
