@@ -1,0 +1,91 @@
+import React from "react";
+import { connect } from "react-redux";
+import { API } from "../../utils/api";
+import { getChildren } from "../../utils/data";
+import SectionHeader from "../common/Section";
+import { renderChildren } from "./Folder";
+import "./Tree.css";
+
+class Tree extends React.Component {
+  state = {
+    data: { children: [] },
+    isVisible: this.props.isVisible
+  };
+
+  updateTree = () => {
+    // TODO(arjun): add proper loader
+    let repoDetails = this.props.data.repoDetails;
+    if (repoDetails.username && repoDetails.reponame) {
+      API.getFilesTree(repoDetails.username, repoDetails.reponame)
+        .then(response => {
+          this.setState({
+            data: getChildren(repoDetails.reponame, response.data.tree)
+          });
+        })
+        .catch(error => {
+          // TODO(arjun): this needs to be better communicated
+          console.log("Error in API call");
+        });
+    }
+  };
+
+  componentDidMount() {
+    this.updateTree();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.isVisible !== nextProps.isVisible) {
+      this.setState({
+        isVisible: nextProps.isVisible
+      });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.isVisible && this.state.isVisible) {
+      this.updateTree();
+    }
+  }
+
+  toggleVisibility = () => {
+    this.setState(
+      {
+        isVisible: !this.state.isVisible
+      },
+      () => {
+        if (this.state.isVisible) {
+          this.updateTree();
+        }
+      }
+    );
+  };
+
+  render() {
+    // data is a recursive tree structure, where every element
+    // has children, that denote the subtree
+    const children = this.state.data.children;
+    const renderedChildren = renderChildren(children, 0, this.props);
+
+    return (
+      <div className="tree-container">
+        <SectionHeader
+          onClick={() => this.toggleVisibility()}
+          isVisible={this.state.isVisible}
+          name={"Files tree"}
+        />
+        {this.state.isVisible ? (
+          <div className="tree-content">{renderedChildren}</div>
+        ) : null}
+      </div>
+    );
+  }
+}
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(Tree);

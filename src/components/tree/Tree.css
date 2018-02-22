@@ -12,6 +12,10 @@
   margin-top: 1px;
 }
 
+.file-selected a {
+  background: #e0eefd;
+}
+
 .file-container a {
   display: block;
   width: 232px;
@@ -23,4 +27,15 @@
 .file-container a:hover {
   background: #eee;
   text-decoration: none;
+}
+
+.file-triangle {
+  height: 9px;
+  width: 9px;
+  fill: none;
+  padding-top: 3px;
+}
+
+.file-triangle path {
+  stroke: #999;
 }
