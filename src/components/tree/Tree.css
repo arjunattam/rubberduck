@@ -39,3 +39,18 @@
 .file-triangle path {
   stroke: #999;
 }
+
+@keyframes slidein {
+  from {
+    transform: translateY(-6em);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.file-children {
+  animation-duration: 1s;
+  animation-name: slidein;
+}

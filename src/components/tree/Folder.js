@@ -89,7 +89,9 @@ class Folder extends React.Component {
             {this.props.name}
           </a>
         </div>
-        <div>{this.state.isCollapsed ? null : renderedChildren}</div>
+        {this.state.isCollapsed ? null : (
+          <div className="file-children">{renderedChildren}</div>
+        )}
       </div>
     );
   }

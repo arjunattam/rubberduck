@@ -20,7 +20,8 @@ class Title extends React.Component {
           </a>
         </p>
         <p className="branch">
-          <Octicon name="git-branch" style={{ height: 12 }} /> {"master"}
+          <Octicon name="git-branch" style={{ height: 12 }} />{" "}
+          {this.props.data.repoDetails.branch}
         </p>
         <div>{this.props.children}</div>
       </div>
