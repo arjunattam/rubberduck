@@ -31,7 +31,10 @@ class Tree extends React.Component {
   };
 
   componentDidMount() {
-    this.updateTree();
+    if (this.props.storage.token !== undefined) {
+      // We have the jwt, so make API call
+      this.updateTree();
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,6 +42,11 @@ class Tree extends React.Component {
       this.setState({
         isVisible: nextProps.isVisible
       });
+    }
+
+    if (this.props.storage.token !== nextProps.storage.token) {
+      // jwt has been updated, so refresh the tree
+      this.updateTree();
     }
   }
 
