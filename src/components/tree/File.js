@@ -28,6 +28,13 @@ export class File extends React.Component {
     return (this.props.depth + 1) * 12 + 2;
   };
 
+  scrollTo = () => {
+    const fileBox = document.querySelectorAll(
+      `div.file-header[data-path="${this.props.path}"]`
+    )[0];
+    window.scrollTo(0, window.scrollY + fileBox.getBoundingClientRect().y - 75);
+  };
+
   render() {
     const pl = this.getPadding();
     const path = constructPath(
@@ -37,12 +44,22 @@ export class File extends React.Component {
       this.props.data.repoDetails.branch
     );
 
-    return (
-      <div className="file-container">
-        <a href={path} style={{ paddingLeft: pl }}>
-          <TreeLabel {...this.props} icon="file" iconColor="#999" />
-        </a>
-      </div>
-    );
+    if (this.props.additions !== undefined) {
+      return (
+        <div className="file-container">
+          <a onClick={() => this.scrollTo()} style={{ paddingLeft: pl }}>
+            <TreeLabel {...this.props} icon="file" iconColor="#999" />
+          </a>
+        </div>
+      );
+    } else {
+      return (
+        <div className="file-container">
+          <a href={path} style={{ paddingLeft: pl }}>
+            <TreeLabel {...this.props} icon="file" iconColor="#999" />
+          </a>
+        </div>
+      );
+    }
   }
 }
