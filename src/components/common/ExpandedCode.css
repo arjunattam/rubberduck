@@ -29,6 +29,10 @@
 
 .expanded-filepath {
   padding-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 500px;
 }
 
 .expanded-button {

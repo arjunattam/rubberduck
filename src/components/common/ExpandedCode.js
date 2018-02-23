@@ -5,6 +5,8 @@ import Octicon from "react-component-octicons";
 import "./ExpandedCode.css";
 
 export default class ExpandedCode extends React.Component {
+  // Line numbers are zero-indexed in the API, so we need to +1
+  // for display.
   getBase64Decoded(encodedString) {
     let decoded = "";
     try {
@@ -47,7 +49,7 @@ export default class ExpandedCode extends React.Component {
             language={this.props.language}
             style={githubStyle}
             showLineNumbers={true}
-            startingLineNumber={this.props.startLine}
+            startingLineNumber={this.props.startLine + 1}
             lineNumberStyle={{ color: "rgba(27,31,35,0.3)" }}
             wrapLines={true}
             lineStyle={lineNo => {

@@ -151,7 +151,7 @@ class References extends React.Component {
         <SectionHeader
           onClick={this.toggleVisibility}
           isVisible={this.state.isVisible}
-          name={"References"}
+          name={"Usages"}
         />
         {this.state.isVisible ? (
           <div className="reference-container">

@@ -2,7 +2,7 @@ const jsLocation = JS_ASSET_LOCATION; // will be replaced with actual location b
 const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location by script
 const CONTEXT_MENUS = [
   {
-    title: "Find references",
+    title: "Find usages",
     id: "REFERENCES_TRIGGER",
     contexts: ["page", "selection"]
   },

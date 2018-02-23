@@ -31,8 +31,8 @@ export const renderChildren = (children, depth, parentProps) => {
     <div>
       {childrenToRender.map(element => {
         if (element.children.length > 0) {
-          // Ordering of props is important since the element needs to override
-          // the parentProps
+          // Ordering of props is important since the element
+          // needs to override the parentProps
           return (
             <Folder
               {...parentProps}
@@ -85,12 +85,8 @@ class Folder extends React.Component {
       <Octicon name="triangle-down" className="file-triangle" />
     );
     const childrenStyle = this.state.isCollapsed
-      ? {
-          display: "none"
-        }
-      : {
-          display: "block"
-        };
+      ? "file-children-collapsed"
+      : null;
 
     return (
       <div>
@@ -104,7 +100,7 @@ class Folder extends React.Component {
             {this.props.name}
           </a>
         </div>
-        <div className="file-children" style={childrenStyle}>
+        <div className={"file-children " + childrenStyle}>
           {renderedChildren}
         </div>
       </div>

@@ -4,11 +4,20 @@
 }
 
 .tree-content {
-  /* padding-bottom: 10px; */
-  /* max-height: calc(100vh - 207px); */
   overflow-y: auto;
   overflow-x: hidden;
   transition: max-height 200ms ease-in;
+}
+
+.tree-content-visible {
+  padding-bottom: 10px;
+  max-height: calc(100vh - 192px);
+}
+
+.tree-content-hidden {
+  max-height: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 .file-container {
@@ -58,4 +67,8 @@
 
 .file-children {
   animation: slide-down 0.1s ease-out;
+}
+
+.file-children-collapsed {
+  display: none;
 }

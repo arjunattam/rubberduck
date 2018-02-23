@@ -66,16 +66,9 @@ class Tree extends React.Component {
     // has children, that denote the subtree
     const children = this.state.data.children;
     const renderedChildren = renderChildren(children, 0, this.props);
-    const contentStyle = this.state.isVisible
-      ? {
-          maxHeight: "calc(100vh - 207px)",
-          paddingBottom: 10
-        }
-      : {
-          maxHeight: 0,
-          padding: 0,
-          overflow: "hidden"
-        };
+    const styleClass = this.state.isVisible
+      ? "tree-content-visible"
+      : "tree-content-hidden";
 
     return (
       <div className="tree-container">
@@ -84,9 +77,7 @@ class Tree extends React.Component {
           isVisible={this.state.isVisible}
           name={"Files tree"}
         />
-        <div className="tree-content" style={contentStyle}>
-          {renderedChildren}
-        </div>
+        <div className={"tree-content " + styleClass}>{renderedChildren}</div>
       </div>
     );
   }
