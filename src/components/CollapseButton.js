@@ -1,12 +1,14 @@
 import React from "react";
+import Octicon from "react-component-octicons";
 import "./CollapseButton.css";
 
 export default class CollapseButton extends React.Component {
-  // TODO (arjun): when the page is scrolled, and the view is shown,
-  // the page scrolls up. This needs to be fixed.
-
   render() {
-    const text = this.props.isVisible ? "←" : "→";
+    const icon = this.props.isVisible ? (
+      <Octicon name="chevron-left" style={{ height: 20, width: 20 }} />
+    ) : (
+      <Octicon name="chevron-right" style={{ height: 20, width: 20 }} />
+    );
     const classMod = this.props.isVisible ? "shown" : "";
 
     return (
@@ -14,7 +16,7 @@ export default class CollapseButton extends React.Component {
         className={"collapse-container " + classMod}
         onClick={this.props.onClick}
       >
-        {text}
+        {icon}
       </div>
     );
   }

@@ -16,7 +16,8 @@ class Tree extends React.Component {
     // TODO(arjun): add proper loader
     let repoDetails = this.props.data.repoDetails;
     if (repoDetails.username && repoDetails.reponame) {
-      API.getFilesTree(repoDetails.username, repoDetails.reponame)
+      const branch = repoDetails.branch || "master";
+      API.getFilesTree(repoDetails.username, repoDetails.reponame, branch)
         .then(response => {
           this.setState({
             data: getChildren(repoDetails.reponame, response.data.tree)

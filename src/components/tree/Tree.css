@@ -1,15 +1,21 @@
 .tree-container {
-  overflow-x: hidden;
   background: #fff;
+  overflow: hidden;
 }
 
 .tree-content {
-  margin-bottom: 10px;
+  padding-bottom: 10px;
+  max-height: calc(100vh - 207px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .file-container {
   font-size: 14px;
   margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .file-selected a {
@@ -39,7 +45,7 @@
 .file-triangle path {
   stroke: #999;
 }
-
+/* 
 @keyframes slidein {
   from {
     transform: translateY(-6em);
@@ -53,4 +59,4 @@
 .file-children {
   animation-duration: 1s;
   animation-name: slidein;
-}
+} */

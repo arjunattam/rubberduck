@@ -90,9 +90,8 @@ export class BaseAPI {
     sendMessage(message, cb);
   }
 
-  getFilesTree(username, reponame) {
-    const uri =
-      "/repos/" + username + "/" + reponame + "/git/trees/master?recursive=1";
+  getFilesTree(username, reponame, branch) {
+    const uri = `/repos/${username}/${reponame}/git/trees/${branch}?recursive=1`;
     return axios.get("https://api.github.com" + uri, {
       // TODO(arjun): replace this with the github token
       headers: {

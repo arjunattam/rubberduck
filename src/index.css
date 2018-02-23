@@ -19,7 +19,6 @@ body {
   border-right: #ccc solid 1px;
   font-size: 13px;
   height: 100%;
-  overflow: auto;
 }
 
 .monospace {
