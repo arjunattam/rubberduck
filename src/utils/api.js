@@ -2,6 +2,9 @@ import { sendMessage, constructMessage } from "./chrome";
 import Store from "../store";
 const axios = require("axios");
 
+export const rootUrl = "https://www.codeview.io/";
+// export const rootUrl = 'http://localhost:8000/'
+
 export const encodeQueryData = data => {
   let ret = [];
   for (let d in data)
@@ -36,11 +39,7 @@ export class BaseRequest {
   }
 
   getAPIUrl() {
-    // let baseURL = `http://localhost:8000/api/`;
-    // if (process.env.NODE_ENV === "production") {
-    let baseURL = `https://www.codeview.io/api/`;
-    // }
-    return baseURL;
+    return `${rootUrl}api/`;
   }
 
   fetch(uri, params) {
