@@ -72,3 +72,21 @@
 .file-children-collapsed {
   display: none;
 }
+
+.tree-additions {
+  font-size: 11px;
+  color: #2cbe4e;
+}
+
+.tree-additions::before {
+  content: "+";
+}
+
+.tree-deletions {
+  font-size: 11px;
+  color: #cb2531;
+}
+
+.tree-deletions::before {
+  content: "-";
+}

@@ -9,7 +9,6 @@ import "./Tree.css";
 class Tree extends React.Component {
   state = {
     data: { children: [] },
-    isPRTree: false,
     isVisible: this.props.isVisible
   };
 
@@ -27,7 +26,6 @@ class Tree extends React.Component {
         API.getPRFiles(username, reponame, pullId)
           .then(response => {
             this.setState({
-              isPRTree: true,
               data: getPRChildren(reponame, response.data)
             });
           })
@@ -41,8 +39,7 @@ class Tree extends React.Component {
         API.getFilesTree(username, reponame, branch)
           .then(response => {
             this.setState({
-              data: getTreeChildren(reponame, response.data.tree),
-              isPRTree: false
+              data: getTreeChildren(reponame, response.data.tree)
             });
           })
           .catch(error => {

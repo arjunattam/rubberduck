@@ -49,16 +49,45 @@ const fillPaths = (tree, parentPath) => {
   return tree;
 };
 
+const sumOfKey = (children, key) => {
+  let sum = 0;
+  for (var index = 0; index < children.length; index++) {
+    sum += children[index][key];
+  }
+  return sum;
+};
+
+const appendDiffInfo = (tree, prResponse) => {
+  for (var index = 0; index < tree.length; index++) {
+    const element = tree[index];
+
+    if (element.children.length === 0) {
+      // We find this in the prResponse
+      const prFile = prResponse.find(x => x.filename === element.path);
+      tree[index].additions = prFile.additions;
+      tree[index].deletions = prFile.deletions;
+    } else {
+      // Need to sum up from children
+      tree[index].children = appendDiffInfo(tree[index].children, prResponse);
+      tree[index].additions = sumOfKey(tree[index].children, "additions");
+      tree[index].deletions = sumOfKey(tree[index].children, "deletions");
+    }
+  }
+
+  return tree;
+};
+
 export const getPRChildren = (reponame, fileList) => {
   // fileList is a list of files that have been changed in the PR
   const filenames = fileList.map(element => {
     return element.filename;
   });
-  return {
+  let result = {
     name: reponame,
     path: "",
     children: fillPaths(buildTree(filenames), "")
   };
+  return appendDiffInfo([result], fileList)[0];
 };
 
 export const getTreeChildren = (reponame, tree) => {
