@@ -85,7 +85,11 @@ class Folder extends React.Component {
       <div>
         <div className={"file-container " + selectedName}>
           <a onClick={this.toggleCollapsed} style={{ paddingLeft: pl }}>
-            {triangle} <Octicon name="file-directory" style={{ height: 15 }} />{" "}
+            {triangle}{" "}
+            <Octicon
+              name="file-directory"
+              style={{ height: 15, color: "#8294ac" }}
+            />{" "}
             {this.props.name}
           </a>
         </div>

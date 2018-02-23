@@ -13,14 +13,15 @@ export default class File extends React.Component {
     const pl = this.getPadding();
     const path = constructPath(
       this.props.path,
-      this.props.username,
-      this.props.reponame,
-      this.props.branch
+      this.props.data.repoDetails.username,
+      this.props.data.repoDetails.reponame,
+      this.props.data.repoDetails.branch
     );
     return (
       <div className="file-container">
         <a href={path} style={{ paddingLeft: pl }}>
-          <Octicon name="file" style={{ height: 15 }} /> {this.props.name}
+          <Octicon name="file" style={{ height: 15, color: "#999" }} />{" "}
+          {this.props.name}
         </a>
       </div>
     );
