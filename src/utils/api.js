@@ -1,5 +1,6 @@
 import { sendMessage, constructMessage } from "./chrome";
 import Store from "../store";
+import { Authorization } from "./authorization";
 const axios = require("axios");
 
 export const encodeQueryData = data => {
@@ -90,15 +91,36 @@ export class BaseAPI {
     sendMessage(message, cb);
   }
 
+  isGithubAuthorized() {
+    const token = Store.getState().storage.token;
+    const decoded = Authorization.decodeJWT(token);
+
+    if (decoded !== null) return decoded.github_username !== "";
+    else return false;
+  }
+
+  makePassthroughGet(uriPath) {
+    if (this.isGithubAuthorized()) {
+      // If user is logged in with github, we will send
+      // this API call to pass through via backend.
+      const uri = `/github_passthrough/${uriPath}`;
+      return this.baseRequest.fetch(uri);
+    } else {
+      // Make call directly to github using client IP address
+      // for efficient rate limit utilisation.
+      const uri = `https://api.github.com/${uriPath}`;
+      return axios.get(uri);
+    }
+  }
+
   getFilesTree(username, reponame) {
-    const uri =
-      "/repos/" + username + "/" + reponame + "/git/trees/master?recursive=1";
-    return axios.get("https://api.github.com" + uri, {
-      // TODO(arjun): replace this with the github token
-      headers: {
-        Authorization: "token 111ab37ff1337fc2ab25cc86c96f01981a8e7c4f"
-      }
-    });
+    const uriPath = `repos/${username}/${reponame}/git/trees/master?recursive=1`;
+    return this.makePassthroughGet(uriPath);
+  }
+
+  getPRFiles(username, reponame, pr) {
+    const uriPath = `repos/${username}/${reponame}/pulls/${pr}/files`;
+    return this.makePassthroughGet(uriPath);
   }
 
   issueToken(clientId) {
