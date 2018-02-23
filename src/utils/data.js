@@ -1,53 +1,73 @@
 // Utilities to convert data formats
-export const getChildren = (reponame, tree) => {
-  // tree has objects of types `tree` and `blob`
-  // this method converts this flat tree structure into
-  // a proper nested tree.
-  let result = {
-    name: reponame,
-    path: "",
-    children: []
-  };
+const buildTree = fileList => {
+  // Recursively method that takes in a list and returns the tree
+  if (fileList.length === 0) {
+    return [];
+  }
 
-  for (var i = 0; i < tree.length; i++) {
-    let element = tree[i];
-    let split = element.path.split("/");
+  let hierarchy = {};
+  for (var index = 0; index < fileList.length; index++) {
+    const element = fileList[index];
+    const currentLevelName = element.split("/")[0];
 
-    if (split.length === 1) {
-      // This is a first-level child
-      result.children.push({ name: split[0], children: [], path: split[0] });
-    } else {
-      // This will go deeper, so we will traverse the tree
-      let subTreeElement = result.children;
+    if (!(currentLevelName in hierarchy)) {
+      // key is not defined
+      hierarchy[currentLevelName] = [];
+    }
 
-      if (subTreeElement === undefined) {
-        subTreeElement = [];
-      }
+    const spliced = element.split("/").splice(1);
 
-      for (var j = 0; j < split.length; j++) {
-        let subPath = split[j];
-
-        if (j === split.length - 1) {
-          // This is the last element, so add to tree
-          subTreeElement.push({
-            name: split[j],
-            children: [],
-            path: split.join("/")
-          });
-        } else {
-          // This is a mid-level child, so need to locate
-          // this in the tree_element, and find the sub-tree
-          // where this file will eventually land
-          let existingNames = [];
-          for (var k = 0; k < subTreeElement.length; k++) {
-            existingNames.push(subTreeElement[k]["name"]);
-          }
-          let index = existingNames.indexOf(subPath);
-          subTreeElement = subTreeElement[index]["children"];
-        }
-      }
+    if (spliced.length > 0) {
+      hierarchy[currentLevelName].push(spliced.join("/"));
     }
   }
 
+  let result = [];
+  for (var levelName in hierarchy) {
+    result.push({
+      name: levelName,
+      path: "", // TODO(arjun): fill in a path
+      children: buildTree(hierarchy[levelName])
+    });
+  }
+
   return result;
+};
+
+const fillPaths = (tree, parentPath) => {
+  // Do DFS on the tree and fill up paths along the way
+  for (var index = 0; index < tree.length; index++) {
+    if (parentPath !== "") {
+      tree[index].path = `${parentPath}/${tree[index].name}`;
+    } else {
+      tree[index].path = `${tree[index].name}`;
+    }
+
+    tree[index].children = fillPaths(tree[index].children, tree[index].path);
+  }
+
+  return tree;
+};
+
+export const getPRChildren = (reponame, fileList) => {
+  // fileList is a list of files that have been changed in the PR
+  const filenames = fileList.map(element => {
+    return element.filename;
+  });
+  return {
+    name: reponame,
+    path: "",
+    children: fillPaths(buildTree(filenames), "")
+  };
+};
+
+export const getTreeChildren = (reponame, tree) => {
+  const filenames = tree.map(element => {
+    return element.path;
+  });
+  return {
+    name: reponame,
+    path: "",
+    children: fillPaths(buildTree(filenames), "")
+  };
 };

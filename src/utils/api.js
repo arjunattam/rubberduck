@@ -108,7 +108,11 @@ export class BaseAPI {
       // Make call directly to github using client IP address
       // for efficient rate limit utilisation.
       const uri = `https://api.github.com/${uriPath}`;
-      return axios.get(uri);
+      return axios.get(uri, {
+        headers: {
+          Authorization: "token 111ab37ff1337fc2ab25cc86c96f01981a8e7c4f"
+        }
+      });
     }
   }
 

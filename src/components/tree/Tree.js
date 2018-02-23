@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { API } from "../../utils/api";
-import { getChildren } from "../../utils/data";
+import { getTreeChildren, getPRChildren } from "../../utils/data";
 import SectionHeader from "../common/Section";
 import { renderChildren } from "./Folder";
 import "./Tree.css";
@@ -9,29 +9,52 @@ import "./Tree.css";
 class Tree extends React.Component {
   state = {
     data: { children: [] },
+    isPRTree: false,
     isVisible: this.props.isVisible
   };
 
   updateTree = () => {
     // TODO(arjun): add proper loader
     let repoDetails = this.props.data.repoDetails;
+
     if (repoDetails.username && repoDetails.reponame) {
-      const branch = repoDetails.branch || "master";
-      API.getFilesTree(repoDetails.username, repoDetails.reponame, branch)
-        .then(response => {
-          this.setState({
-            data: getChildren(repoDetails.reponame, response.data.tree)
+      // Repo details have been figured
+      const { username, reponame } = repoDetails;
+
+      if (repoDetails.type === "pull") {
+        // We are on a PR page, will get PR files tree
+        const pullId = repoDetails.typeId;
+        API.getPRFiles(username, reponame, pullId)
+          .then(response => {
+            this.setState({
+              isPRTree: true,
+              data: getPRChildren(reponame, response.data)
+            });
+          })
+          .catch(error => {
+            // TODO(arjun): this needs to be better communicated
+            console.log("Error in API call", error);
           });
-        })
-        .catch(error => {
-          // TODO(arjun): this needs to be better communicated
-          console.log("Error in API call");
-        });
+      } else {
+        // We are on normal files page, will get normal files tree
+        const branch = repoDetails.branch || "master";
+        API.getFilesTree(username, reponame, branch)
+          .then(response => {
+            this.setState({
+              data: getTreeChildren(reponame, response.data.tree),
+              isPRTree: false
+            });
+          })
+          .catch(error => {
+            // TODO(arjun): this needs to be better communicated
+            console.log("Error in API call");
+          });
+      }
     }
   };
 
   componentDidMount() {
-    if (this.props.storage.token !== undefined) {
+    if (this.props.storage.token) {
       // We have the jwt, so make API call
       this.updateTree();
     }
@@ -45,8 +68,8 @@ class Tree extends React.Component {
     }
 
     if (this.props.storage.token !== nextProps.storage.token) {
-      // jwt has been updated, so refresh the tree
-      this.updateTree();
+      // jwt will be updated, so refresh the tree
+      if (nextProps.storage.token) this.updateTree();
     }
   }
 
