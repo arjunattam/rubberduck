@@ -99,7 +99,7 @@ export class BaseAPI {
     else return false;
   }
 
-  makePassthroughGet(uriPath) {
+  makeConditionalGet(uriPath) {
     if (this.isGithubAuthorized()) {
       // If user is logged in with github, we will send
       // this API call to pass through via backend.
@@ -115,12 +115,12 @@ export class BaseAPI {
 
   getFilesTree(username, reponame) {
     const uriPath = `repos/${username}/${reponame}/git/trees/master?recursive=1`;
-    return this.makePassthroughGet(uriPath);
+    return this.makeConditionalGet(uriPath);
   }
 
   getPRFiles(username, reponame, pr) {
     const uriPath = `repos/${username}/${reponame}/pulls/${pr}/files`;
-    return this.makePassthroughGet(uriPath);
+    return this.makeConditionalGet(uriPath);
   }
 
   issueToken(clientId) {
