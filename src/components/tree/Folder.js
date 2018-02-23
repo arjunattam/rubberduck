@@ -85,22 +85,11 @@ class Folder extends React.Component {
       <Octicon name="triangle-down" className="file-triangle" />
     );
     const childrenStyle = this.state.isCollapsed
-      ? // Since we cannot animate to height: auto, we use max-height
-        // The transition functions for this are from
-        // https://stackoverflow.com/a/27515933/1469222
-        {
-          maxHeight: 0,
-          height: 0,
-          visibility: "hidden",
+      ? {
           display: "none"
-          // transition: "max-height .4s cubic-bezier(0, 1, 0, 1) -.1s"
         }
       : {
-          maxHeight: 500,
-          height: "auto"
-          // visibility: "visible",
-          // transitionTimingFunction: "cubic-bezier(0.5, 0, 1, 0)",
-          // transitionDelay: "0s"
+          display: "block"
         };
 
     return (

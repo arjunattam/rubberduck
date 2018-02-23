@@ -47,6 +47,17 @@
   stroke: #999;
 }
 
+@keyframes slide-down {
+  0% {
+    opacity: 0;
+    -webkit-transform: translateY(-20%);
+  }
+  100% {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+  }
+}
+
 .file-children {
-  transition: max-height 1s linear, visibility 1s;
+  animation: slide-down 0.1s ease-out;
 }
