@@ -3,9 +3,7 @@ import "./Tree.css";
 import File from "./File";
 import Octicon from "react-component-octicons";
 
-export const renderChildren = (children, depth, parentProps) => {
-  // The parentProps are required to pass org/repo information down
-  // the component chain, so that we can construct the link href. Can this be avoided?
+const sortChildren = children => {
   const parents = children
     .filter(element => {
       return element.children.length > 0;
@@ -20,12 +18,18 @@ export const renderChildren = (children, depth, parentProps) => {
     .sort(function(a, b) {
       return a.name.localeCompare(b.name);
     });
-  // Expected ordering is first folders, then files, each alphabetical
-  children = parents.concat(onlyChildren);
 
+  // Expected ordering is first folders, then files, each alphabetical
+  return parents.concat(onlyChildren);
+};
+
+export const renderChildren = (children, depth, parentProps) => {
+  // The parentProps are required to pass org/repo information down
+  // the component chain, so that we can construct the link href. Can this be avoided?
+  const childrenToRender = sortChildren(children);
   return (
     <div>
-      {children.map(element => {
+      {childrenToRender.map(element => {
         if (element.children.length > 0) {
           // Ordering of props is important since the element needs to override
           // the parentProps
@@ -80,6 +84,24 @@ class Folder extends React.Component {
     ) : (
       <Octicon name="triangle-down" className="file-triangle" />
     );
+    const childrenStyle = this.state.isCollapsed
+      ? // Since we cannot animate to height: auto, we use max-height
+        // The transition functions for this are from
+        // https://stackoverflow.com/a/27515933/1469222
+        {
+          maxHeight: 0,
+          height: 0,
+          visibility: "hidden",
+          display: "none"
+          // transition: "max-height .4s cubic-bezier(0, 1, 0, 1) -.1s"
+        }
+      : {
+          maxHeight: 500,
+          height: "auto"
+          // visibility: "visible",
+          // transitionTimingFunction: "cubic-bezier(0.5, 0, 1, 0)",
+          // transitionDelay: "0s"
+        };
 
     return (
       <div>
@@ -93,9 +115,9 @@ class Folder extends React.Component {
             {this.props.name}
           </a>
         </div>
-        {this.state.isCollapsed ? null : (
-          <div className="file-children">{renderedChildren}</div>
-        )}
+        <div className="file-children" style={childrenStyle}>
+          {renderedChildren}
+        </div>
       </div>
     );
   }

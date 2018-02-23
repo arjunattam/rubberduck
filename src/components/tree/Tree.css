@@ -4,22 +4,20 @@
 }
 
 .tree-content {
-  padding-bottom: 10px;
-  max-height: calc(100vh - 207px);
+  /* padding-bottom: 10px; */
+  /* max-height: calc(100vh - 207px); */
   overflow-y: auto;
   overflow-x: hidden;
+  transition: max-height 200ms ease-in;
 }
 
 .file-container {
   font-size: 14px;
   margin-top: 1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .file-selected a {
-  background: #e0eefd;
+  background: #f2f8fe;
 }
 
 .file-container a {
@@ -28,6 +26,9 @@
   padding-top: 2px;
   padding-bottom: 2px;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .file-container a:hover {
@@ -45,18 +46,7 @@
 .file-triangle path {
   stroke: #999;
 }
-/* 
-@keyframes slidein {
-  from {
-    transform: translateY(-6em);
-  }
-
-  to {
-    transform: translateY(0);
-  }
-}
 
 .file-children {
-  animation-duration: 1s;
-  animation-name: slidein;
-} */
+  transition: max-height 1s linear, visibility 1s;
+}
