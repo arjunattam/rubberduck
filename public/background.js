@@ -12,6 +12,7 @@ const CONTEXT_MENUS = [
     contexts: ["page", "selection"]
   }
 ];
+
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
