@@ -49,11 +49,9 @@
 
 @keyframes slide-down {
   0% {
-    opacity: 0;
-    -webkit-transform: translateY(-20%);
+    -webkit-transform: translateY(-30%);
   }
   100% {
-    opacity: 1;
     -webkit-transform: translateY(0);
   }
 }
