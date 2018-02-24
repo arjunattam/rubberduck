@@ -55,7 +55,7 @@ The extension has two components
    python manage.py runserver
    ```
 
-2. Change `src/utils/api.js`
+2. Change backend url in `src/utils/api.js`
 
 3. Run the extension
 
