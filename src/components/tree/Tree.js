@@ -26,7 +26,7 @@ class Tree extends React.Component {
         API.getPRFiles(username, reponame, pullId)
           .then(response => {
             this.setState({
-              data: getPRChildren(reponame, response.data)
+              data: getPRChildren(reponame, response)
             });
           })
           .catch(error => {
@@ -39,12 +39,12 @@ class Tree extends React.Component {
         API.getFilesTree(username, reponame, branch)
           .then(response => {
             this.setState({
-              data: getTreeChildren(reponame, response.data.tree)
+              data: getTreeChildren(reponame, response.tree)
             });
           })
           .catch(error => {
             // TODO(arjun): this needs to be better communicated
-            console.log("Error in API call");
+            console.log("Error in API call", error);
           });
       }
     }
