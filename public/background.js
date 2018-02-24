@@ -2,7 +2,7 @@ const jsLocation = JS_ASSET_LOCATION; // will be replaced with actual location b
 const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location by script
 const CONTEXT_MENUS = [
   {
-    title: "Find references",
+    title: "Find usages",
     id: "REFERENCES_TRIGGER",
     contexts: ["page", "selection"]
   },
@@ -12,6 +12,7 @@ const CONTEXT_MENUS = [
     contexts: ["page", "selection"]
   }
 ];
+
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;

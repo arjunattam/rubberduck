@@ -3,6 +3,9 @@ import Store from "../store";
 import { Authorization } from "./authorization";
 const axios = require("axios");
 
+export const rootUrl = "https://www.codeview.io/";
+// export const rootUrl = 'http://localhost:8000/'
+
 export const encodeQueryData = data => {
   let ret = [];
   for (let d in data)
@@ -37,11 +40,7 @@ export class BaseRequest {
   }
 
   getAPIUrl() {
-    // let baseURL = `http://localhost:8000/api/`;
-    // if (process.env.NODE_ENV === "production") {
-    let baseURL = `https://www.codeview.io/api/`;
-    // }
-    return baseURL;
+    return `${rootUrl}/`;
   }
 
   fetch(uri, params) {
@@ -103,13 +102,15 @@ export class BaseAPI {
     if (this.isGithubAuthorized()) {
       // If user is logged in with github, we will send
       // this API call to pass through via backend.
-      const uri = `/github_passthrough/${uriPath}`;
+      const uri = `github_passthrough/${uriPath.replace("?", "%3F")}/`;
       return this.baseRequest.fetch(uri);
     } else {
       // Make call directly to github using client IP address
       // for efficient rate limit utilisation.
       const uri = `https://api.github.com/${uriPath}`;
-      return axios.get(uri);
+      return axios.get(uri).then(response => {
+        return response.data ? response.data : response;
+      });
     }
   }
 
@@ -124,17 +125,17 @@ export class BaseAPI {
   }
 
   issueToken(clientId) {
-    const uri = `/token_issue/`;
+    const uri = `api/token_issue/`;
     return this.baseRequest.post(uri, { client_id: clientId });
   }
 
   refreshTokenBackground(token) {
-    const uri = `/token_refresh/`;
+    const uri = `api/token_refresh/`;
     return this.baseRequest.post(uri, { token: token });
   }
 
   createSession(pull_request_id, organisation, reponame) {
-    const uri = "/sessions/";
+    const uri = "api/sessions/";
     return this.baseRequest.post(uri, {
       pull_request_id,
       organisation,
@@ -147,7 +148,9 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri = `sessions/${sessionId}/hover/?${encodeQueryData(queryParams)}`;
+    const uri = `api/sessions/${sessionId}/hover/?${encodeQueryData(
+      queryParams
+    )}`;
     return this.baseRequest.fetch(uri);
   }
 
@@ -156,7 +159,7 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri = `sessions/${sessionId}/references/?${encodeQueryData(
+    const uri = `api/sessions/${sessionId}/references/?${encodeQueryData(
       queryParams
     )}`;
     return this.baseRequest.fetch(uri);
@@ -167,7 +170,7 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri = `sessions/${sessionId}/definition/?${encodeQueryData(
+    const uri = `api/sessions/${sessionId}/definition/?${encodeQueryData(
       queryParams
     )}`;
     return this.baseRequest.fetch(uri);
