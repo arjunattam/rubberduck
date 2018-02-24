@@ -35,18 +35,6 @@ The extension has two components
 1. [Authentication](docs/AUTHENTICATION.md)
 2. [Development](docs/DEVELOPMENT.md)
 
-## Some issues
-
-1. We need an icon and a landing page on a website. Perhaps a new name?
-
-2. Options configuration: to be able to run the extension with a locally deployed server setup.
-
-3. The injected elements inherit some styling from the Github page, which needs to be fixed.
-
-4. Some things need to be checked for big repos: recursive files tree API will not work, big pull requests might have file query limitations. Need to evaluate.
-
-5. Branch and sha needs to be a first class citizen for navigation.
-
 ## Testing with localhost
 
 1. Run the local server
@@ -64,3 +52,7 @@ The extension has two components
    ```
 
 4. Delete and reinstall on chrome if you were running the production build. TODO -- clean this up.
+
+## Some issues
+
+1. Some things need to be checked for big repos: recursive files tree API will not work, big pull requests might have file query limitations. Need to evaluate.

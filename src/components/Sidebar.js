@@ -5,7 +5,7 @@ import "./../index.css";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Title from "./Title";
-import StatusBar from "./StatusBar";
+import StatusBar from "./status/StatusBar";
 import CollapseButton from "./CollapseButton";
 import Tree from "./tree/Tree";
 import References from "./References";
