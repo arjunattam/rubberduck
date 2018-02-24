@@ -161,7 +161,7 @@ class References extends React.Component {
                 {this.state.count} references
               </div>
             </div>
-            <div>{referenceItems}</div>{" "}
+            <div className="reference-items">{referenceItems}</div>
           </div>
         ) : null}
       </div>
