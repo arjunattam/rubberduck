@@ -5,7 +5,33 @@ import Octicon from "react-component-octicons";
 import "./ExpandedCode.css";
 
 export default class ExpandedCode extends React.Component {
+  // Line numbers are zero-indexed in the API, so we need to +1
+  // for display.
+  getBase64Decoded(encodedString) {
+    let decoded = "";
+    try {
+      decoded = atob(encodedString);
+    } catch (e) {
+      decoded = "";
+    }
+    return decoded;
+  }
+
+  getHighligtedLineStyle(lineNo) {
+    let highlightedLineNo;
+    if (this.props.lineNumber && this.props.startLine) {
+      highlightedLineNo = this.props.lineNumber - this.props.startLine + 1;
+    }
+    if (highlightedLineNo && highlightedLineNo === lineNo) {
+      return {
+        backgroundColor: "#FFFBE0"
+      };
+    }
+    return {};
+  }
+
   render() {
+    let decodedCode = this.getBase64Decoded(this.props.codeBase64);
     return (
       <div className="expanded-code" style={{ top: this.props.top }}>
         <div className="expanded-title">
@@ -23,10 +49,14 @@ export default class ExpandedCode extends React.Component {
             language={this.props.language}
             style={githubStyle}
             showLineNumbers={true}
-            startingLineNumber={this.props.startLine}
+            startingLineNumber={this.props.startLine + 1}
             lineNumberStyle={{ color: "rgba(27,31,35,0.3)" }}
+            wrapLines={true}
+            lineStyle={lineNo => {
+              return this.getHighligtedLineStyle(lineNo);
+            }}
           >
-            {atob(this.props.codeBase64)}
+            {decodedCode}
           </SyntaxHighlighter>
         </div>
       </div>

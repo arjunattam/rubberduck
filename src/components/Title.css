@@ -1,19 +1,22 @@
 .header {
-  height: 45px; /* same as github title */
+  height: 48px; /* same as github title */
   padding: 4px;
   padding-left: 10px;
   background: rgb(250, 251, 252);
+  font-size: 15px;
 }
 
 .header .branch {
   font-size: 11px;
+  color: #000;
+  margin-left: 3px;
 }
 
 .header p {
   margin-top: 3px;
   margin-bottom: 3px;
-}
-
-.header p a {
-  font-weight: bold;
+  color: #999;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

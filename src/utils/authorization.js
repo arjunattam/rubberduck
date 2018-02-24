@@ -1,6 +1,7 @@
 // See docs/AUTHENTICATION.md for documentation
-
 import { sendMessage, constructMessage } from "./chrome";
+import { rootUrl } from "./api";
+
 const jwt = require("jsonwebtoken");
 
 export class AuthUtils {
@@ -21,7 +22,7 @@ export class AuthUtils {
   }
 
   triggerOAuthFlow(jwt, cb) {
-    const url = "https://www.codeview.io/github_oauth/?token=" + jwt;
+    const url = `${rootUrl}github_oauth/?token=${jwt}`;
     const message = constructMessage("AUTH_TRIGGER", { url: url });
     sendMessage(message, cb);
   }

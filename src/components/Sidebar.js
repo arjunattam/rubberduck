@@ -5,12 +5,12 @@ import "./../index.css";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Title from "./Title";
-import Tree from "./Tree";
 import StatusBar from "./StatusBar";
 import CollapseButton from "./CollapseButton";
+import Tree from "./tree/Tree";
 import References from "./References";
 import Definitions from "./Definitions";
-import HoverListener from "./Hover";
+import HoverListener from "./hover/HoverListener";
 import * as GithubLayout from "./../adapters/github/layout";
 
 class Sidebar extends React.Component {

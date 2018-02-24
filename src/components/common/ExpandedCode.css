@@ -2,8 +2,8 @@
   width: 640px;
   position: fixed;
   top: 40px;
-  left: 236px;
-  z-index: 10000;
+  left: 234px;
+  z-index: 10010;
   border: 1px solid #c8e1ff;
   cursor: text;
 }
@@ -29,6 +29,10 @@
 
 .expanded-filepath {
   padding-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 500px;
 }
 
 .expanded-button {

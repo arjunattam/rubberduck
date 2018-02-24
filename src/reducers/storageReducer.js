@@ -3,7 +3,8 @@ import { createReducer } from "redux-create-reducer";
 const initialState = {
   initialized: false,
   clientId: null,
-  jwt: null
+  token: null,
+  sessions: {}
 };
 
 export default createReducer(initialState, {
@@ -15,6 +16,10 @@ export default createReducer(initialState, {
     };
   },
   UPDATE_FROM_CHROME_STORAGE: (state, action) => {
+    console.log("Updated storage data", {
+      ...state,
+      ...action.payload
+    });
     return {
       ...state,
       ...action.payload

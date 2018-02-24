@@ -1,0 +1,92 @@
+.tree-container {
+  background: #fff;
+  overflow: hidden;
+}
+
+.tree-content {
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: max-height 200ms ease-in;
+}
+
+.tree-content-visible {
+  padding-bottom: 10px;
+  max-height: calc(100vh - 192px);
+}
+
+.tree-content-hidden {
+  max-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.file-container {
+  font-size: 14px;
+  margin-top: 1px;
+}
+
+.file-selected a {
+  background: #f2f8fe;
+}
+
+.file-container a {
+  display: block;
+  width: 232px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-container a:hover {
+  background: #eee;
+  text-decoration: none;
+}
+
+.file-triangle {
+  height: 10px;
+  width: 10px;
+  fill: none;
+  padding-top: 2px;
+}
+
+.file-triangle path {
+  stroke: #999;
+}
+
+@keyframes slide-down {
+  0% {
+    -webkit-transform: translateY(-30%);
+  }
+  100% {
+    -webkit-transform: translateY(0);
+  }
+}
+
+.file-children {
+  animation: slide-down 0.1s ease-out;
+}
+
+.file-children-collapsed {
+  display: none;
+}
+
+.tree-additions {
+  font-size: 11px;
+  color: #2cbe4e;
+}
+
+.tree-additions::before {
+  content: "+";
+}
+
+.tree-deletions {
+  font-size: 11px;
+  color: #cb2531;
+}
+
+.tree-deletions::before {
+  content: "-";
+}

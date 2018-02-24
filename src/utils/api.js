@@ -1,6 +1,10 @@
 import { sendMessage, constructMessage } from "./chrome";
 import Store from "../store";
+import { Authorization } from "./authorization";
 const axios = require("axios");
+
+export const rootUrl = "https://www.codeview.io/";
+// export const rootUrl = 'http://localhost:8000/'
 
 export const encodeQueryData = data => {
   let ret = [];
@@ -36,11 +40,7 @@ export class BaseRequest {
   }
 
   getAPIUrl() {
-    let baseURL = `http://localhost:8000/api/`;
-    // if (process.env.NODE_ENV === "production") {
-    baseURL = `https://www.codeview.io/api/`;
-    // }
-    return baseURL;
+    return `${rootUrl}/`;
   }
 
   fetch(uri, params) {
@@ -90,29 +90,52 @@ export class BaseAPI {
     sendMessage(message, cb);
   }
 
+  isGithubAuthorized() {
+    const token = Store.getState().storage.token;
+    const decoded = Authorization.decodeJWT(token);
+
+    if (decoded !== null) return decoded.github_username !== "";
+    else return false;
+  }
+
+  makeConditionalGet(uriPath) {
+    if (this.isGithubAuthorized()) {
+      // If user is logged in with github, we will send
+      // this API call to pass through via backend.
+      const uri = `github_passthrough/${uriPath.replace("?", "%3F")}/`;
+      return this.baseRequest.fetch(uri);
+    } else {
+      // Make call directly to github using client IP address
+      // for efficient rate limit utilisation.
+      const uri = `https://api.github.com/${uriPath}`;
+      return axios.get(uri).then(response => {
+        return response.data ? response.data : response;
+      });
+    }
+  }
+
   getFilesTree(username, reponame) {
-    const uri =
-      "/repos/" + username + "/" + reponame + "/git/trees/master?recursive=1";
-    return axios.get("https://api.github.com" + uri, {
-      // TODO(arjun): replace this with the github token
-      headers: {
-        Authorization: "token 111ab37ff1337fc2ab25cc86c96f01981a8e7c4f"
-      }
-    });
+    const uriPath = `repos/${username}/${reponame}/git/trees/master?recursive=1`;
+    return this.makeConditionalGet(uriPath);
+  }
+
+  getPRFiles(username, reponame, pr) {
+    const uriPath = `repos/${username}/${reponame}/pulls/${pr}/files`;
+    return this.makeConditionalGet(uriPath);
   }
 
   issueToken(clientId) {
-    const uri = `/token_issue/`;
+    const uri = `api/token_issue/`;
     return this.baseRequest.post(uri, { client_id: clientId });
   }
 
   refreshTokenBackground(token) {
-    const uri = `/token_refresh/`;
+    const uri = `api/token_refresh/`;
     return this.baseRequest.post(uri, { token: token });
   }
 
   createSession(pull_request_id, organisation, reponame) {
-    const uri = "/sessions/";
+    const uri = "api/sessions/";
     return this.baseRequest.post(uri, {
       pull_request_id,
       organisation,
@@ -125,7 +148,9 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri = `sessions/${sessionId}/hover/?${encodeQueryData(queryParams)}`;
+    const uri = `api/sessions/${sessionId}/hover/?${encodeQueryData(
+      queryParams
+    )}`;
     return this.baseRequest.fetch(uri);
   }
 
@@ -134,7 +159,7 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri = `sessions/${sessionId}/references/?${encodeQueryData(
+    const uri = `api/sessions/${sessionId}/references/?${encodeQueryData(
       queryParams
     )}`;
     return this.baseRequest.fetch(uri);
@@ -145,7 +170,7 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri = `sessions/${sessionId}/definition/?${encodeQueryData(
+    const uri = `api/sessions/${sessionId}/definition/?${encodeQueryData(
       queryParams
     )}`;
     return this.baseRequest.fetch(uri);
