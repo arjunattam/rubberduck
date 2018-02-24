@@ -46,3 +46,21 @@ The extension has two components
 4. Some things need to be checked for big repos: recursive files tree API will not work, big pull requests might have file query limitations. Need to evaluate.
 
 5. Branch and sha needs to be a first class citizen for navigation.
+
+## Testing with localhost
+
+1. Run the local server
+
+   ```
+   python manage.py runserver
+   ```
+
+2. Change `src/utils/api.js`
+
+3. Run the extension
+
+   ```
+   npm start
+   ```
+
+4. Delete and reinstall on chrome if you were running the production build. TODO -- clean this up.
