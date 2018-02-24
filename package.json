@@ -17,10 +17,11 @@
     "redux-thunk": "^2.2.0"
   },
   "config": {
-    "pack": "build/. -p test_key.pem -o dist/mercury.crx"
+    "pack": "build/. -p keys/development_key.pem -o dist/mercury.crx"
   },
   "scripts": {
     "start": "react-app-rewired start",
+    "start-local": "REACT_APP_BACKEND_ENV=local npm run start",
     "build": "react-app-rewired build && node scripts/helpers.js",
     "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",
     "pack": "npm run build && npm run gen-crx",

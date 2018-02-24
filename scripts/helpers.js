@@ -13,13 +13,15 @@ These methods are called during `npm run start` and `npm run build`.
 const fs = require("fs");
 const manifestKey =
   "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAySpRY2cTq3UzJE4KA9CtM1gkIrpvu/1NNT3yvN1hv76HYTORjUb1lZg73jm08oNo/5xE0asG77LP5h4Z/NeXU5KyQyvDUyyLvhcuR10OmqVCLCZ2XJhcK/eJgm89xwYgrt+RDQ7R6xoL75TUptHbksCrLj++qXET/JEDqDWFg3lX/BYa9tug6x5Fwpf7Ohrkes3nvHcg9ShbJxx9/CDl5Gyt6e0kN7YaLhoqJj6dBF8Cnu9fMZAKrMGLFO7HoP7Q3dnYHnroMnl5/7lB3BGyrl53T2nmkxuXPw3vKOjdN9r99NqEda4nGdshnXLPZz8M8/EmHKNo432Bn0ncdjY7DQIDAQAB";
+const localManifestKey =
+  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlN56sx9mTFsM9qnbym1SLbO2BVyy0ilA75ja9ljoA6CpriYm0uYqY4s6KAQv2v7vZPSelxw+wy3W+HK1yGy+RXcidTtiCb7orVyoiFS2dCwb+g5QsqAyPV+cW3rYv+safbYLPbfHkPnBpSjSvop3BixQz5+//S9p4iqAZqUWfa6Op9NiQ5VaICl/gJeF4rOJGvwLO2D5XoHl24L/q3UZJ+eLUbOyIhY03Qcs25n4rzpq21EfM3lYOZi8xq4Hp89TFQGG63tSrE8xXKiZsHK29K/SJw+cYr74cFUiPwlXA9LA0rZR9Zw0GwvqBSoOoCuDqHGDXBoffdtsLwSgGWSZQwIDAQAB";
 
 // Replace placeholder with actual values
-const updateBackground = () => {
-  const backgroundJS = "./build/background.js";
+const updateBackground = buildPath => {
+  const backgroundJS = `${buildPath}/background.js`;
   const jsPlaceholder = "JS_ASSET_LOCATION";
   const cssPlaceholder = "CSS_ASSET_LOCATION";
-  const assetManifest = "./build/asset-manifest.json";
+  const assetManifest = `${buildPath}/asset-manifest.json`;
   // Get contents to override
   let jsLocation = '"./static/js/bundle.js"';
   let cssLocation = "null";
@@ -49,15 +51,21 @@ const getGitBranch = () => {
     .replace(/\s+/, "");
 };
 
-const updateManifestKey = () => {
+const updateManifestKey = buildPath => {
   // Add manifest key to the manifest.json file so that we
   // preserve extension id during development cycles
   // From: https://developer.chrome.com/apps/app_identity#copy_key
-  const manifest = "./build/manifest.json";
+  const manifest = `${buildPath}/manifest.json`;
   let manifestContents = JSON.parse(fs.readFileSync(manifest, "utf8"));
   manifestContents.key = manifestKey;
   manifestContents.version_name =
     manifestContents.version + " " + getGitBranch();
+
+  if (process.env.REACT_APP_BACKEND_ENV === "local") {
+    manifestContents.name = "mercury-local";
+    manifestContents.key = localManifestKey;
+  }
+
   // Write back new object
   fs.writeFile(manifest, JSON.stringify(manifestContents), function(err) {
     if (err) {
@@ -75,6 +83,7 @@ module.exports = {
 
 if (require.main === module) {
   // If this script is called as `node ...`, call these methods
-  updateBackground();
-  updateManifestKey();
+  const buildPath = "./build";
+  updateBackground(buildPath);
+  updateManifestKey(buildPath);
 }

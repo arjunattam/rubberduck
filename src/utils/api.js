@@ -3,8 +3,13 @@ import Store from "../store";
 import { Authorization } from "./authorization";
 const axios = require("axios");
 
-export const rootUrl = "https://www.codeview.io/";
-// export const rootUrl = "http://localhost:8000/";
+let envRootUrl = "https://www.codeview.io/";
+
+if (process.env.REACT_APP_BACKEND_ENV === "local") {
+  envRootUrl = "http://localhost:8000/";
+}
+
+export const rootUrl = envRootUrl;
 
 export const encodeQueryData = data => {
   let ret = [];
@@ -109,7 +114,7 @@ export class BaseAPI {
       // for efficient rate limit utilisation.
       const uri = `https://api.github.com/${uriPath}`;
       return axios
-        .get(uri)
+        .get(uri, { headers: { Authorization: "" } })
         .then(response => {
           return response.data ? response.data : response;
         })
