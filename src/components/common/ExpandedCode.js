@@ -19,7 +19,7 @@ export default class ExpandedCode extends React.Component {
 
   getHighligtedLineStyle(lineNo) {
     let highlightedLineNo;
-    if (this.props.lineNumber && this.props.startLine) {
+    if (this.props.lineNumber >= 0 && this.props.startLine >= 0) {
       highlightedLineNo = this.props.lineNumber - this.props.startLine + 1;
     }
     if (highlightedLineNo && highlightedLineNo === lineNo) {
