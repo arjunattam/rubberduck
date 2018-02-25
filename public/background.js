@@ -1,5 +1,6 @@
 const jsLocation = JS_ASSET_LOCATION; // will be replaced with actual location by script
 const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location by script
+
 const CONTEXT_MENUS = [
   {
     title: "Find usages",
@@ -13,6 +14,8 @@ const CONTEXT_MENUS = [
   }
 ];
 
+const INJECTABLE_URLS = ["github.com"];
+
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
@@ -23,6 +26,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // To ensure we don't inject the extension twice
   const injectFlagCode =
     "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;";
+
+  if (INJECTABLE_URLS.indexOf(extractHostname(tab.url)) < 0) {
+    // Tab hostname is not in the INJECTABLE_URLS
+    return;
+  }
 
   chrome.tabs.executeScript(
     tabId,
@@ -220,3 +228,22 @@ function getAjax(data, success) {
   xhr.send();
   return xhr;
 }
+
+// Helper method to extract hostname from url
+const extractHostname = url => {
+  var hostname;
+  //find & remove protocol (http, ftp, etc.) and get hostname
+
+  if (url.indexOf("://") > -1) {
+    hostname = url.split("/")[2];
+  } else {
+    hostname = url.split("/")[0];
+  }
+
+  //find & remove port number
+  hostname = hostname.split(":")[0];
+  //find & remove "?"
+  hostname = hostname.split("?")[0];
+
+  return hostname;
+};
