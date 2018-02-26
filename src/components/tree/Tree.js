@@ -5,7 +5,8 @@ import { getTreeChildren, getPRChildren } from "../../utils/data";
 import SectionHeader from "../common/Section";
 import { renderChildren } from "./Folder";
 import "./Tree.css";
-
+let Pjax = require("pjax");
+let document = window.document;
 class Tree extends React.Component {
   state = {
     data: { children: [] },
@@ -73,6 +74,17 @@ class Tree extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (!prevState.isVisible && this.state.isVisible) {
       this.updateTree();
+    }
+    if (
+      prevState.data.children.length === 0 &&
+      this.state.data.children.length > 0
+    ) {
+      let pjax = new Pjax({
+        elements: "a", // default is "a[href], form[action]"
+        selectors: ["#js-repo-pjax-container"],
+        debug: true,
+        disablePjaxHeader: true
+      });
     }
   }
 
