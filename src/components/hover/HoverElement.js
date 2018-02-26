@@ -61,7 +61,7 @@ class HoverElement extends React.Component {
           // We will set state only if the current
           // mouse location overlaps with the response
           let definitionPath = "";
-          if (response.result.definition.location !== null) {
+          if (response.result.definition !== null) {
             definitionPath = response.result.definition.location.path;
           }
           this.setState({
