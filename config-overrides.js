@@ -14,16 +14,22 @@ const helpers = require("./scripts/helpers");
 
 module.exports = function override(config, env) {
   // Add plugin to write files to disk from webpack dev server
-  config.output.path = path.join(__dirname, "./build");
+  let buildPath = "./build";
+
+  if (process.env.REACT_APP_BACKEND_ENV === "local") {
+    buildPath = "./build-local";
+  }
+
+  config.output.path = path.join(__dirname, buildPath);
   config.plugins.push(new WriteFilePlugin());
 
   // Copy public folder to build folder
-  fs.removeSync("./build/"); // to clear the asset-manifest.json file
-  fs.copySync("./public/", "./build/");
+  fs.removeSync(buildPath); // to clear the asset-manifest.json file
+  fs.copySync("./public/", buildPath);
 
   // Run helper scripts
-  helpers.updateBackground();
-  helpers.updateManifestKey();
+  helpers.updateBackground(buildPath);
+  helpers.updateManifestKey(buildPath);
 
   // All config manipulation is complete
   return config;

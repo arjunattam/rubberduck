@@ -10,17 +10,37 @@ This repo is the chrome extension for the mercury project.
    yarn
    ```
 
-2. For development, we will run the dev server, and load an unpacked extension on Chrome. See [how to](https://developer.chrome.com/extensions/getstarted#unpacked). Open an [example github url](https://github.com/pallets/flask) to see this in action.
+2. For development, we will run the dev server, and load an unpacked extension on Chrome from `build/`. See [how to](https://developer.chrome.com/extensions/getstarted#unpacked). Open an [example github url](https://github.com/pallets/flask) to see this in action.
 
    ```
    npm run start
    ```
 
-3. To distribute binary file, we pack the extension into a crx file, located at `dist/mercury.crx`. Generate new crx using the command:
+3. To distribute binary file, we pack the extension into a crx file, located at `dist/mercury.crx`. Generate new crx using the command. Packing needs keys (see below).
 
    ```
    npm run pack
    ```
+
+## Keys setup
+
+To be able to pack crx, you need to setup `keys/development_key.pem` in your project directory. Get this key from [here](https://drive.google.com/drive/u/0/folders/1ABADv_hmG2FAsPYJokvv_FBw-z_nMQUT) (needs Google account).
+
+## Testing with localhost
+
+1. Run the local server
+
+   ```
+   python manage.py runserver
+   ```
+
+2. Run the extension
+
+   ```
+   npm run start-local
+   ```
+
+3. Load the unpacked extension in your Chrome from the build location: `build-local/`. The production and local builds can co-exist on Chrome, and you can enable/disable through `chrome://extensions`.
 
 ## Architecture
 
@@ -34,15 +54,3 @@ The extension has two components
 
 1. [Authentication](docs/AUTHENTICATION.md)
 2. [Development](docs/DEVELOPMENT.md)
-
-## Some issues
-
-1. We need an icon and a landing page on a website. Perhaps a new name?
-
-2. Options configuration: to be able to run the extension with a locally deployed server setup.
-
-3. The injected elements inherit some styling from the Github page, which needs to be fixed.
-
-4. Some things need to be checked for big repos: recursive files tree API will not work, big pull requests might have file query limitations. Need to evaluate.
-
-5. Branch and sha needs to be a first class citizen for navigation.

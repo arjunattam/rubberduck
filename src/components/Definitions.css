@@ -1,6 +1,9 @@
 .definitions-section {
   background: rgb(250, 251, 252);
   padding-bottom: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 207px);
 }
 
 .definition-item {

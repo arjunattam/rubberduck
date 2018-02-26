@@ -26,6 +26,12 @@ export class AuthUtils {
     const message = constructMessage("AUTH_TRIGGER", { url: url });
     sendMessage(message, cb);
   }
+
+  triggerLogoutFlow(jwt, cb) {
+    const url = `${rootUrl}github_oauth_logout/?token=${jwt}`;
+    const message = constructMessage("AUTH_TRIGGER", { url: url });
+    sendMessage(message, cb);
+  }
 }
 
 export const Authorization = new AuthUtils();

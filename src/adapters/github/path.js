@@ -22,7 +22,6 @@ const GH_RAW_CONTENT = "body > pre";
 const checkIfSkipped = () => {
   // This method applies some conditions to see if the page should be skipped
   // Reference: https://github.com/buunguyen/octotree/blob/master/src/adapters/github.js
-
   if (document.querySelector(GH_404_SEL) != null) {
     // Element exists, this is a 404
     return true;
