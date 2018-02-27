@@ -16,27 +16,21 @@ class BaseWebSocket {
   }
 
   createSession(pull_request_id, organisation, reponame) {
+    // We create the connection first, and then send the message
+    // to create session.
+    // TODO(arjun): handle cases when the connection is lost, will need to re-setup
     this.wsp = this.createConnection();
-    // this.wsp.onPackedMessage.addListener(data =>
-    //   console.log("received:", data)
-    // );
-
-    return this.wsp
-      .open()
-      .then(() =>
-        this.wsp.sendRequest({
-          type: "session.create",
-          payload: {
-            pull_request_id,
-            organisation,
-            name: reponame,
-            service: "github"
-          }
-        })
-      )
-      .then(response => {
-        console.log("sessionc reate response", response);
-      });
+    return this.wsp.open().then(() =>
+      this.wsp.sendRequest({
+        type: "session.create",
+        payload: {
+          pull_request_id,
+          organisation,
+          name: reponame,
+          service: "github"
+        }
+      })
+    );
   }
 
   getHover(sessionId, baseOrHead, filePath, lineNumber, charNumber) {

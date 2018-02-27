@@ -101,19 +101,25 @@ class Extension extends React.Component {
     let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
     if (type === "pull" && username && reponame && typeId) {
       let prId = btoa(`${username}/${reponame}/${typeId}`);
-      WS.createSession(typeId, username, reponame);
+
+      // We are not going to persist session id for the web socket for now
       // if (!this.props.storage.sessions[prId] && this.props.storage.token) {
-      //   API.createSession(typeId, username, reponame).then(response => {
-      //     let prId = btoa(`${username}/${reponame}/${typeId}`);
-      //     let sessions = {
-      //       ...this.props.storage.sessions,
-      //       [prId]: { ...response }
-      //     };
-      //     StorageUtils.setAllInStore({ sessions }, res => {
-      //       console.log("Sessions set in store", sessions, res);
-      //     });
-      //   });
-      // }
+
+      if (this.props.storage.token) {
+        WS.createSession(typeId, username, reponame).then(response => {
+          console.log("session created:", response.result);
+          let prId = btoa(`${username}/${reponame}/${typeId}`);
+          let sessions = {
+            ...this.props.storage.sessions,
+            [prId]: { ...response }
+          };
+
+          // Not saving session response for web socket
+          // StorageUtils.setAllInStore({ sessions }, res => {
+          //   console.log("Sessions set in store", sessions, res);
+          // });
+        });
+      }
     }
   }
 

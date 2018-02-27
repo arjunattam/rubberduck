@@ -54,7 +54,6 @@ class HoverElement extends React.Component {
       this.props.hoverResult.charNumber
     )
       .then(response => {
-        console.log("hover response", response);
         const isForCurrentMouse = this.isOverlappingWithCurrent(
           hoverXY.x,
           hoverXY.y
