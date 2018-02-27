@@ -64,7 +64,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     let storageChange = changes[key];
     storageChanges = {
       ...storageChanges,
-      [key]: storageChange.newValue
+      [key]: storageChange.newValue || null
     };
   }
   sendMessageToAllTabs("STORAGE_UPDATED", storageChanges);
