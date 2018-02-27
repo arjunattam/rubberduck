@@ -27,7 +27,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   const injectFlagCode =
     "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;";
 
-  if (INJECTABLE_URLS.indexOf(extractHostname(tab.url)) < 0) {
+  if (!tab.url || INJECTABLE_URLS.indexOf(extractHostname(tab.url)) < 0) {
     // Tab hostname is not in the INJECTABLE_URLS
     return;
   }
