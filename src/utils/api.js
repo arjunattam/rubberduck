@@ -151,7 +151,8 @@ export class BaseAPI {
     return this.baseRequest.post(uri, {
       pull_request_id,
       organisation,
-      name: reponame
+      name: reponame,
+      service: "github"
     });
   }
 
