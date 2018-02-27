@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { API } from "../utils/api";
+import { WS } from "../utils/websocket";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./Sidebar";
@@ -77,7 +78,8 @@ class Extension extends React.Component {
 
   handleTokenUpdate(token, clientId) {
     StorageUtils.setAllInStore({ token, clientId }, () => {
-      this.handleSessionInitialization();
+      // Disabling this for now -- to prevent two calls for session creation
+      // this.handleSessionInitialization();
     });
   }
 
@@ -99,18 +101,19 @@ class Extension extends React.Component {
     let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
     if (type === "pull" && username && reponame && typeId) {
       let prId = btoa(`${username}/${reponame}/${typeId}`);
-      if (!this.props.storage.sessions[prId] && this.props.storage.token) {
-        API.createSession(typeId, username, reponame).then(response => {
-          let prId = btoa(`${username}/${reponame}/${typeId}`);
-          let sessions = {
-            ...this.props.storage.sessions,
-            [prId]: { ...response }
-          };
-          StorageUtils.setAllInStore({ sessions }, res => {
-            console.log("Sessions set in store", sessions, res);
-          });
-        });
-      }
+      WS.createSession(typeId, username, reponame);
+      // if (!this.props.storage.sessions[prId] && this.props.storage.token) {
+      //   API.createSession(typeId, username, reponame).then(response => {
+      //     let prId = btoa(`${username}/${reponame}/${typeId}`);
+      //     let sessions = {
+      //       ...this.props.storage.sessions,
+      //       [prId]: { ...response }
+      //     };
+      //     StorageUtils.setAllInStore({ sessions }, res => {
+      //       console.log("Sessions set in store", sessions, res);
+      //     });
+      //   });
+      // }
     }
   }
 

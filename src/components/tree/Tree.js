@@ -82,7 +82,7 @@ class Tree extends React.Component {
       let pjax = new Pjax({
         elements: "a", // default is "a[href], form[action]"
         selectors: ["#js-repo-pjax-container"],
-        debug: true,
+        // debug: true,
         disablePjaxHeader: true
       });
     }

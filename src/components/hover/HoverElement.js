@@ -2,7 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
-import { API } from "../../utils/api";
+// import { API } from "../../utils/api";
+import { WS } from "../../utils/websocket";
 import * as SessionUtils from "../../utils/session";
 import HoverBox from "./HoverBox";
 
@@ -45,38 +46,38 @@ class HoverElement extends React.Component {
       x: this.props.hoverResult.mouseX,
       y: this.props.hoverResult.mouseY
     };
-    API.getHover(
+    WS.getHover(
       SessionUtils.getCurrentSessionId(this.props.storage.sessions),
       this.props.hoverResult.fileSha,
       this.props.hoverResult.filePath,
       this.props.hoverResult.lineNumber,
       this.props.hoverResult.charNumber
-    )
-      .then(response => {
-        const isForCurrentMouse = this.isOverlappingWithCurrent(
-          hoverXY.x,
-          hoverXY.y
-        );
-        if (isForCurrentMouse) {
-          // We will set state only if the current
-          // mouse location overlaps with the response
-          let definitionPath = "";
-          if (response.result.definition !== null) {
-            definitionPath = response.result.definition.location.path;
-          }
-          this.setState({
-            name: response.result.name,
-            type: response.result.type,
-            docstring: response.result.docstring,
-            filePath: definitionPath,
-            x: this.props.hoverResult.mouseX,
-            y: this.props.hoverResult.mouseY
-          });
-        }
-      })
-      .catch(error => {
-        console.log("Error in API call", error);
-      });
+    );
+    // .then(response => {
+    //   const isForCurrentMouse = this.isOverlappingWithCurrent(
+    //     hoverXY.x,
+    //     hoverXY.y
+    //   );
+    //   if (isForCurrentMouse) {
+    //     // We will set state only if the current
+    //     // mouse location overlaps with the response
+    //     let definitionPath = "";
+    //     if (response.result.definition !== null) {
+    //       definitionPath = response.result.definition.location.path;
+    //     }
+    //     this.setState({
+    //       name: response.result.name,
+    //       type: response.result.type,
+    //       docstring: response.result.docstring,
+    //       filePath: definitionPath,
+    //       x: this.props.hoverResult.mouseX,
+    //       y: this.props.hoverResult.mouseY
+    //     });
+    //   }
+    // })
+    // .catch(error => {
+    //   console.log("Error in API call", error);
+    // });
   };
 
   componentDidUpdate(prevProps, prevState) {
