@@ -6,7 +6,7 @@ import SectionHeader from "../common/Section";
 import { renderChildren } from "./Folder";
 import "./Tree.css";
 let Pjax = require("pjax");
-let document = window.document;
+
 class Tree extends React.Component {
   state = {
     data: { children: [] },
@@ -82,7 +82,9 @@ class Tree extends React.Component {
       let pjax = new Pjax({
         elements: "a", // default is "a[href], form[action]"
         selectors: ["#js-repo-pjax-container"],
-        debug: true,
+        // debug: true,
+        cacheBust: false,
+        currentUrlFullReload: false,
         disablePjaxHeader: true
       });
     }
