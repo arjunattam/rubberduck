@@ -1,40 +1,75 @@
+import Store from "../store";
+import WebSocketAsPromised from "websocket-as-promised";
+
 // Handlers for web socket stuff
 class BaseWebSocket {
-  constructor() {
-    this.socket = this.createConnection();
-
-    this.socket.onmessage = function(event) {
-      console.log("received:", JSON.parse(event.data));
-    };
-  }
-
   createConnection() {
-    console.log("creating socket connection");
-    return new WebSocket("ws://localhost:8000/sessions/");
-  }
-
-  sendToSocket(msgJson) {
-    console.log("sending", msgJson);
-    this.socket.send(JSON.stringify(msgJson));
+    const token = Store.getState().storage.token;
+    const wsUrl = `ws://localhost:8000/sessions/?token=${token}`;
+    return new WebSocketAsPromised(wsUrl, {
+      packMessage: data => JSON.stringify(data),
+      unpackMessage: message => JSON.parse(message),
+      attachRequestId: (data, requestId) =>
+        Object.assign({ id: requestId }, data),
+      extractRequestId: data => data && data.id
+    });
   }
 
   createSession(pull_request_id, organisation, reponame) {
-    return this.sendToSocket({
-      type: "session.create",
-      pull_request_id,
-      organisation,
-      name: reponame,
-      service: "github"
-    });
+    this.wsp = this.createConnection();
+    // this.wsp.onPackedMessage.addListener(data =>
+    //   console.log("received:", data)
+    // );
+
+    return this.wsp
+      .open()
+      .then(() =>
+        this.wsp.sendRequest({
+          type: "session.create",
+          payload: {
+            pull_request_id,
+            organisation,
+            name: reponame,
+            service: "github"
+          }
+        })
+      )
+      .then(response => {
+        console.log("sessionc reate response", response);
+      });
   }
 
   getHover(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
     const queryParams = {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
-      location_id: `${filePath}#L${lineNumber}#C${charNumber}`,
-      type: "session.hover"
+      location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    return this.sendToSocket(queryParams);
+    return this.wsp.sendRequest({
+      type: "session.hover",
+      payload: queryParams
+    });
+  }
+
+  getReferences(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
+    const queryParams = {
+      is_base_repo: baseOrHead === "base" ? "true" : "false",
+      location_id: `${filePath}#L${lineNumber}#C${charNumber}`
+    };
+    return this.wsp.sendRequest({
+      type: "session.references",
+      payload: queryParams
+    });
+  }
+
+  getDefinition(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
+    const queryParams = {
+      is_base_repo: baseOrHead === "base" ? "true" : "false",
+      location_id: `${filePath}#L${lineNumber}#C${charNumber}`
+    };
+    return this.wsp.sendRequest({
+      type: "session.definition",
+      payload: queryParams
+    });
   }
 }
 

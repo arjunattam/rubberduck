@@ -78,7 +78,6 @@ class Extension extends React.Component {
 
   handleTokenUpdate(token, clientId) {
     StorageUtils.setAllInStore({ token, clientId }, () => {
-      // Disabling this for now -- to prevent two calls for session creation
       // this.handleSessionInitialization();
     });
   }
@@ -89,7 +88,8 @@ class Extension extends React.Component {
   }
 
   handleUrlUpdate() {
-    this.handleSessionInitialization();
+    // Disabling this for now -- to prevent two calls for session creation
+    // this.handleSessionInitialization();
   }
 
   updateRepoDetailsFromPath() {
