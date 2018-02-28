@@ -30,9 +30,13 @@ class Extension extends React.Component {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
     }
+    let isSameSessionPath = GitPathAdapter.isSameSessionPath(
+      prevProps.data.repoDetails,
+      this.props.data.repoDetails
+    );
     if (
-      prevProps.storage.token !== this.props.storage.token &&
-      this.props.storage.token
+      prevProps.storage.token !== this.props.storage.token ||
+      !isSameSessionPath
     ) {
       this.handleSessionInitialization();
     }
@@ -74,29 +78,32 @@ class Extension extends React.Component {
   }
 
   handleUrlUpdate() {
-    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
-    this.handleSessionInitialization();
+    this.updateRepoDetailsFromPath();
   }
 
   updateRepoDetailsFromPath() {
     this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
   }
 
+  handleSessionCreation(typeId, username, reponame) {
+    API.createSession(typeId, username, reponame).then(response => {
+      let prHash = btoa(`${username}/${reponame}/${typeId}`);
+      let sessions = {
+        ...this.props.storage.sessions,
+        [prHash]: { ...response }
+      };
+      StorageUtils.setAllInStore({ sessions }, res => {
+        console.log("Sessions set in store", sessions, res);
+      });
+    });
+  }
+
   handleSessionInitialization() {
-    let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
+    let { type, typeId, username, reponame } = this.props.data.repoDetails;
     if (type === "pull" && username && reponame && typeId) {
-      let prId = btoa(`${username}/${reponame}/${typeId}`);
-      if (!this.props.storage.sessions[prId] && this.props.storage.token) {
-        API.createSession(typeId, username, reponame).then(response => {
-          let prId = btoa(`${username}/${reponame}/${typeId}`);
-          let sessions = {
-            ...this.props.storage.sessions,
-            [prId]: { ...response }
-          };
-          StorageUtils.setAllInStore({ sessions }, res => {
-            console.log("Sessions set in store", sessions, res);
-          });
-        });
+      let prHash = btoa(`${username}/${reponame}/${typeId}`);
+      if (!this.props.storage.sessions[prHash] && this.props.storage.token) {
+        this.handleSessionCreation(typeId, username, reponame);
       }
     }
   }
