@@ -40,7 +40,7 @@ export class AuthUtils {
       return true;
     }
     let decodedToken = JWT.decode(token);
-    let tokenExpiryMoment = Moment(decodedToken.exp);
+    let tokenExpiryMoment = Moment.unix(decodedToken.exp);
     let currentMoment = Moment();
     if (currentMoment.isSameOrAfter(tokenExpiryMoment, "second")) {
       return true;
@@ -54,7 +54,7 @@ export class AuthUtils {
     }
     let decodedToken = JWT.decode(token);
     let currentMoment = Moment();
-    let tokenExpiryMoment = Moment(decodedToken.exp).add(30, "days");
+    let tokenExpiryMoment = Moment.unix(decodedToken.exp).add(30, "days");
     if (tokenExpiryMoment.diff(currentMoment, "hours") < 24) {
       return true;
     }
@@ -67,9 +67,9 @@ export class AuthUtils {
     }
     let decodedToken = JWT.decode(token);
     let currentMoment = Moment();
-    let tokenOriginalIssueMoment = Moment(decodedToken.orig_iat);
-    let tokenExpiryMoment = Moment(decodedToken.exp);
-    let tokenRefreshExpiryMoment = Moment(decodedToken.orig_iat).add(
+    let tokenOriginalIssueMoment = Moment.unix(decodedToken.orig_iat);
+    let tokenExpiryMoment = Moment.unix(decodedToken.exp);
+    let tokenRefreshExpiryMoment = Moment(tokenOriginalIssueMoment).add(
       30,
       "days"
     );
