@@ -13,7 +13,6 @@ import * as GitPathAdapter from "../adapters/github/path";
 class Extension extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
     this.StorageActions = bindActionCreators(
       StorageActions,
@@ -27,11 +26,11 @@ class Extension extends React.Component {
     this.initializeStorage();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
     }
-    if (!prevProps.storage.token && this.props.storage.token) {
+    if (prevProps.storage.token !== this.props.storage.token) {
       this.handleSessionInitialization();
     }
   }
@@ -59,25 +58,10 @@ class Extension extends React.Component {
   setupAuthorization() {
     let clientId =
       this.props.storage.clientId || Authorization.generateClientId();
-    this.setupJWT(clientId);
-  }
-
-  setupJWT(clientId) {
     let existingToken = this.props.storage.token;
-    if (existingToken) {
-      API.refreshTokenBackground(existingToken).then(response => {
-        this.handleTokenUpdate(response.token, clientId);
-      });
-    } else {
-      API.issueToken(clientId).then(response => {
-        this.handleTokenUpdate(response.token, clientId);
-      });
-    }
-  }
 
-  handleTokenUpdate(token, clientId) {
-    StorageUtils.setAllInStore({ token, clientId }, () => {
-      this.handleSessionInitialization();
+    Authorization.handleTokenState(clientId, existingToken).then(token => {
+      StorageUtils.setAllInStore({ token, clientId }, () => {});
     });
   }
 
@@ -87,6 +71,7 @@ class Extension extends React.Component {
   }
 
   handleUrlUpdate() {
+    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
     this.handleSessionInitialization();
   }
 
@@ -95,7 +80,6 @@ class Extension extends React.Component {
   }
 
   handleSessionInitialization() {
-    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
     let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
     if (type === "pull" && username && reponame && typeId) {
       let prId = btoa(`${username}/${reponame}/${typeId}`);

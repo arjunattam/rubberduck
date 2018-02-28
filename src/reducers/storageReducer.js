@@ -16,7 +16,17 @@ export default createReducer(initialState, {
     };
   },
   UPDATE_FROM_CHROME_STORAGE: (state, action) => {
-    console.log("Updated storage data", {
+    console.log("Updated storage data from chrome", {
+      ...state,
+      ...action.payload
+    });
+    return {
+      ...state,
+      ...action.payload
+    };
+  },
+  UPDATE_STORAGE: (state, action) => {
+    console.log("Updated storage data locally", {
       ...state,
       ...action.payload
     });
