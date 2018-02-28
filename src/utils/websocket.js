@@ -1,11 +1,13 @@
 import Store from "../store";
 import WebSocketAsPromised from "websocket-as-promised";
+import { rootUrl } from "./api";
 
 // Handlers for web socket stuff
 class BaseWebSocket {
   createConnection() {
     const token = Store.getState().storage.token;
-    const wsUrl = `ws://localhost:8000/sessions/?token=${token}`;
+    const baseWsUrl = rootUrl.replace("http", "ws");
+    const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
     return new WebSocketAsPromised(wsUrl, {
       packMessage: data => JSON.stringify(data),
       unpackMessage: message => JSON.parse(message),
