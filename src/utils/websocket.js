@@ -22,6 +22,10 @@ class BaseWebSocket {
     // to create session.
     // TODO(arjun): handle cases when the connection is lost, will need to re-setup
     this.wsp = this.createConnection();
+    this.wsp.onPackedMessage.addListener(message => {
+      // Console log if this will not be handled by a promise later
+      if (message.id === undefined) console.log("received", message);
+    });
     return this.wsp.open().then(() =>
       this.wsp.sendRequest({
         type: "session.create",
