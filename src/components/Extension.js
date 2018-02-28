@@ -30,7 +30,10 @@ class Extension extends React.Component {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
     }
-    if (prevProps.storage.token !== this.props.storage.token) {
+    if (
+      prevProps.storage.token !== this.props.storage.token &&
+      this.props.storage.token
+    ) {
       this.handleSessionInitialization();
     }
   }
