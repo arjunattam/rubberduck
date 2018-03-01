@@ -126,8 +126,8 @@ export class BaseAPI {
     }
   }
 
-  getFilesTree(username, reponame) {
-    const uriPath = `repos/${username}/${reponame}/git/trees/master?recursive=1`;
+  getFilesTree(username, reponame, branch) {
+    const uriPath = `repos/${username}/${reponame}/git/trees/${branch}?recursive=1`;
     return this.makeConditionalGet(uriPath);
   }
 
