@@ -98,7 +98,15 @@ class Extension extends React.Component {
 
   handleSessionInitialization() {
     this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
-    let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
+    let {
+      type,
+      typeId,
+      username,
+      reponame,
+      branch
+    } = GitPathAdapter.getRepoFromPath();
+    console.log(GitPathAdapter.getRepoFromPath());
+
     if (type === "pull" && username && reponame && typeId) {
       let prId = btoa(`${username}/${reponame}/${typeId}`);
 
@@ -106,12 +114,31 @@ class Extension extends React.Component {
       // if (!this.props.storage.sessions[prId] && this.props.storage.token) {
 
       if (this.props.storage.token) {
-        WS.createSession(typeId, username, reponame).then(response => {
-          console.log("session created:", response.result);
+        WS.createPRSession(username, reponame, typeId).then(response => {
           let prId = btoa(`${username}/${reponame}/${typeId}`);
           let sessions = {
             ...this.props.storage.sessions,
             [prId]: { ...response }
+          };
+
+          // Not saving session response for web socket
+          // StorageUtils.setAllInStore({ sessions }, res => {
+          //   console.log("Sessions set in store", sessions, res);
+          // });
+        });
+      }
+    } else if (type === "file" && branch) {
+      let branchId = btoa(`${username}/${reponame}/${branch}`);
+
+      // We are not going to persist session id for the web socket for now
+      // if (!this.props.storage.sessions[branchId] && this.props.storage.token) {
+
+      if (this.props.storage.token) {
+        WS.createCompareSession(username, reponame, branch).then(response => {
+          let branchId = btoa(`${username}/${reponame}/${branch}`);
+          let sessions = {
+            ...this.props.storage.sessions,
+            [branchId]: { ...response }
           };
 
           // Not saving session response for web socket

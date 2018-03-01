@@ -17,7 +17,7 @@ class BaseWebSocket {
     });
   }
 
-  createSession(pull_request_id, organisation, reponame) {
+  createPRSession(organisation, reponame, pull_request_id) {
     // We create the connection first, and then send the message
     // to create session.
     // TODO(arjun): handle cases when the connection is lost, will need to re-setup
@@ -34,6 +34,26 @@ class BaseWebSocket {
           organisation,
           name: reponame,
           service: "github"
+        }
+      })
+    );
+  }
+
+  createCompareSession(organisation, reponame, head_sha, base_sha) {
+    this.wsp = this.createConnection();
+    this.wsp.onPackedMessage.addListener(message => {
+      // Console log if this will not be handled by a promise later
+      if (message.id === undefined) console.log("received", message);
+    });
+    return this.wsp.open().then(() =>
+      this.wsp.sendRequest({
+        type: "session.create",
+        payload: {
+          organisation,
+          name: reponame,
+          service: "github",
+          head_sha,
+          base_sha
         }
       })
     );
