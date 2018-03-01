@@ -1,9 +1,12 @@
 import React from "react";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import { listener as blobListener } from "../../adapters/github/views/blob";
 import { listener as pullListener } from "../../adapters/github/views/pull";
 import HoverElement from "./HoverElement";
+import * as GitPathAdapter from "../../adapters/github/path";
 
-export default class HoverListener extends React.Component {
+class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
   state = {
     mouseX: -1000,
@@ -30,6 +33,16 @@ export default class HoverListener extends React.Component {
       this.setState({ mouseX: -1000, mouseY: -1000 });
     }
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    let isSameSessionPath = GitPathAdapter.isSameSessionPath(
+      prevProps.data.repoDetails,
+      this.props.data.repoDetails
+    );
+    if (!isSameSessionPath) {
+      this.setupListener();
+    }
+  }
 
   filterForHoverBox = (x, y) => {
     // Return true if x and y lie inside the hover box
@@ -72,6 +85,7 @@ export default class HoverListener extends React.Component {
     }
 
     if (listener !== null) {
+      document.body.onmouseover = null;
       document.body.onmouseover = e => {
         this.onMouseOverListener(e, listener);
       };
@@ -98,3 +112,12 @@ export default class HoverListener extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(HoverListener);
