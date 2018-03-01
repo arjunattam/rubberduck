@@ -10,7 +10,7 @@ if (process.env.REACT_APP_BACKEND_ENV === "local") {
 }
 
 export const rootUrl = envRootUrl;
-export const baseApiUrl = "api/v1/";
+export const baseApiUrl = "api/v1";
 
 export const encodeQueryData = data => {
   let ret = [];
@@ -138,17 +138,17 @@ export class BaseAPI {
   }
 
   issueToken(clientId) {
-    const uri = baseApiUrl + `token_issue/`;
+    const uri = `${baseApiUrl}/token_issue/`;
     return this.baseRequest.post(uri, { client_id: clientId });
   }
 
   refreshTokenBackground(token) {
-    const uri = baseApiUrl + `token_refresh/`;
+    const uri = `${baseApiUrl}/token_refresh/`;
     return this.baseRequest.post(uri, { token: token });
   }
 
   createSession(pull_request_id, organisation, reponame) {
-    const uri = baseApiUrl + `sessions/`;
+    const uri = `${baseApiUrl}/sessions/`;
     return this.baseRequest.post(uri, {
       pull_request_id,
       organisation,
@@ -162,9 +162,9 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri =
-      baseApiUrl +
-      `sessions/${sessionId}/hover/?${encodeQueryData(queryParams)}`;
+    const uri = `${baseApiUrl}/sessions/${sessionId}/hover/?${encodeQueryData(
+      queryParams
+    )}`;
     return this.baseRequest.fetch(uri);
   }
 
@@ -173,9 +173,9 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri =
-      baseApiUrl +
-      `sessions/${sessionId}/references/?${encodeQueryData(queryParams)}`;
+    const uri = `${baseApiUrl}/sessions/${sessionId}/references/?${encodeQueryData(
+      queryParams
+    )}`;
     return this.baseRequest.fetch(uri);
   }
 
@@ -184,9 +184,9 @@ export class BaseAPI {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
     };
-    const uri =
-      baseApiUrl +
-      `/sessions/${sessionId}/definition/?${encodeQueryData(queryParams)}`;
+    const uri = `${baseApiUrl}/sessions/${sessionId}/definition/?${encodeQueryData(
+      queryParams
+    )}`;
     return this.baseRequest.fetch(uri);
   }
 }
