@@ -3,6 +3,7 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import { githubGist as githubStyle } from "react-syntax-highlighter/styles/hljs";
 import Octicon from "react-component-octicons";
 import "./ExpandedCode.css";
+import { decodeBase64 } from "../../utils/data";
 
 export default class ExpandedCode extends React.Component {
   // Line numbers are zero-indexed in the API, so we need to +1
@@ -10,7 +11,7 @@ export default class ExpandedCode extends React.Component {
   getBase64Decoded(encodedString) {
     let decoded = "";
     try {
-      decoded = atob(encodedString);
+      decoded = decodeBase64(encodedString);
     } catch (e) {
       decoded = "";
     }

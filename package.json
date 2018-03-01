@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^0.17.1",
+    "js-base64": "^2.4.3",
     "jsonwebtoken": "^8.1.1",
     "pjax": "https://github.com/rishabhgrg/pjax",
     "react": "^16.2.0",
