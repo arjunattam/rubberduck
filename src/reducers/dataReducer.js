@@ -5,7 +5,12 @@ const initialState = {
   repoDetails: {},
   openSection: "tree",
   textSelection: {},
-  isSidebarVisible: true
+  isSidebarVisible: true,
+  fileTree: {
+    name: "",
+    path: "",
+    children: []
+  }
 };
 
 export default createReducer(initialState, {
@@ -29,6 +34,15 @@ export default createReducer(initialState, {
       ...state,
       repoDetails: {
         ...state.repoDetails,
+        ...action.payload
+      }
+    };
+  },
+  SET_FILE_TREE: (state, action) => {
+    return {
+      ...state,
+      fileTree: {
+        ...state.fileTree,
         ...action.payload
       }
     };

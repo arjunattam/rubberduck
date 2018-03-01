@@ -30,3 +30,10 @@ export function setRepoDetails(data) {
     payload: data
   };
 }
+
+export function setFileTree(data) {
+  return {
+    type: "SET_FILE_TREE",
+    payload: data
+  };
+}

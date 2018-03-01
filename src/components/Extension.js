@@ -9,7 +9,12 @@ import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
 import * as GitPathAdapter from "../adapters/github/path";
+import * as DataUtils from "../utils/data";
 
+const Pjax = require("pjax");
+let document = window.document;
+
+let GlobalPjax;
 class Extension extends React.Component {
   constructor(props) {
     super(props);
@@ -39,6 +44,7 @@ class Extension extends React.Component {
       !isSameSessionPath
     ) {
       this.handleSessionInitialization();
+      this.handleFileTreeUpdate();
     }
   }
 
@@ -105,6 +111,49 @@ class Extension extends React.Component {
       if (!this.props.storage.sessions[prHash] && this.props.storage.token) {
         this.handleSessionCreation(typeId, username, reponame);
       }
+    }
+  }
+
+  getFileTreeAPI(repoDetails) {
+    const { username, reponame, type } = repoDetails;
+    const pullId = repoDetails.typeId;
+    const branch = repoDetails.branch || "master";
+    if (type === "pull") {
+      return API.getPRFiles(username, reponame, pullId).then(response => {
+        return DataUtils.getPRChildren(reponame, response);
+      });
+    } else {
+      return API.getFilesTree(username, reponame, branch).then(response => {
+        return DataUtils.getTreeChildren(reponame, response.tree);
+      });
+    }
+  }
+
+  handleFileTreeUpdate() {
+    let repoDetails = this.props.data.repoDetails;
+
+    if (repoDetails.username && repoDetails.reponame) {
+      // Repo details have been figured
+      const { username, reponame } = repoDetails;
+      const pullId = repoDetails.typeId;
+      const branch = repoDetails.branch || "master";
+
+      this.getFileTreeAPI(repoDetails)
+        .then(fileTreeData => {
+          this.DataActions.setFileTree(fileTreeData);
+          setTimeout(() => {
+            GlobalPjax = new Pjax({
+              elements: "a", // default is "a[href], form[action]"
+              selectors: ["#js-repo-pjax-container"],
+              debug: true,
+              disablePjaxHeader: true
+            });
+          }, 2000);
+        })
+        .catch(error => {
+          // TODO(arjun): this needs to be better communicated
+          console.log("Error in API call", error);
+        });
     }
   }
 

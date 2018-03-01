@@ -52,10 +52,10 @@ class Tree extends React.Component {
   };
 
   componentDidMount() {
-    if (this.props.storage.token) {
-      // We have the jwt, so make API call
-      this.updateTree();
-    }
+    // if (this.props.storage.token) {
+    //   // We have the jwt, so make API call
+    //   this.updateTree();
+    // }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -65,27 +65,16 @@ class Tree extends React.Component {
       });
     }
 
-    if (this.props.storage.token !== nextProps.storage.token) {
-      // jwt will be updated, so refresh the tree
-      if (nextProps.storage.token) this.updateTree();
-    }
+    // if (this.props.storage.token !== nextProps.storage.token) {
+    //   // jwt will be updated, so refresh the tree
+    //   if (nextProps.storage.token) this.updateTree();
+    // }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevState.isVisible && this.state.isVisible) {
-      this.updateTree();
-    }
-    if (
-      prevState.data.children.length === 0 &&
-      this.state.data.children.length > 0
-    ) {
-      let pjax = new Pjax({
-        elements: "a", // default is "a[href], form[action]"
-        selectors: ["#js-repo-pjax-container"],
-        debug: true,
-        disablePjaxHeader: true
-      });
-    }
+    // if (!prevState.isVisible && this.state.isVisible) {
+    //   this.updateTree();
+    // }
   }
 
   toggleVisibility = () => {
@@ -104,7 +93,8 @@ class Tree extends React.Component {
   render() {
     // data is a recursive tree structure, where every element
     // has children, that denote the subtree
-    const children = this.state.data.children;
+    // const children = this.state.data.children;
+    const children = this.props.data.fileTree.children;
     const renderedChildren = renderChildren(children, 0, this.props);
     const styleClass = this.state.isVisible
       ? "tree-content-visible"
