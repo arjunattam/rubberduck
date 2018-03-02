@@ -4,6 +4,7 @@ import "./StatusBar.css";
 import { getParameterByName } from "../../utils/api";
 import { Authorization } from "../../utils/authorization";
 import * as StorageUtils from "../../utils/storage";
+import SessionStatus from "./SessionStatus";
 
 class StatusBar extends React.Component {
   state = {
@@ -48,6 +49,15 @@ class StatusBar extends React.Component {
   };
 
   render() {
+    return (
+      <div>
+        <SessionStatus />
+        {this.renderAuth()}
+      </div>
+    );
+  }
+
+  renderAuth() {
     // Three possible situations: 1. token unavailable, 2. token available but
     // no github login, and 3. token and github login both available
     const decodedJWT = this.props.storage.token
