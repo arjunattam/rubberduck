@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^0.17.1",
+    "js-base64": "^2.4.3",
     "jsonwebtoken": "^8.1.1",
     "pjax": "https://github.com/rishabhgrg/pjax",
     "react": "^16.2.0",
@@ -28,6 +29,8 @@
     "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",
     "pack": "npm run build && npm run gen-crx",
     "test": "react-app-rewired test --env=jsdom",
+    "gen-zip": "rm -f bundle.zip && zip -r9 -r9 bundle.zip build/*",
+    "chrome-zip": "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip",
     "eject": "react-app-rewired eject"
   },
   "devDependencies": {

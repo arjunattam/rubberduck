@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { API } from "../utils/api";
 import { WS } from "../utils/websocket";
+import { encodeToBase64 } from "../utils/data";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./Sidebar";
@@ -108,14 +109,14 @@ class Extension extends React.Component {
     console.log(GitPathAdapter.getRepoFromPath());
 
     if (type === "pull" && username && reponame && typeId) {
-      let prId = btoa(`${username}/${reponame}/${typeId}`);
+      let prId = encodeToBase64(`${username}/${reponame}/${typeId}`);
 
       // We are not going to persist session id for the web socket for now
       // if (!this.props.storage.sessions[prId] && this.props.storage.token) {
 
       if (this.props.storage.token) {
         WS.createPRSession(username, reponame, typeId).then(response => {
-          let prId = btoa(`${username}/${reponame}/${typeId}`);
+          let prId = encodeToBase64(`${username}/${reponame}/${typeId}`);
           let sessions = {
             ...this.props.storage.sessions,
             [prId]: { ...response }
@@ -128,14 +129,14 @@ class Extension extends React.Component {
         });
       }
     } else if (type === "file" && branch) {
-      let branchId = btoa(`${username}/${reponame}/${branch}`);
+      let branchId = encodeToBase64(`${username}/${reponame}/${branch}`);
 
       // We are not going to persist session id for the web socket for now
       // if (!this.props.storage.sessions[branchId] && this.props.storage.token) {
 
       if (this.props.storage.token) {
         WS.createCompareSession(username, reponame, branch).then(response => {
-          let branchId = btoa(`${username}/${reponame}/${branch}`);
+          let branchId = encodeToBase64(`${username}/${reponame}/${branch}`);
           let sessions = {
             ...this.props.storage.sessions,
             [branchId]: { ...response }
