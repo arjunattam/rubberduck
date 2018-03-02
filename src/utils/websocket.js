@@ -9,7 +9,7 @@ class BaseWebSocket {
     this.wsp = null;
   }
 
-  createWebsocket(token) {
+  createWebsocket = token => {
     const baseWsUrl = rootUrl.replace("http", "ws");
     const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
     this.wsp = new WebSocketAsPromised(wsUrl, {
@@ -19,25 +19,26 @@ class BaseWebSocket {
         Object.assign({ id: requestId }, data),
       extractRequestId: data => data && data.id
     });
-  }
+  };
 
-  connectSocket(token) {
+  connectSocket = (token, onClose) => {
     this.createWebsocket(token);
+    this.wsp.onClose.addListener(response => onClose(response));
     return this.wsp.open();
-  }
+  };
 
-  tearDown() {
+  tearDown = () => {
     if (this.wsp !== null) {
-      return this.wsp.close();
+      return this.wsp.close().then(() => (this.wsp = null));
     } else {
       // Socket was never actually created
       new Promise((resolve, reject) => {
         resolve();
       });
     }
-  }
+  };
 
-  sendRequest(payload) {
+  sendRequest = payload => {
     return new Promise((resolve, reject) => {
       this.wsp.sendRequest(payload).then(response => {
         // response can have result or error
@@ -49,43 +50,43 @@ class BaseWebSocket {
         }
       });
     });
-  }
+  };
 
-  setupListener(listener) {
+  setupListener = listener => {
     this.wsp.onPackedMessage.addListener(message => {
       // Console log if this will not be handled by a promise later
       if (message.id === undefined) {
         listener(message);
       }
     });
-  }
+  };
 
-  createPRSession(organisation, reponame, pull_request_id) {
+  createPRSession = (organisation, name, pull_request_id) => {
     return this.sendRequest({
       type: "session.create",
       payload: {
         organisation,
-        name: reponame,
+        name,
         service: "github",
         pull_request_id
       }
     });
-  }
+  };
 
-  createCompareSession(organisation, reponame, head_sha, base_sha) {
+  createCompareSession = (organisation, name, head_sha, base_sha) => {
     return this.sendRequest({
       type: "session.create",
       payload: {
         organisation,
-        name: reponame,
+        name,
         service: "github",
         head_sha,
         base_sha
       }
     });
-  }
+  };
 
-  getHover(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
+  getHover = (sessionId, baseOrHead, filePath, lineNumber, charNumber) => {
     // sessionId is actually not required
     const queryParams = {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
@@ -95,9 +96,9 @@ class BaseWebSocket {
       type: "session.hover",
       payload: queryParams
     });
-  }
+  };
 
-  getReferences(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
+  getReferences = (sessionId, baseOrHead, filePath, lineNumber, charNumber) => {
     // sessionId is actually not required
     const queryParams = {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
@@ -107,9 +108,9 @@ class BaseWebSocket {
       type: "session.references",
       payload: queryParams
     });
-  }
+  };
 
-  getDefinition(sessionId, baseOrHead, filePath, lineNumber, charNumber) {
+  getDefinition = (sessionId, baseOrHead, filePath, lineNumber, charNumber) => {
     // sessionId is actually not required
     const queryParams = {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
@@ -119,7 +120,7 @@ class BaseWebSocket {
       type: "session.definition",
       payload: queryParams
     });
-  }
+  };
 }
 
 class WebSocketManager {
@@ -133,7 +134,11 @@ class WebSocketManager {
   }
 
   statusUpdatesListener = message => {
-    console.log("status update listener", message);
+    // This will trigger the UI states for session status
+    console.log(message.status_update);
+    if (message.status_update === "ready") {
+      this.isReady = true;
+    }
   };
 
   setupListener = () => {
@@ -144,13 +149,21 @@ class WebSocketManager {
     });
   };
 
+  onSocketClose = response => {
+    // response has {code, reason}
+    // TODO(arjun): reconnect here
+    console.log("looks like the socket closed", response);
+  };
+
   createConnection = () => {
     const token = Store.getState().storage.token;
     return new Promise((resolve, reject) => {
       this.ws
-        .connectSocket(token)
+        .connectSocket(token, this.onSocketClose)
         .then(() => {
           this.isConnected = true;
+          this.isReady = false;
+          this.setupListener();
           resolve();
         })
         .catch(() => {
@@ -161,14 +174,63 @@ class WebSocketManager {
     });
   };
 
+  tearDownIfRequired = () => {
+    if (this.isConnected) {
+      this.isReady = false;
+      this.isConnected = false;
+      return this.ws.tearDown();
+    } else {
+      return new Promise((resolve, reject) => {
+        resolve();
+      });
+    }
+  };
+
   createSession = params => {
     // This method is called with params, and internally
     // we need to figure out which type of session this is
-    if (this.isConnected) {
-      return this.ws.tearDown().then(this.createConnection);
+    return this.tearDownIfRequired()
+      .then(this.createConnection)
+      .then(() => {
+        if (params.type == "pull") {
+          this.ws.createPRSession(
+            params.organisation,
+            params.name,
+            params.pull_request_id
+          );
+        } else if (params.type == "file") {
+          // TODO(arjun): this will evolve when we support base_sha
+          this.ws.createCompareSession(
+            params.organisation,
+            params.name,
+            params.head_sha
+          );
+        }
+      });
+  };
+
+  getLSCallHelper = (method, ...params) => {
+    // We can only make these calls once ready
+    if (this.isReady) {
+      return method(...params);
     } else {
-      return this.createConnection();
+      return new Promise((resolve, reject) => {
+        console.log("session not ready");
+        reject();
+      });
     }
+  };
+
+  getHover = (...params) => {
+    return this.getLSCallHelper(this.ws.getHover, ...params);
+  };
+
+  getReferences = (...params) => {
+    return this.getLSCallHelper(this.ws.getReferences, ...params);
+  };
+
+  getDefinition = (...params) => {
+    return this.getLSCallHelper(this.ws.getDefinition, ...params);
   };
 }
 

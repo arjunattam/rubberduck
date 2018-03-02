@@ -47,15 +47,6 @@ class HoverElement extends React.Component {
       y: this.props.hoverResult.mouseY
     };
 
-    if (WS.wsp === undefined) {
-      // Avoid hover box in file view for now
-      this.setState({
-        x: -1000,
-        y: -1000
-      });
-      return;
-    }
-
     WS.getHover(
       SessionUtils.getCurrentSessionId(this.props.storage.sessions),
       this.props.hoverResult.fileSha,
