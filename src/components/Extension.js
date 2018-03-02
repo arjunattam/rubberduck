@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { API } from "../utils/api";
 import { WS } from "../utils/websocket";
-import { encodeToBase64 } from "../utils/data";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./Sidebar";
@@ -98,54 +97,22 @@ class Extension extends React.Component {
   }
 
   handleSessionInitialization() {
+    // Q: do we need to set the repo details here?
     this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
-    let {
-      type,
-      typeId,
-      username,
-      reponame,
-      branch
-    } = GitPathAdapter.getRepoFromPath();
-    console.log(GitPathAdapter.getRepoFromPath());
+    const repoDetails = GitPathAdapter.getRepoFromPath();
 
-    if (type === "pull" && username && reponame && typeId) {
-      let prId = encodeToBase64(`${username}/${reponame}/${typeId}`);
-
-      // We are not going to persist session id for the web socket for now
-      // if (!this.props.storage.sessions[prId] && this.props.storage.token) {
+    if (repoDetails.username && repoDetails.reponame) {
+      const params = {
+        organisation: repoDetails.username,
+        name: repoDetails.reponame,
+        pull_request_id: repoDetails.typeId,
+        type: repoDetails.type,
+        head_sha: repoDetails.branch
+      };
 
       if (this.props.storage.token) {
-        WS.createPRSession(username, reponame, typeId).then(response => {
-          let prId = encodeToBase64(`${username}/${reponame}/${typeId}`);
-          let sessions = {
-            ...this.props.storage.sessions,
-            [prId]: { ...response }
-          };
-
-          // Not saving session response for web socket
-          // StorageUtils.setAllInStore({ sessions }, res => {
-          //   console.log("Sessions set in store", sessions, res);
-          // });
-        });
-      }
-    } else if (type === "file" && branch) {
-      let branchId = encodeToBase64(`${username}/${reponame}/${branch}`);
-
-      // We are not going to persist session id for the web socket for now
-      // if (!this.props.storage.sessions[branchId] && this.props.storage.token) {
-
-      if (this.props.storage.token) {
-        WS.createCompareSession(username, reponame, branch).then(response => {
-          let branchId = encodeToBase64(`${username}/${reponame}/${branch}`);
-          let sessions = {
-            ...this.props.storage.sessions,
-            [branchId]: { ...response }
-          };
-
-          // Not saving session response for web socket
-          // StorageUtils.setAllInStore({ sessions }, res => {
-          //   console.log("Sessions set in store", sessions, res);
-          // });
+        WS.createSession(params).then(response => {
+          console.log("created session", response);
         });
       }
     }
