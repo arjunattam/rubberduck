@@ -135,7 +135,7 @@ class WebSocketManager {
 
   statusUpdatesListener = message => {
     // This will trigger the UI states for session status
-    console.log(message.status_update);
+    console.log(message);
     if (message.status_update === "ready") {
       this.isReady = true;
     }
