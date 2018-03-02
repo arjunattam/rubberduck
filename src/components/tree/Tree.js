@@ -7,6 +7,7 @@ import { renderChildren } from "./Folder";
 import "./Tree.css";
 let Pjax = require("pjax");
 let document = window.document;
+
 class Tree extends React.Component {
   state = {
     data: { children: [] },

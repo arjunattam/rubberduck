@@ -5,7 +5,8 @@ const initialState = {
   repoDetails: {},
   openSection: "tree",
   textSelection: {},
-  isSidebarVisible: true
+  isSidebarVisible: true,
+  sessionStatus: ""
 };
 
 export default createReducer(initialState, {
@@ -31,6 +32,12 @@ export default createReducer(initialState, {
         ...state.repoDetails,
         ...action.payload
       }
+    };
+  },
+  UPDATE_SESSION_STATUS: (state, action) => {
+    return {
+      ...state,
+      sessionStatus: action.sessionStatus
     };
   },
   UPDATE_DATA: (state, action) => {

@@ -33,3 +33,10 @@ export function setRepoDetails(data) {
     payload: data
   };
 }
+
+export function updateSessionStatus(data) {
+  return {
+    type: "UPDATE_SESSION_STATUS",
+    payload: data
+  };
+}

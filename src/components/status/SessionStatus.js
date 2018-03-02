@@ -1,12 +1,28 @@
 import React from "react";
+import { connect } from "react-redux";
 import "./SessionStatus.css";
 
 const start = "#fff6dc";
-const middle = "#feffd0";
 const end = "#dbffcc";
 
-export default class SessionStatus extends React.Component {
+class SessionStatus extends React.Component {
   render() {
-    return <div className="session-status-bar">Session status: ready</div>;
+    const readyStyle = { background: end };
+    const style = this.props.data.sessionStatus === "ready" ? readyStyle : null;
+
+    return (
+      <div className="session-status-bar" style={style}>
+        Session: {this.props.data.sessionStatus}
+      </div>
+    );
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(SessionStatus);

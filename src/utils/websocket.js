@@ -133,9 +133,18 @@ class WebSocketManager {
     this.ws = new BaseWebSocket();
   }
 
+  dispatchStatus = status => {
+    Store.dispatch({
+      type: "UPDATE_SESSION_STATUS",
+      sessionStatus: status
+    });
+  };
+
   statusUpdatesListener = message => {
     // This will trigger the UI states for session status
     console.log(message);
+    this.dispatchStatus(message.status_update);
+
     if (message.status_update === "ready") {
       this.isReady = true;
     }
@@ -192,6 +201,7 @@ class WebSocketManager {
     return this.tearDownIfRequired()
       .then(this.createConnection)
       .then(() => {
+        this.dispatchStatus("creating");
         if (params.type == "pull") {
           this.ws.createPRSession(
             params.organisation,
