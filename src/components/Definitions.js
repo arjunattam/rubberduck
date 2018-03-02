@@ -7,6 +7,7 @@ import ExpandedCode from "./common/ExpandedCode";
 import CodeNode from "./common/CodeNode";
 import Docstring from "./common/Docstring";
 import { API } from "./../utils/api";
+import { decodeBase64 } from "../utils/data";
 import "./Definitions.css";
 import * as SessionUtils from "../utils/session";
 
@@ -36,7 +37,7 @@ class DefinitionItem extends React.Component {
         <CodeNode name={this.props.name} file={this.props.filePath}>
           <div className="definition-docstring">
             {this.props.docstring
-              ? Docstring(atob(this.props.docstring))
+              ? Docstring(decodeBase64(this.props.docstring))
               : "docstring goes here"}
           </div>
         </CodeNode>

@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { API } from "../utils/api";
+import { encodeToBase64 } from "../utils/data";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./Sidebar";
@@ -98,10 +99,10 @@ class Extension extends React.Component {
     this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
     let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
     if (type === "pull" && username && reponame && typeId) {
-      let prId = btoa(`${username}/${reponame}/${typeId}`);
+      let prId = encodeToBase64(`${username}/${reponame}/${typeId}`);
       if (!this.props.storage.sessions[prId] && this.props.storage.token) {
         API.createSession(typeId, username, reponame).then(response => {
-          let prId = btoa(`${username}/${reponame}/${typeId}`);
+          let prId = encodeToBase64(`${username}/${reponame}/${typeId}`);
           let sessions = {
             ...this.props.storage.sessions,
             [prId]: { ...response }
