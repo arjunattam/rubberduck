@@ -57,13 +57,15 @@ const updateManifestKey = buildPath => {
   // From: https://developer.chrome.com/apps/app_identity#copy_key
   const manifest = `${buildPath}/manifest.json`;
   let manifestContents = JSON.parse(fs.readFileSync(manifest, "utf8"));
-  manifestContents.key = manifestKey;
   manifestContents.version_name =
     manifestContents.version + " " + getGitBranch();
 
   if (process.env.REACT_APP_BACKEND_ENV === "local") {
-    manifestContents.name = "mercury-local";
+    manifestContents.name = "Rubberduck-local";
     manifestContents.key = localManifestKey;
+  } else {
+    manifestContents.name = "Rubberduck-development";
+    manifestContents.key = manifestKey;
   }
 
   // Write back new object
@@ -85,5 +87,10 @@ if (require.main === module) {
   // If this script is called as `node ...`, call these methods
   const buildPath = "./build";
   updateBackground(buildPath);
-  updateManifestKey(buildPath);
+
+  if (process.env.REACT_APP_CHROME_ZIP !== "true") {
+    // We don't update the key in the manifest if the script is
+    // run for chrome store zip file
+    updateManifestKey(buildPath);
+  }
 }
