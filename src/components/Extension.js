@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { API } from "../utils/api";
+import { encodeToBase64 } from "../utils/data";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./Sidebar";
@@ -93,7 +94,7 @@ class Extension extends React.Component {
 
   handleSessionCreation(typeId, username, reponame) {
     API.createSession(typeId, username, reponame).then(response => {
-      let prHash = btoa(`${username}/${reponame}/${typeId}`);
+      let prHash = encodeToBase64(`${username}/${reponame}/${typeId}`);
       let sessions = {
         ...this.props.storage.sessions,
         [prHash]: { ...response }
@@ -107,7 +108,7 @@ class Extension extends React.Component {
   handleSessionInitialization() {
     let { type, typeId, username, reponame } = this.props.data.repoDetails;
     if (type === "pull" && username && reponame && typeId) {
-      let prHash = btoa(`${username}/${reponame}/${typeId}`);
+      let prHash = encodeToBase64(`${username}/${reponame}/${typeId}`);
       if (!this.props.storage.sessions[prHash] && this.props.storage.token) {
         this.handleSessionCreation(typeId, username, reponame);
       }

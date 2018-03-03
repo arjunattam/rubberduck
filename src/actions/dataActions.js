@@ -1,4 +1,5 @@
 import { API } from "../utils/api";
+import { encodeToBase64 } from "../utils/data";
 
 export function updateData(data) {
   return {
@@ -15,7 +16,9 @@ export function createSession(data) {
       data.username,
       data.reponame
     ).then(response => {
-      let prId = btoa(`${data.username}/${data.reponame}/${data.prNumber}`);
+      let prId = encodeToBase64(
+        `${data.username}/${data.reponame}/${data.prNumber}`
+      );
       return {
         response,
         data: prId

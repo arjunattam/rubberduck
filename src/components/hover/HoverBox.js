@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import Docstring from "../common/Docstring";
 import CodeNode from "../common/CodeNode";
 import "./Hover.css";
+import { decodeBase64 } from "../../utils/data";
 
 export default class HoverBox extends React.Component {
   // Presentation component for the hover box
@@ -36,7 +37,7 @@ export default class HoverBox extends React.Component {
           />
         </div>
         <div className="docstring">
-          {Docstring(atob(this.props.docstring || ""))}
+          {Docstring(decodeBase64(this.props.docstring || ""))}
         </div>
         <div className="button-container">
           <a className="button" onClick={this.props.onReferences}>
