@@ -101,7 +101,7 @@ class Definitions extends React.Component {
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
-    if (isValidResult) {
+    if (isValidResult && this.state.isVisible) {
       API.getDefinition(
         SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,

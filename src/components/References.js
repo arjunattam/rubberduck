@@ -99,7 +99,7 @@ class References extends React.Component {
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
-    if (isValidResult) {
+    if (isValidResult && this.state.isVisible) {
       API.getReferences(
         SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
