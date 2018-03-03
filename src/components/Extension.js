@@ -146,8 +146,9 @@ class Extension extends React.Component {
             GlobalPjax = new Pjax({
               elements: "a", // default is "a[href], form[action]"
               selectors: ["#js-repo-pjax-container"],
-              debug: true,
-              disablePjaxHeader: true
+              disablePjaxHeader: true,
+              cacheBust: false,
+              currentUrlFullReload: false
             });
           }, 2000);
         })
