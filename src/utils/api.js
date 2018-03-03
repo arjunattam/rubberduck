@@ -147,12 +147,23 @@ export class BaseAPI {
     return this.baseRequest.post(uri, { token: token });
   }
 
-  createSession(pull_request_id, organisation, reponame) {
+  createPRSession(organisation, reponame, pull_request_id) {
     const uri = `${baseApiUrl}/sessions/`;
     return this.baseRequest.post(uri, {
       pull_request_id,
       organisation,
       name: reponame,
+      service: "github"
+    });
+  }
+
+  createCompareSession(organisation, reponame, head_sha, base_sha) {
+    const uri = `${baseApiUrl}/sessions/`;
+    return this.baseRequest.post(uri, {
+      organisation,
+      name: reponame,
+      head_sha,
+      base_sha,
       service: "github"
     });
   }

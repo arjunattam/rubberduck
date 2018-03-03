@@ -6,7 +6,8 @@ import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import SmallCodeSnippet from "./common/SmallCodeSnippet";
 import CodeNode from "./common/CodeNode";
-import { API } from "./../utils/api";
+// import { API } from "./../utils/api";
+import { WS } from "./../utils/websocket";
 import * as SessionUtils from "../utils/session";
 import "./References.css";
 
@@ -100,7 +101,7 @@ class References extends React.Component {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult && this.state.isVisible) {
-      API.getReferences(
+      WS.getReferences(
         SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,

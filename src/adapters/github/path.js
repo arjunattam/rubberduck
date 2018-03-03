@@ -93,10 +93,13 @@ export const getRepoFromPath = () => {
   }
   const branch = getBranch() || null;
 
+  // Check if this is a Tree/Blob view
+  const isFileView = type == null || type == "tree" || type == "blob";
+
   return {
     username: username,
     reponame: reponame,
-    type: type,
+    type: isFileView ? "file" : type,
     typeId: typeId,
     branch: branch,
     path: path

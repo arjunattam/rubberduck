@@ -10,7 +10,8 @@ const initialState = {
     name: "",
     path: "",
     children: []
-  }
+  },
+  sessionStatus: ""
 };
 
 export default createReducer(initialState, {
@@ -45,6 +46,12 @@ export default createReducer(initialState, {
         ...state.fileTree,
         ...action.payload
       }
+    };
+  },
+  UPDATE_SESSION_STATUS: (state, action) => {
+    return {
+      ...state,
+      sessionStatus: action.sessionStatus
     };
   },
   UPDATE_DATA: (state, action) => {

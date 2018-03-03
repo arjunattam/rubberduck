@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { API } from "../utils/api";
-import { encodeToBase64 } from "../utils/data";
+import { WS } from "../utils/websocket";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./Sidebar";
@@ -73,7 +73,6 @@ class Extension extends React.Component {
     let clientId =
       this.props.storage.clientId || Authorization.generateClientId();
     let existingToken = this.props.storage.token;
-
     Authorization.handleTokenState(clientId, existingToken).then(token => {
       StorageUtils.setAllInStore({ token, clientId }, () => {});
     });
@@ -92,25 +91,37 @@ class Extension extends React.Component {
     this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
   }
 
-  handleSessionCreation(typeId, username, reponame) {
-    API.createSession(typeId, username, reponame).then(response => {
-      let prHash = encodeToBase64(`${username}/${reponame}/${typeId}`);
-      let sessions = {
-        ...this.props.storage.sessions,
-        [prHash]: { ...response }
-      };
-      StorageUtils.setAllInStore({ sessions }, res => {
-        console.log("Sessions set in store", sessions, res);
-      });
+  handleSessionCreation(params) {
+    WS.createSession(params).then(response => {
+      console.log("created session", response);
     });
+    // API.createSession(typeId, username, reponame).then(response => {
+    //   let prHash = encodeToBase64(`${username}/${reponame}/${typeId}`);
+    //   let sessions = {
+    //     ...this.props.storage.sessions,
+    //     [prHash]: { ...response }
+    //   };
+    //   StorageUtils.setAllInStore({ sessions }, res => {
+    //     console.log("Sessions set in store", sessions, res);
+    //   });
+    // });
   }
 
   handleSessionInitialization() {
-    let { type, typeId, username, reponame } = this.props.data.repoDetails;
-    if (type === "pull" && username && reponame && typeId) {
-      let prHash = encodeToBase64(`${username}/${reponame}/${typeId}`);
-      if (!this.props.storage.sessions[prHash] && this.props.storage.token) {
-        this.handleSessionCreation(typeId, username, reponame);
+    const repoDetails = this.props.data.repoDetails;
+    if (repoDetails.username && repoDetails.reponame) {
+      const params = {
+        organisation: repoDetails.username,
+        name: repoDetails.reponame,
+        pull_request_id: repoDetails.typeId,
+        type: repoDetails.type,
+        head_sha: repoDetails.branch
+      };
+
+      if (this.props.storage.token) {
+        WS.createSession(params).then(response => {
+          console.log("created session", response);
+        });
       }
     }
   }
