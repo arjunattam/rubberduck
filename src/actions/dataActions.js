@@ -33,3 +33,17 @@ export function setRepoDetails(data) {
     payload: data
   };
 }
+
+export function setFileTree(data) {
+  return {
+    type: "SET_FILE_TREE",
+    payload: data
+  };
+}
+
+export function updateSessionStatus(data) {
+  return {
+    type: "UPDATE_SESSION_STATUS",
+    payload: data
+  };
+}
