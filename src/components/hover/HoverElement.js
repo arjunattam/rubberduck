@@ -46,9 +46,6 @@ class HoverElement extends React.Component {
       x: this.props.hoverResult.mouseX,
       y: this.props.hoverResult.mouseY
     };
-    if (!SessionUtils.getCurrentSessionId(this.props.storage.sessions)) {
-      return;
-    }
     WS.getHover(
       SessionUtils.getCurrentSessionId(this.props.storage.sessions),
       this.props.hoverResult.fileSha,
