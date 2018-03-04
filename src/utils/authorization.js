@@ -1,8 +1,10 @@
 // See docs/AUTHENTICATION.md for documentation
 import { sendMessage, constructMessage } from "./chrome";
 import { rootUrl } from "./api";
+import { API } from "./api";
+const Moment = require("moment");
 
-const jwt = require("jsonwebtoken");
+const JWT = require("jsonwebtoken");
 
 export class AuthUtils {
   generateClientId() {
@@ -18,7 +20,7 @@ export class AuthUtils {
   }
 
   decodeJWT(token) {
-    return jwt.decode(token);
+    return JWT.decode(token);
   }
 
   triggerOAuthFlow(jwt, cb) {
@@ -31,6 +33,79 @@ export class AuthUtils {
     const url = `${rootUrl}github_oauth_logout/?token=${jwt}`;
     const message = constructMessage("AUTH_TRIGGER", { url: url });
     sendMessage(message, cb);
+  }
+
+  isTokenExpired(token) {
+    if (!token) {
+      return true;
+    }
+    let decodedToken = JWT.decode(token);
+    let tokenExpiryMoment = Moment.unix(decodedToken.exp);
+    let currentMoment = Moment();
+    if (currentMoment.isSameOrAfter(tokenExpiryMoment, "second")) {
+      return true;
+    }
+    return false;
+  }
+
+  isTokenExpiring(token) {
+    if (!token) {
+      return true;
+    }
+    let decodedToken = JWT.decode(token);
+    let currentMoment = Moment();
+    let tokenExpiryMoment = Moment.unix(decodedToken.exp);
+    if (tokenExpiryMoment.diff(currentMoment, "hours") < 24) {
+      return true;
+    }
+    return false;
+  }
+
+  isTokenRefreshExpiring(token) {
+    if (!token) {
+      return true;
+    }
+    let decodedToken = JWT.decode(token);
+    let currentMoment = Moment();
+    let tokenOriginalIssueMoment = Moment.unix(decodedToken.orig_iat);
+    let tokenExpiryMoment = Moment.unix(decodedToken.exp);
+    let tokenRefreshExpiryMoment = Moment(tokenOriginalIssueMoment).add(
+      30,
+      "days"
+    );
+    if (tokenRefreshExpiryMoment.diff(currentMoment, "hours") < 24) {
+      return true;
+    }
+    return false;
+  }
+
+  issueToken(clientId) {
+    clientId = clientId || this.generateClientId();
+    return API.issueToken(clientId).then(response => {
+      return response.token;
+    });
+  }
+
+  refreshToken(existingToken) {
+    API.refreshTokenBackground(existingToken).then(response => {
+      return response.token;
+    });
+  }
+
+  handleTokenState(clientId, existingToken) {
+    if (
+      !existingToken ||
+      this.isTokenExpired(existingToken) ||
+      this.isTokenRefreshExpiring(existingToken)
+    ) {
+      return this.issueToken(clientId);
+    } else if (this.isTokenExpiring(existingToken)) {
+      return this.refreshToken(existingToken);
+    } else {
+      return new Promise(resolve => {
+        resolve(existingToken);
+      });
+    }
   }
 }
 

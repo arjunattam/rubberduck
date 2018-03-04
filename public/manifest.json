@@ -1,8 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "mercury",
-  "description": "Chrome extension for mercury",
-  "version": "0.1.8",
+  "name": "Rubberduck",
+  "short_name": "Rubberduck",
+  "description": "Code review assistant for GitHub",
+  "version": "0.1.9",
   "browser_action": {
     "default_icon": "favicon.ico",
     "default_popup": "index.html"
@@ -19,6 +20,5 @@
     "storage",
     "identity",
     "contextMenus"
-  ],
-  "update_url": "http://www.example.com/update.xml"
+  ]
 }

@@ -59,40 +59,49 @@ const getBranch = () => {
 };
 
 export const getRepoFromPath = () => {
+  let repoDetails = {
+    username: null,
+    reponame: null,
+    type: null,
+    typeId: null,
+    branch: null,
+    path: null
+  };
+
   // (username)/(reponame)[/(type)][/(typeId)][/(filePath)]
   const match = window.location.pathname.match(
     // /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?(?:\/(.+))?/
     /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?/
   );
 
-  if (checkIfSkipped()) {
-    return {};
+  if (window.location.hostname !== "github.com" || checkIfSkipped() || !match) {
+    return repoDetails;
   }
 
-  const username = match[1];
-  const reponame = match[2];
-  const type = match[3];
-  const typeId = match[4];
-  const path = match[5];
+  const username = match[1] || null;
+  const reponame = match[2] || null;
+  const type = match[3] || null;
+  const typeId = match[4] || null;
+  const path = match[5] || null;
 
   if (
     ~GH_RESERVED_USER_NAMES.indexOf(username) ||
     ~GH_RESERVED_REPO_NAMES.indexOf(reponame)
   ) {
     // Not a repository, skip
-    return {};
+    return repoDetails;
   }
+  const branch = getBranch() || null;
 
-  // Check if this is a PR and whether we should show changes
-  const isPR = type === "pull";
-  const pullNumber = isPR ? typeId : null;
+  // Check if this is a Tree/Blob view
+  const isFileView = type == null || type == "tree" || type == "blob";
 
   return {
     username: username,
     reponame: reponame,
-    type: type,
+    type: isFileView ? "file" : type,
     typeId: typeId,
-    branch: getBranch(),
+    branch: branch,
     path: path
   };
 };
@@ -107,4 +116,18 @@ export const constructPath = (subPath, orgname, reponame, branch) => {
   }
 
   return "/" + orgname + "/" + reponame + "/blob/" + branch + "/" + subPath;
+};
+
+export const isSameSessionPath = (oldRepoDetails, newRepoDetails) => {
+  if (!oldRepoDetails || !newRepoDetails) {
+    return false;
+  }
+  let isSame = true;
+  for (let key in oldRepoDetails) {
+    if (oldRepoDetails[key] !== newRepoDetails[key]) {
+      isSame = false;
+      break;
+    }
+  }
+  return isSame;
 };
