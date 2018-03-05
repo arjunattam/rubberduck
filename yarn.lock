@@ -4887,9 +4887,9 @@ pinkie@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
 
-"pjax@https://github.com/rishabhgrg/pjax":
+"pjax@https://github.com/karigari/pjax.git#karigari":
   version "0.2.5"
-  resolved "https://github.com/rishabhgrg/pjax#b7a4b6c018ab81b603648670a215b509b26cdb0c"
+  resolved "https://github.com/karigari/pjax.git#86ddc011420b54d20ddb0ebe58888691811eb24b"
 
 pkg-dir@^1.0.0:
   version "1.0.0"
