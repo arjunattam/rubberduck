@@ -1,3 +1,13 @@
+.references-section {
+  overflow: hidden;
+  max-height: calc(100vh - 207px);
+  transition: max-height 200ms ease-in;
+}
+
+.references-section.collapsed {
+  max-height: 25px;
+}
+
 .reference-container {
   background: rgb(250, 251, 252);
   padding-bottom: 10px;
@@ -5,10 +15,6 @@
   overflow-x: hidden;
   max-height: calc(100vh - 207px);
   transition: max-height 200ms ease-in;
-}
-
-.reference-container.collapsed {
-  max-height: 0;
 }
 
 .reference-title {

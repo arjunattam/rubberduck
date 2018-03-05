@@ -28,13 +28,9 @@ class DefinitionItem extends React.Component {
   };
 
   render() {
-    let definitonClassName = this.props.visible
-      ? "definition-item"
-      : "definition-item collapsed";
-
     return (
       <div
-        className={definitonClassName}
+        className="definition-item"
         onMouseEnter={this.handleMouseHover}
         onMouseLeave={this.handleMouseHover}
         ref={"container"}
@@ -140,8 +136,11 @@ class Definitions extends React.Component {
   };
 
   render() {
+    let definitonClassName = this.state.isVisible
+      ? "definitions-section"
+      : "definitions-section collapsed";
     return (
-      <div className="definitions-section">
+      <div className={definitonClassName}>
         <SectionHeader
           onClick={this.toggleVisibility}
           isVisible={this.state.isVisible}

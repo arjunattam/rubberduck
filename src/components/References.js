@@ -148,17 +148,17 @@ class References extends React.Component {
     });
 
     let referencesClassName = this.state.isVisible
-      ? "reference-container"
-      : "reference-container collapsed";
+      ? "references-section"
+      : "references-section collapsed";
 
     return (
-      <div className="references-section">
+      <div className={referencesClassName}>
         <SectionHeader
           onClick={this.toggleVisibility}
           isVisible={this.state.isVisible}
           name={"Usages"}
         />
-        <div className={referencesClassName}>
+        <div className="reference-container">
           <div className="reference-title">
             <div className="reference-name monospace">{this.state.name}</div>
             <div className="reference-count">{this.state.count} references</div>
