@@ -5,6 +5,32 @@ import BaseListener from "./base";
 import { getRepoFromPath } from "../path";
 
 class BlobPageListener extends BaseListener {
+  getFontAspectRatio = () => {
+    return 0.6; // TODO(arjun): Calculate this methodically
+  };
+
+  hasTextUnderMouse = (element, x, y) => {
+    // Overriding base method because this calculation is different
+    const node = element.parentElement; // This represents entire code line
+
+    try {
+      const tdElement = node.closest("td.blob-code");
+      const boundRect = tdElement.getBoundingClientRect();
+      const lineContentLength = tdElement.textContent.length;
+      const elStyle = window.getComputedStyle(tdElement);
+      const lineHeight = this.stripPx(elStyle.fontSize);
+      // Check if line content width is greater than x
+      const padding = this.stripPx(elStyle.paddingLeft);
+      const widthWithText =
+        this.getPixelsFromChar(lineContentLength, lineHeight) +
+        boundRect.x +
+        padding;
+      return widthWithText > x;
+    } catch (err) {
+      return false;
+    }
+  };
+
   getFileSha = element => {
     // TODO -- this might fail for cases where branch name has a `/`
     const { typeId } = getRepoFromPath(); // sha id from window url
@@ -26,8 +52,7 @@ class BlobPageListener extends BaseListener {
     const elStyle = window.getComputedStyle(actualElement);
     const charInPixels = mouseX - bbox.x - this.stripPx(elStyle.paddingLeft);
     const lineHeight = this.stripPx(elStyle.fontSize);
-    const fontAspectRatio = this.getFontAspectRatio(); // aspect ratio (w/h) for SF-Mono font
-    return Math.round(charInPixels / (fontAspectRatio * lineHeight));
+    return Math.round(this.getCharsFromPixels(charInPixels, lineHeight));
   };
 
   getLineNumber = element => {

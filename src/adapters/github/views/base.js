@@ -30,7 +30,16 @@ export default class BaseListener {
 
   getFontAspectRatio = () => {
     // This will have to change if we need to support other fonts
+    // Returns aspect ratio (w/h) for SF-Mono font
     return SF_MONO_ASPECT_RATIO;
+  };
+
+  getPixelsFromChar = (chars, fontSize) => {
+    return chars * (this.getFontAspectRatio() * fontSize);
+  };
+
+  getCharsFromPixels = (pixels, fontSize) => {
+    return pixels / (this.getFontAspectRatio() * fontSize);
   };
 
   hasTextUnderMouse = (element, x, y) => {
@@ -38,12 +47,8 @@ export default class BaseListener {
     // Get the bounding box of the element
     const boundRect = element.parentElement.getBoundingClientRect();
     let hasTextOnMouse = true;
-    if (boundRect.x + boundRect.width < x) {
-      // In this case, the mouse does not have text below
-      hasTextOnMouse = false;
-    }
-    console.log("has text", hasTextOnMouse, x, y);
-    return hasTextOnMouse;
+    // If bounding box covers more width than x, we are good
+    return boundRect.x + boundRect.width > x;
   };
 
   valuesAreValid = result => {

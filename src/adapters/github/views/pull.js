@@ -55,8 +55,7 @@ class PRPageListener extends BaseListener {
       const elStyle = window.getComputedStyle(codeTd);
       const charInPixels = mouseX - bbox.x - this.stripPx(elStyle.paddingLeft);
       const lineHeight = this.stripPx(elStyle.fontSize);
-      const fontAspectRatio = this.getFontAspectRatio(); // aspect ratio (w/h) for SF-Mono font
-      return Math.round(charInPixels / (fontAspectRatio * lineHeight)) - 1; // PR adds +/-
+      return Math.round(this.getCharsFromPixels(charInPixels, lineHeight)) - 1; // PR adds +/-
     } catch (err) {
       return -1;
     }
