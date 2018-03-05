@@ -87,7 +87,7 @@ export class AuthUtils {
   }
 
   refreshToken(existingToken) {
-    API.refreshTokenBackground(existingToken).then(response => {
+    return API.refreshTokenBackground(existingToken).then(response => {
       return response.token;
     });
   }
