@@ -28,6 +28,28 @@ export default class BaseListener {
     );
   };
 
+  hasTextUnderMouse = (element, x, y) => {
+    // Overriding base method because this calculation is different
+    const node = element.parentElement; // This represents entire code line
+
+    try {
+      const tdElement = node.closest("td.blob-code");
+      const boundRect = tdElement.getBoundingClientRect();
+      const lineContentLength = tdElement.textContent.length;
+      const elStyle = window.getComputedStyle(tdElement);
+      const lineHeight = this.stripPx(elStyle.fontSize);
+      // Check if line content width is greater than x
+      const padding = this.stripPx(elStyle.paddingLeft);
+      const widthWithText =
+        this.getPixelsFromChar(lineContentLength, lineHeight) +
+        boundRect.x +
+        padding;
+      return widthWithText > x;
+    } catch (err) {
+      return false;
+    }
+  };
+
   getFontAspectRatio = () => {
     // This will have to change if we need to support other fonts
     // Returns aspect ratio (w/h) for SF-Mono font
@@ -40,15 +62,6 @@ export default class BaseListener {
 
   getCharsFromPixels = (pixels, fontSize) => {
     return pixels / (this.getFontAspectRatio() * fontSize);
-  };
-
-  hasTextUnderMouse = (element, x, y) => {
-    // Compute if there is text below the element
-    // Get the bounding box of the element
-    const boundRect = element.parentElement.getBoundingClientRect();
-    let hasTextOnMouse = true;
-    // If bounding box covers more width than x, we are good
-    return boundRect.x + boundRect.width > x;
   };
 
   valuesAreValid = result => {

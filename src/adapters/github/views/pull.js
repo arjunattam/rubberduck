@@ -1,6 +1,34 @@
 import BaseListener from "./base";
 
 class PRPageListener extends BaseListener {
+  hasTextUnderMouseForDiff = (element, x, y) => {
+    // Compute if there is text below the element
+    const boundRect = element.parentElement.getBoundingClientRect();
+    // If bounding box covers more width than x, we are good
+    return boundRect.x + boundRect.width > x;
+  };
+
+  hasTextUnderWrapper = (element, x, y) => {
+    // There are two cases here: are we checking the diff portion
+    // or the expanded code sections (ones that are grey-ed out)
+    // For the expanded code section, the base class method will work
+    const codeTd = element.parentNode.closest("td.code-review");
+
+    if (codeTd === null) {
+      // We are in the expanded section
+      return this.hasTextUnderMouse(element, x, y);
+    }
+
+    return this.hasTextUnderMouseForDiff(element, x, y);
+  };
+
+  isValidResult = (element, x, y, hoverResult) => {
+    return (
+      this.hasTextUnderWrapper(element, x, y) &&
+      this.valuesAreValid(hoverResult)
+    );
+  };
+
   getFileUri = element => {
     // file uri is the attribute `data-path` of div.js-file-header
     // which is the left sibling of div.js-file-content, which is
