@@ -91,22 +91,6 @@ class Extension extends React.Component {
     this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
   }
 
-  handleSessionCreation(params) {
-    WS.createSession(params).then(response => {
-      console.log("created session", response);
-    });
-    // API.createSession(typeId, username, reponame).then(response => {
-    //   let prHash = encodeToBase64(`${username}/${reponame}/${typeId}`);
-    //   let sessions = {
-    //     ...this.props.storage.sessions,
-    //     [prHash]: { ...response }
-    //   };
-    //   StorageUtils.setAllInStore({ sessions }, res => {
-    //     console.log("Sessions set in store", sessions, res);
-    //   });
-    // });
-  }
-
   handleSessionInitialization() {
     const repoDetails = this.props.data.repoDetails;
     if (repoDetails.username && repoDetails.reponame) {
