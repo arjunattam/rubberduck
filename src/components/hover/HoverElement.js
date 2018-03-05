@@ -41,6 +41,20 @@ class HoverElement extends React.Component {
     this.triggerAction("definitions");
   };
 
+  callAPIProxy = () => {
+    const { lineNumber, charNumber, filePath } = this.props.hoverResult;
+    const name = `${lineNumber} - ${charNumber} - ${filePath}`;
+
+    this.setState({
+      name: name,
+      type: "",
+      docstring: "",
+      filePath: "",
+      x: this.props.hoverResult.mouseX,
+      y: this.props.hoverResult.mouseY
+    });
+  };
+
   callAPI = () => {
     const hoverXY = {
       x: this.props.hoverResult.mouseX,
@@ -86,7 +100,7 @@ class HoverElement extends React.Component {
       this.props.hoverResult.charNumber !== prevProps.hoverResult.charNumber
     ) {
       // Props have been updated, so make API call if we are on new line/char
-      this.callAPI(prevProps);
+      this.callAPIProxy(prevProps);
     }
   }
 
