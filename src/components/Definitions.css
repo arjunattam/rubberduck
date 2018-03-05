@@ -1,18 +1,22 @@
 .definitions-section {
   background: rgb(250, 251, 252);
   padding-bottom: 20px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: calc(100vh - 207px);
+}
+
+.definition-item.collapsed {
+  max-height: 0;
 }
 
 .definition-item {
+  max-height: calc(100vh - 207px);
+  overflow-y: hidden;
+  overflow-x: hidden;
   background: #fff;
-  min-height: 90px;
   cursor: pointer;
   border-top: 1px solid #f1f8ff;
   border-bottom: 1px solid #f1f8ff;
   margin-top: 10px;
+  transition: max-height 200ms ease-in;
 }
 
 .definition-item:hover {

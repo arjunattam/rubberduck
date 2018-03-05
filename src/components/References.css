@@ -4,6 +4,11 @@
   overflow-y: auto;
   overflow-x: hidden;
   max-height: calc(100vh - 207px);
+  transition: max-height 200ms ease-in;
+}
+
+.reference-container.collapsed {
+  max-height: 0;
 }
 
 .reference-title {
