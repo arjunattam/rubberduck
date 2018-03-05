@@ -15,7 +15,7 @@ export default class BaseListener {
       filePath: this.getFileUri(element),
       fileSha: this.getFileSha(element),
       lineNumber: this.getLineNumber(element),
-      charNumber: this.getCharNumber(element, x),
+      charNumber: this.getCharNumber(element, x, y),
       mouseX: x,
       mouseY: y
     };
@@ -36,10 +36,9 @@ export default class BaseListener {
       const tdElement = node.closest("td.blob-code");
       const boundRect = tdElement.getBoundingClientRect();
       const lineContentLength = tdElement.textContent.length;
-      const elStyle = window.getComputedStyle(tdElement);
-      const lineHeight = this.stripPx(elStyle.fontSize);
+      const lineHeight = this.getFontSize(tdElement);
       // Check if line content width is greater than x
-      const padding = this.stripPx(elStyle.paddingLeft);
+      const padding = this.getPaddingLeft(tdElement);
       const widthWithText =
         this.getPixelsFromChar(lineContentLength, lineHeight) +
         boundRect.x +
@@ -75,5 +74,15 @@ export default class BaseListener {
   stripPx = value => {
     // Get `12px` and return `12`
     return +value.replace("px", "");
+  };
+
+  getFontSize = element => {
+    const elStyle = window.getComputedStyle(element);
+    return this.stripPx(elStyle.fontSize);
+  };
+
+  getPaddingLeft = element => {
+    const elStyle = window.getComputedStyle(element);
+    return this.stripPx(elStyle.paddingLeft);
   };
 }

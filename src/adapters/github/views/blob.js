@@ -11,8 +11,8 @@ class BlobPageListener extends BaseListener {
 
   getFileSha = element => {
     // TODO -- this might fail for cases where branch name has a `/`
-    const { typeId } = getRepoFromPath(); // sha id from window url
-    return typeId;
+    const { branch } = getRepoFromPath(); // sha id from window url
+    return branch;
   };
 
   getCharNumber = (element, mouseX) => {
@@ -27,10 +27,10 @@ class BlobPageListener extends BaseListener {
       }
     }
     const bbox = actualElement.getBoundingClientRect();
-    const elStyle = window.getComputedStyle(actualElement);
-    const charInPixels = mouseX - bbox.x - this.stripPx(elStyle.paddingLeft);
-    const lineHeight = this.stripPx(elStyle.fontSize);
-    return Math.round(this.getCharsFromPixels(charInPixels, lineHeight));
+    const charInPixels = mouseX - bbox.x - this.getPaddingLeft(actualElement);
+    return Math.round(
+      this.getCharsFromPixels(charInPixels, this.getFontSize(actualElement))
+    );
   };
 
   getLineNumber = element => {

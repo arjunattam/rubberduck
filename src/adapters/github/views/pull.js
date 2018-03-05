@@ -70,22 +70,73 @@ class PRPageListener extends BaseListener {
     }
   };
 
-  getCharNumber = (element, mouseX) => {
-    // Similar to blob calculation
+  getCharNumberHelper = (element, mouseX) => {
+    const bbox = element.getBoundingClientRect();
+    const lineHeight = this.getFontSize(element);
+    const charInPixels = mouseX - bbox.x - this.getPaddingLeft(element);
+    return Math.round(this.getCharsFromPixels(charInPixels, lineHeight)) - 1; // PR adds +/-
+  };
+
+  getNumDisplayLines = element => {
+    const boundRect = element.getBoundingClientRect();
+    return Math.round(boundRect.height / this.getFontSize(element)) - 1;
+  };
+
+  getMouseDisplayLine = (element, mouseX, mouseY) => {
+    const boundRect = element.getBoundingClientRect();
+    const relativeY = mouseY - boundRect.y;
+    return relativeY / this.getFontSize(element);
+  };
+
+  getCharNumber = (element, mouseX, mouseY) => {
+    // Code lines can get extended to multiple display lines in the diff view
+    // We handle cases where the code is extended to up to two display lines
+    // in the diff view. Remaining cases:
+    // 1. code extends to >2 display lines
+    // 2. code extends to >=2 display lines in the expanded code section
     let codeTd = element.parentNode.closest("td.code-review");
 
     if (codeTd === null) {
+      // Inside expanded code section
       codeTd = element.parentNode.closest("td.blob-code");
-    }
 
-    try {
-      const bbox = codeTd.getBoundingClientRect();
-      const elStyle = window.getComputedStyle(codeTd);
-      const charInPixels = mouseX - bbox.x - this.stripPx(elStyle.paddingLeft);
-      const lineHeight = this.stripPx(elStyle.fontSize);
-      return Math.round(this.getCharsFromPixels(charInPixels, lineHeight)) - 1; // PR adds +/-
-    } catch (err) {
-      return -1;
+      if (codeTd === null) {
+        return -1;
+      }
+
+      if (this.getNumDisplayLines(codeTd) > 1) {
+        console.log(">=2 display lines inside expanded code is not supported");
+        return -1;
+      } else {
+        return this.getCharNumberHelper(codeTd, mouseX);
+      }
+    } else {
+      // Inside the diff section
+      const displayLines = this.getNumDisplayLines(codeTd);
+
+      if (displayLines == 1) {
+        return this.getCharNumberHelper(codeTd, mouseX);
+      } else if (displayLines == 2) {
+        // We need to check where the mouse is
+
+        if (this.getMouseDisplayLine(codeTd, mouseX, mouseY) > 1.5) {
+          // We are in the second line
+          const secondLineResult = this.getCharNumberHelper(codeTd, mouseX);
+          const innerElement = codeTd.querySelector("span.blob-code-inner");
+          const firstLineWidth = innerElement.getBoundingClientRect().width;
+          const firstLineChars =
+            this.getCharsFromPixels(firstLineWidth, this.getFontSize(codeTd)) -
+            1;
+          // Subtracted 1 to remove the +/- that is pre-appended by github
+          return secondLineResult + Math.round(firstLineChars);
+        } else {
+          // We are in the first line
+          return this.getCharNumberHelper(codeTd, mouseX);
+        }
+      } else {
+        console.log(">2 display lines inside diff section not supported");
+        return -1;
+      }
     }
   };
 
