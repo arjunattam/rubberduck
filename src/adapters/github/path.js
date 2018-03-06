@@ -87,7 +87,7 @@ const getCompareViewSha = () => {
   let result = {};
   branches.map(element => {
     const match = element.match(/(base|compare): (.+)/);
-    result[match[1] == "compare" ? "head" : match[1]] = match[2];
+    result[match[1] === "compare" ? "head" : match[1]] = match[2];
   });
   return result;
 };
@@ -134,14 +134,13 @@ const getPRCommitSha = () => {
   return null;
 };
 
-export const getRepoFromPath = () => {
+const getRepoFromPath = () => {
   // Parse url path to infer repo data
   let repoDetails = {
     username: null,
     reponame: null,
     type: null,
     typeId: null,
-    branch: null,
     path: null
   };
 
@@ -167,17 +166,15 @@ export const getRepoFromPath = () => {
     // Not a repository, skip
     return repoDetails;
   }
-  const branch = getBranch() || null;
 
   // Check if this is a Tree/Blob view
-  const isFileView = type == null || type == "tree" || type == "blob";
+  const isFileView = type === null || type === "tree" || type === "blob";
 
   return {
     username: username,
     reponame: reponame,
     type: isFileView ? "file" : type,
     typeId: typeId,
-    branch: branch,
     path: path
   };
 };
@@ -225,7 +222,7 @@ export const fetchRepoDetails = () => {
   repoDetails.reponame = repoFromPath.reponame;
   repoDetails.type = repoFromPath.type;
   repoDetails.prId = repoFromPath.typeId;
-  repoDetails.branch = repoFromPath.branch;
+  repoDetails.branch = getBranch() || null;
 
   // Fill up base/head for types
   if (repoDetails.type === "commit") {

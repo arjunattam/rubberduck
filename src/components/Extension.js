@@ -113,7 +113,7 @@ class Extension extends React.Component {
 
   getFileTreeAPI(repoDetails) {
     const { username, reponame, type } = repoDetails;
-    const pullId = repoDetails.typeId;
+    const pullId = repoDetails.prId;
     const branch = repoDetails.branch || "master";
     if (type === "pull") {
       return API.getPRFiles(username, reponame, pullId).then(response => {
@@ -132,8 +132,6 @@ class Extension extends React.Component {
     if (repoDetails.username && repoDetails.reponame) {
       // Repo details have been figured
       const { username, reponame } = repoDetails;
-      const pullId = repoDetails.typeId;
-      const branch = repoDetails.branch || "master";
 
       this.getFileTreeAPI(repoDetails)
         .then(fileTreeData => {

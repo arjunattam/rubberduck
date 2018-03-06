@@ -1,7 +1,6 @@
 import Store from "../store";
 import WebSocketAsPromised from "websocket-as-promised";
 import { rootUrl } from "./api";
-import { encodeToBase64 } from "./data";
 
 class BaseWebSocket {
   // Base class that has methods for a socket connection
@@ -199,21 +198,21 @@ class WebSocketManager {
     return this.tearDownIfRequired()
       .then(this.createConnection)
       .then(() => {
-        if (params.type == "pull") {
+        if (params.type === "pull") {
           this.dispatchStatus("creating");
           this.ws.createPRSession(
             params.organisation,
             params.name,
             params.pull_request_id
           );
-        } else if (params.type == "file") {
+        } else if (params.type === "file") {
           this.dispatchStatus("creating");
           this.ws.createCompareSession(
             params.organisation,
             params.name,
             params.head_sha
           );
-        } else if (params.type == "commit" || params.type == "compare") {
+        } else if (params.type === "commit" || params.type === "compare") {
           this.dispatchStatus("creating");
           this.ws.createCompareSession(
             params.organisation,

@@ -114,9 +114,9 @@ class PRPageListener extends BaseListener {
       // Inside the diff section
       const displayLines = this.getNumDisplayLines(codeTd);
 
-      if (displayLines == 1) {
+      if (displayLines === 1) {
         return this.getCharNumberHelper(codeTd, mouseX);
-      } else if (displayLines == 2) {
+      } else if (displayLines === 2) {
         // We need to check where the mouse is
 
         if (this.getMouseDisplayLine(codeTd, mouseX, mouseY) > 1.5) {

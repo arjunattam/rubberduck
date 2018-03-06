@@ -1,7 +1,5 @@
 import React from "react";
 import { connect } from "react-redux";
-import { API } from "../../utils/api";
-import { getTreeChildren, getPRChildren } from "../../utils/data";
 import SectionHeader from "../common/Section";
 import { renderChildren } from "./Folder";
 import "./Tree.css";

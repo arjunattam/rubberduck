@@ -2,17 +2,19 @@
 // Exports a hover listener method with a callback param
 // Callback gets object: filePath, fileSha, lineNumber, charNumber, name
 import BaseListener from "./base";
-import { getRepoFromPath } from "../path";
 
 class BlobPageListener extends BaseListener {
+  constructor(fileSha) {
+    super();
+    this.fileSha = fileSha;
+  }
+
   getFontAspectRatio = () => {
     return 0.6; // TODO(arjun): Calculate this methodically
   };
 
   getFileSha = element => {
-    // TODO -- this might fail for cases where branch name has a `/`
-    const { branch } = getRepoFromPath(); // sha id from window url
-    return branch;
+    return this.fileSha;
   };
 
   getCharNumber = (element, mouseX) => {
@@ -49,15 +51,15 @@ class BlobPageListener extends BaseListener {
 
   getFileUri = element => {
     const node = element.parentNode;
-    const shaId = this.getFileSha();
+    let shaId = this.fileSha;
     const uri = node.baseURI;
     const parsed = uri.replace("#", "").split(shaId);
     return parsed[1].slice(1);
   };
 }
 
-export const listener = (event, callback) => {
-  const pageListener = new BlobPageListener();
+export const listener = (event, callback, fileSha) => {
+  const pageListener = new BlobPageListener(fileSha);
   const result = pageListener.readXY(event.x, event.y);
   callback(result);
 };

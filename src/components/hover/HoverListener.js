@@ -1,6 +1,5 @@
 import React from "react";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
 import { listener as blobListener } from "../../adapters/github/views/blob";
 import { listener as pullListener } from "../../adapters/github/views/pull";
 import HoverElement from "./HoverElement";
@@ -18,8 +17,6 @@ class HoverListener extends React.Component {
     // Callback for the hover listener. API call is made if the
     // mouse locations were correctly infered by the view adapter,
     // and there is text below the mouse.
-    console.log(hoverResult);
-
     const hasValidMouseLocation =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
@@ -67,7 +64,7 @@ class HoverListener extends React.Component {
 
   onMouseOverListener(e, listener) {
     if (!this.filterForHoverBox(e.x, e.y)) {
-      listener(e, this.receiver);
+      listener(e, this.receiver, this.props.data.repoDetails.branch);
       this.setState({
         currentMouseX: e.x,
         currentMouseY: e.y
