@@ -134,14 +134,25 @@ const getPRCommitSha = () => {
   return null;
 };
 
+const getFilePath = () => {
+  const pathElement = document.getElementById("blob-path");
+
+  if (pathElement !== null) {
+    const fullPath = pathElement.textContent.trim();
+    const firstSlashIndex = fullPath.indexOf("/");
+    return fullPath.slice(firstSlashIndex + 1);
+  }
+
+  return null;
+};
+
 const getRepoFromPath = () => {
   // Parse url path to infer repo data
   let repoDetails = {
     username: null,
     reponame: null,
     type: null,
-    typeId: null,
-    path: null
+    typeId: null
   };
 
   // (username)/(reponame)[/(type)][/(typeId)][/(filePath)]
@@ -157,7 +168,6 @@ const getRepoFromPath = () => {
   const reponame = match[2] || null;
   const type = match[3] || null;
   const typeId = match[4] || null;
-  const path = match[5] || null;
 
   if (
     ~GH_RESERVED_USER_NAMES.indexOf(username) ||
@@ -174,8 +184,7 @@ const getRepoFromPath = () => {
     username: username,
     reponame: reponame,
     type: isFileView ? "file" : type,
-    typeId: typeId,
-    path: path
+    typeId: typeId
   };
 };
 
@@ -193,14 +202,20 @@ export const isSameSessionPath = (oldRepoDetails, newRepoDetails) => {
   if (!oldRepoDetails || !newRepoDetails) {
     return false;
   }
-  let isSame = true;
-  for (let key in oldRepoDetails) {
-    if (oldRepoDetails[key] !== newRepoDetails[key]) {
-      isSame = false;
-      break;
-    }
+
+  const isTypeSame = oldRepoDetails.type === newRepoDetails.type;
+  const isHeadSame = oldRepoDetails.headSha === newRepoDetails.headSha;
+  const isBaseSame = oldRepoDetails.baseSha === newRepoDetails.baseSha;
+  const isBranchSame = oldRepoDetails.branch === newRepoDetails.branch;
+  return isTypeSame && isHeadSame && isBaseSame && isBranchSame;
+};
+
+export const hasChangedPath = (oldRepoDetails, newRepoDetails) => {
+  if (!oldRepoDetails || !newRepoDetails) {
+    return false;
   }
-  return isSame;
+
+  return oldRepoDetails.path !== newRepoDetails.path;
 };
 
 export const fetchRepoDetails = () => {
@@ -221,8 +236,11 @@ export const fetchRepoDetails = () => {
   repoDetails.username = repoFromPath.username;
   repoDetails.reponame = repoFromPath.reponame;
   repoDetails.type = repoFromPath.type;
-  repoDetails.prId = repoFromPath.typeId;
+  repoDetails.prId = repoFromPath.type === "pull" ? repoFromPath.typeId : null;
+
   repoDetails.branch = getBranch() || null;
+
+  repoDetails.path = getFilePath();
 
   // Fill up base/head for types
   if (repoDetails.type === "commit") {

@@ -27,9 +27,9 @@ class Extension extends React.Component {
   }
 
   componentDidMount() {
-    this.updateRepoDetailsFromPath();
     this.setupChromeListener();
     this.initializeStorage();
+    this.updateRepoDetailsFromPath();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -132,24 +132,25 @@ class Extension extends React.Component {
     if (repoDetails.username && repoDetails.reponame) {
       // Repo details have been figured
       const { username, reponame } = repoDetails;
-
-      this.getFileTreeAPI(repoDetails)
-        .then(fileTreeData => {
-          this.DataActions.setFileTree(fileTreeData);
-          setTimeout(() => {
-            GlobalPjax = new Pjax({
-              elements: "a", // default is "a[href], form[action]"
-              selectors: ["#js-repo-pjax-container"],
-              disablePjaxHeader: true,
-              cacheBust: false,
-              currentUrlFullReload: false
-            });
-          }, 2000);
-        })
-        .catch(error => {
-          // TODO(arjun): this needs to be better communicated
-          console.log("Error in API call", error);
-        });
+      if (this.props.storage.token) {
+        this.getFileTreeAPI(repoDetails)
+          .then(fileTreeData => {
+            this.DataActions.setFileTree(fileTreeData);
+            setTimeout(() => {
+              GlobalPjax = new Pjax({
+                elements: "a", // default is "a[href], form[action]"
+                selectors: ["#js-repo-pjax-container"],
+                disablePjaxHeader: true,
+                cacheBust: false,
+                currentUrlFullReload: false
+              });
+            }, 2000);
+          })
+          .catch(error => {
+            // TODO(arjun): this needs to be better communicated
+            console.log("Error in API call", error);
+          });
+      }
     }
   }
 

@@ -194,7 +194,6 @@ class WebSocketManager {
   createSession = params => {
     // This method is called with params, and internally
     // we need to figure out which type of session this is
-    console.log("session params", params);
     return this.tearDownIfRequired()
       .then(this.createConnection)
       .then(() => {

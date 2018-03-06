@@ -34,11 +34,15 @@ class HoverListener extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    let isSameSessionPath = GitPathAdapter.isSameSessionPath(
+    const isSameSessionPath = GitPathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
-    if (!isSameSessionPath) {
+    const hasChangedPath = GitPathAdapter.hasChangedPath(
+      prevProps.data.repoDetails,
+      this.props.data.repoDetails
+    );
+    if (!isSameSessionPath || hasChangedPath) {
       this.setupListener();
     }
   }
@@ -94,10 +98,6 @@ class HoverListener extends React.Component {
       document.body.onmouseover = null;
     }
   };
-
-  componentDidMount() {
-    this.setupListener();
-  }
 
   componentWillUnmount() {
     document.body.onmouseover = null;
