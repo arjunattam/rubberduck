@@ -70,27 +70,30 @@ class Folder extends React.Component {
     this.setState({ isCollapsed: !this.state.isCollapsed });
   };
 
-  render() {
-    const pl = this.getPadding();
+  renderFolderStructure() {
     const children = this.props.children;
     const renderedChildren = renderChildren(
       children,
       this.props.depth,
       this.props
     );
-    const selectedName = this.state.isCollapsed ? "" : "file-selected";
-    const triangle = (
-      <Octicon
-        name={this.state.isCollapsed ? "triangle-right" : "triangle-down"}
-        className="file-triangle"
-      />
-    );
-    const childrenStyle = this.state.isCollapsed
-      ? "file-children-collapsed"
-      : null;
+    return <div className="file-children ">{renderedChildren}</div>;
+  }
 
+  render() {
+    const pl = this.getPadding();
+    const selectedName = this.state.isCollapsed ? "" : "file-selected";
+    let triangleClassName = `file-triangle${
+      this.state.isCollapsed ? " collapsed" : ""
+    }`;
+    const triangle = (
+      <Octicon name={"triangle-down"} className="file-triangle" />
+    );
+    const children = this.props.children;
+    let containerClassName = "folder-structure-container";
+    containerClassName += this.state.isCollapsed ? " collapsed" : "";
     return (
-      <div>
+      <div className={containerClassName}>
         <div className={"file-container " + selectedName}>
           <a onClick={this.toggleCollapsed} style={{ paddingLeft: pl }}>
             {triangle}{" "}
@@ -101,9 +104,7 @@ class Folder extends React.Component {
             />
           </a>
         </div>
-        <div className={"file-children " + childrenStyle}>
-          {renderedChildren}
-        </div>
+        {this.renderFolderStructure()}
       </div>
     );
   }
