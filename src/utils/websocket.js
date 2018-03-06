@@ -201,19 +201,27 @@ class WebSocketManager {
     return this.tearDownIfRequired()
       .then(this.createConnection)
       .then(() => {
-        this.dispatchStatus("creating");
         if (params.type == "pull") {
+          this.dispatchStatus("creating");
           this.ws.createPRSession(
             params.organisation,
             params.name,
             params.pull_request_id
           );
         } else if (params.type == "file") {
-          // TODO(arjun): this will evolve when we support base_sha
+          this.dispatchStatus("creating");
           this.ws.createCompareSession(
             params.organisation,
             params.name,
             params.head_sha
+          );
+        } else if (params.type == "commit" || params.type == "compare") {
+          this.dispatchStatus("creating");
+          this.ws.createCompareSession(
+            params.organisation,
+            params.name,
+            params.head_sha,
+            params.base_sha
           );
         }
       });

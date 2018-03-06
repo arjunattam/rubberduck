@@ -65,6 +65,32 @@ const getBranch = () => {
   return codePageBranch || prPageBranch || menuBranch;
 };
 
+export const getCommitViewSha = () => {
+  const headShaBlock = document.querySelector("span.sha-block span.sha");
+  const baseShaBlock = document.querySelector("span.sha-block a.sha");
+  const baseInner = baseShaBlock.parentElement.innerHTML;
+
+  return {
+    head: headShaBlock.textContent.trim(),
+    base: baseInner.match(/\b[0-9a-f]{40}\b/)[0]
+  };
+};
+
+export const getCompareViewSha = () => {
+  const shaElements = document.querySelectorAll(
+    "div.commitish-suggester span.js-select-button"
+  );
+  const branches = Array.from(shaElements).map(element => {
+    return element.getAttribute("title");
+  });
+  let result = {};
+  branches.map(element => {
+    const match = element.match(/([0-9a-z]+): ([0-9a-z]+)/);
+    result[match[1] == "compare" ? "head" : match[1]] = match[2];
+  });
+  return result;
+};
+
 export const getRepoFromPath = () => {
   let repoDetails = {
     username: null,

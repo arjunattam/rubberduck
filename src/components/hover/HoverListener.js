@@ -76,11 +76,13 @@ class HoverListener extends React.Component {
   setupListener = () => {
     const isFileView = window.location.href.indexOf("blob") >= 0;
     const isPRView = window.location.href.indexOf("pull") >= 0;
+    const isCommitView = window.location.href.indexOf("commit") >= 0;
+    const isCompareView = window.location.href.indexOf("compare") >= 0;
     let listener = null;
 
     if (isFileView) {
       listener = blobListener;
-    } else if (isPRView) {
+    } else if (isPRView || isCommitView || isCompareView) {
       listener = pullListener;
     }
 

@@ -102,6 +102,16 @@ class Extension extends React.Component {
         head_sha: repoDetails.branch
       };
 
+      if (params.type === "commit") {
+        const { base, head } = GitPathAdapter.getCommitViewSha();
+        params.head_sha = head;
+        params.base_sha = base;
+      } else if (params.type === "compare") {
+        const { base, head } = GitPathAdapter.getCompareViewSha();
+        params.head_sha = head;
+        params.base_sha = base;
+      }
+
       if (this.props.storage.token) {
         WS.createSession(params).then(response => {
           console.log("created session", response);
