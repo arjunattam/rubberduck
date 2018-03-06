@@ -1,8 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { readXY as blobReadXY } from "../adapters/github/views/blob";
-import { readXY as pullReadXY } from "../adapters/github/views/pull";
+import { getReader } from "../adapters/github/views/helper";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import SmallCodeSnippet from "./common/SmallCodeSnippet";
@@ -91,17 +90,14 @@ class References extends React.Component {
   };
 
   readPage = () => {
-    const isFileView = window.location.href.indexOf("blob") >= 0;
-    const isPRView = window.location.href.indexOf("pull") >= 0;
+    const reader = getReader();
 
-    if (isFileView) {
-      return blobReadXY(
+    if (reader !== null) {
+      return reader(
         this.props.selectionX,
         this.props.selectionY,
         this.props.data.repoDetails.branch
       );
-    } else if (isPRView) {
-      return pullReadXY(this.props.selectionX, this.props.selectionY);
     }
 
     return {};

@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { listener as blobListener } from "../../adapters/github/views/blob";
-import { listener as pullListener } from "../../adapters/github/views/pull";
+import { getListener } from "../../adapters/github/views/helper";
 import HoverElement from "./HoverElement";
 import * as GitPathAdapter from "../../adapters/github/path";
 
@@ -77,17 +76,7 @@ class HoverListener extends React.Component {
   }
 
   setupListener = () => {
-    const isFileView = window.location.href.indexOf("blob") >= 0;
-    const isPRView = window.location.href.indexOf("pull") >= 0;
-    const isCommitView = window.location.href.indexOf("commit") >= 0;
-    const isCompareView = window.location.href.indexOf("compare") >= 0;
-    let listener = null;
-
-    if (isFileView) {
-      listener = blobListener;
-    } else if (isPRView || isCommitView || isCompareView) {
-      listener = pullListener;
-    }
+    const listener = getListener();
 
     if (listener !== null) {
       document.body.onmouseover = null;
