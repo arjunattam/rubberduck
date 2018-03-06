@@ -15,15 +15,18 @@ export default class FileIcon extends React.Component {
       width: "24px",
       textAlign: "center"
     };
-    if (iconClassName) {
+    if (iconClassName && this.props.octicon !== "file-directory") {
       return <i className={iconClassName} style={iconStyle} />;
     } else {
-      return (
-        <Octicon
-          name="file"
-          style={{ height: 15, color: "#999", marginRight: "3px" }}
-        />
-      );
+      let octIconStyle = {
+        verticalAlign: "text-bottom",
+        marginRight: "3px",
+        paddingLeft: "5px",
+        paddingRight: "5px",
+        height: 15,
+        color: this.props.octColor
+      };
+      return <Octicon name={this.props.octicon} style={octIconStyle} />;
     }
   }
 }

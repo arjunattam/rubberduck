@@ -11,27 +11,21 @@ export const TreeLabel = props => {
   const deletions = props.deletions ? (
     <span className="tree-deletions">{props.deletions}</span>
   ) : null;
-  let labelStyle = { display: "flex", alignItems: "center" };
-  if (props.icon === "file") {
-    return (
-      <div style={labelStyle}>
-        <FileIcon fileName={props.name} />
-        <span>{props.name}</span>
-        {additions} {deletions}
-      </div>
-    );
-  } else {
-    return (
-      <span>
-        <Octicon
-          name={props.icon}
-          style={{ height: 15, color: props.iconColor }}
-        />
-        <span>{props.name}</span>
-        {additions} {deletions}
-      </span>
-    );
-  }
+  let labelStyle = {
+    paddingTop: "4px",
+    paddingBottom: "4px"
+  };
+  return (
+    <span>
+      <FileIcon
+        fileName={props.name}
+        octicon={props.icon}
+        octColor={props.iconColor}
+      />
+      <span style={labelStyle}>{props.name}</span>
+      {additions} {deletions}
+    </span>
+  );
 };
 
 export class File extends React.Component {
