@@ -1,5 +1,6 @@
 // This is a set of utils for Github path (window url) manipulation
 // https://github.com/buunguyen/octotree/blob/master/src/adapters/github.js#L76
+import { API } from "../../utils/api";
 
 // prettier-ignore
 const GH_RESERVED_USER_NAMES = [ // These cannot be usernames
@@ -85,10 +86,52 @@ export const getCompareViewSha = () => {
   });
   let result = {};
   branches.map(element => {
-    const match = element.match(/([0-9a-z]+): ([0-9a-z]+)/);
+    const match = element.match(/(base|compare): (.+)/);
     result[match[1] == "compare" ? "head" : match[1]] = match[2];
   });
   return result;
+};
+
+async function findPRBase() {
+  const repoDetails = getRepoFromPath();
+  const response = await API.getPRInfo(
+    repoDetails.username,
+    repoDetails.reponame,
+    repoDetails.typeId
+  );
+  return response.base.sha;
+}
+
+export const getPRCommitSha = () => {
+  // In cases where the PR diff view specifies some commits
+  const match = window.location.pathname.match(
+    /pull\/\d+\/(commits|files)\/([.0-9a-z]+)/
+  );
+
+  if (match === null) {
+    return null;
+  } else if (match.length >= 2) {
+    const shaPlaceholder = match[2];
+    const shaPairMatch = shaPlaceholder.match(/([0-9a-z]+)\.\.([0-9a-z]+)/);
+
+    if (shaPairMatch === null) {
+      // We have the head, and need to call API to get base
+      let result = { base: null, head: shaPlaceholder };
+
+      return findPRBase().then(value => {
+        result.base = value;
+        return result;
+      });
+    } else {
+      const result = { base: shaPairMatch[1], head: shaPairMatch[2] };
+
+      return new Promise((resolve, reject) => {
+        resolve(result);
+      });
+    }
+  }
+
+  return null;
 };
 
 export const getRepoFromPath = () => {

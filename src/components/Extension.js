@@ -110,6 +110,24 @@ class Extension extends React.Component {
         const { base, head } = GitPathAdapter.getCompareViewSha();
         params.head_sha = head;
         params.base_sha = base;
+      } else if (params.type === "pull") {
+        const shaPromise = GitPathAdapter.getPRCommitSha();
+
+        if (shaPromise !== null) {
+          shaPromise.then(shas => {
+            params.head_sha = shas.head;
+            params.base_sha = shas.base;
+            params.type = "compare";
+
+            if (this.props.storage.token) {
+              WS.createSession(params).then(response => {
+                console.log("created session", response);
+              });
+            }
+          });
+
+          return;
+        }
       }
 
       if (this.props.storage.token) {
