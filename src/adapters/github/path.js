@@ -55,7 +55,14 @@ const getBranch = () => {
     prPageBranch = prPageSelector.getAttribute("title");
   }
 
-  return codePageBranch || prPageBranch;
+  const branchMenuDiv = document.querySelector(".branch-select-menu");
+  let menuBranch = null;
+  if (branchMenuDiv !== null) {
+    const innerSpan = branchMenuDiv.querySelector("span.js-select-button");
+    menuBranch = innerSpan.textContent;
+  }
+
+  return codePageBranch || prPageBranch || menuBranch;
 };
 
 export const getRepoFromPath = () => {
