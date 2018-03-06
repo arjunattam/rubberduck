@@ -6,11 +6,9 @@ import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import CodeNode from "./common/CodeNode";
 import Docstring from "./common/Docstring";
-// import { API } from "./../utils/api";
 import { WS } from "./../utils/websocket";
 import { decodeBase64 } from "../utils/data";
 import "./Definitions.css";
-import * as SessionUtils from "../utils/session";
 
 class DefinitionItem extends React.Component {
   state = {
@@ -104,7 +102,6 @@ class Definitions extends React.Component {
 
     if (isValidResult && this.state.isVisible) {
       WS.getDefinition(
-        SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,

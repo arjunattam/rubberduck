@@ -14,8 +14,8 @@ import * as DataUtils from "../utils/data";
 
 const Pjax = require("pjax");
 let document = window.document;
-
 let GlobalPjax;
+
 class Extension extends React.Component {
   constructor(props) {
     super(props);
@@ -40,10 +40,8 @@ class Extension extends React.Component {
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
-    if (
-      prevProps.storage.token !== this.props.storage.token ||
-      !isSameSessionPath
-    ) {
+    let hasTokenChanged = prevProps.storage.token !== this.props.storage.token;
+    if (hasTokenChanged || !isSameSessionPath) {
       this.handleSessionInitialization();
       this.handleFileTreeUpdate();
     }
@@ -88,7 +86,9 @@ class Extension extends React.Component {
   }
 
   updateRepoDetailsFromPath() {
-    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
+    GitPathAdapter.fetchRepoDetails().then(repoDetails => {
+      this.DataActions.setRepoDetails(repoDetails);
+    });
   }
 
   handleSessionInitialization() {
@@ -97,38 +97,11 @@ class Extension extends React.Component {
       const params = {
         organisation: repoDetails.username,
         name: repoDetails.reponame,
-        pull_request_id: repoDetails.typeId,
+        pull_request_id: repoDetails.prId,
         type: repoDetails.type,
-        head_sha: repoDetails.branch
+        head_sha: repoDetails.headSha || repoDetails.branch,
+        base_sha: repoDetails.baseSha
       };
-
-      if (params.type === "commit") {
-        const { base, head } = GitPathAdapter.getCommitViewSha();
-        params.head_sha = head;
-        params.base_sha = base;
-      } else if (params.type === "compare") {
-        const { base, head } = GitPathAdapter.getCompareViewSha();
-        params.head_sha = head;
-        params.base_sha = base;
-      } else if (params.type === "pull") {
-        const shaPromise = GitPathAdapter.getPRCommitSha();
-
-        if (shaPromise !== null) {
-          shaPromise.then(shas => {
-            params.head_sha = shas.head;
-            params.base_sha = shas.base;
-            params.type = "compare";
-
-            if (this.props.storage.token) {
-              WS.createSession(params).then(response => {
-                console.log("created session", response);
-              });
-            }
-          });
-
-          return;
-        }
-      }
 
       if (this.props.storage.token) {
         WS.createSession(params).then(response => {

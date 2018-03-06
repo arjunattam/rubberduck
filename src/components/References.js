@@ -6,9 +6,7 @@ import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import SmallCodeSnippet from "./common/SmallCodeSnippet";
 import CodeNode from "./common/CodeNode";
-// import { API } from "./../utils/api";
 import { WS } from "./../utils/websocket";
-import * as SessionUtils from "../utils/session";
 import "./References.css";
 
 class ReferenceItem extends React.Component {
@@ -102,7 +100,6 @@ class References extends React.Component {
 
     if (isValidResult && this.state.isVisible) {
       WS.getReferences(
-        SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,

@@ -37,12 +37,6 @@ export class File extends React.Component {
 
   render() {
     const pl = this.getPadding();
-    const path = constructPath(
-      this.props.path,
-      this.props.data.repoDetails.username,
-      this.props.data.repoDetails.reponame,
-      this.props.data.repoDetails.branch
-    );
 
     if (this.props.additions !== undefined) {
       return (
@@ -53,6 +47,13 @@ export class File extends React.Component {
         </div>
       );
     } else {
+      const path = constructPath(
+        this.props.path,
+        this.props.data.repoDetails.username,
+        this.props.data.repoDetails.reponame,
+        this.props.data.repoDetails.branch
+      );
+
       return (
         <div className="file-container">
           <a href={path} style={{ paddingLeft: pl }}>

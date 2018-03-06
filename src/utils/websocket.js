@@ -86,8 +86,7 @@ class BaseWebSocket {
     });
   };
 
-  getHover = (sessionId, baseOrHead, filePath, lineNumber, charNumber) => {
-    // sessionId is actually not required
+  getHover = (baseOrHead, filePath, lineNumber, charNumber) => {
     const queryParams = {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
@@ -98,8 +97,7 @@ class BaseWebSocket {
     });
   };
 
-  getReferences = (sessionId, baseOrHead, filePath, lineNumber, charNumber) => {
-    // sessionId is actually not required
+  getReferences = (baseOrHead, filePath, lineNumber, charNumber) => {
     const queryParams = {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
@@ -110,8 +108,7 @@ class BaseWebSocket {
     });
   };
 
-  getDefinition = (sessionId, baseOrHead, filePath, lineNumber, charNumber) => {
-    // sessionId is actually not required
+  getDefinition = (baseOrHead, filePath, lineNumber, charNumber) => {
     const queryParams = {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`

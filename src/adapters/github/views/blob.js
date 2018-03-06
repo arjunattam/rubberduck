@@ -49,6 +49,7 @@ const isValidResult = result => {
 
 const parseCommonAncestor = (element, x, y) => {
   const node = element.parentNode;
+  // TODO(arjun): need to remove this dependency of get repo path
   const { typeId } = getRepoFromPath(); // sha id from window url
   const result = {
     name: element.nodeValue,
