@@ -1,7 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { readXY } from "./../adapters/github/views/pull";
+import { readXY as blobReadXY } from "../adapters/github/views/blob";
+import { readXY as pullReadXY } from "../adapters/github/views/pull";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import CodeNode from "./common/CodeNode";
@@ -91,10 +92,25 @@ class Definitions extends React.Component {
     }
   }
 
+  readPage = () => {
+    const isFileView = window.location.href.indexOf("blob") >= 0;
+    const isPRView = window.location.href.indexOf("pull") >= 0;
+
+    if (isFileView) {
+      return blobReadXY(
+        this.props.selectionX,
+        this.props.selectionY,
+        this.props.data.repoDetails.branch
+      );
+    } else if (isPRView) {
+      return pullReadXY(this.props.selectionX, this.props.selectionY);
+    }
+
+    return {};
+  };
+
   getSelectionData = () => {
-    // Assumes PR view and gets file name, line number etc
-    // from selection x and y
-    const hoverResult = readXY(this.props.selectionX, this.props.selectionY);
+    const hoverResult = this.readPage();
 
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
@@ -125,11 +141,6 @@ class Definitions extends React.Component {
           console.log("Error in API call", error);
         });
     }
-  };
-
-  componentDidMount = () => {
-    // We have props, so we will make an API call to get data
-    this.getSelectionData();
   };
 
   render() {
