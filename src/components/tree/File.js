@@ -13,7 +13,8 @@ export const TreeLabel = props => {
   ) : null;
   let labelStyle = {
     paddingTop: "4px",
-    paddingBottom: "4px"
+    paddingBottom: "4px",
+    marginRight: "4px"
   };
   return (
     <span>
