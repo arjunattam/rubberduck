@@ -140,16 +140,20 @@ class Definitions extends React.Component {
   };
 
   render() {
+    let definitonClassName = this.state.isVisible
+      ? "definitions-section"
+      : "definitions-section collapsed";
     return (
-      <div className="definitions-section">
+      <div className={definitonClassName}>
         <SectionHeader
           onClick={this.toggleVisibility}
           isVisible={this.state.isVisible}
           name={"Definitions"}
         />
-        {this.state.isVisible ? (
-          <DefinitionItem {...this.state.definition} />
-        ) : null}
+        <DefinitionItem
+          {...this.state.definition}
+          visible={this.state.isVisible}
+        />
       </div>
     );
   }

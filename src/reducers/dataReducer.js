@@ -11,7 +11,8 @@ const initialState = {
     path: "",
     children: []
   },
-  sessionStatus: ""
+  sessionStatus: "",
+  apiStatus: ""
 };
 
 export default createReducer(initialState, {
@@ -49,6 +50,12 @@ export default createReducer(initialState, {
     };
   },
   UPDATE_SESSION_STATUS: (state, action) => {
+    return {
+      ...state,
+      sessionStatus: action.sessionStatus
+    };
+  },
+  UPDATE_API_STATUS: (state, action) => {
     return {
       ...state,
       sessionStatus: action.sessionStatus

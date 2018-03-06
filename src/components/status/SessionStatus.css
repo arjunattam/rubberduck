@@ -1,7 +1,4 @@
 .session-status-bar {
-  position: fixed;
-  bottom: 50px;
-  left: 0;
   border-top: 1px #ccc solid;
   background: #fff6dc;
   width: 214px;

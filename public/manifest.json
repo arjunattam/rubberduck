@@ -12,6 +12,18 @@
     "persistent": false,
     "scripts": ["background.js"]
   },
+  "web_accessible_resources": ["fonts/*.woff2"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/*",
+        "https://bitbucket.org/*",
+        "http://localhost:8000/*",
+        "https://www.codeview.io/*"
+      ],
+      "css": ["css/fileicon.css"]
+    }
+  ],
   "permissions": [
     "https://github.com/*",
     "https://bitbucket.org/*",

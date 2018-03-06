@@ -8,8 +8,10 @@ body {
   box-sizing: content-box;
 }
 
-#mercury-sidebar .mercury-container {
+#mercury-sidebar .sidebar-container {
   position: fixed;
+  display: flex;
+  flex-direction: column;
   top: 0;
   bottom: 0;
   left: 0;
@@ -19,6 +21,10 @@ body {
   border-right: #ccc solid 1px;
   font-size: 13px;
   height: 100%;
+}
+
+.repo-info-sections {
+  flex-grow: 1;
 }
 
 .monospace {

@@ -1,6 +1,4 @@
 .status {
-  bottom: 0;
-  position: fixed;
   height: 40px;
   border-top: 1px #ccc solid;
   border-right: 1px solid #ccc;
