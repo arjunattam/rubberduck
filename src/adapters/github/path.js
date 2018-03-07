@@ -116,7 +116,9 @@ export const getRepoFromPath = () => {
 export const constructPath = (subPath, orgname, reponame, branch) => {
   // return relative path which follows a domain name, like
   // github.com, from given sub-path
-  if (branch === undefined) {
+  if (branch === undefined || branch === null) {
+    // TODO(arjun): for some projects, master is not the default branch
+    // hence this breaks
     branch = "master";
   }
 
