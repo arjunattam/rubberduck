@@ -32,8 +32,6 @@
 .file-container a {
   display: block;
   width: 232px;
-  padding-top: 2px;
-  padding-bottom: 2px;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
@@ -43,17 +41,6 @@
 .file-container a:hover {
   background: #eee;
   text-decoration: none;
-}
-
-.file-triangle {
-  height: 10px;
-  width: 10px;
-  fill: none;
-  padding-top: 2px;
-}
-
-.file-triangle path {
-  stroke: #999;
 }
 
 @keyframes slide-down {
@@ -66,7 +53,46 @@
 }
 
 .file-children {
-  animation: slide-down 0.1s ease-out;
+  /* animation: slide-down 0.1s ease-out; */
+}
+
+.folder-structure-container {
+  transition: max-height 0.4s ease-in-out;
+  overflow: hidden;
+  max-height: 600px;
+}
+
+.folder-structure-container.collapsed {
+  max-height: 25px;
+}
+
+.file-triangle {
+  height: 10px;
+  width: 10px;
+  fill: none;
+  padding-top: 2px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.section-triangle {
+  transition: transform 0.3s ease-in-out;
+  transform: rotate(0);
+}
+
+.section-triangle.collapsed {
+  transform: rotate(-90deg);
+}
+
+.folder-structure-container .file-triangle {
+  transform: rotate(0);
+}
+
+.folder-structure-container.collapsed .file-triangle {
+  transform: rotate(-90deg);
+}
+
+.file-triangle path {
+  stroke: #999;
 }
 
 .file-children-collapsed {

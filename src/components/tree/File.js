@@ -2,6 +2,7 @@ import React from "react";
 import Octicon from "react-component-octicons";
 import { constructPath } from "../../adapters/github/path";
 import "./Tree.css";
+import FileIcon from "./fileIcon/FileIcon";
 
 export const TreeLabel = props => {
   const additions = props.additions ? (
@@ -10,14 +11,20 @@ export const TreeLabel = props => {
   const deletions = props.deletions ? (
     <span className="tree-deletions">{props.deletions}</span>
   ) : null;
-
+  let labelStyle = {
+    paddingTop: "4px",
+    paddingBottom: "4px",
+    marginRight: "4px"
+  };
   return (
     <span>
-      <Octicon
-        name={props.icon}
-        style={{ height: 15, color: props.iconColor }}
-      />{" "}
-      {props.name} {additions} {deletions}
+      <FileIcon
+        fileName={props.name}
+        octicon={props.icon}
+        octColor={props.iconColor}
+      />
+      <span style={labelStyle}>{props.name}</span>
+      {additions} {deletions}
     </span>
   );
 };
