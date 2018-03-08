@@ -36,6 +36,8 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  height: 25px;
+  line-height: 25px;
 }
 
 .file-container a:hover {
