@@ -3,7 +3,7 @@
   "name": "Rubberduck",
   "short_name": "Rubberduck",
   "description": "Code review assistant for GitHub",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "browser_action": {
     "default_icon": "favicon.ico",
     "default_popup": "index.html"
