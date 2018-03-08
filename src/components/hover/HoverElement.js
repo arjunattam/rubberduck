@@ -2,9 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
-// import { API } from "../../utils/api";
 import { WS } from "../../utils/websocket";
-import * as SessionUtils from "../../utils/session";
 import HoverBox from "./HoverBox";
 
 class HoverElement extends React.Component {
@@ -47,7 +45,6 @@ class HoverElement extends React.Component {
       y: this.props.hoverResult.mouseY
     };
     WS.getHover(
-      SessionUtils.getCurrentSessionId(this.props.storage.sessions),
       this.props.hoverResult.fileSha,
       this.props.hoverResult.filePath,
       this.props.hoverResult.lineNumber,

@@ -137,6 +137,11 @@ export class BaseAPI {
     return this.makeConditionalGet(uriPath);
   }
 
+  getPRInfo(username, reponame, pr) {
+    const uriPath = `repos/${username}/${reponame}/pulls/${pr}`;
+    return this.makeConditionalGet(uriPath);
+  }
+
   issueToken(clientId) {
     const uri = `${baseApiUrl}/token_issue/`;
     return this.baseRequest.post(uri, { client_id: clientId });

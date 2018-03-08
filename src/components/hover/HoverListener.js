@@ -1,8 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { listener as blobListener } from "../../adapters/github/views/blob";
-import { listener as pullListener } from "../../adapters/github/views/pull";
+import { getListener } from "../../adapters/github/views/helper";
 import HoverElement from "./HoverElement";
 import * as GitPathAdapter from "../../adapters/github/path";
 
@@ -35,11 +33,15 @@ class HoverListener extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    let isSameSessionPath = GitPathAdapter.isSameSessionPath(
+    const isSameSessionPath = GitPathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
-    if (!isSameSessionPath) {
+    const hasChangedPath = GitPathAdapter.hasChangedPath(
+      prevProps.data.repoDetails,
+      this.props.data.repoDetails
+    );
+    if (!isSameSessionPath || hasChangedPath) {
       this.setupListener();
     }
   }
@@ -65,7 +67,7 @@ class HoverListener extends React.Component {
 
   onMouseOverListener(e, listener) {
     if (!this.filterForHoverBox(e.x, e.y)) {
-      listener(e, this.receiver);
+      listener(e, this.receiver, this.props.data.repoDetails.branch);
       this.setState({
         currentMouseX: e.x,
         currentMouseY: e.y
@@ -74,15 +76,7 @@ class HoverListener extends React.Component {
   }
 
   setupListener = () => {
-    const isFileView = window.location.href.indexOf("blob") >= 0;
-    const isPRView = window.location.href.indexOf("pull") >= 0;
-    let listener = null;
-
-    if (isFileView) {
-      listener = blobListener;
-    } else if (isPRView) {
-      listener = pullListener;
-    }
+    const listener = getListener();
 
     if (listener !== null) {
       document.body.onmouseover = null;
@@ -93,10 +87,6 @@ class HoverListener extends React.Component {
       document.body.onmouseover = null;
     }
   };
-
-  componentDidMount() {
-    this.setupListener();
-  }
 
   componentWillUnmount() {
     document.body.onmouseover = null;

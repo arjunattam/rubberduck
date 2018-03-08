@@ -1,16 +1,14 @@
 import React from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { readXY } from "./../adapters/github/views/pull";
+import { getReader } from "../adapters/github/views/helper";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import CodeNode from "./common/CodeNode";
 import Docstring from "./common/Docstring";
-// import { API } from "./../utils/api";
 import { WS } from "./../utils/websocket";
 import { decodeBase64 } from "../utils/data";
 import "./Definitions.css";
-import * as SessionUtils from "../utils/session";
 
 class DefinitionItem extends React.Component {
   state = {
@@ -93,10 +91,22 @@ class Definitions extends React.Component {
     }
   }
 
+  readPage = () => {
+    const reader = getReader();
+
+    if (reader !== null) {
+      return reader(
+        this.props.selectionX,
+        this.props.selectionY,
+        this.props.data.repoDetails.branch
+      );
+    }
+
+    return {};
+  };
+
   getSelectionData = () => {
-    // Assumes PR view and gets file name, line number etc
-    // from selection x and y
-    const hoverResult = readXY(this.props.selectionX, this.props.selectionY);
+    const hoverResult = this.readPage();
 
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
@@ -104,7 +114,6 @@ class Definitions extends React.Component {
 
     if (isValidResult && this.state.isVisible) {
       WS.getDefinition(
-        SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
@@ -128,11 +137,6 @@ class Definitions extends React.Component {
           console.log("Error in API call", error);
         });
     }
-  };
-
-  componentDidMount = () => {
-    // We have props, so we will make an API call to get data
-    this.getSelectionData();
   };
 
   render() {

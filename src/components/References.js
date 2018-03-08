@@ -1,14 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { readXY } from "./../adapters/github/views/pull";
+import { getReader } from "../adapters/github/views/helper";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import SmallCodeSnippet from "./common/SmallCodeSnippet";
 import CodeNode from "./common/CodeNode";
-// import { API } from "./../utils/api";
 import { WS } from "./../utils/websocket";
-import * as SessionUtils from "../utils/session";
 import "./References.css";
 
 class ReferenceItem extends React.Component {
@@ -91,10 +89,22 @@ class References extends React.Component {
     });
   };
 
+  readPage = () => {
+    const reader = getReader();
+
+    if (reader !== null) {
+      return reader(
+        this.props.selectionX,
+        this.props.selectionY,
+        this.props.data.repoDetails.branch
+      );
+    }
+
+    return {};
+  };
+
   getSelectionData = () => {
-    // Assumes PR view and gets file name, line number etc
-    // from selection x and y
-    const hoverResult = readXY(this.props.selectionX, this.props.selectionY);
+    const hoverResult = this.readPage();
 
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
@@ -102,7 +112,6 @@ class References extends React.Component {
 
     if (isValidResult && this.state.isVisible) {
       WS.getReferences(
-        SessionUtils.getCurrentSessionId(this.props.storage.sessions),
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,

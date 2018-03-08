@@ -14,8 +14,8 @@ import * as DataUtils from "../utils/data";
 
 const Pjax = require("pjax");
 let document = window.document;
-
 let GlobalPjax;
+
 class Extension extends React.Component {
   constructor(props) {
     super(props);
@@ -27,9 +27,9 @@ class Extension extends React.Component {
   }
 
   componentDidMount() {
-    this.updateRepoDetailsFromPath();
     this.setupChromeListener();
     this.initializeStorage();
+    this.updateRepoDetailsFromPath();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -40,10 +40,8 @@ class Extension extends React.Component {
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
-    if (
-      prevProps.storage.token !== this.props.storage.token ||
-      !isSameSessionPath
-    ) {
+    let hasTokenChanged = prevProps.storage.token !== this.props.storage.token;
+    if (hasTokenChanged || !isSameSessionPath) {
       this.handleSessionInitialization();
       this.handleFileTreeUpdate();
     }
@@ -88,7 +86,9 @@ class Extension extends React.Component {
   }
 
   updateRepoDetailsFromPath() {
-    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
+    GitPathAdapter.fetchRepoDetails().then(repoDetails => {
+      this.DataActions.setRepoDetails(repoDetails);
+    });
   }
 
   handleSessionInitialization() {
@@ -97,22 +97,27 @@ class Extension extends React.Component {
       const params = {
         organisation: repoDetails.username,
         name: repoDetails.reponame,
-        pull_request_id: repoDetails.typeId,
+        pull_request_id: repoDetails.prId,
         type: repoDetails.type,
-        head_sha: repoDetails.branch
+        head_sha: repoDetails.headSha || repoDetails.branch,
+        base_sha: repoDetails.baseSha
       };
 
       if (this.props.storage.token) {
-        WS.createSession(params).then(response => {
-          console.log("created session", response);
-        });
+        WS.createNewSession(params)
+          .then(response => {
+            console.log("Session created", response);
+          })
+          .catch(error => {
+            console.log("Error in creating session", error);
+          });
       }
     }
   }
 
   getFileTreeAPI(repoDetails) {
     const { username, reponame, type } = repoDetails;
-    const pullId = repoDetails.typeId;
+    const pullId = repoDetails.prId;
     const branch = repoDetails.branch || "master";
     if (type === "pull") {
       return API.getPRFiles(username, reponame, pullId).then(response => {
@@ -131,26 +136,25 @@ class Extension extends React.Component {
     if (repoDetails.username && repoDetails.reponame) {
       // Repo details have been figured
       const { username, reponame } = repoDetails;
-      const pullId = repoDetails.typeId;
-      const branch = repoDetails.branch || "master";
-
-      this.getFileTreeAPI(repoDetails)
-        .then(fileTreeData => {
-          this.DataActions.setFileTree(fileTreeData);
-          setTimeout(() => {
-            GlobalPjax = new Pjax({
-              elements: "a", // default is "a[href], form[action]"
-              selectors: ["#js-repo-pjax-container"],
-              disablePjaxHeader: true,
-              cacheBust: false,
-              currentUrlFullReload: false
-            });
-          }, 2000);
-        })
-        .catch(error => {
-          // TODO(arjun): this needs to be better communicated
-          console.log("Error in API call", error);
-        });
+      if (this.props.storage.token) {
+        this.getFileTreeAPI(repoDetails)
+          .then(fileTreeData => {
+            this.DataActions.setFileTree(fileTreeData);
+            setTimeout(() => {
+              GlobalPjax = new Pjax({
+                elements: "a", // default is "a[href], form[action]"
+                selectors: ["#js-repo-pjax-container"],
+                disablePjaxHeader: true,
+                cacheBust: false,
+                currentUrlFullReload: false
+              });
+            }, 2000);
+          })
+          .catch(error => {
+            // TODO(arjun): this needs to be better communicated
+            console.log("Error in API call", error);
+          });
+      }
     }
   }
 
