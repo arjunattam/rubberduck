@@ -4,12 +4,16 @@ import "./Section.css";
 
 const SectionHeaderIcon = props => {
   const iconStyle = { height: 12, marginRight: "5px", width: 12 };
-
-  if (props.isOpen) {
-    return <Octicon name="triangle-down" style={iconStyle} />;
-  } else {
-    return <Octicon name="triangle-right" style={iconStyle} />;
-  }
+  let traingleCLassName = props.isOpen
+    ? "section-triangle"
+    : "section-triangle collapsed";
+  return (
+    <Octicon
+      name="triangle-down"
+      className={traingleCLassName}
+      style={iconStyle}
+    />
+  );
 };
 
 export default class SectionHeader extends React.Component {

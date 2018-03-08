@@ -7,6 +7,19 @@ const initialState = {
   sessions: {}
 };
 
+const sanitizeChromeStoratePayload = payload => {
+  let sanitizedPayload = { ...payload };
+  for (let key in payload) {
+    if (sanitizedPayload[key]) continue;
+    switch (key) {
+      case "sessions":
+        sanitizedPayload[key] = {};
+        break;
+    }
+  }
+  return sanitizedPayload;
+};
+
 export default createReducer(initialState, {
   SET_FROM_CHROME_STORAGE: (state, action) => {
     return {
@@ -16,7 +29,19 @@ export default createReducer(initialState, {
     };
   },
   UPDATE_FROM_CHROME_STORAGE: (state, action) => {
-    console.log("Updated storage data", {
+    if (!action.payload) return { ...state };
+    console.log("Updated storage data from chrome", {
+      ...state,
+      ...action.payload
+    });
+    let sanitizedPayload = sanitizeChromeStoratePayload(action.payload);
+    return {
+      ...state,
+      ...sanitizedPayload
+    };
+  },
+  UPDATE_STORAGE: (state, action) => {
+    console.log("Updated storage data locally", {
       ...state,
       ...action.payload
     });

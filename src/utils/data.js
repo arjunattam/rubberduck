@@ -1,3 +1,5 @@
+import { Base64 } from "js-base64";
+
 // Utilities to convert data formats
 const buildTree = fileList => {
   // Recursively method that takes in a list and returns the tree
@@ -99,4 +101,12 @@ export const getTreeChildren = (reponame, tree) => {
     path: "",
     children: fillPaths(buildTree(filenames), "")
   };
+};
+
+export const encodeToBase64 = string => {
+  return Base64.encode(string);
+};
+
+export const decodeBase64 = string => {
+  return Base64.decode(string);
 };

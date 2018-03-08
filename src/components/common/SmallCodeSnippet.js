@@ -2,6 +2,7 @@ import React from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { github as githubStyle } from "react-syntax-highlighter/styles/hljs";
 import "./SmallCodeSnippet.css";
+import { decodeBase64 } from "../../utils/data";
 
 export default class SmallCodeSnippet extends React.Component {
   getMiddleLine = content => {
@@ -33,7 +34,7 @@ export default class SmallCodeSnippet extends React.Component {
             return style;
           }}
         >
-          {this.getMiddleLine(atob(this.props.contents))}
+          {this.getMiddleLine(decodeBase64(this.props.contents))}
         </SyntaxHighlighter>
       </div>
     );

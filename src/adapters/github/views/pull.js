@@ -1,149 +1,196 @@
-const getFileUri = element => {
-  // file uri is the attribute `data-path` of div.js-file-header
-  // which is the left sibling of div.js-file-content, which is
-  // an ancestor of given element.
-  try {
-    const fileContentDiv = element.parentNode.closest("div.js-file-content");
-    const divSiblings = fileContentDiv.parentNode;
-    const fileHeaderDiv = divSiblings.querySelectorAll("div.js-file-header")[0];
-    return fileHeaderDiv.getAttribute("data-path");
-  } catch (err) {
-    return -1;
-  }
-};
+import BaseListener from "./base";
 
-const getLineNumber = element => {
-  // line number is attribute `data-line-number` of td.blob-num
-  // which is the left sibling of td.code-review, which is ancestor of element
-  // In case when the code was not in view, and was brought by "expanding", we
-  // need to look for a different parent, td.blob-code
-  let codeTd = element.parentNode.closest("td.code-review");
-
-  if (codeTd === null) {
-    codeTd = element.parentNode.closest("td.blob-code");
-  }
-
-  try {
-    let lineTd = codeTd.previousSibling.previousSibling;
-
-    if (lineTd.getAttribute("data-line-number") === null) {
-      // In unified diff view, we need to go more left to find siblings
-      lineTd = lineTd.previousSibling.previousSibling;
-    }
-
-    return +lineTd.getAttribute("data-line-number") - 1; // 0-indexed
-  } catch (err) {
-    return -1;
-  }
-};
-
-const getCharNumber = (element, mouseX) => {
-  // Similar to blob calculation
-  let codeTd = element.parentNode.closest("td.code-review");
-
-  if (codeTd === null) {
-    codeTd = element.parentNode.closest("td.blob-code");
-  }
-
-  try {
-    const bbox = codeTd.getBoundingClientRect();
-    const elStyle = window.getComputedStyle(codeTd);
-    const charInPixels = mouseX - bbox.x - stripPx(elStyle.paddingLeft);
-    const lineHeight = stripPx(elStyle.fontSize);
-    const fontAspectRatio = 0.6; // aspect ratio (w/h) for SF-Mono font
-    return Math.round(charInPixels / (fontAspectRatio * lineHeight)) - 1; // PR adds +/-
-  } catch (err) {
-    return -1;
-  }
-};
-
-const getHeadOrBase = element => {
-  // Similar to blob calculation
-  let codeTd = element.parentNode.closest("td.code-review");
-
-  if (codeTd === null) {
-    codeTd = element.parentNode.closest("td.blob-code");
-  }
-
-  if (codeTd !== null) {
-    if (codeTd.classList.contains("blob-code-deletion")) {
-      // Deletions can only belong in base
-      return "base";
-    } else if (codeTd.classList.contains("blob-code-addition")) {
-      // Additions can only belong in head
-      return "head";
-    } else {
-      // This depends on the unified/split view
-      const isUnifiedView = codeTd.parentNode.childNodes.length === 7;
-
-      if (isUnifiedView) {
-        // We return line number for head by convention, so this will also be head
-        return "head";
-      } else {
-        // This is the split view
-        const lineNumber = getLineNumber(element) + 1;
-        const lineTd = codeTd.previousSibling.previousSibling;
-
-        if (lineTd.id.indexOf("L" + lineNumber) >= 0) {
-          // Left side
-          return "base";
-        } else if (lineTd.id.indexOf("R" + lineNumber) >= 0) {
-          return "head";
-        } else {
-          return -1;
-        }
-      }
-    }
-  } else {
-    return -1;
-  }
-};
-
-const isValidResult = result => {
-  return !Object.keys(result).some(function(k) {
-    return result[k] < 0;
-  });
-};
-
-const parseCommonAncestor = (element, x, y) => {
-  const result = {
-    name: element.nodeValue,
-    filePath: getFileUri(element),
-    fileSha: getHeadOrBase(element),
-    lineNumber: getLineNumber(element),
-    charNumber: getCharNumber(element, x),
-    mouseX: x,
-    mouseY: y
+class PRPageListener extends BaseListener {
+  hasTextUnderMouseForDiff = (element, x, y) => {
+    // Compute if there is text below the element
+    const boundRect = element.parentElement.getBoundingClientRect();
+    // If bounding box covers more width than x, we are good
+    return boundRect.x + boundRect.width > x;
   };
 
-  // Compute if there is text below the element
-  // Get the bounding box of the element
-  const boundRect = element.parentElement.getBoundingClientRect();
-  let hasTextOnMouse = true;
-  if (boundRect.x + boundRect.width < x) {
-    // In this case, the mouse does not have text below
-    hasTextOnMouse = false;
-  }
+  hasTextUnderWrapper = (element, x, y) => {
+    // There are two cases here: are we checking the diff portion
+    // or the expanded code sections (ones that are grey-ed out)
+    // For the expanded code section, the base class method will work
+    const codeTd = element.parentNode.closest("td.code-review");
 
-  if (isValidResult(result) && hasTextOnMouse) {
-    return result;
-  } else {
-    return {};
-  }
-};
+    if (codeTd === null) {
+      // We are in the expanded section
+      return this.hasTextUnderMouse(element, x, y);
+    }
 
-const stripPx = value => {
-  // Get `12px` and return `12`
-  return +value.replace("px", "");
-};
+    return this.hasTextUnderMouseForDiff(element, x, y);
+  };
 
-export const readXY = (mouseX, mouseY) => {
-  const range = document.caretRangeFromPoint(mouseX, mouseY);
-  const rangeElement = range.commonAncestorContainer;
-  return parseCommonAncestor(rangeElement, mouseX, mouseY);
-};
+  isValidResult = (element, x, y, hoverResult) => {
+    return (
+      this.hasTextUnderWrapper(element, x, y) &&
+      this.valuesAreValid(hoverResult)
+    );
+  };
+
+  getFileUri = element => {
+    // file uri is the attribute `data-path` of div.js-file-header
+    // which is the left sibling of div.js-file-content, which is
+    // an ancestor of given element.
+    try {
+      const fileContentDiv = element.parentNode.closest("div.js-file-content");
+      const divSiblings = fileContentDiv.parentNode;
+      const fileHeaderDiv = divSiblings.querySelectorAll(
+        "div.js-file-header"
+      )[0];
+      return fileHeaderDiv.getAttribute("data-path");
+    } catch (err) {
+      return -1;
+    }
+  };
+
+  getLineNumber = element => {
+    // line number is attribute `data-line-number` of td.blob-num
+    // which is the left sibling of td.code-review, which is ancestor of element
+    // In case when the code was not in view, and was brought by "expanding", we
+    // need to look for a different parent, td.blob-code
+    let codeTd = element.parentNode.closest("td.code-review");
+
+    if (codeTd === null) {
+      codeTd = element.parentNode.closest("td.blob-code");
+    }
+
+    try {
+      let lineTd = codeTd.previousSibling.previousSibling;
+
+      if (lineTd.getAttribute("data-line-number") === null) {
+        // In unified diff view, we need to go more left to find siblings
+        lineTd = lineTd.previousSibling.previousSibling;
+      }
+
+      return +lineTd.getAttribute("data-line-number") - 1; // 0-indexed
+    } catch (err) {
+      return -1;
+    }
+  };
+
+  getCharNumberHelper = (element, mouseX) => {
+    const bbox = element.getBoundingClientRect();
+    const lineHeight = this.getFontSize(element);
+    const charInPixels = mouseX - bbox.x - this.getPaddingLeft(element);
+    return Math.round(this.getCharsFromPixels(charInPixels, lineHeight)) - 1; // PR adds +/-
+  };
+
+  getNumDisplayLines = element => {
+    const boundRect = element.getBoundingClientRect();
+    return Math.round(boundRect.height / this.getFontSize(element)) - 1;
+  };
+
+  getMouseDisplayLine = (element, mouseX, mouseY) => {
+    const boundRect = element.getBoundingClientRect();
+    const relativeY = mouseY - boundRect.y;
+    return relativeY / this.getFontSize(element);
+  };
+
+  getCharNumber = (element, mouseX, mouseY) => {
+    // Code lines can get extended to multiple display lines in the diff view
+    // We handle cases where the code is extended to up to two display lines
+    // in the diff view. Remaining cases:
+    // 1. code extends to >2 display lines
+    // 2. code extends to >=2 display lines in the expanded code section
+    let codeTd = element.parentNode.closest("td.code-review");
+
+    if (codeTd === null) {
+      // Inside expanded code section
+      codeTd = element.parentNode.closest("td.blob-code");
+
+      if (codeTd === null) {
+        return -1;
+      }
+
+      if (this.getNumDisplayLines(codeTd) > 1) {
+        console.log(">=2 display lines inside expanded code is not supported");
+        return -1;
+      } else {
+        return this.getCharNumberHelper(codeTd, mouseX);
+      }
+    } else {
+      // Inside the diff section
+      const displayLines = this.getNumDisplayLines(codeTd);
+
+      if (displayLines === 1) {
+        return this.getCharNumberHelper(codeTd, mouseX);
+      } else if (displayLines === 2) {
+        // We need to check where the mouse is
+
+        if (this.getMouseDisplayLine(codeTd, mouseX, mouseY) > 1.5) {
+          // We are in the second line
+          const secondLineResult = this.getCharNumberHelper(codeTd, mouseX);
+          const innerElement = codeTd.querySelector("span.blob-code-inner");
+          const firstLineWidth = innerElement.getBoundingClientRect().width;
+          const firstLineChars =
+            this.getCharsFromPixels(firstLineWidth, this.getFontSize(codeTd)) -
+            1;
+          // Subtracted 1 to remove the +/- that is pre-appended by github
+          return secondLineResult + Math.round(firstLineChars);
+        } else {
+          // We are in the first line
+          return this.getCharNumberHelper(codeTd, mouseX);
+        }
+      } else {
+        console.log(">2 display lines inside diff section not supported");
+        return -1;
+      }
+    }
+  };
+
+  getFileSha = element => {
+    // Does not return the file sha, returns base/head
+    // Similar to blob calculation
+    let codeTd = element.parentNode.closest("td.code-review");
+
+    if (codeTd === null) {
+      codeTd = element.parentNode.closest("td.blob-code");
+    }
+
+    if (codeTd !== null) {
+      if (codeTd.classList.contains("blob-code-deletion")) {
+        // Deletions can only belong in base
+        return "base";
+      } else if (codeTd.classList.contains("blob-code-addition")) {
+        // Additions can only belong in head
+        return "head";
+      } else {
+        // This depends on the unified/split view
+        const isUnifiedView = codeTd.parentNode.childNodes.length === 7;
+
+        if (isUnifiedView) {
+          // We return line number for head by convention, so this will also be head
+          return "head";
+        } else {
+          // This is the split view
+          const lineNumber = this.getLineNumber(element) + 1;
+          const lineTd = codeTd.previousSibling.previousSibling;
+
+          if (lineTd.id.indexOf("L" + lineNumber) >= 0) {
+            // Left side
+            return "base";
+          } else if (lineTd.id.indexOf("R" + lineNumber) >= 0) {
+            return "head";
+          } else {
+            return -1;
+          }
+        }
+      }
+    } else {
+      return -1;
+    }
+  };
+}
 
 export const listener = (event, callback) => {
-  const result = readXY(event.x, event.y);
+  const pageListener = new PRPageListener();
+  const result = pageListener.readXY(event.x, event.y);
   callback(result);
+};
+
+export const readXY = (x, y) => {
+  const pageListener = new PRPageListener();
+  return pageListener.readXY(x, y);
 };

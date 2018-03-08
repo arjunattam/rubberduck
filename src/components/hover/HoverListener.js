@@ -1,9 +1,10 @@
 import React from "react";
-import { listener as blobListener } from "../../adapters/github/views/blob";
-import { listener as pullListener } from "../../adapters/github/views/pull";
+import { connect } from "react-redux";
+import { getListener } from "../../adapters/github/views/helper";
 import HoverElement from "./HoverElement";
+import * as GitPathAdapter from "../../adapters/github/path";
 
-export default class HoverListener extends React.Component {
+class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
   state = {
     mouseX: -1000,
@@ -31,6 +32,20 @@ export default class HoverListener extends React.Component {
     }
   };
 
+  componentDidUpdate(prevProps, prevState) {
+    const isSameSessionPath = GitPathAdapter.isSameSessionPath(
+      prevProps.data.repoDetails,
+      this.props.data.repoDetails
+    );
+    const hasChangedPath = GitPathAdapter.hasChangedPath(
+      prevProps.data.repoDetails,
+      this.props.data.repoDetails
+    );
+    if (!isSameSessionPath || hasChangedPath) {
+      this.setupListener();
+    }
+  }
+
   filterForHoverBox = (x, y) => {
     // Return true if x and y lie inside the hover box
     // We will not remove the hover box if that is the case
@@ -52,7 +67,7 @@ export default class HoverListener extends React.Component {
 
   onMouseOverListener(e, listener) {
     if (!this.filterForHoverBox(e.x, e.y)) {
-      listener(e, this.receiver);
+      listener(e, this.receiver, this.props.data.repoDetails.branch);
       this.setState({
         currentMouseX: e.x,
         currentMouseY: e.y
@@ -61,17 +76,10 @@ export default class HoverListener extends React.Component {
   }
 
   setupListener = () => {
-    const isFileView = window.location.href.indexOf("blob") >= 0;
-    const isPRView = window.location.href.indexOf("pull") >= 0;
-    let listener = null;
-
-    if (isFileView) {
-      listener = blobListener;
-    } else if (isPRView) {
-      listener = pullListener;
-    }
+    const listener = getListener();
 
     if (listener !== null) {
+      document.body.onmouseover = null;
       document.body.onmouseover = e => {
         this.onMouseOverListener(e, listener);
       };
@@ -79,10 +87,6 @@ export default class HoverListener extends React.Component {
       document.body.onmouseover = null;
     }
   };
-
-  componentDidMount() {
-    this.setupListener();
-  }
 
   componentWillUnmount() {
     document.body.onmouseover = null;
@@ -98,3 +102,12 @@ export default class HoverListener extends React.Component {
     );
   }
 }
+
+function mapStateToProps(state) {
+  const { storage, data } = state;
+  return {
+    storage,
+    data
+  };
+}
+export default connect(mapStateToProps)(HoverListener);

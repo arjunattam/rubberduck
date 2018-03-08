@@ -1,0 +1,7 @@
+.session-status-bar {
+  border-top: 1px #ccc solid;
+  background: #fff6dc;
+  width: 214px;
+  height: 20px;
+  padding: 9px;
+}

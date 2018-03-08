@@ -88,11 +88,13 @@ class Sidebar extends React.Component {
 
     if (this.props.data.isSidebarVisible) {
       return (
-        <div className="mercury-container">
+        <div className="sidebar-container">
           {this.renderTitle()}
-          {this.renderTree()}
-          {this.renderReferences()}
-          {this.renderDefinitions()}
+          <div className="repo-info-sections">
+            {this.renderTree()}
+            {this.renderReferences()}
+            {this.renderDefinitions()}
+          </div>
           <HoverListener />
           <StatusBar />
         </div>

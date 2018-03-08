@@ -1,5 +1,6 @@
 // This is a set of utils for Github path (window url) manipulation
 // https://github.com/buunguyen/octotree/blob/master/src/adapters/github.js#L76
+import { API } from "../../utils/api";
 
 // prettier-ignore
 const GH_RESERVED_USER_NAMES = [ // These cannot be usernames
@@ -55,54 +56,217 @@ const getBranch = () => {
     prPageBranch = prPageSelector.getAttribute("title");
   }
 
-  return codePageBranch || prPageBranch;
+  const branchMenuDiv = document.querySelector(".branch-select-menu");
+  let menuBranch = null;
+  if (branchMenuDiv !== null) {
+    const innerSpan = branchMenuDiv.querySelector("span.js-select-button");
+    menuBranch = innerSpan.textContent;
+  }
+
+  return codePageBranch || prPageBranch || menuBranch;
 };
 
-export const getRepoFromPath = () => {
+const getCommitViewSha = () => {
+  const headShaBlock = document.querySelector("span.sha-block span.sha");
+  const baseShaBlock = document.querySelector("span.sha-block a.sha");
+  const baseInner = baseShaBlock.parentElement.innerHTML;
+
+  return {
+    head: headShaBlock.textContent.trim(),
+    base: baseInner.match(/\b[0-9a-f]{40}\b/)[0]
+  };
+};
+
+const getCompareViewSha = () => {
+  const shaElements = document.querySelectorAll(
+    "div.commitish-suggester span.js-select-button"
+  );
+  const branches = Array.from(shaElements).map(element => {
+    return element.getAttribute("title");
+  });
+  let result = {};
+  branches.map(element => {
+    const match = element.match(/(base|compare): (.+)/);
+    result[match[1] === "compare" ? "head" : match[1]] = match[2];
+  });
+  return result;
+};
+
+async function findPRBase() {
+  const repoDetails = getRepoFromPath();
+  const response = await API.getPRInfo(
+    repoDetails.username,
+    repoDetails.reponame,
+    repoDetails.typeId
+  );
+  return response.base.sha;
+}
+
+const getPRCommitSha = () => {
+  // In cases where the PR diff view specifies some commits
+  const match = window.location.pathname.match(
+    /pull\/\d+\/(commits|files)\/([.0-9a-z]+)/
+  );
+
+  if (match === null) {
+    return null;
+  } else if (match.length >= 2) {
+    const shaPlaceholder = match[2];
+    const shaPairMatch = shaPlaceholder.match(/([0-9a-z]+)\.\.([0-9a-z]+)/);
+
+    if (shaPairMatch === null) {
+      // We have the head, and need to call API to get base
+      let result = { base: null, head: shaPlaceholder };
+
+      return findPRBase().then(value => {
+        result.base = value;
+        return result;
+      });
+    } else {
+      const result = { base: shaPairMatch[1], head: shaPairMatch[2] };
+
+      return new Promise((resolve, reject) => {
+        resolve(result);
+      });
+    }
+  }
+
+  return null;
+};
+
+const getFilePath = () => {
+  const pathElement = document.getElementById("blob-path");
+
+  if (pathElement !== null) {
+    const fullPath = pathElement.textContent.trim();
+    const firstSlashIndex = fullPath.indexOf("/");
+    return fullPath.slice(firstSlashIndex + 1);
+  }
+
+  return null;
+};
+
+const getRepoFromPath = () => {
+  // Parse url path to infer repo data
+  let repoDetails = {
+    username: null,
+    reponame: null,
+    type: null,
+    typeId: null
+  };
+
   // (username)/(reponame)[/(type)][/(typeId)][/(filePath)]
   const match = window.location.pathname.match(
-    // /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?(?:\/(.+))?/
     /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?/
   );
 
-  if (checkIfSkipped()) {
-    return {};
+  if (window.location.hostname !== "github.com" || checkIfSkipped() || !match) {
+    return repoDetails;
   }
 
-  const username = match[1];
-  const reponame = match[2];
-  const type = match[3];
-  const typeId = match[4];
-  const path = match[5];
+  const username = match[1] || null;
+  const reponame = match[2] || null;
+  const type = match[3] || null;
+  const typeId = match[4] || null;
 
   if (
     ~GH_RESERVED_USER_NAMES.indexOf(username) ||
     ~GH_RESERVED_REPO_NAMES.indexOf(reponame)
   ) {
     // Not a repository, skip
-    return {};
+    return repoDetails;
   }
 
-  // Check if this is a PR and whether we should show changes
-  const isPR = type === "pull";
-  const pullNumber = isPR ? typeId : null;
+  // Check if this is a Tree/Blob view
+  const isFileView = type === null || type === "tree" || type === "blob";
 
   return {
     username: username,
     reponame: reponame,
-    type: type,
-    typeId: typeId,
-    branch: getBranch(),
-    path: path
+    type: isFileView ? "file" : type,
+    typeId: typeId
   };
 };
 
 export const constructPath = (subPath, orgname, reponame, branch) => {
   // return relative path which follows a domain name, like
   // github.com, from given sub-path
-  if (branch === undefined) {
+  if (branch === undefined || branch === null) {
+    // TODO(arjun): for some projects, master is not the default branch
+    // hence this breaks
     branch = "master";
   }
 
   return "/" + orgname + "/" + reponame + "/blob/" + branch + "/" + subPath;
+};
+
+export const isSameSessionPath = (oldRepoDetails, newRepoDetails) => {
+  if (!oldRepoDetails || !newRepoDetails) {
+    return false;
+  }
+
+  const isTypeSame = oldRepoDetails.type === newRepoDetails.type;
+  const isHeadSame = oldRepoDetails.headSha === newRepoDetails.headSha;
+  const isBaseSame = oldRepoDetails.baseSha === newRepoDetails.baseSha;
+  const isBranchSame = oldRepoDetails.branch === newRepoDetails.branch;
+  return isTypeSame && isHeadSame && isBaseSame && isBranchSame;
+};
+
+export const hasChangedPath = (oldRepoDetails, newRepoDetails) => {
+  if (!oldRepoDetails || !newRepoDetails) {
+    return false;
+  }
+
+  return oldRepoDetails.path !== newRepoDetails.path;
+};
+
+export const fetchRepoDetails = () => {
+  // Build the repo details object, with path parsing or API calls.
+  // Return promise that will be saved in Redux store.
+  let repoDetails = {
+    username: null,
+    reponame: null,
+    type: null,
+    prId: null,
+    branch: null,
+    headSha: null,
+    baseSha: null,
+    path: null
+  };
+
+  const repoFromPath = getRepoFromPath();
+  repoDetails.username = repoFromPath.username;
+  repoDetails.reponame = repoFromPath.reponame;
+  repoDetails.type = repoFromPath.type;
+  repoDetails.prId = repoFromPath.type === "pull" ? repoFromPath.typeId : null;
+
+  repoDetails.branch = getBranch() || null;
+
+  repoDetails.path = getFilePath();
+
+  // Fill up base/head for types
+  if (repoDetails.type === "commit") {
+    const { base, head } = getCommitViewSha();
+    repoDetails.headSha = head;
+    repoDetails.baseSha = base;
+  } else if (repoDetails.type === "compare") {
+    const { base, head } = getCompareViewSha();
+    repoDetails.headSha = head;
+    repoDetails.baseSha = base;
+  } else if (repoDetails.type === "pull") {
+    const shaPromise = getPRCommitSha();
+
+    if (shaPromise !== null) {
+      return shaPromise.then(shas => {
+        repoDetails.headSha = shas.head;
+        repoDetails.baseSha = shas.base;
+        repoDetails.type = "compare";
+        return repoDetails;
+      });
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    resolve(repoDetails);
+  });
 };

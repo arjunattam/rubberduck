@@ -1,8 +1,9 @@
 {
   "manifest_version": 2,
-  "name": "mercury",
-  "description": "Chrome extension for mercury",
-  "version": "0.1.8",
+  "name": "Rubberduck",
+  "short_name": "Rubberduck",
+  "description": "Code review assistant for GitHub",
+  "version": "0.1.9",
   "browser_action": {
     "default_icon": "favicon.ico",
     "default_popup": "index.html"
@@ -11,6 +12,18 @@
     "persistent": false,
     "scripts": ["background.js"]
   },
+  "web_accessible_resources": ["fonts/*.woff2"],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/*",
+        "https://bitbucket.org/*",
+        "http://localhost:8000/*",
+        "https://www.codeview.io/*"
+      ],
+      "css": ["css/fileicon.css"]
+    }
+  ],
   "permissions": [
     "https://github.com/*",
     "https://bitbucket.org/*",
@@ -19,6 +32,5 @@
     "storage",
     "identity",
     "contextMenus"
-  ],
-  "update_url": "http://www.example.com/update.xml"
+  ]
 }

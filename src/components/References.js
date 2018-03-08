@@ -1,13 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { readXY } from "./../adapters/github/views/pull";
+import { getReader } from "../adapters/github/views/helper";
 import SectionHeader from "./common/Section";
 import ExpandedCode from "./common/ExpandedCode";
 import SmallCodeSnippet from "./common/SmallCodeSnippet";
 import CodeNode from "./common/CodeNode";
-import { API } from "./../utils/api";
-import * as SessionUtils from "../utils/session";
+import { WS } from "./../utils/websocket";
 import "./References.css";
 
 class ReferenceItem extends React.Component {
@@ -90,18 +89,29 @@ class References extends React.Component {
     });
   };
 
+  readPage = () => {
+    const reader = getReader();
+
+    if (reader !== null) {
+      return reader(
+        this.props.selectionX,
+        this.props.selectionY,
+        this.props.data.repoDetails.branch
+      );
+    }
+
+    return {};
+  };
+
   getSelectionData = () => {
-    // Assumes PR view and gets file name, line number etc
-    // from selection x and y
-    const hoverResult = readXY(this.props.selectionX, this.props.selectionY);
+    const hoverResult = this.readPage();
 
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
-    if (isValidResult) {
-      API.getReferences(
-        SessionUtils.getCurrentSessionId(this.props.storage.sessions),
+    if (isValidResult && this.state.isVisible) {
+      WS.getReferences(
         hoverResult.fileSha,
         hoverResult.filePath,
         hoverResult.lineNumber,
@@ -146,24 +156,24 @@ class References extends React.Component {
       return <ReferenceItem {...reference} key={index} />;
     });
 
+    let referencesClassName = this.state.isVisible
+      ? "references-section"
+      : "references-section collapsed";
+
     return (
-      <div className="references-section">
+      <div className={referencesClassName}>
         <SectionHeader
           onClick={this.toggleVisibility}
           isVisible={this.state.isVisible}
           name={"Usages"}
         />
-        {this.state.isVisible ? (
-          <div className="reference-container">
-            <div className="reference-title">
-              <div className="reference-name monospace">{this.state.name}</div>
-              <div className="reference-count">
-                {this.state.count} references
-              </div>
-            </div>
-            <div className="reference-items">{referenceItems}</div>
+        <div className="reference-container">
+          <div className="reference-title">
+            <div className="reference-name monospace">{this.state.name}</div>
+            <div className="reference-count">{this.state.count} references</div>
           </div>
-        ) : null}
+          <div className="reference-items">{referenceItems}</div>
+        </div>
       </div>
     );
   }

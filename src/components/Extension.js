@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { API } from "../utils/api";
+import { WS } from "../utils/websocket";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./Sidebar";
@@ -9,11 +10,15 @@ import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
 import * as GitPathAdapter from "../adapters/github/path";
+import * as DataUtils from "../utils/data";
+
+const Pjax = require("pjax");
+let document = window.document;
+let GlobalPjax;
 
 class Extension extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
     this.StorageActions = bindActionCreators(
       StorageActions,
@@ -22,17 +27,23 @@ class Extension extends React.Component {
   }
 
   componentDidMount() {
-    this.updateRepoDetailsFromPath();
     this.setupChromeListener();
     this.initializeStorage();
+    this.updateRepoDetailsFromPath();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
     }
-    if (!prevProps.storage.token && this.props.storage.token) {
+    let isSameSessionPath = GitPathAdapter.isSameSessionPath(
+      prevProps.data.repoDetails,
+      this.props.data.repoDetails
+    );
+    let hasTokenChanged = prevProps.storage.token !== this.props.storage.token;
+    if (hasTokenChanged || !isSameSessionPath) {
       this.handleSessionInitialization();
+      this.handleFileTreeUpdate();
     }
   }
 
@@ -59,25 +70,9 @@ class Extension extends React.Component {
   setupAuthorization() {
     let clientId =
       this.props.storage.clientId || Authorization.generateClientId();
-    this.setupJWT(clientId);
-  }
-
-  setupJWT(clientId) {
     let existingToken = this.props.storage.token;
-    if (existingToken) {
-      API.refreshTokenBackground(existingToken).then(response => {
-        this.handleTokenUpdate(response.token, clientId);
-      });
-    } else {
-      API.issueToken(clientId).then(response => {
-        this.handleTokenUpdate(response.token, clientId);
-      });
-    }
-  }
-
-  handleTokenUpdate(token, clientId) {
-    StorageUtils.setAllInStore({ token, clientId }, () => {
-      this.handleSessionInitialization();
+    Authorization.handleTokenState(clientId, existingToken).then(token => {
+      StorageUtils.setAllInStore({ token, clientId }, () => {});
     });
   }
 
@@ -87,29 +82,78 @@ class Extension extends React.Component {
   }
 
   handleUrlUpdate() {
-    this.handleSessionInitialization();
+    this.updateRepoDetailsFromPath();
   }
 
   updateRepoDetailsFromPath() {
-    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
+    GitPathAdapter.fetchRepoDetails().then(repoDetails => {
+      this.DataActions.setRepoDetails(repoDetails);
+    });
   }
 
   handleSessionInitialization() {
-    this.DataActions.setRepoDetails(GitPathAdapter.getRepoFromPath());
-    let { type, typeId, username, reponame } = GitPathAdapter.getRepoFromPath();
-    if (type === "pull" && username && reponame && typeId) {
-      let prId = btoa(`${username}/${reponame}/${typeId}`);
-      if (!this.props.storage.sessions[prId] && this.props.storage.token) {
-        API.createSession(typeId, username, reponame).then(response => {
-          let prId = btoa(`${username}/${reponame}/${typeId}`);
-          let sessions = {
-            ...this.props.storage.sessions,
-            [prId]: { ...response }
-          };
-          StorageUtils.setAllInStore({ sessions }, res => {
-            console.log("Sessions set in store", sessions, res);
+    const repoDetails = this.props.data.repoDetails;
+    if (repoDetails.username && repoDetails.reponame) {
+      const params = {
+        organisation: repoDetails.username,
+        name: repoDetails.reponame,
+        pull_request_id: repoDetails.prId,
+        type: repoDetails.type,
+        head_sha: repoDetails.headSha || repoDetails.branch,
+        base_sha: repoDetails.baseSha
+      };
+
+      if (this.props.storage.token) {
+        WS.createNewSession(params)
+          .then(response => {
+            console.log("Session created", response);
+          })
+          .catch(error => {
+            console.log("Error in creating session", error);
           });
-        });
+      }
+    }
+  }
+
+  getFileTreeAPI(repoDetails) {
+    const { username, reponame, type } = repoDetails;
+    const pullId = repoDetails.prId;
+    const branch = repoDetails.branch || "master";
+    if (type === "pull") {
+      return API.getPRFiles(username, reponame, pullId).then(response => {
+        return DataUtils.getPRChildren(reponame, response);
+      });
+    } else {
+      return API.getFilesTree(username, reponame, branch).then(response => {
+        return DataUtils.getTreeChildren(reponame, response.tree);
+      });
+    }
+  }
+
+  handleFileTreeUpdate() {
+    let repoDetails = this.props.data.repoDetails;
+
+    if (repoDetails.username && repoDetails.reponame) {
+      // Repo details have been figured
+      const { username, reponame } = repoDetails;
+      if (this.props.storage.token) {
+        this.getFileTreeAPI(repoDetails)
+          .then(fileTreeData => {
+            this.DataActions.setFileTree(fileTreeData);
+            setTimeout(() => {
+              GlobalPjax = new Pjax({
+                elements: "a", // default is "a[href], form[action]"
+                selectors: ["#js-repo-pjax-container"],
+                disablePjaxHeader: true,
+                cacheBust: false,
+                currentUrlFullReload: false
+              });
+            }, 2000);
+          })
+          .catch(error => {
+            // TODO(arjun): this needs to be better communicated
+            console.log("Error in API call", error);
+          });
       }
     }
   }
