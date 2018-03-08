@@ -11,8 +11,8 @@ These methods are called during `npm run start` and `npm run build`.
 */
 
 const fs = require("fs");
-const manifestKey =
-  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAySpRY2cTq3UzJE4KA9CtM1gkIrpvu/1NNT3yvN1hv76HYTORjUb1lZg73jm08oNo/5xE0asG77LP5h4Z/NeXU5KyQyvDUyyLvhcuR10OmqVCLCZ2XJhcK/eJgm89xwYgrt+RDQ7R6xoL75TUptHbksCrLj++qXET/JEDqDWFg3lX/BYa9tug6x5Fwpf7Ohrkes3nvHcg9ShbJxx9/CDl5Gyt6e0kN7YaLhoqJj6dBF8Cnu9fMZAKrMGLFO7HoP7Q3dnYHnroMnl5/7lB3BGyrl53T2nmkxuXPw3vKOjdN9r99NqEda4nGdshnXLPZz8M8/EmHKNo432Bn0ncdjY7DQIDAQAB";
+const devManifestKey =
+  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkvVJf+G5S0lXA/3kdEQOTE+piotQ3yLBT83uuFr1hDJgLoJXncFwctrH387lO8QKUNi/G1aDP/t5k1CzZKnTm8pxT3bpnZDWN0xDsWFSkIQ4Z4xZsViOpOsswsVQmncMePoyPP712UYLXkjr9KqyT7/+aFaPnGM8e+Awrco+On4XHVX8onQDaOTj/3D/Uz4tbB4tUtmaTuG+wE6gC+ipcyL9VDsEeZbJC/wV4UDdNZxLmiv4i58j6gnhPeOQSccW2p+xXK0wCgCAqMkw5y6DCinbjvQhctQ0vvshLpEepSIkk+LOtIVLiCwvBt8/RBu3ZgVCQcLVLTJShJlPMPo3dQIDAQAB";
 const localManifestKey =
   "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlN56sx9mTFsM9qnbym1SLbO2BVyy0ilA75ja9ljoA6CpriYm0uYqY4s6KAQv2v7vZPSelxw+wy3W+HK1yGy+RXcidTtiCb7orVyoiFS2dCwb+g5QsqAyPV+cW3rYv+safbYLPbfHkPnBpSjSvop3BixQz5+//S9p4iqAZqUWfa6Op9NiQ5VaICl/gJeF4rOJGvwLO2D5XoHl24L/q3UZJ+eLUbOyIhY03Qcs25n4rzpq21EfM3lYOZi8xq4Hp89TFQGG63tSrE8xXKiZsHK29K/SJw+cYr74cFUiPwlXA9LA0rZR9Zw0GwvqBSoOoCuDqHGDXBoffdtsLwSgGWSZQwIDAQAB";
 
@@ -51,12 +51,24 @@ const getGitBranch = () => {
     .replace(/\s+/, "");
 };
 
+const getManifestJson = buildPath => {
+  const manifest = `${buildPath}/manifest.json`;
+  const content = fs.readFileSync(manifest, "utf8");
+  return JSON.parse(content);
+};
+
+const updateManifestJson = (buildPath, contents) => {
+  // Write back new object
+  const manifest = `${buildPath}/manifest.json`;
+  fs.writeFileSync(manifest, JSON.stringify(contents));
+  console.log("manifest.json updated.");
+};
+
 const updateManifestKey = buildPath => {
   // Add manifest key to the manifest.json file so that we
   // preserve extension id during development cycles
   // From: https://developer.chrome.com/apps/app_identity#copy_key
-  const manifest = `${buildPath}/manifest.json`;
-  let manifestContents = JSON.parse(fs.readFileSync(manifest, "utf8"));
+  let manifestContents = getManifestJson(buildPath);
   manifestContents.version_name =
     manifestContents.version + " " + getGitBranch();
 
@@ -65,22 +77,25 @@ const updateManifestKey = buildPath => {
     manifestContents.key = localManifestKey;
   } else {
     manifestContents.name = "Rubberduck-development";
-    manifestContents.key = manifestKey;
+    manifestContents.key = devManifestKey;
   }
 
-  // Write back new object
-  fs.writeFile(manifest, JSON.stringify(manifestContents), function(err) {
-    if (err) {
-      return console.log(err);
-    }
+  updateManifestJson(buildPath, manifestContents);
+};
 
-    console.log("manifest.json updated.");
-  });
+const updateManifestForLocalhost = buildPath => {
+  // This method add localhost to the list of permissions
+  let manifestContents = getManifestJson(buildPath);
+  const localhost = "http://localhost:8000/*";
+  manifestContents.permissions.push(localhost);
+  manifestContents.content_scripts[0].matches.push(localhost);
+  updateManifestJson(buildPath, manifestContents);
 };
 
 module.exports = {
   updateManifestKey: updateManifestKey,
-  updateBackground: updateBackground
+  updateBackground: updateBackground,
+  updateManifestForLocalhost: updateManifestForLocalhost
 };
 
 if (require.main === module) {

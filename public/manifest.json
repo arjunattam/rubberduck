@@ -18,7 +18,6 @@
       "matches": [
         "https://github.com/*",
         "https://bitbucket.org/*",
-        "http://localhost:8000/*",
         "https://www.codeview.io/*"
       ],
       "css": ["css/fileicon.css"]
@@ -27,7 +26,6 @@
   "permissions": [
     "https://github.com/*",
     "https://bitbucket.org/*",
-    "http://localhost:8000/*",
     "https://www.codeview.io/*",
     "storage",
     "identity",

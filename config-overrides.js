@@ -31,6 +31,11 @@ module.exports = function override(config, env) {
   helpers.updateBackground(buildPath);
   helpers.updateManifestKey(buildPath);
 
+  // Add localhost to the manifest permissions on local
+  if (process.env.REACT_APP_BACKEND_ENV === "local") {
+    helpers.updateManifestForLocalhost(buildPath);
+  }
+
   // All config manipulation is complete
   return config;
 };
