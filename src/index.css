@@ -23,6 +23,32 @@ body {
   height: 100%;
 }
 
+.will-slide-right {
+  animation: slide-right 0.2s ease-out;
+}
+
+.will-slide-left {
+  animation: slide-left 0.2s ease-in;
+}
+
+@keyframes slide-right {
+  0% {
+    transform: translateX(-200%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-200%);
+  }
+}
+
 .repo-info-sections {
   flex-grow: 1;
 }
