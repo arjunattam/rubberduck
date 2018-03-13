@@ -4,9 +4,9 @@ import { bindActionCreators } from "redux";
 import "./../index.css";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
-import Title from "./Title";
+import Title from "./title/Title";
 import StatusBar from "./status/StatusBar";
-import CollapseButton from "./CollapseButton";
+import CollapseButton from "./collapse/CollapseButton";
 import Tree from "./tree/Tree";
 import References from "./References";
 import Definitions from "./Definitions";
@@ -24,10 +24,30 @@ class Sidebar extends React.Component {
     );
   }
 
+  triggerReflow = () => {
+    const element = document.querySelector(
+      "#mercury-sidebar .sidebar-container"
+    );
+    element.classList.remove("will-slide-right");
+    // void element.offsetWidth;
+    element.classList.add("will-slide-left");
+  };
+
   toggleCollapse() {
-    this.DataActions.updateData({
-      isSidebarVisible: !this.props.data.isSidebarVisible
-    });
+    if (this.props.data.isSidebarVisible) {
+      // To trigger the left slide animation, we follow this:
+      // https://css-tricks.com/restart-css-animation/#article-header-id-0
+      this.triggerReflow();
+      setTimeout(() => {
+        this.DataActions.updateData({
+          isSidebarVisible: false
+        });
+      }, 190);
+    } else {
+      this.DataActions.updateData({
+        isSidebarVisible: true
+      });
+    }
   }
 
   hasRepoDetails() {
@@ -88,7 +108,7 @@ class Sidebar extends React.Component {
 
     if (this.props.data.isSidebarVisible) {
       return (
-        <div className="sidebar-container">
+        <div className="sidebar-container will-slide-right">
           {this.renderTitle()}
           <div className="repo-info-sections">
             {this.renderTree()}

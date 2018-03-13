@@ -104,6 +104,13 @@ export class BaseAPI {
     else return false;
   }
 
+  dispatchAuthenticated(isAuthenticated) {
+    Store.dispatch({
+      type: "UPDATE_IS_UNAUTHENTICATED",
+      isUnauthenticated: !isAuthenticated
+    });
+  }
+
   makeConditionalGet(uriPath) {
     if (this.isGithubAuthorized()) {
       // If user is logged in with github, we will send
@@ -121,7 +128,7 @@ export class BaseAPI {
         })
         .catch(error => {
           if (error.response.status >= 400 && error.response.status < 500) {
-            console.log("Handle unauthenticated");
+            this.dispatchAuthenticated(false);
           }
         });
     }

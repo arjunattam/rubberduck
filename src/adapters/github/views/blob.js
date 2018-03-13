@@ -50,11 +50,15 @@ class BlobPageListener extends BaseListener {
   };
 
   getFileUri = element => {
-    const node = element.parentNode;
-    let shaId = this.fileSha;
-    const uri = node.baseURI;
-    const parsed = uri.replace("#", "").split(shaId);
-    return parsed[1].slice(1);
+    const pathElement = document.getElementById("blob-path");
+
+    if (pathElement !== null) {
+      const fullPath = pathElement.textContent.trim();
+      const firstSlashIndex = fullPath.indexOf("/");
+      return fullPath.slice(firstSlashIndex + 1);
+    }
+
+    return "";
   };
 }
 

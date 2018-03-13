@@ -23,6 +23,32 @@ body {
   height: 100%;
 }
 
+.will-slide-right {
+  animation: slide-right 0.2s ease-out;
+}
+
+.will-slide-left {
+  animation: slide-left 0.2s ease-in;
+}
+
+@keyframes slide-right {
+  0% {
+    transform: translateX(-200%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-200%);
+  }
+}
+
 .repo-info-sections {
   flex-grow: 1;
 }
@@ -30,4 +56,36 @@ body {
 .monospace {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier,
     monospace;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.button-div {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  color: #24292e;
+  background-color: #eff3f6;
+  background-image: linear-gradient(-180deg, #fafbfc 0%, #eff3f6 90%);
+  display: inline-block;
+  padding: 6px;
+  height: 20px;
+  width: 20px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  vertical-align: middle;
+  border: 1px solid rgba(27, 31, 35, 0.2);
+  border-radius: 0.25em;
+}
+
+.button-div:hover {
+  background-color: #e6ebf1;
+  background-image: linear-gradient(-180deg, #f0f3f6 0%, #e6ebf1 90%);
+  background-position: -0.5em;
+  border-color: rgba(27, 31, 35, 0.35);
+  text-decoration: none;
 }

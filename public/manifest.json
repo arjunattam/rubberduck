@@ -3,11 +3,7 @@
   "name": "Rubberduck",
   "short_name": "Rubberduck",
   "description": "Code review assistant for GitHub",
-  "version": "0.1.9",
-  "browser_action": {
-    "default_icon": "favicon.ico",
-    "default_popup": "index.html"
-  },
+  "version": "0.1.11",
   "background": {
     "persistent": false,
     "scripts": ["background.js"]
@@ -18,7 +14,6 @@
       "matches": [
         "https://github.com/*",
         "https://bitbucket.org/*",
-        "http://localhost:8000/*",
         "https://www.codeview.io/*"
       ],
       "css": ["css/fileicon.css"]
@@ -27,10 +22,17 @@
   "permissions": [
     "https://github.com/*",
     "https://bitbucket.org/*",
-    "http://localhost:8000/*",
     "https://www.codeview.io/*",
     "storage",
     "identity",
     "contextMenus"
-  ]
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png"
+  }
 }
