@@ -17,7 +17,7 @@ export default class AuthPrompt extends React.Component {
     return (
       <div className="auth-prompt" style={style}>
         <h3>401</h3>
-        <p>Not authorised to work with your private repositories.</p>
+        <p>Not authorised to access your private repositories.</p>
         <p>Login with GitHub to continue.</p>
       </div>
     );

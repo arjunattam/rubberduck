@@ -6,20 +6,40 @@ import { Authorization } from "../../utils/authorization";
 import * as StorageUtils from "../../utils/storage";
 import SessionStatus from "./SessionStatus";
 import AuthPrompt from "./auth";
+import { SettingsButton, Settings } from "./settings";
 
-const chatBadge = (
-  <a href="https://gitter.im/rubberduckio/Lobby" target="_blank">
-    <img src="https://badges.gitter.im/gitterHQ/gitter.png" />
-  </a>
+const StatusComponent = props => (
+  <div>
+    <AuthPrompt isExpanded={props.showAuthPrompt} />
+    <div
+      className="status-container"
+      style={props.showSettings ? { height: 376 } : null}
+    >
+      <div className="status">
+        <div className="status-auth">{props.authState}</div>
+        <SettingsButton onClick={props.onClick} />
+      </div>
+      <Settings isVisible={props.showSettings} onLogout={props.onLogout} />
+    </div>
+  </div>
 );
 
 class StatusBar extends React.Component {
   state = {
-    isExpanded: false
+    showAuthPrompt: false,
+    showSettings: false
+  };
+
+  setDefaultState = () => {
+    this.setState({
+      showAuthPrompt: false,
+      showSettings: false
+    });
   };
 
   launchOAuthFlow = () => {
     // If token already exists we probably need to do any of this
+    this.setDefaultState();
     let token = this.props.storage.token;
     Authorization.triggerOAuthFlow(token, response => {
       // response is the redirected url. It is possible that it is null,
@@ -49,31 +69,13 @@ class StatusBar extends React.Component {
     });
   };
 
-  toggleExpand = () => {
+  toggleSettings = () => {
     this.setState({
-      isExpanded: !this.state.isExpanded
+      showSettings: !this.state.showSettings
     });
   };
 
-  componentWillReceiveProps(newProps) {
-    if (newProps.data.isUnauthenticated) {
-      this.setState({
-        isExpanded: true
-      });
-    }
-  }
-
-  render() {
-    return (
-      <div>
-        {/* <SessionStatus /> */}
-        <AuthPrompt isExpanded={this.state.isExpanded} />
-        {this.renderAuth()}
-      </div>
-    );
-  }
-
-  renderAuth() {
+  getAuthState = () => {
     // Three possible situations: 1. token unavailable, 2. token available but
     // no github login, and 3. token and github login both available
     const decodedJWT = this.props.storage.token
@@ -83,29 +85,38 @@ class StatusBar extends React.Component {
     const hasToken = this.props.storage.token !== null;
     const hasBoth = githubUser !== undefined && githubUser !== "";
 
-    let authState = <p>No token found</p>;
+    let authState = "No token found";
 
     if (hasBoth) {
-      authState = <p> Logged in as {githubUser}</p>;
+      authState = "Logged in as " + githubUser;
     } else if (hasToken) {
       authState = (
-        <p>
-          <a href="javascript:" onClick={() => this.launchOAuthFlow()}>
-            Login with Github
-          </a>
-        </p>
+        <a className="pointer" onClick={() => this.launchOAuthFlow()}>
+          Login with GitHub
+        </a>
       );
     }
+
+    return authState;
+  };
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.data.isUnauthenticated) {
+      this.setState({
+        showAuthPrompt: true
+      });
+    }
+  }
+
+  render() {
     return (
-      <div className="status">
-        <div>{authState}</div>
-        <div
-          className="status-expand-button"
-          onClick={() => this.toggleExpand()}
-        >
-          See more
-        </div>
-      </div>
+      <StatusComponent
+        authState={this.getAuthState()}
+        showAuthPrompt={this.state.showAuthPrompt}
+        showSettings={this.state.showSettings}
+        onClick={() => this.toggleSettings()}
+        onLogout={() => this.launchLogoutFlow()}
+      />
     );
   }
 }

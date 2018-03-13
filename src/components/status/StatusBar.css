@@ -1,16 +1,20 @@
 .status {
-  position: relative;
-  height: 40px;
+  height: 32px;
+  line-height: 32px;
   border-top: 1px #ccc solid;
-  background: rgb(250, 251, 252);
+  border-bottom: 1px #ccc solid;
   padding: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.status-container {
+  position: relative;
+  background: rgb(250, 251, 252);
+  height: 64px;
   transition: height 100ms ease-in;
 }
 
-.status p {
-  margin-bottom: 3px;
-}
-
-.status-expand-button {
-  cursor: pointer;
+.status-auth {
+  font-weight: 600;
 }

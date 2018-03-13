@@ -4,12 +4,12 @@
   background-color: #f6f8fa;
   border-top: 1px #ccc solid;
   padding: 15px;
-  animation: slide-up 0.3s ease-out;
+  animation: slide-up 0.2s ease-out;
 }
 
 @keyframes slide-up {
   0% {
-    transform: translateY(+200%);
+    transform: translateY(+100%);
   }
   100% {
     transform: translateY(0);
