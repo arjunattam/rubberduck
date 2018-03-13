@@ -1,0 +1,12 @@
+.collapse-container {
+  position: fixed;
+  z-index: 10001;
+  top: 10px;
+  left: 5px;
+}
+
+.shown {
+  /* When sidebar is shown */
+  top: 10px;
+  left: 190px;
+}
