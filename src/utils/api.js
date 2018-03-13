@@ -122,6 +122,10 @@ export class BaseAPI {
         .catch(error => {
           if (error.response.status >= 400 && error.response.status < 500) {
             console.log("Handle unauthenticated");
+            Store.dispatch({
+              type: "UPDATE_IS_UNAUTHENTICATED",
+              isUnauthenticated: true
+            });
           }
         });
     }

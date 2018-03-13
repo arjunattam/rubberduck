@@ -13,7 +13,7 @@ export default class CollapseButton extends React.Component {
 
     return (
       <div
-        className={"collapse-container " + classMod}
+        className={"button-div collapse-container " + classMod}
         onClick={this.props.onClick}
       >
         {icon}

@@ -15,9 +15,6 @@ class SessionStatus extends React.Component {
         <div className="session-status-bar" style={style}>
           Session: {this.props.data.sessionStatus}
         </div>
-        <div className="session-status-bar">
-          API: {this.props.data.apiStatus}
-        </div>
       </div>
     );
   }

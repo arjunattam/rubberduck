@@ -5,6 +5,13 @@ import { getParameterByName } from "../../utils/api";
 import { Authorization } from "../../utils/authorization";
 import * as StorageUtils from "../../utils/storage";
 import SessionStatus from "./SessionStatus";
+import AuthPrompt from "./auth";
+
+const chatBadge = (
+  <a href="https://gitter.im/rubberduckio/Lobby" target="_blank">
+    <img src="https://badges.gitter.im/gitterHQ/gitter.png" />
+  </a>
+);
 
 class StatusBar extends React.Component {
   state = {
@@ -48,10 +55,19 @@ class StatusBar extends React.Component {
     });
   };
 
+  componentWillReceiveProps(newProps) {
+    if (newProps.data.isUnauthenticated) {
+      this.setState({
+        isExpanded: true
+      });
+    }
+  }
+
   render() {
     return (
       <div>
-        <SessionStatus />
+        {/* <SessionStatus /> */}
+        <AuthPrompt isExpanded={this.state.isExpanded} />
         {this.renderAuth()}
       </div>
     );
@@ -68,20 +84,9 @@ class StatusBar extends React.Component {
     const hasBoth = githubUser !== undefined && githubUser !== "";
 
     let authState = <p>No token found</p>;
-    let expandedState = null;
 
     if (hasBoth) {
       authState = <p> Logged in as {githubUser}</p>;
-      expandedState = (
-        <p>
-          <a href="javascript:" onClick={() => this.launchLogoutFlow()}>
-            Logout
-          </a>{" "}
-          <a href="javascript:" onClick={() => this.launchOAuthFlow()}>
-            Reauthenticate
-          </a>
-        </p>
-      );
     } else if (hasToken) {
       authState = (
         <p>
@@ -92,22 +97,13 @@ class StatusBar extends React.Component {
       );
     }
     return (
-      <div
-        className="status"
-        style={this.state.isExpanded ? { height: 100 } : null}
-      >
+      <div className="status">
         <div>{authState}</div>
         <div
           className="status-expand-button"
           onClick={() => this.toggleExpand()}
         >
           See more
-        </div>
-        <div>{expandedState}</div>
-        <div>
-          <a href="https://gitter.im/rubberduckio/Lobby" target="_blank">
-            <img src="https://badges.gitter.im/gitterHQ/gitter.png" />
-          </a>
         </div>
       </div>
     );
