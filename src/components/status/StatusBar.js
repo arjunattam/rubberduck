@@ -1,4 +1,5 @@
 import React from "react";
+import Store from "../../store";
 import { connect } from "react-redux";
 import "./StatusBar.css";
 import { getParameterByName } from "../../utils/api";
@@ -16,7 +17,11 @@ const StatusComponent = props => (
       style={props.showSettings ? { height: 376 } : null}
     >
       <div className="status">
-        <div className="status-auth">{props.authState}</div>
+        {props.isLoading ? (
+          <div className="status-loader" />
+        ) : (
+          <div className="status-auth">{props.authState}</div>
+        )}
         <SettingsButton onClick={props.onClick} />
       </div>
       <Settings isVisible={props.showSettings} onLogout={props.onLogout} />
@@ -27,19 +32,26 @@ const StatusComponent = props => (
 class StatusBar extends React.Component {
   state = {
     showAuthPrompt: false,
-    showSettings: false
+    showSettings: false,
+    isLoading: false
   };
 
-  setDefaultState = () => {
+  setLoadingState = () => {
     this.setState({
       showAuthPrompt: false,
-      showSettings: false
+      showSettings: false,
+      isLoading: true
+    });
+    // Use an action for this update.
+    Store.dispatch({
+      type: "UPDATE_IS_UNAUTHENTICATED",
+      isUnauthenticated: false
     });
   };
 
   launchOAuthFlow = () => {
     // If token already exists we probably need to do any of this
-    this.setDefaultState();
+    this.setLoadingState();
     let token = this.props.storage.token;
     Authorization.triggerOAuthFlow(token, response => {
       // response is the redirected url. It is possible that it is null,
@@ -50,6 +62,7 @@ class StatusBar extends React.Component {
         console.log("Could not login with github.");
       } else {
         // Successful OAuth flow, save refreshed token
+        this.setState({ isLoading: false });
         const refreshedToken = getParameterByName("token", response);
         StorageUtils.setAllInStore({ token: refreshedToken });
       }
@@ -59,10 +72,12 @@ class StatusBar extends React.Component {
   launchLogoutFlow = () => {
     // We can unlink github profile with this user with the logout flow
     let token = this.props.storage.token;
+    this.setLoadingState();
     Authorization.triggerLogoutFlow(token, response => {
       if (response === null) {
         console.log("Could not log out.");
       } else {
+        this.setState({ isLoading: false });
         const refreshedToken = getParameterByName("token", response);
         StorageUtils.setAllInStore({ token: refreshedToken });
       }
@@ -101,9 +116,9 @@ class StatusBar extends React.Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (newProps.data.isUnauthenticated) {
+    if (newProps.data.isUnauthenticated != this.state.showAuthPrompt) {
       this.setState({
-        showAuthPrompt: true
+        showAuthPrompt: newProps.data.isUnauthenticated
       });
     }
   }
@@ -111,9 +126,8 @@ class StatusBar extends React.Component {
   render() {
     return (
       <StatusComponent
+        {...this.state}
         authState={this.getAuthState()}
-        showAuthPrompt={this.state.showAuthPrompt}
-        showSettings={this.state.showSettings}
         onClick={() => this.toggleSettings()}
         onLogout={() => this.launchLogoutFlow()}
       />

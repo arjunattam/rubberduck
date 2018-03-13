@@ -2,13 +2,7 @@ import React from "react";
 
 const RubberduckIcon = props => (
   <svg width={props.size} height={props.size} viewBox="0 0 500 500">
-    <g
-      id="Page-1"
-      stroke="none"
-      stroke-width="1"
-      fill="none"
-      fill-rule="evenodd"
-    >
+    <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
       <g id="Group">
         <circle id="Oval" fill="#2A69C1" cx="250" cy="250" r="250" />
         <path
