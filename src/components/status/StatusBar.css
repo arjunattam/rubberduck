@@ -8,11 +8,19 @@
   justify-content: space-between;
 }
 
+.status-main-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 232px;
+}
+
 .status-container {
-  position: relative;
   background: rgb(250, 251, 252);
   height: 64px;
   transition: height 100ms ease-in;
+  z-index: 20000;
+  position: relative;
 }
 
 .status-auth {

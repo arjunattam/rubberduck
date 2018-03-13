@@ -9,7 +9,7 @@ import AuthPrompt from "./auth";
 import { SettingsButton, Settings } from "./settings";
 
 const StatusComponent = props => (
-  <div>
+  <div className="status-main-container">
     <AuthPrompt isExpanded={props.showAuthPrompt} />
     <div
       className="status-container"
