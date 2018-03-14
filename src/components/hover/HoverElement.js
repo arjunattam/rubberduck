@@ -11,6 +11,7 @@ export default class HoverElement extends React.Component {
   state = {
     x: -1000,
     y: -1000,
+    boundRect: {},
     hoverResult: {}
   };
 
@@ -57,7 +58,8 @@ export default class HoverElement extends React.Component {
             docstring: response.result.docstring,
             filePath: definitionPath,
             x: this.props.hoverResult.mouseX,
-            y: this.props.hoverResult.mouseY
+            y: this.props.hoverResult.mouseY,
+            boundRect: this.props.hoverResult.boundRect
           });
         }
       })
@@ -67,11 +69,17 @@ export default class HoverElement extends React.Component {
   };
 
   update = () => {
-    this.callAPI();
-    this.setState({
-      x: this.props.mouseX,
-      y: this.props.mouseY
-    });
+    const hoverName = this.props.hoverResult.name;
+    const hasText = hoverName && hoverName.trim() !== "";
+
+    if (hasText) {
+      this.callAPI();
+      this.setState({
+        x: this.props.mouseX,
+        y: this.props.mouseY,
+        boundRect: this.props.hoverResult.boundRect
+      });
+    }
   };
 
   clear = () => {
@@ -79,6 +87,7 @@ export default class HoverElement extends React.Component {
     this.setState({
       x: -1000,
       y: -1000,
+      boundRect: {},
       hoverResult: {}
     });
   };

@@ -15,6 +15,7 @@ export default class HoverBox extends React.Component {
     fileSha: PropTypes.string,
     x: PropTypes.number,
     y: PropTypes.number,
+    boundRect: PropTypes.object,
     onReferences: PropTypes.func,
     onDefinition: PropTypes.func
   };
@@ -38,15 +39,24 @@ export default class HoverBox extends React.Component {
     );
   };
 
+  getPosition = () => {
+    let left = this.props.x;
+    let top = this.props.y;
+
+    if (this.props.boundRect) {
+      left = this.props.boundRect.left || left;
+      top = this.props.boundRect.top || top;
+    }
+
+    return {
+      left,
+      bottom: window.innerHeight - top - 10
+    };
+  };
+
   render() {
     return (
-      <div
-        className="hover-box"
-        style={{
-          left: this.props.x,
-          bottom: window.innerHeight - this.props.y
-        }}
-      >
+      <div className="hover-box" style={this.getPosition()}>
         <div className="title">
           <CodeNode
             name={this.props.name}
