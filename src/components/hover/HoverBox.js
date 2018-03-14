@@ -19,6 +19,25 @@ export default class HoverBox extends React.Component {
     onDefinition: PropTypes.func
   };
 
+  renderButtons = () => {
+    return (
+      <div className="button-container">
+        <a
+          className="button-div hover-button"
+          onClick={this.props.onReferences}
+        >
+          Find usages
+        </a>
+        <a
+          className="button-div hover-button"
+          onClick={this.props.onDefinition}
+        >
+          Open definition
+        </a>
+      </div>
+    );
+  };
+
   render() {
     return (
       <div
@@ -36,14 +55,7 @@ export default class HoverBox extends React.Component {
           />
         </div>
         <div className="docstring">{Docstring(this.props.docstring)}</div>
-        <div className="button-container">
-          <a className="button" onClick={this.props.onReferences}>
-            Find usages
-          </a>{" "}
-          <a className="button" onClick={this.props.onDefinition}>
-            Open definition
-          </a>
-        </div>
+        {this.renderButtons()}
       </div>
     );
   }

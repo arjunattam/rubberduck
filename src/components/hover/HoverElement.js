@@ -3,6 +3,9 @@ import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
 const debounce = require("debounce");
 
+const DEBOUNCE_TIMEOUT = 500; // ms
+const CURSOR_RADIUS = 20; // pixels
+
 export default class HoverElement extends React.Component {
   // Makes the API call and shows the presentation component: HoverBox
   state = {
@@ -22,7 +25,7 @@ export default class HoverElement extends React.Component {
   isOverlappingWithCurrent = (x, y) => {
     const xdiff = Math.abs(x - this.state.x);
     const ydiff = Math.abs(y - this.state.y);
-    return xdiff < 5 && ydiff < 5;
+    return xdiff <= CURSOR_RADIUS && ydiff <= CURSOR_RADIUS;
   };
 
   callAPI = () => {
@@ -87,7 +90,7 @@ export default class HoverElement extends React.Component {
     ) {
       // Props have been updated, so make API call if we are on new line/char
       this.clear();
-      this.dFunc = debounce(() => this.update(), 500);
+      this.dFunc = debounce(() => this.update(), DEBOUNCE_TIMEOUT);
       this.dFunc();
     }
   }
