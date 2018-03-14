@@ -22,7 +22,6 @@
 
 .file-container {
   font-size: 14px;
-  margin-top: 1px;
 }
 
 .file-selected a {
@@ -82,10 +81,6 @@
 
 .file-triangle path {
   stroke: #999;
-}
-
-.file-children-collapsed {
-  display: none;
 }
 
 .tree-additions {

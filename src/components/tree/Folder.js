@@ -3,6 +3,8 @@ import File from "./File";
 import TreeLabel from "./TreeLabel";
 import Octicon from "react-component-octicons";
 
+const PADDING_CONST = 12; // in pixels
+
 const sortChildren = children => {
   const parents = children
     .filter(element => {
@@ -63,7 +65,7 @@ class Folder extends React.Component {
 
   getPadding = () => {
     // padding is a function of depth
-    return this.props.depth * 12;
+    return this.props.depth * PADDING_CONST;
   };
 
   toggleCollapsed = () => {
@@ -77,7 +79,7 @@ class Folder extends React.Component {
       this.props.depth,
       this.props
     );
-    return <div className="file-children ">{renderedChildren}</div>;
+    return <div className="file-children">{renderedChildren}</div>;
   }
 
   render() {
@@ -88,6 +90,7 @@ class Folder extends React.Component {
     );
     let containerClassName = "folder-structure-container";
     containerClassName += this.state.isCollapsed ? " collapsed" : "";
+
     return (
       <div className={containerClassName}>
         <div className={"file-container " + selectedName}>
@@ -100,7 +103,7 @@ class Folder extends React.Component {
             />
           </a>
         </div>
-        {this.renderFolderStructure()}
+        {this.state.isCollapsed ? null : this.renderFolderStructure()}
       </div>
     );
   }
