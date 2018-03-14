@@ -55,6 +55,10 @@ export class BaseReaderSection extends BaseSection {
     return {};
   };
 
+  renderZeroState = () => (
+    <div className="zero-state">Hover over symbols to trigger</div>
+  );
+
   startLoading = () => {
     this.setState({
       isLoading: true

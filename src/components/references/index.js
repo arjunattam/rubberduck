@@ -68,14 +68,16 @@ class References extends BaseReaderSection {
 
   renderTitle = () =>
     this.state.isLoading ? (
-      <div className="loader-container">
+      <div className="loader-container" style={{ marginTop: 20 }}>
         <div className="status-loader" />
       </div>
-    ) : (
-      <div>
+    ) : this.props.selectionX ? (
+      <div className="reference-title">
         <div className="reference-name monospace">{this.state.name}</div>
         <div className="reference-count">{this.state.count} references</div>
       </div>
+    ) : (
+      this.renderZeroState()
     );
 
   render() {
@@ -91,7 +93,7 @@ class References extends BaseReaderSection {
       <div className={referencesClassName}>
         {this.renderSectionHeader("Usages")}
         <div className="reference-container">
-          <div className="reference-title">{this.renderTitle()}</div>
+          {this.renderTitle()}
           <div className="reference-items">{referenceItems}</div>
         </div>
       </div>

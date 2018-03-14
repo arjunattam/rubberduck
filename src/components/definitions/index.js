@@ -56,11 +56,13 @@ class Definitions extends BaseReaderSection {
       <div className="loader-container" style={{ marginTop: 20 }}>
         <div className="status-loader" />
       </div>
-    ) : (
+    ) : this.props.selectionX ? (
       <DefinitionItem
         {...this.state.definition}
         visible={this.state.isVisible}
       />
+    ) : (
+      this.renderZeroState()
     );
 
   render() {
