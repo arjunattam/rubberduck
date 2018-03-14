@@ -1,35 +1,8 @@
 import React from "react";
-import Octicon from "react-component-octicons";
 import { constructPath } from "../../adapters/github/path";
-import "./Tree.css";
-import FileIcon from "./fileIcon/FileIcon";
+import TreeLabel from "./TreeLabel";
 
-export const TreeLabel = props => {
-  const additions = props.additions ? (
-    <span className="tree-additions">{props.additions}</span>
-  ) : null;
-  const deletions = props.deletions ? (
-    <span className="tree-deletions">{props.deletions}</span>
-  ) : null;
-  let labelStyle = {
-    paddingTop: "4px",
-    paddingBottom: "4px",
-    marginRight: "4px"
-  };
-  return (
-    <span>
-      <FileIcon
-        fileName={props.name}
-        octicon={props.icon}
-        octColor={props.iconColor}
-      />
-      <span style={labelStyle}>{props.name}</span>
-      {additions} {deletions}
-    </span>
-  );
-};
-
-export class File extends React.Component {
+export default class File extends React.Component {
   getPadding = () => {
     // padding is a function of depth
     return (this.props.depth + 1) * 12 + 2;
@@ -80,12 +53,6 @@ export class File extends React.Component {
 
   render() {
     const pl = this.getPadding();
-    const path = constructPath(
-      this.props.path,
-      this.props.data.repoDetails.username,
-      this.props.data.repoDetails.reponame,
-      this.props.data.repoDetails.branch
-    );
     const isPRElement = this.props.additions || this.props.deletions;
 
     if (isPRElement) {

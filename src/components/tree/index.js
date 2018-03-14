@@ -1,28 +1,12 @@
 import React from "react";
 import { connect } from "react-redux";
-import SectionHeader from "../common/Section";
 import { renderChildren } from "./Folder";
+import { BaseSection } from "../section";
 import "./Tree.css";
-let Pjax = require("pjax");
-let document = window.document;
 
-class Tree extends React.Component {
+class Tree extends BaseSection {
   state = {
     isVisible: this.props.isVisible
-  };
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.isVisible !== nextProps.isVisible) {
-      this.setState({
-        isVisible: nextProps.isVisible
-      });
-    }
-  }
-
-  toggleVisibility = () => {
-    this.setState({
-      isVisible: !this.state.isVisible
-    });
   };
 
   render() {
@@ -36,11 +20,7 @@ class Tree extends React.Component {
 
     return (
       <div className="tree-container">
-        <SectionHeader
-          onClick={() => this.toggleVisibility()}
-          isVisible={this.state.isVisible}
-          name={"Files tree"}
-        />
+        {this.renderSectionHeader("Files tree")}
         <div className={"tree-content " + styleClass}>{renderedChildren}</div>
       </div>
     );

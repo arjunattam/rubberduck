@@ -5,7 +5,6 @@ import "./StatusBar.css";
 import { getParameterByName } from "../../utils/api";
 import { Authorization } from "../../utils/authorization";
 import * as StorageUtils from "../../utils/storage";
-import SessionStatus from "./SessionStatus";
 import AuthPrompt from "./auth";
 import { SettingsButton, Settings } from "./settings";
 
@@ -116,7 +115,7 @@ class StatusBar extends React.Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (newProps.data.isUnauthenticated != this.state.showAuthPrompt) {
+    if (newProps.data.isUnauthenticated !== this.state.showAuthPrompt) {
       this.setState({
         showAuthPrompt: newProps.data.isUnauthenticated
       });

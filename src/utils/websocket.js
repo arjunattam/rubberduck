@@ -175,7 +175,7 @@ class WebSocketManager {
   };
 
   tryReconnection = () => {
-    const timerid = setTimeout(
+    setTimeout(
       this.reconnectIfRequired,
       exponentialBackoff(this.reconnectAttempts, 500)
     );

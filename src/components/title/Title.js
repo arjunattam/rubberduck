@@ -28,11 +28,11 @@ class Title extends React.Component {
   );
 
   renderSubtitle = repoDetails => (
-    <p className="branch">
+    <div className="branch">
       {repoDetails.prId
         ? this.renderPR(repoDetails)
         : this.renderBranch(repoDetails)}
-    </p>
+    </div>
   );
 
   render() {

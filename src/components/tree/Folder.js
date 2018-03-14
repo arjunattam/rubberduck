@@ -1,6 +1,6 @@
 import React from "react";
-import "./Tree.css";
-import { File, TreeLabel } from "./File";
+import File from "./File";
+import TreeLabel from "./TreeLabel";
 import Octicon from "react-component-octicons";
 
 const sortChildren = children => {
@@ -83,13 +83,9 @@ class Folder extends React.Component {
   render() {
     const pl = this.getPadding();
     const selectedName = this.state.isCollapsed ? "" : "file-selected";
-    let triangleClassName = `file-triangle${
-      this.state.isCollapsed ? " collapsed" : ""
-    }`;
     const triangle = (
       <Octicon name={"triangle-down"} className="file-triangle" />
     );
-    const children = this.props.children;
     let containerClassName = "folder-structure-container";
     containerClassName += this.state.isCollapsed ? " collapsed" : "";
     return (

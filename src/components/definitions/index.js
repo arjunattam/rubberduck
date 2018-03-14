@@ -1,12 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
-import SectionHeader from "../common/Section";
-import BaseSection from "../section";
+import { BaseReaderSection } from "../section";
 import { WS } from "./../../utils/websocket";
 import DefinitionItem from "./DefinitionItem";
 import "./Definitions.css";
 
-class Definitions extends BaseSection {
+class Definitions extends BaseReaderSection {
   // This gets x and y of the selected text, constructs the
   // API call payload by reading DOM, and then display the
   // result of the API call.
@@ -55,11 +54,7 @@ class Definitions extends BaseSection {
       : "definitions-section collapsed";
     return (
       <div className={definitonClassName}>
-        <SectionHeader
-          onClick={this.toggleVisibility}
-          isVisible={this.state.isVisible}
-          name={"Definitions"}
-        />
+        {this.renderSectionHeader("Definitions")}
         <DefinitionItem
           {...this.state.definition}
           visible={this.state.isVisible}
