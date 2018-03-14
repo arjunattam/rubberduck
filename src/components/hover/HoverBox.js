@@ -4,6 +4,9 @@ import Docstring from "../common/Docstring";
 import CodeNode from "../common/CodeNode";
 import "./Hover.css";
 
+const MAX_HEIGHT = 240;
+const MAX_WIDTH = 300;
+
 export default class HoverBox extends React.Component {
   // Presentation component for the hover box
   static propTypes = {
@@ -40,12 +43,24 @@ export default class HoverBox extends React.Component {
   };
 
   getPosition = () => {
+    // This decides where the hover box should be placed, looking at the
+    // bounding rectangle of the element and the window.
     let left = this.props.x;
     let top = this.props.y;
 
     if (this.props.boundRect) {
       left = this.props.boundRect.left || left;
       top = this.props.boundRect.top || top;
+
+      if (left + MAX_WIDTH > window.innerWidth) {
+        left = window.innerWidth - MAX_WIDTH - 20;
+      }
+
+      if (top < MAX_HEIGHT) {
+        // The box should be at the bottom of the element
+        top = this.props.boundRect.bottom;
+        return { left, top };
+      }
     }
 
     return {

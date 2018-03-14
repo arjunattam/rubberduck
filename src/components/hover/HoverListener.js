@@ -78,7 +78,7 @@ class HoverListener extends React.Component {
       return (
         rect.x <= x &&
         x <= rect.x + rect.width &&
-        rect.y <= y &&
+        rect.y - padding <= y &&
         y <= rect.y + rect.height + padding
       );
     }
@@ -110,9 +110,7 @@ class HoverListener extends React.Component {
   render() {
     return (
       <HoverElement
-        mouseX={this.state.mouseX}
-        mouseY={this.state.mouseY}
-        hoverResult={this.state.hoverResult}
+        {...this.state}
         onReferences={coordinates => this.onReferences(coordinates)}
         onDefinition={coordinates => this.onDefinition(coordinates)}
       />
