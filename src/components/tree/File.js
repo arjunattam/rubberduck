@@ -89,9 +89,12 @@ export default class File extends React.Component {
 
   render() {
     const isPRElement = this.props.additions || this.props.deletions;
+    const isSelected = this.props.currentPath === this.props.path;
+    let className = "file-container";
+    className += isSelected ? " file-selected" : "";
 
     return (
-      <div className="file-container">
+      <div className={className}>
         {isPRElement ? this.renderPRFile() : this.renderBasicFile()}
       </div>
     );

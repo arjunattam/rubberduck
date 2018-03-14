@@ -25,13 +25,14 @@ const sortChildren = children => {
   return parents.concat(onlyChildren);
 };
 
-export const renderChildren = (children, depth, parentProps) => {
+export const renderChildren = (children, depth, parentProps, currentPath) => {
   // The parentProps are required to pass org/repo information down
   // the component chain, so that we can construct the link href. Can this be avoided?
   const childrenToRender = sortChildren(children);
   return (
     <div>
       {childrenToRender.map(element => {
+        console.log(element, currentPath);
         if (element.children.length > 0) {
           // Ordering of props is important since the element
           // needs to override the parentProps
@@ -41,6 +42,7 @@ export const renderChildren = (children, depth, parentProps) => {
               {...element}
               depth={depth + 1}
               key={element.path}
+              currentPath={currentPath}
             />
           );
         } else {
@@ -50,6 +52,7 @@ export const renderChildren = (children, depth, parentProps) => {
               {...element}
               depth={depth + 1}
               key={element.path}
+              currentPath={currentPath}
             />
           );
         }
@@ -72,19 +75,29 @@ class Folder extends React.Component {
     this.setState({ isCollapsed: !this.state.isCollapsed });
   };
 
-  renderFolderStructure() {
+  renderFolderStructure = () => {
     const children = this.props.children;
     const renderedChildren = renderChildren(
       children,
       this.props.depth,
-      this.props
+      this.props,
+      this.props.currentPath
     );
     return <div className="file-children">{renderedChildren}</div>;
+  };
+
+  isCurrentlyOpen = () => {
+    return this.props.currentPath.indexOf(this.props.path) >= 0;
+  };
+
+  componentDidMount() {
+    this.setState({
+      isCollapsed: !this.isCurrentlyOpen()
+    });
   }
 
   render() {
     const pl = this.getPadding();
-    const selectedName = this.state.isCollapsed ? "" : "file-selected";
     const triangle = (
       <Octicon name={"triangle-down"} className="file-triangle" />
     );
@@ -93,7 +106,7 @@ class Folder extends React.Component {
 
     return (
       <div className={containerClassName}>
-        <div className={"file-container " + selectedName}>
+        <div className={"file-container"}>
           <a onClick={this.toggleCollapsed} style={{ paddingLeft: pl }}>
             {triangle}{" "}
             <TreeLabel
