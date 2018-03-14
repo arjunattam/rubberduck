@@ -12,6 +12,7 @@ const initialState = {
     children: []
   },
   sessionStatus: "",
+  showNotReady: null,
   isUnauthenticated: false
 };
 
@@ -50,10 +51,18 @@ export default createReducer(initialState, {
     };
   },
   UPDATE_SESSION_STATUS: (state, action) => {
-    return {
-      ...state,
-      sessionStatus: action.sessionStatus
-    };
+    if (action.sessionStatus === "not_ready") {
+      // This is handled differently. Not saved as the status.
+      return {
+        ...state,
+        showNotReady: Date()
+      };
+    } else {
+      return {
+        ...state,
+        sessionStatus: action.sessionStatus
+      };
+    }
   },
   UPDATE_IS_UNAUTHENTICATED: (state, action) => {
     return {

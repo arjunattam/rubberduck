@@ -3,26 +3,85 @@ import { connect } from "react-redux";
 import "status-indicator/styles.css";
 import "./SessionStatus.css";
 
+/*
+Possible values
+- connecting
+- disconnected
+
+- creating
+- created
+- fetched_details
+- cloned_base_repo
+- setup_base_repo
+- cloned_head_repo
+- initiated
+
+- ready
+
+- unsupported_language
+*/
+
 class SessionStatus extends React.Component {
-  render() {
-    let indicator;
+  state = { showNotReady: null };
+
+  renderIndicator = () => {
     switch (this.props.data.sessionStatus) {
       case "ready":
-        indicator = <status-indicator positive />;
-        break;
+        return <status-indicator positive />;
+      case "disconnected":
       case "error":
-        indicator = <status-indicator negative />;
-        break;
+        return <status-indicator negative />;
+      case "unsupported_language":
+        return <status-indicator active />;
       default:
-        indicator = <status-indicator intermediary pulse />;
+        return <status-indicator intermediary pulse />;
     }
+  };
 
+  getText = () => {
+    switch (this.props.data.sessionStatus) {
+      case "creating":
+        return "initializing";
+      case "created":
+      case "fetched_details":
+      case "cloned_base_repo":
+      case "setup_base_repo":
+      case "cloned_head_repo":
+        return "preparing";
+      case "initiated":
+        return "indexing";
+      case "unsupported_language":
+        return "language not supported";
+      default:
+        return this.props.data.sessionStatus;
+    }
+  };
+
+  showNotReady = () => {
+    const element = document.querySelector(".session-status-inner");
+    element.classList.remove("status-animation");
+    element.classList.add("status-animation");
+  };
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.data.showNotReady !== this.state.showNotReady) {
+      this.showNotReady();
+      this.setState({
+        showNotReady: newProps.data.showNotReady
+      });
+    }
+  }
+
+  render() {
     return (
       <div className="session-status-container">
-        {indicator}
-        <span className="session-status-text">
-          {this.props.data.sessionStatus}
-        </span>
+        <div className="session-status-inner">
+          <div className="session-status">
+            {this.renderIndicator()}
+            <span className="session-status-text">{this.getText()}</span>
+          </div>
+          <div className="session-status-not-ready">Waiting to be ready</div>
+        </div>
       </div>
     );
   }
