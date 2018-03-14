@@ -223,7 +223,9 @@ class WebSocketManager {
   createNewSession = params => {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
-    return this.createSession();
+    return this.createSession().catch(error => {
+      this.dispatchStatus("error");
+    });
   };
 
   createSession = () => {

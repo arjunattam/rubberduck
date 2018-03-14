@@ -5,12 +5,17 @@ import "./SessionStatus.css";
 
 class SessionStatus extends React.Component {
   render() {
-    const indicator =
-      this.props.data.sessionStatus === "ready" ? (
-        <status-indicator positive />
-      ) : (
-        <status-indicator intermediary pulse />
-      );
+    let indicator;
+    switch (this.props.data.sessionStatus) {
+      case "ready":
+        indicator = <status-indicator positive />;
+        break;
+      case "error":
+        indicator = <status-indicator negative />;
+        break;
+      default:
+        indicator = <status-indicator intermediary pulse />;
+    }
 
     return (
       <div className="session-status-container">
