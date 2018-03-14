@@ -11,6 +11,7 @@ import Tree from "./tree";
 import References from "./references";
 import Definitions from "./definitions";
 import HoverListener from "./hover/HoverListener";
+import SessionStatus from "./session";
 import * as GithubLayout from "./../adapters/github/layout";
 
 class Sidebar extends React.Component {
@@ -109,6 +110,7 @@ class Sidebar extends React.Component {
       return (
         <div className="sidebar-container will-slide-right">
           {this.renderTitle()}
+          <SessionStatus />
           <div className="repo-info-sections">
             {this.renderTree()}
             {this.renderReferences()}

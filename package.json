@@ -19,6 +19,7 @@
     "redux-create-reducer": "^1.1.1",
     "redux-promise-middleware": "^5.0.0",
     "redux-thunk": "^2.2.0",
+    "status-indicator": "^1.0.9",
     "websocket-as-promised": "^0.6.0"
   },
   "config": {
