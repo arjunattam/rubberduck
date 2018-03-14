@@ -37,7 +37,6 @@ export default class DefinitionItem extends React.Component {
 
         {this.state.isHovering ? (
           <ExpandedCode
-            language={"python"}
             codeBase64={this.props.codeSnippet}
             top={this.getTop()}
             startLine={this.props.startLineNumber}

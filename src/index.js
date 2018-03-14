@@ -52,7 +52,7 @@ const setupPjax = () => {
 createExtensionContainer();
 renderExtension();
 
-// Wait for 2 seconds, and then setup pjax
+// Wait for 3 seconds, and then setup pjax
 setTimeout(() => {
   setupPjax();
-}, 2000);
+}, 3000);
