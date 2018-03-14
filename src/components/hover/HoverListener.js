@@ -1,15 +1,37 @@
 import React from "react";
 import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as DataActions from "../../actions/dataActions";
 import { getListener } from "../../adapters/github/views/helper";
 import HoverElement from "./HoverElement";
 import * as GitPathAdapter from "../../adapters/github/path";
 
 class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
+  constructor(props) {
+    super(props);
+    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
+  }
+
   state = {
     mouseX: -1000,
     mouseY: -1000,
     hoverResult: {}
+  };
+
+  triggerAction = (actionName, coordinates) => {
+    this.DataActions.updateData({
+      openSection: actionName,
+      textSelection: coordinates
+    });
+  };
+
+  onReferences = coordinates => {
+    this.triggerAction("references", coordinates);
+  };
+
+  onDefinition = coordinates => {
+    this.triggerAction("definitions", coordinates);
   };
 
   receiver = hoverResult => {
@@ -98,6 +120,8 @@ class HoverListener extends React.Component {
         mouseX={this.state.mouseX}
         mouseY={this.state.mouseY}
         hoverResult={this.state.hoverResult}
+        onReferences={coordinates => this.onReferences(coordinates)}
+        onDefinition={coordinates => this.onDefinition(coordinates)}
       />
     );
   }

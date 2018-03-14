@@ -7,7 +7,6 @@ import ExpandedCode from "../common/ExpandedCode";
 import CodeNode from "../common/CodeNode";
 import Docstring from "../common/Docstring";
 import { WS } from "./../../utils/websocket";
-import { decodeBase64 } from "../../utils/data";
 import "./Definitions.css";
 
 class DefinitionItem extends React.Component {
@@ -36,7 +35,7 @@ class DefinitionItem extends React.Component {
         <CodeNode name={this.props.name} file={this.props.filePath}>
           <div className="definition-docstring">
             {this.props.docstring
-              ? Docstring(decodeBase64(this.props.docstring))
+              ? Docstring(this.props.docstring)
               : "docstring goes here"}
           </div>
         </CodeNode>

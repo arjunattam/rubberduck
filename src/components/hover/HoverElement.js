@@ -1,42 +1,28 @@
 import React from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import * as DataActions from "../../actions/dataActions";
 import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
+const debounce = require("debounce");
 
-class HoverElement extends React.Component {
-  // Makes the API call and shows the presentiation component: HoverBox
-  constructor(props) {
-    super(props);
-    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
-  }
-
+export default class HoverElement extends React.Component {
+  // Makes the API call and shows the presentation component: HoverBox
   state = {
     x: -1000,
     y: -1000,
     hoverResult: {}
   };
 
+  onReferences = () => {
+    this.props.onReferences({ x: this.state.x, y: this.state.y });
+  };
+
+  onDefinition = () => {
+    this.props.onDefinition({ x: this.state.x, y: this.state.y });
+  };
+
   isOverlappingWithCurrent = (x, y) => {
     const xdiff = Math.abs(x - this.state.x);
     const ydiff = Math.abs(y - this.state.y);
     return xdiff < 5 && ydiff < 5;
-  };
-
-  triggerAction = actionName => {
-    this.DataActions.updateData({
-      openSection: actionName,
-      textSelection: { x: this.state.x, y: this.state.y }
-    });
-  };
-
-  onReferences = () => {
-    this.triggerAction("references");
-  };
-
-  onDefinition = () => {
-    this.triggerAction("definitions");
   };
 
   callAPI = () => {
@@ -77,22 +63,33 @@ class HoverElement extends React.Component {
       });
   };
 
+  update = () => {
+    this.callAPI();
+    this.setState({
+      x: this.props.mouseX,
+      y: this.props.mouseY
+    });
+  };
+
+  clear = () => {
+    if (this.dFunc !== undefined) this.dFunc.clear();
+    this.setState({
+      x: -1000,
+      y: -1000,
+      hoverResult: {}
+    });
+  };
+
   componentDidUpdate(prevProps, prevState) {
     if (
       this.props.hoverResult.lineNumber !== prevProps.hoverResult.lineNumber ||
       this.props.hoverResult.charNumber !== prevProps.hoverResult.charNumber
     ) {
       // Props have been updated, so make API call if we are on new line/char
-      this.callAPI(prevProps);
+      this.clear();
+      this.dFunc = debounce(() => this.update(), 500);
+      this.dFunc();
     }
-  }
-
-  componentWillReceiveProps(newProps) {
-    this.setState({
-      x: newProps.mouseX,
-      y: newProps.mouseY,
-      hover: {}
-    });
   }
 
   render() {
@@ -105,12 +102,3 @@ class HoverElement extends React.Component {
     );
   }
 }
-
-function mapStateToProps(state) {
-  const { storage, data } = state;
-  return {
-    storage,
-    data
-  };
-}
-export default connect(mapStateToProps)(HoverElement);
