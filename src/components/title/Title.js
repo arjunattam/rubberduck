@@ -3,10 +3,40 @@ import { connect } from "react-redux";
 import Octicon from "react-component-octicons";
 import "./Title.css";
 
+const getPRTitle = () => {
+  const element = document.querySelector(
+    "#partial-discussion-header > div.gh-header-show > h1"
+  );
+  if (element) {
+    return element.textContent;
+  } else {
+    return "";
+  }
+};
+
 class Title extends React.Component {
+  renderBranch = repoDetails => (
+    <div>
+      <Octicon name="git-branch" style={{ height: 12 }} /> {repoDetails.branch}
+    </div>
+  );
+
+  renderPR = repoDetails => (
+    <div>
+      <Octicon name="git-pull-request" style={{ height: 12 }} /> {getPRTitle()}
+    </div>
+  );
+
+  renderSubtitle = repoDetails => (
+    <div className="branch">
+      {repoDetails.prId
+        ? this.renderPR(repoDetails)
+        : this.renderBranch(repoDetails)}
+    </div>
+  );
+
   render() {
-    let repoDetails = this.props.data.repoDetails;
-    const usernameHref = "/" + repoDetails.username;
+    const repoDetails = this.props.data.repoDetails;
     const reponameHref =
       "/" + repoDetails.username + "/" + repoDetails.reponame;
 
@@ -14,15 +44,11 @@ class Title extends React.Component {
       <div className="header">
         <p>
           <Octicon name="repo" style={{ height: 21 }} />{" "}
-          <a href={usernameHref}>{repoDetails.username}</a> /{" "}
           <a href={reponameHref}>
             <strong>{repoDetails.reponame}</strong>
           </a>
         </p>
-        <p className="branch">
-          <Octicon name="git-branch" style={{ height: 12 }} />{" "}
-          {this.props.data.repoDetails.branch}
-        </p>
+        {this.renderSubtitle(repoDetails)}
         <div>{this.props.children}</div>
       </div>
     );

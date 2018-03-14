@@ -16,6 +16,7 @@ export default class BaseListener {
       fileSha: this.getFileSha(element),
       lineNumber: this.getLineNumber(element),
       charNumber: this.getCharNumber(element, x, y),
+      boundRect: this.getBoundRect(element),
       mouseX: x,
       mouseY: y
     };
@@ -47,6 +48,10 @@ export default class BaseListener {
     } catch (err) {
       return false;
     }
+  };
+
+  getBoundRect = element => {
+    return element.parentElement.getBoundingClientRect();
   };
 
   getFontAspectRatio = () => {

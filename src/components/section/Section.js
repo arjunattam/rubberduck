@@ -16,13 +16,11 @@ const SectionHeaderIcon = props => {
   );
 };
 
-export default class SectionHeader extends React.Component {
-  render() {
-    return (
-      <div className="section-header" onClick={this.props.onClick}>
-        <SectionHeaderIcon isOpen={this.props.isVisible} />
-        {this.props.name}
-      </div>
-    );
-  }
-}
+const SectionHeader = props => (
+  <div className="section-header" onClick={props.onClick}>
+    <SectionHeaderIcon isOpen={props.isVisible} />
+    {props.name}
+  </div>
+);
+
+export default SectionHeader;

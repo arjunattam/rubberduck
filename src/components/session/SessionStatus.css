@@ -1,0 +1,58 @@
+.session-status-container {
+  text-transform: uppercase;
+  font-size: 11px;
+  height: 25px;
+  width: 100%;
+  font-weight: bold;
+  border-top: 1px solid #c8e1ff;
+  border-bottom: 1px solid #c8e1ff;
+  color: #333;
+  overflow: hidden;
+}
+
+.session-status-text {
+  margin-left: 6px;
+}
+
+.session-status {
+  height: 15px;
+  width: 100%;
+  background: #c8e1ff;
+  padding: 5px 0px 5px 11px;
+}
+
+.session-status-not-ready {
+  background: #fff5ba;
+  height: 15px;
+  width: 100%;
+  padding: 5px 0px 5px 11px;
+}
+
+.session-status-inner {
+  display: inline-block;
+  width: 100%;
+  white-space: nowrap;
+  top: 0px;
+  left: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.status-animation {
+  animation: not-ready 2.5s linear;
+}
+
+@keyframes not-ready {
+  0% {
+    top: 0;
+  }
+  5% {
+    top: -25px;
+  }
+  95% {
+    top: -25px;
+  }
+  100% {
+    top: 0px;
+  }
+}

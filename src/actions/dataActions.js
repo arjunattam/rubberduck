@@ -40,3 +40,10 @@ export function setFileTree(data) {
     payload: data
   };
 }
+
+export function setTreeLoading(data) {
+  return {
+    type: "SET_TREE_LOADING",
+    payload: data
+  };
+}

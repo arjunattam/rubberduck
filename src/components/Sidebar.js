@@ -7,10 +7,11 @@ import * as StorageActions from "../actions/storageActions";
 import Title from "./title/Title";
 import StatusBar from "./status/StatusBar";
 import CollapseButton from "./collapse/CollapseButton";
-import Tree from "./tree/Tree";
-import References from "./References";
-import Definitions from "./Definitions";
+import Tree from "./tree";
+import References from "./references";
+import Definitions from "./definitions";
 import HoverListener from "./hover/HoverListener";
+import SessionStatus from "./session";
 import * as GithubLayout from "./../adapters/github/layout";
 
 class Sidebar extends React.Component {
@@ -29,7 +30,6 @@ class Sidebar extends React.Component {
       "#mercury-sidebar .sidebar-container"
     );
     element.classList.remove("will-slide-right");
-    // void element.offsetWidth;
     element.classList.add("will-slide-left");
   };
 
@@ -111,6 +111,7 @@ class Sidebar extends React.Component {
         <div className="sidebar-container will-slide-right">
           {this.renderTitle()}
           <div className="repo-info-sections">
+            <SessionStatus />
             {this.renderTree()}
             {this.renderReferences()}
             {this.renderDefinitions()}

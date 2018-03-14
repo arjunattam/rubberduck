@@ -175,7 +175,7 @@ class WebSocketManager {
   };
 
   tryReconnection = () => {
-    const timerid = setTimeout(
+    setTimeout(
       this.reconnectIfRequired,
       exponentialBackoff(this.reconnectAttempts, 500)
     );
@@ -223,7 +223,17 @@ class WebSocketManager {
   createNewSession = params => {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
-    return this.createSession();
+    return this.createSession().catch(error => {
+      console.log(error);
+      if (error.error && error.error === "Language not supported") {
+        this.dispatchStatus("unsupported_language");
+      } else if (error === "No session to be created") {
+        this.dispatchStatus("no_session");
+      } else {
+        this.dispatchStatus("error");
+      }
+      throw error;
+    });
   };
 
   createSession = () => {
@@ -271,6 +281,7 @@ class WebSocketManager {
     } else {
       return new Promise((resolve, reject) => {
         console.log("session not ready");
+        this.dispatchStatus("not_ready");
         reject();
       });
     }

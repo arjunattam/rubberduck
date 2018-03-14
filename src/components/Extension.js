@@ -12,9 +12,7 @@ import { Authorization } from "./../utils/authorization";
 import * as GitPathAdapter from "../adapters/github/path";
 import * as DataUtils from "../utils/data";
 
-const Pjax = require("pjax");
 let document = window.document;
-let GlobalPjax;
 
 class Extension extends React.Component {
   constructor(props) {
@@ -119,6 +117,7 @@ class Extension extends React.Component {
     const { username, reponame, type } = repoDetails;
     const pullId = repoDetails.prId;
     const branch = repoDetails.branch || "master";
+    this.DataActions.setTreeLoading(true);
     if (type === "pull") {
       return API.getPRFiles(username, reponame, pullId).then(response => {
         return DataUtils.getPRChildren(reponame, response);
@@ -139,19 +138,12 @@ class Extension extends React.Component {
       if (this.props.storage.token) {
         this.getFileTreeAPI(repoDetails)
           .then(fileTreeData => {
+            this.DataActions.setTreeLoading(false);
             this.DataActions.setFileTree(fileTreeData);
-            setTimeout(() => {
-              GlobalPjax = new Pjax({
-                elements: "a", // default is "a[href], form[action]"
-                selectors: ["#js-repo-pjax-container"],
-                disablePjaxHeader: true,
-                cacheBust: false,
-                currentUrlFullReload: false
-              });
-            }, 2000);
           })
           .catch(error => {
             // TODO(arjun): this needs to be better communicated
+            this.DataActions.setTreeLoading(false);
             console.log("Error in API call", error);
           });
       }
@@ -184,7 +176,7 @@ class Extension extends React.Component {
   }
 
   render() {
-    return <Sidebar />;
+    return this.props.data.repoDetails.reponame ? <Sidebar /> : null;
   }
 }
 

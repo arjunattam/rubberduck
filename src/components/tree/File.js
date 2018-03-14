@@ -1,38 +1,13 @@
 import React from "react";
-import Octicon from "react-component-octicons";
 import { constructPath } from "../../adapters/github/path";
-import "./Tree.css";
-import FileIcon from "./fileIcon/FileIcon";
+import TreeLabel from "./TreeLabel";
 
-export const TreeLabel = props => {
-  const additions = props.additions ? (
-    <span className="tree-additions">{props.additions}</span>
-  ) : null;
-  const deletions = props.deletions ? (
-    <span className="tree-deletions">{props.deletions}</span>
-  ) : null;
-  let labelStyle = {
-    paddingTop: "4px",
-    paddingBottom: "4px",
-    marginRight: "4px"
-  };
-  return (
-    <span>
-      <FileIcon
-        fileName={props.name}
-        octicon={props.icon}
-        octColor={props.iconColor}
-      />
-      <span style={labelStyle}>{props.name}</span>
-      {additions} {deletions}
-    </span>
-  );
-};
+const PADDING_CONST = 12; // in pixels -- same as folder
 
-export class File extends React.Component {
+export default class File extends React.Component {
   getPadding = () => {
     // padding is a function of depth
-    return (this.props.depth + 1) * 12 + 2;
+    return (this.props.depth + 1) * PADDING_CONST + 2;
   };
 
   clickHandler = event => {
@@ -78,7 +53,7 @@ export class File extends React.Component {
     }
   };
 
-  render() {
+  renderBasicFile = () => {
     const pl = this.getPadding();
     const path = constructPath(
       this.props.path,
@@ -86,40 +61,42 @@ export class File extends React.Component {
       this.props.data.repoDetails.reponame,
       this.props.data.repoDetails.branch
     );
+
+    return (
+      <a href={path} style={{ paddingLeft: pl }}>
+        <TreeLabel {...this.props} icon="file" iconColor="#999" />
+      </a>
+    );
+  };
+
+  renderPRFile = () => {
+    // This is a PR element, so we will scroll to file changed on the element
+    // This might trigger pjax call to open the "files changed" view on Github
+    // if that has not been opened already.
+    const pl = this.getPadding();
+    const filesChangedUrl = this.getFilesChangedUrl();
+
+    return (
+      <a
+        href={filesChangedUrl}
+        onClick={e => this.clickHandler(e)}
+        style={{ paddingLeft: pl }}
+      >
+        <TreeLabel {...this.props} icon="file" iconColor="#999" />
+      </a>
+    );
+  };
+
+  render() {
     const isPRElement = this.props.additions || this.props.deletions;
+    const isSelected = this.props.currentPath === this.props.path;
+    let className = "file-container";
+    className += isSelected ? " file-selected" : "";
 
-    if (isPRElement) {
-      // This is a PR element, so we will scroll to file changed on the element
-      // This might trigger pjax call to open the "files changed" view on Github
-      // if that has not been opened already.
-      const filesChangedUrl = this.getFilesChangedUrl();
-
-      return (
-        <div className="file-container">
-          <a
-            href={filesChangedUrl}
-            onClick={e => this.clickHandler(e)}
-            style={{ paddingLeft: pl }}
-          >
-            <TreeLabel {...this.props} icon="file" iconColor="#999" />
-          </a>
-        </div>
-      );
-    } else {
-      const path = constructPath(
-        this.props.path,
-        this.props.data.repoDetails.username,
-        this.props.data.repoDetails.reponame,
-        this.props.data.repoDetails.branch
-      );
-
-      return (
-        <div className="file-container">
-          <a href={path} style={{ paddingLeft: pl }}>
-            <TreeLabel {...this.props} icon="file" iconColor="#999" />
-          </a>
-        </div>
-      );
-    }
+    return (
+      <div className={className}>
+        {isPRElement ? this.renderPRFile() : this.renderBasicFile()}
+      </div>
+    );
   }
 }

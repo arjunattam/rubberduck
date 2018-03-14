@@ -31,6 +31,29 @@ export default class ExpandedCode extends React.Component {
     return {};
   }
 
+  getLanguage = () => {
+    if (this.props.filepath) {
+      const splitPath = this.props.filepath.split(".");
+
+      if (splitPath.length > 0) {
+        const ext = splitPath[splitPath.length - 1];
+
+        switch (ext) {
+          case "py":
+            return "python";
+          case "js":
+            return "javascript";
+          case "ts":
+            return "typescript";
+          case "java":
+            return "java";
+          default:
+            return null;
+        }
+      }
+    }
+  };
+
   render() {
     let decodedCode = this.getBase64Decoded(this.props.codeBase64);
     return (
@@ -47,7 +70,7 @@ export default class ExpandedCode extends React.Component {
         </div>
         <div className="expanded-content">
           <SyntaxHighlighter
-            language={this.props.language}
+            language={this.getLanguage()}
             style={githubStyle}
             showLineNumbers={true}
             startingLineNumber={this.props.startLine + 1}

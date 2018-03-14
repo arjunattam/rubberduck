@@ -1,42 +1,44 @@
 import React from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import * as DataActions from "../../actions/dataActions";
 import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
+const debounce = require("debounce");
 
-class HoverElement extends React.Component {
-  // Makes the API call and shows the presentiation component: HoverBox
-  constructor(props) {
-    super(props);
-    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
-  }
+const DEBOUNCE_TIMEOUT = 500; // ms
+const CURSOR_RADIUS = 20; // pixels
 
+export default class HoverElement extends React.Component {
+  // Makes the API call and shows the presentation component: HoverBox
   state = {
     x: -1000,
     y: -1000,
-    hoverResult: {}
+    boundRect: {},
+    isLoading: false
+  };
+
+  onReferences = () => {
+    this.props.onReferences({ x: this.state.x, y: this.state.y });
+  };
+
+  onDefinition = () => {
+    this.props.onDefinition({ x: this.state.x, y: this.state.y });
   };
 
   isOverlappingWithCurrent = (x, y) => {
     const xdiff = Math.abs(x - this.state.x);
     const ydiff = Math.abs(y - this.state.y);
-    return xdiff < 5 && ydiff < 5;
+    return xdiff <= CURSOR_RADIUS && ydiff <= CURSOR_RADIUS;
   };
 
-  triggerAction = actionName => {
-    this.DataActions.updateData({
-      openSection: actionName,
-      textSelection: { x: this.state.x, y: this.state.y }
+  startLoading = () => {
+    this.setState({
+      isLoading: true
     });
   };
 
-  onReferences = () => {
-    this.triggerAction("references");
-  };
-
-  onDefinition = () => {
-    this.triggerAction("definitions");
+  stopLoading = () => {
+    this.setState({
+      isLoading: false
+    });
   };
 
   callAPI = () => {
@@ -44,6 +46,7 @@ class HoverElement extends React.Component {
       x: this.props.hoverResult.mouseX,
       y: this.props.hoverResult.mouseY
     };
+    this.startLoading();
     WS.getHover(
       this.props.hoverResult.fileSha,
       this.props.hoverResult.filePath,
@@ -51,6 +54,7 @@ class HoverElement extends React.Component {
       this.props.hoverResult.charNumber
     )
       .then(response => {
+        this.stopLoading();
         const isForCurrentMouse = this.isOverlappingWithCurrent(
           hoverXY.x,
           hoverXY.y
@@ -68,13 +72,39 @@ class HoverElement extends React.Component {
             docstring: response.result.docstring,
             filePath: definitionPath,
             x: this.props.hoverResult.mouseX,
-            y: this.props.hoverResult.mouseY
+            y: this.props.hoverResult.mouseY,
+            boundRect: this.props.hoverResult.boundRect
           });
         }
       })
       .catch(error => {
+        this.stopLoading();
+        this.clear();
         console.log("Error in API call", error);
       });
+  };
+
+  update = () => {
+    const hoverName = this.props.hoverResult.name;
+    const hasText = hoverName && hoverName.trim() !== "";
+
+    if (hasText) {
+      this.callAPI();
+      this.setState({
+        x: this.props.mouseX,
+        y: this.props.mouseY,
+        boundRect: this.props.hoverResult.boundRect
+      });
+    }
+  };
+
+  clear = () => {
+    if (this.dFunc !== undefined) this.dFunc.clear();
+    this.setState({
+      x: -1000,
+      y: -1000,
+      boundRect: {}
+    });
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -83,16 +113,10 @@ class HoverElement extends React.Component {
       this.props.hoverResult.charNumber !== prevProps.hoverResult.charNumber
     ) {
       // Props have been updated, so make API call if we are on new line/char
-      this.callAPI(prevProps);
+      this.clear();
+      this.dFunc = debounce(() => this.update(), DEBOUNCE_TIMEOUT);
+      this.dFunc();
     }
-  }
-
-  componentWillReceiveProps(newProps) {
-    this.setState({
-      x: newProps.mouseX,
-      y: newProps.mouseY,
-      hover: {}
-    });
   }
 
   render() {
@@ -105,12 +129,3 @@ class HoverElement extends React.Component {
     );
   }
 }
-
-function mapStateToProps(state) {
-  const { storage, data } = state;
-  return {
-    storage,
-    data
-  };
-}
-export default connect(mapStateToProps)(HoverElement);
