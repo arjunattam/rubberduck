@@ -1,12 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { getReader } from "../adapters/github/views/helper";
-import SectionHeader from "./common/Section";
-import ExpandedCode from "./common/ExpandedCode";
-import SmallCodeSnippet from "./common/SmallCodeSnippet";
-import CodeNode from "./common/CodeNode";
-import { WS } from "./../utils/websocket";
+import { getReader } from "../../adapters/github/views/helper";
+import SectionHeader from "../common/Section";
+import ExpandedCode from "../common/ExpandedCode";
+import SmallCodeSnippet from "../common/SmallCodeSnippet";
+import CodeNode from "../common/CodeNode";
+import { WS } from "../../utils/websocket";
 import "./References.css";
 
 class ReferenceItem extends React.Component {

@@ -8,8 +8,8 @@ import Title from "./title/Title";
 import StatusBar from "./status/StatusBar";
 import CollapseButton from "./collapse/CollapseButton";
 import Tree from "./tree/Tree";
-import References from "./References";
-import Definitions from "./Definitions";
+import References from "./references";
+import Definitions from "./definitions";
 import HoverListener from "./hover/HoverListener";
 import * as GithubLayout from "./../adapters/github/layout";
 
@@ -29,7 +29,6 @@ class Sidebar extends React.Component {
       "#mercury-sidebar .sidebar-container"
     );
     element.classList.remove("will-slide-right");
-    // void element.offsetWidth;
     element.classList.add("will-slide-left");
   };
 
