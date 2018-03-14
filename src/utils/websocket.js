@@ -223,7 +223,14 @@ class WebSocketManager {
   createNewSession = params => {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
-    return this.createSession();
+    return this.createSession().catch(error => {
+      if (error.error && error.error === "Language not supported") {
+        this.dispatchStatus("unsupported_language");
+      } else {
+        this.dispatchStatus("error");
+      }
+      throw error;
+    });
   };
 
   createSession = () => {
@@ -271,6 +278,7 @@ class WebSocketManager {
     } else {
       return new Promise((resolve, reject) => {
         console.log("session not ready");
+        this.dispatchStatus("not_ready");
         reject();
       });
     }

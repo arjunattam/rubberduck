@@ -54,4 +54,16 @@ export class BaseReaderSection extends BaseSection {
 
     return {};
   };
+
+  startLoading = () => {
+    this.setState({
+      isLoading: true
+    });
+  };
+
+  stopLoading = () => {
+    this.setState({
+      isLoading: false
+    });
+  };
 }

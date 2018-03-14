@@ -11,6 +11,7 @@ class References extends BaseReaderSection {
   // result of the API call.
   state = {
     isVisible: false,
+    isLoading: false,
     references: []
   };
 
@@ -43,6 +44,7 @@ class References extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult && this.state.isVisible) {
+      this.startLoading();
       WS.getReferences(
         hoverResult.fileSha,
         hoverResult.filePath,
@@ -50,6 +52,7 @@ class References extends BaseReaderSection {
         hoverResult.charNumber
       )
         .then(response => {
+          this.stopLoading();
           this.setState({
             name: hoverResult.name,
             count: response.result.count,
@@ -57,10 +60,23 @@ class References extends BaseReaderSection {
           });
         })
         .catch(error => {
+          this.stopLoading();
           console.log("Error in API call", error);
         });
     }
   };
+
+  renderTitle = () =>
+    this.state.isLoading ? (
+      <div className="loader-container">
+        <div className="status-loader" />
+      </div>
+    ) : (
+      <div>
+        <div className="reference-name monospace">{this.state.name}</div>
+        <div className="reference-count">{this.state.count} references</div>
+      </div>
+    );
 
   render() {
     const referenceItems = this.state.references.map((reference, index) => {
@@ -75,10 +91,7 @@ class References extends BaseReaderSection {
       <div className={referencesClassName}>
         {this.renderSectionHeader("Usages")}
         <div className="reference-container">
-          <div className="reference-title">
-            <div className="reference-name monospace">{this.state.name}</div>
-            <div className="reference-count">{this.state.count} references</div>
-          </div>
+          <div className="reference-title">{this.renderTitle()}</div>
           <div className="reference-items">{referenceItems}</div>
         </div>
       </div>

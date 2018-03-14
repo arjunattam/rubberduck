@@ -25,6 +25,16 @@ const renderExtension = () => {
   );
 };
 
+const createPjax = () => {
+  GlobalPjax = new Pjax({
+    elements: "a", // default is "a[href], form[action]"
+    selectors: ["#js-repo-pjax-container"],
+    disablePjaxHeader: true,
+    cacheBust: false,
+    currentUrlFullReload: false
+  });
+};
+
 const setupPjax = () => {
   // Trigger pjax setup whenever the files tree DOM changes
   // Select the node that will be observed for mutations
@@ -33,18 +43,13 @@ const setupPjax = () => {
   var config = { childList: true, subtree: true };
   // Callback function to execute when mutations are observed
   var callback = function(mutationsList) {
-    GlobalPjax = new Pjax({
-      elements: "a", // default is "a[href], form[action]"
-      selectors: ["#js-repo-pjax-container"],
-      disablePjaxHeader: true,
-      cacheBust: false,
-      currentUrlFullReload: false
-    });
+    createPjax();
   };
   // Create an observer instance linked to the callback function
   var observer = new MutationObserver(callback);
   // Start observing the target node for configured mutations
   observer.observe(targetNode, config);
+  createPjax();
 };
 
 // Content script setup -- on injection

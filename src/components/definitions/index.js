@@ -11,17 +11,18 @@ class Definitions extends BaseReaderSection {
   // result of the API call.
   state = {
     isVisible: false,
+    isLoading: false,
     definition: {}
   };
 
   getSelectionData = () => {
     const hoverResult = this.readPage();
-
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult && this.state.isVisible) {
+      this.startLoading();
       WS.getDefinition(
         hoverResult.fileSha,
         hoverResult.filePath,
@@ -29,6 +30,7 @@ class Definitions extends BaseReaderSection {
         hoverResult.charNumber
       )
         .then(response => {
+          this.stopLoading();
           let filePath = response.result.definition.location
             ? response.result.definition.location.path
             : "";
@@ -43,10 +45,23 @@ class Definitions extends BaseReaderSection {
           this.setState({ definition: definition });
         })
         .catch(error => {
+          this.stopLoading();
           console.log("Error in API call", error);
         });
     }
   };
+
+  renderItems = () =>
+    this.state.isLoading ? (
+      <div className="loader-container" style={{ marginTop: 20 }}>
+        <div className="status-loader" />
+      </div>
+    ) : (
+      <DefinitionItem
+        {...this.state.definition}
+        visible={this.state.isVisible}
+      />
+    );
 
   render() {
     let definitonClassName = this.state.isVisible
@@ -55,10 +70,7 @@ class Definitions extends BaseReaderSection {
     return (
       <div className={definitonClassName}>
         {this.renderSectionHeader("Definitions")}
-        <DefinitionItem
-          {...this.state.definition}
-          visible={this.state.isVisible}
-        />
+        {this.renderItems()}
       </div>
     );
   }
