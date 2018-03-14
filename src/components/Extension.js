@@ -117,6 +117,7 @@ class Extension extends React.Component {
     const { username, reponame, type } = repoDetails;
     const pullId = repoDetails.prId;
     const branch = repoDetails.branch || "master";
+    this.DataActions.setTreeLoading(true);
     if (type === "pull") {
       return API.getPRFiles(username, reponame, pullId).then(response => {
         return DataUtils.getPRChildren(reponame, response);
@@ -137,10 +138,12 @@ class Extension extends React.Component {
       if (this.props.storage.token) {
         this.getFileTreeAPI(repoDetails)
           .then(fileTreeData => {
+            this.DataActions.setTreeLoading(false);
             this.DataActions.setFileTree(fileTreeData);
           })
           .catch(error => {
             // TODO(arjun): this needs to be better communicated
+            this.DataActions.setTreeLoading(false);
             console.log("Error in API call", error);
           });
       }

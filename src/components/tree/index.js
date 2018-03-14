@@ -6,8 +6,27 @@ import "./Tree.css";
 
 class Tree extends BaseSection {
   state = {
-    isVisible: this.props.isVisible
+    isVisible: this.props.isVisible,
+    isLoading: false
   };
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.isVisible !== this.state.isVisible) {
+      this.setState({ isVisible: newProps.isVisible });
+    }
+
+    if (newProps.data.isTreeLoading !== this.state.isLoading) {
+      this.setState({
+        isLoading: newProps.data.isTreeLoading
+      });
+    }
+  }
+
+  renderLoader = () => (
+    <div className="loader-container" style={{ marginTop: 20 }}>
+      <div className="status-loader" />
+    </div>
+  );
 
   render() {
     // data.fileTree is a recursive tree structure, where every element
@@ -26,7 +45,9 @@ class Tree extends BaseSection {
     return (
       <div className="tree-container">
         {this.renderSectionHeader("Files tree")}
-        <div className={"tree-content " + styleClass}>{renderedChildren}</div>
+        <div className={"tree-content " + styleClass}>
+          {this.state.isLoading ? this.renderLoader() : renderedChildren}
+        </div>
       </div>
     );
   }

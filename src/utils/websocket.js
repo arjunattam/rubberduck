@@ -224,8 +224,11 @@ class WebSocketManager {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
     return this.createSession().catch(error => {
+      console.log(error);
       if (error.error && error.error === "Language not supported") {
         this.dispatchStatus("unsupported_language");
+      } else if (error === "No session to be created") {
+        this.dispatchStatus("no_session");
       } else {
         this.dispatchStatus("error");
       }

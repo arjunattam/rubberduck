@@ -11,7 +11,7 @@
 
 .tree-content-visible {
   padding-bottom: 10px;
-  max-height: calc(100vh - 192px);
+  max-height: calc(100vh - 232px);
 }
 
 .tree-content-hidden {

@@ -19,6 +19,7 @@ Possible values
 - ready
 
 - unsupported_language
+- no_session
 */
 
 class SessionStatus extends React.Component {
@@ -32,6 +33,7 @@ class SessionStatus extends React.Component {
       case "error":
         return <status-indicator negative />;
       case "unsupported_language":
+      case "no_session":
         return <status-indicator active />;
       default:
         return <status-indicator intermediary pulse />;
@@ -52,6 +54,8 @@ class SessionStatus extends React.Component {
         return "indexing";
       case "unsupported_language":
         return "language not supported";
+      case "no_session":
+        return "inactive";
       default:
         return this.props.data.sessionStatus;
     }
@@ -60,6 +64,7 @@ class SessionStatus extends React.Component {
   showNotReady = () => {
     const element = document.querySelector(".session-status-inner");
     element.classList.remove("status-animation");
+    void element.offsetWidth;
     element.classList.add("status-animation");
   };
 

@@ -6,13 +6,20 @@ const initialState = {
   openSection: "tree",
   textSelection: {},
   isSidebarVisible: true,
+
+  // Files tree
   fileTree: {
     name: "",
     path: "",
     children: []
   },
+  isTreeLoading: false,
+
+  // These are used to show session status
   sessionStatus: "",
   showNotReady: null,
+
+  // Triggers the 401 pop-up
   isUnauthenticated: false
 };
 
@@ -50,12 +57,18 @@ export default createReducer(initialState, {
       }
     };
   },
+  SET_TREE_LOADING: (state, action) => {
+    return {
+      ...state,
+      isTreeLoading: action.payload
+    };
+  },
   UPDATE_SESSION_STATUS: (state, action) => {
     if (action.sessionStatus === "not_ready") {
       // This is handled differently. Not saved as the status.
       return {
         ...state,
-        showNotReady: Date()
+        showNotReady: new Date()
       };
     } else {
       return {

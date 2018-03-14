@@ -48,8 +48,10 @@ const setupPjax = () => {
   // Create an observer instance linked to the callback function
   var observer = new MutationObserver(callback);
   // Start observing the target node for configured mutations
-  observer.observe(targetNode, config);
-  createPjax();
+  if (targetNode) {
+    observer.observe(targetNode, config);
+    createPjax();
+  }
 };
 
 // Content script setup -- on injection
