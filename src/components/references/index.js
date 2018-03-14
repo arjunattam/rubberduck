@@ -1,68 +1,15 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { getReader } from "../../adapters/github/views/helper";
 import SectionHeader from "../common/Section";
-import ExpandedCode from "../common/ExpandedCode";
-import SmallCodeSnippet from "../common/SmallCodeSnippet";
-import CodeNode from "../common/CodeNode";
+import BaseSection from "../section";
 import { WS } from "../../utils/websocket";
+import ReferenceItem from "./ReferenceItem";
 import "./References.css";
 
-class ReferenceItem extends React.Component {
-  state = {
-    isHovering: false
-  };
-
-  handleMouseHover = () => {
-    this.setState({
-      isHovering: !this.state.isHovering
-    });
-  };
-
-  getTop = () => {
-    return this.refs.container.getBoundingClientRect().top;
-  };
-
-  render() {
-    return (
-      <div
-        className="reference-item"
-        onMouseEnter={this.handleMouseHover}
-        onMouseLeave={this.handleMouseHover}
-        ref={"container"}
-      >
-        <CodeNode {...this.props}>
-          <SmallCodeSnippet
-            contents={this.props.codeSnippet}
-            lineNumber={this.props.lineNumber - this.props.startLineNumber}
-          />
-        </CodeNode>
-
-        {this.state.isHovering ? (
-          <ExpandedCode
-            language={"python"}
-            codeBase64={this.props.codeSnippet}
-            top={this.getTop()}
-            startLine={this.props.startLineNumber}
-            lineNumber={this.props.lineNumber}
-            filepath={this.props.file}
-          />
-        ) : null}
-      </div>
-    );
-  }
-}
-
-class References extends React.Component {
+class References extends BaseSection {
   // This gets x and y of the selected text, constructs the
   // API call payload by reading DOM, and then display the
   // result of the API call.
-  static propTypes = {
-    selectionX: PropTypes.number,
-    selectionY: PropTypes.number
-  };
-
   state = {
     isVisible: false,
     references: []
@@ -87,20 +34,6 @@ class References extends React.Component {
         startLineNumber: reference.contents_start_line
       };
     });
-  };
-
-  readPage = () => {
-    const reader = getReader();
-
-    if (reader !== null) {
-      return reader(
-        this.props.selectionX,
-        this.props.selectionY,
-        this.props.data.repoDetails.branch
-      );
-    }
-
-    return {};
   };
 
   getSelectionData = () => {
@@ -128,27 +61,6 @@ class References extends React.Component {
           console.log("Error in API call", error);
         });
     }
-  };
-
-  componentWillReceiveProps(newProps) {
-    if (newProps.isVisible !== this.state.isVisible) {
-      this.setState({ isVisible: newProps.isVisible });
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevProps.selectionX !== this.props.selectionX ||
-      prevProps.selectionY !== this.props.selectionY
-    ) {
-      this.getSelectionData();
-    }
-  }
-
-  toggleVisibility = () => {
-    this.setState({
-      isVisible: !this.state.isVisible
-    });
   };
 
   render() {
