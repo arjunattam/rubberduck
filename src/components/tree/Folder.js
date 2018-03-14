@@ -1,7 +1,9 @@
 import React from "react";
-import "./Tree.css";
-import { File, TreeLabel } from "./File";
+import File from "./File";
+import TreeLabel from "./TreeLabel";
 import Octicon from "react-component-octicons";
+
+const PADDING_CONST = 12; // in pixels
 
 const sortChildren = children => {
   const parents = children
@@ -23,7 +25,7 @@ const sortChildren = children => {
   return parents.concat(onlyChildren);
 };
 
-export const renderChildren = (children, depth, parentProps) => {
+export const renderChildren = (children, depth, parentProps, currentPath) => {
   // The parentProps are required to pass org/repo information down
   // the component chain, so that we can construct the link href. Can this be avoided?
   const childrenToRender = sortChildren(children);
@@ -39,6 +41,7 @@ export const renderChildren = (children, depth, parentProps) => {
               {...element}
               depth={depth + 1}
               key={element.path}
+              currentPath={currentPath}
             />
           );
         } else {
@@ -48,6 +51,7 @@ export const renderChildren = (children, depth, parentProps) => {
               {...element}
               depth={depth + 1}
               key={element.path}
+              currentPath={currentPath}
             />
           );
         }
@@ -63,38 +67,48 @@ class Folder extends React.Component {
 
   getPadding = () => {
     // padding is a function of depth
-    return this.props.depth * 12;
+    return this.props.depth * PADDING_CONST;
   };
 
   toggleCollapsed = () => {
     this.setState({ isCollapsed: !this.state.isCollapsed });
   };
 
-  renderFolderStructure() {
+  renderFolderStructure = () => {
     const children = this.props.children;
     const renderedChildren = renderChildren(
       children,
       this.props.depth,
-      this.props
+      this.props,
+      this.props.currentPath
     );
-    return <div className="file-children ">{renderedChildren}</div>;
+    return <div className="file-children">{renderedChildren}</div>;
+  };
+
+  isCurrentlyOpen = () => {
+    return (
+      this.props.currentPath &&
+      this.props.currentPath.indexOf(this.props.path) >= 0
+    );
+  };
+
+  componentDidMount() {
+    this.setState({
+      isCollapsed: !this.isCurrentlyOpen()
+    });
   }
 
   render() {
     const pl = this.getPadding();
-    const selectedName = this.state.isCollapsed ? "" : "file-selected";
-    let triangleClassName = `file-triangle${
-      this.state.isCollapsed ? " collapsed" : ""
-    }`;
     const triangle = (
       <Octicon name={"triangle-down"} className="file-triangle" />
     );
-    const children = this.props.children;
     let containerClassName = "folder-structure-container";
     containerClassName += this.state.isCollapsed ? " collapsed" : "";
+
     return (
       <div className={containerClassName}>
-        <div className={"file-container " + selectedName}>
+        <div className={"file-container"}>
           <a onClick={this.toggleCollapsed} style={{ paddingLeft: pl }}>
             {triangle}{" "}
             <TreeLabel
@@ -104,7 +118,7 @@ class Folder extends React.Component {
             />
           </a>
         </div>
-        {this.renderFolderStructure()}
+        {this.state.isCollapsed ? null : this.renderFolderStructure()}
       </div>
     );
   }

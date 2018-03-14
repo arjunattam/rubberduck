@@ -12,9 +12,7 @@ import { Authorization } from "./../utils/authorization";
 import * as GitPathAdapter from "../adapters/github/path";
 import * as DataUtils from "../utils/data";
 
-const Pjax = require("pjax");
 let document = window.document;
-let GlobalPjax;
 
 class Extension extends React.Component {
   constructor(props) {
@@ -140,15 +138,6 @@ class Extension extends React.Component {
         this.getFileTreeAPI(repoDetails)
           .then(fileTreeData => {
             this.DataActions.setFileTree(fileTreeData);
-            setTimeout(() => {
-              GlobalPjax = new Pjax({
-                elements: "a", // default is "a[href], form[action]"
-                selectors: ["#js-repo-pjax-container"],
-                disablePjaxHeader: true,
-                cacheBust: false,
-                currentUrlFullReload: false
-              });
-            }, 2000);
           })
           .catch(error => {
             // TODO(arjun): this needs to be better communicated

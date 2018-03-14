@@ -1,18 +1,35 @@
 import React from "react";
 import PropTypes from "prop-types";
+import SectionHeader from "./Section";
 import { getReader } from "../../adapters/github/views/helper";
 
-export default class BaseSection extends React.Component {
-  static propTypes = {
-    selectionX: PropTypes.number,
-    selectionY: PropTypes.number
-  };
-
+export class BaseSection extends React.Component {
   componentWillReceiveProps(newProps) {
     if (newProps.isVisible !== this.state.isVisible) {
       this.setState({ isVisible: newProps.isVisible });
     }
   }
+
+  toggleVisibility = () => {
+    this.setState({
+      isVisible: !this.state.isVisible
+    });
+  };
+
+  renderSectionHeader = name => (
+    <SectionHeader
+      onClick={() => this.toggleVisibility()}
+      isVisible={this.state.isVisible}
+      name={name}
+    />
+  );
+}
+
+export class BaseReaderSection extends BaseSection {
+  static propTypes = {
+    selectionX: PropTypes.number,
+    selectionY: PropTypes.number
+  };
 
   componentDidUpdate(prevProps, prevState) {
     const hasSelectionChanged =
@@ -23,12 +40,6 @@ export default class BaseSection extends React.Component {
       this.getSelectionData();
     }
   }
-
-  toggleVisibility = () => {
-    this.setState({
-      isVisible: !this.state.isVisible
-    });
-  };
 
   readPage = () => {
     const reader = getReader();

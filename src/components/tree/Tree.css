@@ -22,11 +22,10 @@
 
 .file-container {
   font-size: 14px;
-  margin-top: 1px;
 }
 
 .file-selected a {
-  background: #f2f8fe;
+  background-color: #e7f2ff;
 }
 
 .file-container a {
@@ -60,11 +59,11 @@
   width: 10px;
   fill: none;
   padding-top: 2px;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.1s ease-in-out;
 }
 
 .section-triangle {
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.1s ease-in-out;
   transform: rotate(0);
 }
 
@@ -82,10 +81,6 @@
 
 .file-triangle path {
   stroke: #999;
-}
-
-.file-children-collapsed {
-  display: none;
 }
 
 .tree-additions {

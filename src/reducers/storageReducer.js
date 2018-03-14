@@ -15,6 +15,8 @@ const sanitizeChromeStoratePayload = payload => {
       case "sessions":
         sanitizedPayload[key] = {};
         break;
+      default:
+        break;
     }
   }
   return sanitizedPayload;

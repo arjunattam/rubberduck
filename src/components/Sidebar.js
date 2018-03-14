@@ -7,7 +7,7 @@ import * as StorageActions from "../actions/storageActions";
 import Title from "./title/Title";
 import StatusBar from "./status/StatusBar";
 import CollapseButton from "./collapse/CollapseButton";
-import Tree from "./tree/Tree";
+import Tree from "./tree";
 import References from "./references";
 import Definitions from "./definitions";
 import HoverListener from "./hover/HoverListener";

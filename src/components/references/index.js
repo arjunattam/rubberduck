@@ -1,12 +1,11 @@
 import React from "react";
 import { connect } from "react-redux";
-import SectionHeader from "../common/Section";
-import BaseSection from "../section";
+import { BaseReaderSection } from "../section";
 import { WS } from "../../utils/websocket";
 import ReferenceItem from "./ReferenceItem";
 import "./References.css";
 
-class References extends BaseSection {
+class References extends BaseReaderSection {
   // This gets x and y of the selected text, constructs the
   // API call payload by reading DOM, and then display the
   // result of the API call.
@@ -74,11 +73,7 @@ class References extends BaseSection {
 
     return (
       <div className={referencesClassName}>
-        <SectionHeader
-          onClick={this.toggleVisibility}
-          isVisible={this.state.isVisible}
-          name={"Usages"}
-        />
+        {this.renderSectionHeader("Usages")}
         <div className="reference-container">
           <div className="reference-title">
             <div className="reference-name monospace">{this.state.name}</div>
