@@ -65,13 +65,26 @@ export default class HoverBox extends React.Component {
 
     return {
       left,
-      bottom: window.innerHeight - top - 10
+      bottom: window.innerHeight - top
     };
+  };
+
+  getDisplay = () => {
+    // Adding display styling for the animation to trigger
+    if (this.props.x > 0) {
+      return { display: "block" };
+    } else {
+      return { display: "none" };
+    }
+  };
+
+  getStyle = () => {
+    return { ...this.getPosition(), ...this.getDisplay() };
   };
 
   render() {
     return (
-      <div className="hover-box" style={this.getPosition()}>
+      <div className="hover-box" style={this.getStyle()}>
         <div className="title">
           <CodeNode
             name={this.props.name}

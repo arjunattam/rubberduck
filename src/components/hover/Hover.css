@@ -4,6 +4,7 @@
   z-index: 10000;
   position: fixed;
   border: solid 1px #c8e1ff;
+  animation: fade-in 0.15s linear;
 }
 
 .hover-box .title {
@@ -32,4 +33,13 @@
   font-size: 14px;
   width: auto;
   height: auto;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
