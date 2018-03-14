@@ -32,7 +32,6 @@ export const renderChildren = (children, depth, parentProps, currentPath) => {
   return (
     <div>
       {childrenToRender.map(element => {
-        console.log(element, currentPath);
         if (element.children.length > 0) {
           // Ordering of props is important since the element
           // needs to override the parentProps
@@ -87,7 +86,10 @@ class Folder extends React.Component {
   };
 
   isCurrentlyOpen = () => {
-    return this.props.currentPath.indexOf(this.props.path) >= 0;
+    return (
+      this.props.currentPath &&
+      this.props.currentPath.indexOf(this.props.path) >= 0
+    );
   };
 
   componentDidMount() {
