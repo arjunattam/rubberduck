@@ -4,10 +4,11 @@ import "./CollapseButton.css";
 
 export default class CollapseButton extends React.Component {
   render() {
-    const icon = this.props.isVisible ? (
-      <Octicon name="chevron-left" style={{ height: 20, width: 20 }} />
-    ) : (
-      <Octicon name="chevron-right" style={{ height: 20, width: 20 }} />
+    const icon = (
+      <Octicon
+        name={this.props.isVisible ? "chevron-left" : "chevron-right"}
+        style={{ height: 20, width: 20 }}
+      />
     );
     const classMod = this.props.isVisible ? "shown" : "";
 
