@@ -9,18 +9,6 @@ class Tree extends BaseSection {
     isVisible: this.props.isVisible
   };
 
-  deconstructPath = () => {
-    // We might be on a path page at this point, which must
-    // be open
-    const currentPath = this.props.data.repoDetails.path;
-
-    if (currentPath) {
-      return currentPath.split("/");
-    }
-
-    return [];
-  };
-
   render() {
     // data.fileTree is a recursive tree structure, where every element
     // has children, that denote the subtree
