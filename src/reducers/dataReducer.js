@@ -12,7 +12,6 @@ const initialState = {
     children: []
   },
   sessionStatus: "",
-  apiStatus: {},
   isUnauthenticated: false
 };
 
@@ -51,12 +50,6 @@ export default createReducer(initialState, {
     };
   },
   UPDATE_SESSION_STATUS: (state, action) => {
-    return {
-      ...state,
-      sessionStatus: action.sessionStatus
-    };
-  },
-  UPDATE_API_STATUS: (state, action) => {
     return {
       ...state,
       sessionStatus: action.sessionStatus
