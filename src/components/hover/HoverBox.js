@@ -86,11 +86,17 @@ export default class HoverBox extends React.Component {
     return (
       <div className="hover-box" style={this.getStyle()}>
         <div className="title">
-          <CodeNode
-            name={this.props.name}
-            file={this.props.filePath}
-            showButton={false}
-          />
+          {this.props.isLoading ? (
+            <div className="loader-container">
+              <div className="status-loader" />
+            </div>
+          ) : (
+            <CodeNode
+              name={this.props.name}
+              file={this.props.filePath}
+              showButton={false}
+            />
+          )}
         </div>
         <div className="docstring">{Docstring(this.props.docstring)}</div>
         {this.renderButtons()}

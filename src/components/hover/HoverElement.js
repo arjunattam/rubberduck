@@ -12,7 +12,7 @@ export default class HoverElement extends React.Component {
     x: -1000,
     y: -1000,
     boundRect: {},
-    hoverResult: {}
+    isLoading: false
   };
 
   onReferences = () => {
@@ -29,11 +29,24 @@ export default class HoverElement extends React.Component {
     return xdiff <= CURSOR_RADIUS && ydiff <= CURSOR_RADIUS;
   };
 
+  startLoading = () => {
+    this.setState({
+      isLoading: true
+    });
+  };
+
+  stopLoading = () => {
+    this.setState({
+      isLoading: false
+    });
+  };
+
   callAPI = () => {
     const hoverXY = {
       x: this.props.hoverResult.mouseX,
       y: this.props.hoverResult.mouseY
     };
+    this.startLoading();
     WS.getHover(
       this.props.hoverResult.fileSha,
       this.props.hoverResult.filePath,
@@ -41,6 +54,7 @@ export default class HoverElement extends React.Component {
       this.props.hoverResult.charNumber
     )
       .then(response => {
+        this.stopLoading();
         const isForCurrentMouse = this.isOverlappingWithCurrent(
           hoverXY.x,
           hoverXY.y
@@ -64,6 +78,7 @@ export default class HoverElement extends React.Component {
         }
       })
       .catch(error => {
+        this.stopLoading();
         console.log("Error in API call", error);
       });
   };
@@ -87,8 +102,7 @@ export default class HoverElement extends React.Component {
     this.setState({
       x: -1000,
       y: -1000,
-      boundRect: {},
-      hoverResult: {}
+      boundRect: {}
     });
   };
 
