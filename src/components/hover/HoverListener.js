@@ -63,7 +63,7 @@ class HoverListener extends React.Component {
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
-    if (!isSameSessionPath || hasChangedPath) {
+    if (!isSameSessionPath || hasChangedPath || !this.listener) {
       this.setupListener();
     }
   }
@@ -91,12 +91,12 @@ class HoverListener extends React.Component {
   }
 
   setupListener = () => {
-    const listener = getListener();
+    this.listener = getListener();
 
-    if (listener !== null) {
+    if (this.listener !== null) {
       document.body.onmouseover = null;
       document.body.onmouseover = e => {
-        this.onMouseOverListener(e, listener);
+        this.onMouseOverListener(e, this.listener);
       };
     } else {
       document.body.onmouseover = null;
