@@ -15,6 +15,12 @@ class References extends BaseReaderSection {
     references: []
   };
 
+  clearState = () => {
+    this.setState({
+      references: []
+    });
+  };
+
   getReferenceItems = apiResponse => {
     return apiResponse.references.map(reference => {
       const parent = reference.parent;

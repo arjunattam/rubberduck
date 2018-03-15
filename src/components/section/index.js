@@ -37,6 +37,7 @@ export class BaseReaderSection extends BaseSection {
       prevProps.selectionY !== this.props.selectionY;
     const hasVisibilityChanged = prevProps.isVisible !== this.props.isVisible;
     if (hasSelectionChanged || hasVisibilityChanged) {
+      this.clearState();
       this.getSelectionData();
     }
   }

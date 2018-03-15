@@ -39,17 +39,17 @@
 }
 
 .status-animation {
-  animation: not-ready 2.5s linear;
+  animation: not-ready 2s linear;
 }
 
 @keyframes not-ready {
   0% {
     top: 0;
   }
-  5% {
+  10% {
     top: -25px;
   }
-  95% {
+  90% {
     top: -25px;
   }
   100% {
