@@ -54,8 +54,24 @@ export default class ExpandedCode extends React.Component {
     }
   };
 
+  setScrollTop = () => {
+    const element = document.querySelector(".expanded-content");
+
+    if (element) {
+      const totalHeight = element.scrollHeight;
+      const totalLines = this.getBase64Decoded(this.props.codeBase64).split(
+        "\n"
+      ).length;
+      element.scrollTop = this.props.lineNumber * (totalHeight / totalLines);
+    }
+  };
+
+  componentDidMount() {
+    this.setScrollTop();
+  }
+
   render() {
-    let decodedCode = this.getBase64Decoded(this.props.codeBase64);
+    const decodedCode = this.getBase64Decoded(this.props.codeBase64);
     return (
       <div className="expanded-code" style={{ top: this.props.top }}>
         <div className="expanded-title">
