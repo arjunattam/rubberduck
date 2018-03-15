@@ -31,7 +31,7 @@ export default class DefinitionItem extends React.Component {
           <div className="definition-docstring">
             {this.props.docstring
               ? Docstring(this.props.docstring)
-              : "docstring goes here"}
+              : "No docstring found"}
           </div>
         </CodeNode>
 

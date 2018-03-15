@@ -100,11 +100,12 @@ export default class HoverElement extends React.Component {
 
   clear = () => {
     if (this.dFunc !== undefined) this.dFunc.clear();
-    this.setState({
-      x: -1000,
-      y: -1000,
-      boundRect: {}
-    });
+    if (this.state.x > 0)
+      this.setState({
+        x: -1000,
+        y: -1000,
+        boundRect: {}
+      });
   };
 
   componentDidUpdate(prevProps, prevState) {

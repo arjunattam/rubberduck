@@ -16,24 +16,21 @@ const getPRTitle = () => {
 
 class Title extends React.Component {
   renderBranch = repoDetails => (
-    <div>
+    <div className="branch">
       <Octicon name="git-branch" style={{ height: 12 }} /> {repoDetails.branch}
     </div>
   );
 
   renderPR = repoDetails => (
-    <div>
+    <div className="branch">
       <Octicon name="git-pull-request" style={{ height: 12 }} /> {getPRTitle()}
     </div>
   );
 
-  renderSubtitle = repoDetails => (
-    <div className="branch">
-      {repoDetails.prId
-        ? this.renderPR(repoDetails)
-        : this.renderBranch(repoDetails)}
-    </div>
-  );
+  renderSubtitle = repoDetails =>
+    repoDetails.prId
+      ? this.renderPR(repoDetails)
+      : this.renderBranch(repoDetails);
 
   render() {
     const repoDetails = this.props.data.repoDetails;

@@ -15,6 +15,12 @@ class Definitions extends BaseReaderSection {
     definition: {}
   };
 
+  clearState = () => {
+    this.setState({
+      definition: {}
+    });
+  };
+
   getSelectionData = () => {
     const hoverResult = this.readPage();
     const isValidResult =
