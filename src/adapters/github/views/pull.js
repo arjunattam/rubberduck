@@ -74,7 +74,10 @@ class PRPageListener extends BaseListener {
     const bbox = element.getBoundingClientRect();
     const lineHeight = this.getFontSize(element);
     const charInPixels = mouseX - bbox.x - this.getPaddingLeft(element);
-    return Math.round(this.getCharsFromPixels(charInPixels, lineHeight)) - 1; // PR adds +/-
+    const estimatedChars = this.getCharsFromPixels(charInPixels, lineHeight);
+    const tabSize = this.getTabSize(element);
+    const numTabs = this.getNumTabs(element);
+    return Math.round(estimatedChars - numTabs * (tabSize - 1)) - 1; // PR adds +/-
   };
 
   getNumDisplayLines = element => {
@@ -123,6 +126,7 @@ class PRPageListener extends BaseListener {
           // We are in the second line
           const secondLineResult = this.getCharNumberHelper(codeTd, mouseX);
           const innerElement = codeTd.querySelector("span.blob-code-inner");
+          // TODO(arjun): in this case, we need to strip out the tabs
           const firstLineWidth = innerElement.getBoundingClientRect().width;
           const firstLineChars =
             this.getCharsFromPixels(firstLineWidth, this.getFontSize(codeTd)) -
