@@ -30,29 +30,32 @@ export default class BaseListener {
   };
 
   hasTextUnderMouse = (element, x, y) => {
-    // Overriding base method because this calculation is different
     const node = element.parentElement; // This represents entire code line
 
     try {
       const tdElement = node.closest("td.blob-code");
-      const boundRect = tdElement.getBoundingClientRect();
-      const lineContentLength = tdElement.textContent.length;
+      const lineContentLength = this.getContentLength(tdElement);
       const lineHeight = this.getFontSize(tdElement);
       // Check if line content width is greater than x
-      const padding = this.getPaddingLeft(tdElement);
       const widthWithText =
         this.getPixelsFromChar(lineContentLength, lineHeight) +
-        boundRect.x +
-        padding;
+        tdElement.getBoundingClientRect().x +
+        this.getPaddingLeft(tdElement);
       return widthWithText > x;
     } catch (err) {
       return false;
     }
   };
 
-  getBoundRect = element => {
-    return element.parentElement.getBoundingClientRect();
+  getContentLength = element => {
+    // This methods takes an element and returns content length with tab as spaces
+    const lineContentLength = element.textContent.length;
+    const numTabs = this.getNumTabs(element);
+    const tabSize = this.getTabSize(element);
+    return lineContentLength + numTabs * (tabSize - 1);
   };
+
+  getBoundRect = element => element.parentElement.getBoundingClientRect();
 
   getFontAspectRatio = () => {
     // This will have to change if we need to support other fonts
@@ -76,18 +79,15 @@ export default class BaseListener {
     });
   };
 
-  stripPx = value => {
-    // Get `12px` and return `12`
-    return +value.replace("px", "");
-  };
+  stripPx = value => +value.replace("px", "");
 
-  getFontSize = element => {
-    const elStyle = window.getComputedStyle(element);
-    return this.stripPx(elStyle.fontSize);
-  };
+  getStyle = element => window.getComputedStyle(element);
 
-  getPaddingLeft = element => {
-    const elStyle = window.getComputedStyle(element);
-    return this.stripPx(elStyle.paddingLeft);
-  };
+  getFontSize = element => this.stripPx(this.getStyle(element).fontSize);
+
+  getPaddingLeft = element => this.stripPx(this.getStyle(element).paddingLeft);
+
+  getTabSize = element => +this.getStyle(element).tabSize;
+
+  getNumTabs = element => element.textContent.split("\t").length - 1;
 }

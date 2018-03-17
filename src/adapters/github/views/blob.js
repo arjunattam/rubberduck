@@ -30,9 +30,11 @@ class BlobPageListener extends BaseListener {
     }
     const bbox = actualElement.getBoundingClientRect();
     const charInPixels = mouseX - bbox.x - this.getPaddingLeft(actualElement);
-    return Math.round(
-      this.getCharsFromPixels(charInPixels, this.getFontSize(actualElement))
-    );
+    const fontSize = this.getFontSize(actualElement);
+    const estimatedChars = this.getCharsFromPixels(charInPixels, fontSize);
+    const tabSize = this.getTabSize(actualElement);
+    const numTabs = this.getNumTabs(actualElement);
+    return Math.round(estimatedChars - numTabs * (tabSize - 1));
   };
 
   getLineNumber = element => {
