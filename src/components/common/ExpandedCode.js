@@ -47,6 +47,8 @@ export default class ExpandedCode extends React.Component {
             return "typescript";
           case "java":
             return "java";
+          case "go":
+            return "go";
           default:
             return null;
         }
@@ -54,15 +56,17 @@ export default class ExpandedCode extends React.Component {
     }
   };
 
+  getContent = () => this.getBase64Decoded(this.props.codeBase64);
+
   setScrollTop = () => {
     const element = document.querySelector(".expanded-content");
 
     if (element) {
       const totalHeight = element.scrollHeight;
-      const totalLines = this.getBase64Decoded(this.props.codeBase64).split(
-        "\n"
-      ).length;
-      element.scrollTop = this.props.lineNumber * (totalHeight / totalLines);
+      const totalLines = this.getContent().split("\n").length;
+      element.scrollTop =
+        (this.props.lineNumber - this.props.startingLineNumber) *
+        (totalHeight / totalLines);
     }
   };
 
@@ -70,8 +74,23 @@ export default class ExpandedCode extends React.Component {
     this.setScrollTop();
   }
 
+  renderCode = children => (
+    <SyntaxHighlighter
+      language={this.getLanguage()}
+      style={githubStyle}
+      showLineNumbers={true}
+      startingLineNumber={this.props.startLine + 1}
+      lineNumberStyle={{ color: "rgba(27,31,35,0.3)" }}
+      wrapLines={true}
+      lineStyle={lineNo => {
+        return this.getHighligtedLineStyle(lineNo);
+      }}
+    >
+      {children}
+    </SyntaxHighlighter>
+  );
+
   render() {
-    const decodedCode = this.getBase64Decoded(this.props.codeBase64);
     return (
       <div className="expanded-code" style={{ top: this.props.top }}>
         <div className="expanded-title">
@@ -85,19 +104,7 @@ export default class ExpandedCode extends React.Component {
           </div>
         </div>
         <div className="expanded-content">
-          <SyntaxHighlighter
-            language={this.getLanguage()}
-            style={githubStyle}
-            showLineNumbers={true}
-            startingLineNumber={this.props.startLine + 1}
-            lineNumberStyle={{ color: "rgba(27,31,35,0.3)" }}
-            wrapLines={true}
-            lineStyle={lineNo => {
-              return this.getHighligtedLineStyle(lineNo);
-            }}
-          >
-            {decodedCode}
-          </SyntaxHighlighter>
+          {this.renderCode(this.getContent())}
         </div>
       </div>
     );
