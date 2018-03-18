@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { renderChildren } from "./Folder";
 import { BaseSection } from "../section";
+import { flattenChildren } from "../../utils/data";
 import "./Tree.css";
 
 class Tree extends BaseSection {
@@ -28,10 +29,21 @@ class Tree extends BaseSection {
     </div>
   );
 
+  flattenSingleDirectory = () => {
+    // This method flattens the tree in the case when there is a chain
+    // of single directories.
+    // For example, src/org/eclipse/ls/... (often found in Java)
+    const tree = this.props.data.fileTree;
+    if (tree.children) {
+      return flattenChildren(tree).children;
+    }
+    return this.props.data.fileTree.children;
+  };
+
   render() {
     // data.fileTree is a recursive tree structure, where every element
     // has children, that denote the subtree
-    const children = this.props.data.fileTree.children;
+    const children = this.flattenSingleDirectory();
     const renderedChildren = renderChildren(
       children,
       0,

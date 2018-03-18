@@ -28,7 +28,7 @@ const buildTree = fileList => {
   for (var levelName in hierarchy) {
     result.push({
       name: levelName,
-      path: "", // TODO(arjun): fill in a path
+      path: "",
       children: buildTree(hierarchy[levelName])
     });
   }
@@ -109,4 +109,31 @@ export const encodeToBase64 = string => {
 
 export const decodeBase64 = string => {
   return Base64.decode(string);
+};
+
+export const flattenChildren = tree => {
+  if (tree.children.length === 0 || tree.children.length > 1) {
+    let newTree = {};
+    newTree.name = tree.name;
+    newTree.path = tree.path;
+    newTree.children = tree.children.map(element => {
+      return flattenChildren(element);
+    });
+    return newTree;
+  } else {
+    // There is only one child. If this child has >=1 children,
+    // it is a folder, and we can flatten it at this level.
+    let flattened = {};
+    const child = tree.children[0];
+
+    if (child.children.length > 0) {
+      flattened.name = tree.name + "/" + child.name;
+      flattened.path = child.path;
+      flattened.children = child.children;
+      return flattenChildren(flattened);
+    } else {
+      // Child is a file
+      return tree;
+    }
+  }
 };
