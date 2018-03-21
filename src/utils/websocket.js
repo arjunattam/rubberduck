@@ -166,7 +166,7 @@ class WebSocketManager {
   reconnectIfRequired = () => {
     // We should reconnect if the socket connection was `ready`
     // and the server disconnected.
-    if (this.isReady && !this.ws.isConnected()) {
+    if (!this.ws.isConnected()) {
       this.reconnectAttempts += 1;
       this.createSession().then(response => {
         this.reconnectAttempts = 0;
@@ -177,12 +177,13 @@ class WebSocketManager {
   tryReconnection = () => {
     setTimeout(
       this.reconnectIfRequired,
-      exponentialBackoff(this.reconnectAttempts, 500)
+      exponentialBackoff(this.reconnectAttempts, 1000)
     );
   };
 
   onSocketClose = closeResponse => {
     this.dispatchStatus("disconnected");
+    this.isReady = false;
 
     if (!closeResponse.wasClean) {
       // This means we did not explicitly close the connection ourself
