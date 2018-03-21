@@ -104,7 +104,11 @@ export default class HoverElement extends React.Component {
       this.setState({
         x: -1000,
         y: -1000,
-        boundRect: {}
+        boundRect: {},
+        name: "",
+        type: "",
+        docstring: "",
+        filePath: ""
       });
   };
 

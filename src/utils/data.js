@@ -113,9 +113,7 @@ export const decodeBase64 = string => {
 
 export const flattenChildren = tree => {
   if (tree.children.length === 0 || tree.children.length > 1) {
-    let newTree = {};
-    newTree.name = tree.name;
-    newTree.path = tree.path;
+    let newTree = Object.assign({}, tree);
     newTree.children = tree.children.map(element => {
       return flattenChildren(element);
     });
@@ -123,7 +121,7 @@ export const flattenChildren = tree => {
   } else {
     // There is only one child. If this child has >=1 children,
     // it is a folder, and we can flatten it at this level.
-    let flattened = {};
+    let flattened = Object.assign({}, tree);
     const child = tree.children[0];
 
     if (child.children.length > 0) {
