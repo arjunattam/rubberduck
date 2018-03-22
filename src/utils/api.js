@@ -1,6 +1,8 @@
 import { sendMessage, constructMessage } from "./chrome";
 import Store from "../store";
 import { Authorization } from "./authorization";
+import axiosRetry from "axios-retry";
+
 const axios = require("axios");
 
 let envRootUrl = "https://www.codeview.io/";
@@ -11,6 +13,7 @@ if (process.env.REACT_APP_BACKEND_ENV === "local") {
 
 export const rootUrl = envRootUrl;
 export const baseApiUrl = "api/v1";
+const RETRY_LIMIT = 100;
 
 export const encodeQueryData = data => {
   let ret = [];
@@ -34,6 +37,10 @@ export class BaseRequest {
     let baseURL = this.getAPIUrl();
     this.baseRequest = axios.create({
       baseURL: baseURL
+    });
+    axiosRetry(this.baseRequest, {
+      retryDelay: axiosRetry.exponentialDelay,
+      retries: RETRY_LIMIT
     });
   }
 

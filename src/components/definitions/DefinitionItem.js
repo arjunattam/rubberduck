@@ -27,7 +27,7 @@ export default class DefinitionItem extends React.Component {
         onMouseLeave={this.handleMouseHover}
         ref={"container"}
       >
-        <CodeNode name={this.props.name} file={this.props.filePath}>
+        <CodeNode {...this.props}>
           <div className="definition-docstring">
             {this.props.docstring
               ? Docstring(this.props.docstring)
@@ -36,13 +36,7 @@ export default class DefinitionItem extends React.Component {
         </CodeNode>
 
         {this.state.isHovering ? (
-          <ExpandedCode
-            codeBase64={this.props.codeSnippet}
-            top={this.getTop()}
-            startLine={this.props.startLineNumber}
-            lineNumber={this.props.lineNumber}
-            filepath={this.props.filePath}
-          />
+          <ExpandedCode {...this.props} top={this.getTop()} />
         ) : null}
       </div>
     );

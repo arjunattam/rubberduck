@@ -16,21 +16,27 @@ class BaseWebSocket {
     return this.wsp && this.wsp.isOpened;
   };
 
-  createWebsocket = token => {
-    const baseWsUrl = rootUrl.replace("http", "ws");
-    const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
-    this.wsp = new WebSocketAsPromised(wsUrl, {
-      packMessage: data => JSON.stringify(data),
-      unpackMessage: message => JSON.parse(message),
-      attachRequestId: (data, requestId) =>
-        Object.assign({ id: requestId }, data),
-      extractRequestId: data => data && data.id
-    });
+  isConnecting = () => {
+    return this.wsp && this.wsp.isOpening;
+  };
+
+  createWebsocket = (token, onClose) => {
+    if (this.wsp === null) {
+      const baseWsUrl = rootUrl.replace("http", "ws");
+      const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
+      this.wsp = new WebSocketAsPromised(wsUrl, {
+        packMessage: data => JSON.stringify(data),
+        unpackMessage: message => JSON.parse(message),
+        attachRequestId: (data, requestId) =>
+          Object.assign({ id: requestId }, data),
+        extractRequestId: data => data && data.id
+      });
+      this.wsp.onClose.addListener(response => onClose(response));
+    }
   };
 
   connectSocket = (token, onClose) => {
-    this.createWebsocket(token);
-    this.wsp.onClose.addListener(response => onClose(response));
+    this.createWebsocket(token, onClose);
     return this.wsp.open();
   };
 
@@ -39,7 +45,7 @@ class BaseWebSocket {
       return this.wsp.close().then(() => (this.wsp = null));
     } else {
       // Socket was never actually created
-      new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         resolve();
       });
     }
@@ -211,7 +217,7 @@ class WebSocketManager {
   };
 
   tearDownIfRequired = () => {
-    if (this.ws.isConnected()) {
+    if (this.ws.isConnected() || this.ws.isConnecting()) {
       this.isReady = false;
       return this.ws.tearDown();
     } else {

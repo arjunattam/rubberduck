@@ -21,6 +21,12 @@ class References extends BaseReaderSection {
     });
   };
 
+  getFileLink = (filePath, lineNumber) => {
+    const { username, reponame, branch } = this.props.data.repoDetails;
+    const offsetLine = lineNumber + 1;
+    return `/${username}/${reponame}/blob/${branch}/${filePath}#L${offsetLine}`;
+  };
+
   getReferenceItems = apiResponse => {
     return apiResponse.references.map(reference => {
       const parent = reference.parent;
@@ -34,7 +40,11 @@ class References extends BaseReaderSection {
 
       return {
         name: parentName,
-        file: reference.location.path,
+        filePath: reference.location.path,
+        fileLink: this.getFileLink(
+          reference.location.path,
+          reference.location.range.start.line
+        ),
         lineNumber: reference.location.range.start.line,
         codeSnippet: reference.contents,
         startLineNumber: reference.contents_start_line

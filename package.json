@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "axios": "^0.17.1",
+    "axios-retry": "^3.0.2",
     "debounce": "^1.1.0",
     "js-base64": "^2.4.3",
     "jsonwebtoken": "^8.1.1",

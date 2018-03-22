@@ -34,13 +34,7 @@ export default class ReferenceItem extends React.Component {
         </CodeNode>
 
         {this.state.isHovering ? (
-          <ExpandedCode
-            codeBase64={this.props.codeSnippet}
-            top={this.getTop()}
-            startLine={this.props.startLineNumber}
-            lineNumber={this.props.lineNumber}
-            filepath={this.props.file}
-          />
+          <ExpandedCode {...this.props} top={this.getTop()} />
         ) : null}
       </div>
     );
