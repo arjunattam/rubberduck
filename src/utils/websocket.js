@@ -20,21 +20,23 @@ class BaseWebSocket {
     return this.wsp && this.wsp.isOpening;
   };
 
-  createWebsocket = token => {
-    const baseWsUrl = rootUrl.replace("http", "ws");
-    const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
-    this.wsp = new WebSocketAsPromised(wsUrl, {
-      packMessage: data => JSON.stringify(data),
-      unpackMessage: message => JSON.parse(message),
-      attachRequestId: (data, requestId) =>
-        Object.assign({ id: requestId }, data),
-      extractRequestId: data => data && data.id
-    });
+  createWebsocket = (token, onClose) => {
+    if (this.wsp === null) {
+      const baseWsUrl = rootUrl.replace("http", "ws");
+      const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
+      this.wsp = new WebSocketAsPromised(wsUrl, {
+        packMessage: data => JSON.stringify(data),
+        unpackMessage: message => JSON.parse(message),
+        attachRequestId: (data, requestId) =>
+          Object.assign({ id: requestId }, data),
+        extractRequestId: data => data && data.id
+      });
+      this.wsp.onClose.addListener(response => onClose(response));
+    }
   };
 
   connectSocket = (token, onClose) => {
-    this.createWebsocket(token);
-    this.wsp.onClose.addListener(response => onClose(response));
+    this.createWebsocket(token, onClose);
     return this.wsp.open();
   };
 
