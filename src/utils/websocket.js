@@ -16,6 +16,10 @@ class BaseWebSocket {
     return this.wsp && this.wsp.isOpened;
   };
 
+  isConnecting = () => {
+    return this.wsp && this.wsp.isOpening;
+  };
+
   createWebsocket = token => {
     const baseWsUrl = rootUrl.replace("http", "ws");
     const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
@@ -39,7 +43,7 @@ class BaseWebSocket {
       return this.wsp.close().then(() => (this.wsp = null));
     } else {
       // Socket was never actually created
-      new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         resolve();
       });
     }
@@ -211,7 +215,7 @@ class WebSocketManager {
   };
 
   tearDownIfRequired = () => {
-    if (this.ws.isConnected()) {
+    if (this.ws.isConnected() || this.ws.isConnecting()) {
       this.isReady = false;
       return this.ws.tearDown();
     } else {
