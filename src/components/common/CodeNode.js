@@ -10,7 +10,7 @@ export default class CodeNode extends React.Component {
     return (
       <div className="code-node-container">
         <div className="code-node-file">
-          <Octicon name="file" style={{ height: 12 }} /> {this.props.file}
+          <Octicon name="file" style={{ height: 12 }} /> {this.props.filePath}
         </div>
 
         <div className="code-node-name">

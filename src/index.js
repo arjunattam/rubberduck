@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import Extension from "./components/Extension";
 import store from "./store.js";
+import Raven from "raven-js";
 // import registerServiceWorker from "./registerServiceWorker";
 
 const Pjax = require("pjax");
@@ -23,6 +24,12 @@ const renderExtension = () => {
     </Provider>,
     document.getElementById(containerId)
   );
+};
+
+const loadSentry = () => {
+  Raven.config(
+    "https://c59b970dd8d74935ab8a0001e5cdbe14@sentry.io/417166"
+  ).install();
 };
 
 const createPjax = () => {
@@ -58,6 +65,7 @@ const setupPjax = () => {
 // registerServiceWorker();
 createExtensionContainer();
 renderExtension();
+loadSentry();
 
 // Wait for 2 seconds, and then setup pjax
 setTimeout(() => {

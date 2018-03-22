@@ -4,11 +4,13 @@
   "private": true,
   "dependencies": {
     "axios": "^0.17.1",
+    "axios-retry": "^3.0.2",
     "debounce": "^1.1.0",
     "js-base64": "^2.4.3",
     "jsonwebtoken": "^8.1.1",
     "moment": "^2.20.1",
     "pjax": "https://github.com/karigari/pjax.git#karigari",
+    "raven-js": "^3.23.3",
     "react": "^16.2.0",
     "react-component-octicons": "^1.5.0",
     "react-dom": "^16.2.0",
