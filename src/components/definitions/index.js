@@ -57,6 +57,13 @@ class Definitions extends BaseReaderSection {
     }
   };
 
+  getFileLink = () => {
+    const { username, reponame, branch } = this.props.data.repoDetails;
+    const { filePath, lineNumber } = this.state.definition;
+    const offsetLine = lineNumber + 1;
+    return `/${username}/${reponame}/blob/${branch}/${filePath}#L${offsetLine}`;
+  };
+
   renderItems = () =>
     this.state.isLoading ? (
       <div className="loader-container" style={{ marginTop: 20 }}>
@@ -65,6 +72,7 @@ class Definitions extends BaseReaderSection {
     ) : this.props.selectionX ? (
       <DefinitionItem
         {...this.state.definition}
+        fileLink={this.getFileLink()}
         visible={this.state.isVisible}
       />
     ) : (
