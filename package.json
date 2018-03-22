@@ -9,6 +9,7 @@
     "jsonwebtoken": "^8.1.1",
     "moment": "^2.20.1",
     "pjax": "https://github.com/karigari/pjax.git#karigari",
+    "raven-js": "^3.23.3",
     "react": "^16.2.0",
     "react-component-octicons": "^1.5.0",
     "react-dom": "^16.2.0",
