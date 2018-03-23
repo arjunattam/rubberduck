@@ -9,7 +9,7 @@ import Sidebar from "./Sidebar";
 import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
-import * as GitPathAdapter from "../adapters/github/path";
+import { pathAdapter } from "../adapters";
 import * as DataUtils from "../utils/data";
 
 let document = window.document;
@@ -34,7 +34,7 @@ class Extension extends React.Component {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
     }
-    let isSameSessionPath = GitPathAdapter.isSameSessionPath(
+    let isSameSessionPath = pathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
@@ -84,7 +84,7 @@ class Extension extends React.Component {
   }
 
   updateRepoDetailsFromPath() {
-    GitPathAdapter.fetchRepoDetails().then(repoDetails => {
+    pathAdapter.fetchRepoDetails().then(repoDetails => {
       this.DataActions.setRepoDetails(repoDetails);
     });
   }
@@ -176,6 +176,7 @@ class Extension extends React.Component {
   }
 
   render() {
+    console.log(this.props.data);
     return this.props.data.repoDetails.reponame ? <Sidebar /> : null;
   }
 }

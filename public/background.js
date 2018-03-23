@@ -14,7 +14,7 @@ const CONTEXT_MENUS = [
   }
 ];
 
-const INJECTABLE_URLS = ["github.com"];
+const INJECTABLE_URLS = ["github.com", "bitbucket.org"];
 
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {

@@ -188,85 +188,88 @@ const getRepoFromPath = () => {
   };
 };
 
-export const constructPath = (subPath, orgname, reponame, branch) => {
-  // return relative path which follows a domain name, like
-  // github.com, from given sub-path
-  if (branch === undefined || branch === null) {
-    // TODO(arjun): for some projects, master is not the default branch
-    // hence this breaks
-    branch = "master";
-  }
+export default class GithubPathAdapter {
+  static constructPath = (subPath, orgname, reponame, branch) => {
+    // return relative path which follows a domain name, like
+    // github.com, from given sub-path
+    if (branch === undefined || branch === null) {
+      // TODO(arjun): for some projects, master is not the default branch
+      // hence this breaks
+      branch = "master";
+    }
 
-  return "/" + orgname + "/" + reponame + "/blob/" + branch + "/" + subPath;
-};
-
-export const isSameSessionPath = (oldRepoDetails, newRepoDetails) => {
-  if (!oldRepoDetails || !newRepoDetails) {
-    return false;
-  }
-
-  const isTypeSame = oldRepoDetails.type === newRepoDetails.type;
-  const isHeadSame = oldRepoDetails.headSha === newRepoDetails.headSha;
-  const isBaseSame = oldRepoDetails.baseSha === newRepoDetails.baseSha;
-  const isBranchSame = oldRepoDetails.branch === newRepoDetails.branch;
-  return isTypeSame && isHeadSame && isBaseSame && isBranchSame;
-};
-
-export const hasChangedPath = (oldRepoDetails, newRepoDetails) => {
-  if (!oldRepoDetails || !newRepoDetails) {
-    return false;
-  }
-
-  return oldRepoDetails.path !== newRepoDetails.path;
-};
-
-export const fetchRepoDetails = () => {
-  // Build the repo details object, with path parsing or API calls.
-  // Return promise that will be saved in Redux store.
-  let repoDetails = {
-    username: null,
-    reponame: null,
-    type: null,
-    prId: null,
-    branch: null,
-    headSha: null,
-    baseSha: null,
-    path: null
+    return "/" + orgname + "/" + reponame + "/blob/" + branch + "/" + subPath;
   };
 
-  const repoFromPath = getRepoFromPath();
-  repoDetails.username = repoFromPath.username;
-  repoDetails.reponame = repoFromPath.reponame;
-  repoDetails.type = repoFromPath.type;
-  repoDetails.prId = repoFromPath.type === "pull" ? repoFromPath.typeId : null;
-
-  repoDetails.branch = getBranch() || null;
-
-  repoDetails.path = getFilePath();
-
-  // Fill up base/head for types
-  if (repoDetails.type === "commit") {
-    const { base, head } = getCommitViewSha();
-    repoDetails.headSha = head;
-    repoDetails.baseSha = base;
-  } else if (repoDetails.type === "compare") {
-    const { base, head } = getCompareViewSha();
-    repoDetails.headSha = head;
-    repoDetails.baseSha = base;
-  } else if (repoDetails.type === "pull") {
-    const shaPromise = getPRCommitSha();
-
-    if (shaPromise !== null) {
-      return shaPromise.then(shas => {
-        repoDetails.headSha = shas.head;
-        repoDetails.baseSha = shas.base;
-        repoDetails.type = "compare";
-        return repoDetails;
-      });
+  static isSameSessionPath = (oldRepoDetails, newRepoDetails) => {
+    if (!oldRepoDetails || !newRepoDetails) {
+      return false;
     }
-  }
 
-  return new Promise((resolve, reject) => {
-    resolve(repoDetails);
-  });
-};
+    const isTypeSame = oldRepoDetails.type === newRepoDetails.type;
+    const isHeadSame = oldRepoDetails.headSha === newRepoDetails.headSha;
+    const isBaseSame = oldRepoDetails.baseSha === newRepoDetails.baseSha;
+    const isBranchSame = oldRepoDetails.branch === newRepoDetails.branch;
+    return isTypeSame && isHeadSame && isBaseSame && isBranchSame;
+  };
+
+  static hasChangedPath = (oldRepoDetails, newRepoDetails) => {
+    if (!oldRepoDetails || !newRepoDetails) {
+      return false;
+    }
+
+    return oldRepoDetails.path !== newRepoDetails.path;
+  };
+
+  static fetchRepoDetails = () => {
+    // Build the repo details object, with path parsing or API calls.
+    // Return promise that will be saved in Redux store.
+    let repoDetails = {
+      username: null,
+      reponame: null,
+      type: null,
+      prId: null,
+      branch: null,
+      headSha: null,
+      baseSha: null,
+      path: null
+    };
+
+    const repoFromPath = getRepoFromPath();
+    repoDetails.username = repoFromPath.username;
+    repoDetails.reponame = repoFromPath.reponame;
+    repoDetails.type = repoFromPath.type;
+    repoDetails.prId =
+      repoFromPath.type === "pull" ? repoFromPath.typeId : null;
+
+    repoDetails.branch = getBranch() || null;
+
+    repoDetails.path = getFilePath();
+
+    // Fill up base/head for types
+    if (repoDetails.type === "commit") {
+      const { base, head } = getCommitViewSha();
+      repoDetails.headSha = head;
+      repoDetails.baseSha = base;
+    } else if (repoDetails.type === "compare") {
+      const { base, head } = getCompareViewSha();
+      repoDetails.headSha = head;
+      repoDetails.baseSha = base;
+    } else if (repoDetails.type === "pull") {
+      const shaPromise = getPRCommitSha();
+
+      if (shaPromise !== null) {
+        return shaPromise.then(shas => {
+          repoDetails.headSha = shas.head;
+          repoDetails.baseSha = shas.base;
+          repoDetails.type = "compare";
+          return repoDetails;
+        });
+      }
+    }
+
+    return new Promise((resolve, reject) => {
+      resolve(repoDetails);
+    });
+  };
+}
