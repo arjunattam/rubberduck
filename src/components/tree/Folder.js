@@ -6,7 +6,6 @@ import Octicon from "react-component-octicons";
 const PADDING_CONST = 12; // in pixels
 
 const sortChildren = children => {
-  console.log("sorting", children);
   const parents = children
     .filter(element => {
       return element.children.length > 0;

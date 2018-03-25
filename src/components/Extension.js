@@ -137,7 +137,6 @@ class Extension extends React.Component {
       if (this.props.storage.token) {
         this.getFileTreeAPI(repoDetails)
           .then(fileTreeData => {
-            console.log("data", fileTreeData);
             this.DataActions.setTreeLoading(false);
             this.DataActions.setFileTree(fileTreeData);
           })

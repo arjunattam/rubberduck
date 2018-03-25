@@ -1,5 +1,4 @@
 const axios = require("axios");
-
 const parse = require("what-the-diff");
 
 const getGitService = () => window.location.host.split(".")[0];
@@ -76,7 +75,6 @@ let BitbucketAPI = {
   },
 
   getAPICaller(uriPath) {
-    // TODO(arjun): need to verify bitbucket api version
     const uri = `https://api.bitbucket.org/2.0/${uriPath}/`;
     return axios.get(uri, { headers: { Authorization: "" } });
   },
