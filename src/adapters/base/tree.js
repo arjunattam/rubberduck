@@ -90,7 +90,7 @@ export const getPRChildren = (reponame, response) => {
 
 export const flattenChildren = tree => {
   const children = tree.children || [];
-  if (children.length === 0 || children.length > 1) {
+  if (children.length === 0 || children.length > 1 || tree.path === "") {
     let newTree = Object.assign({}, tree);
 
     if (children.length > 0) {
