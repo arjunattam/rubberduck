@@ -1,5 +1,7 @@
 const axios = require("axios");
 
+const parse = require("what-the-diff");
+
 const getGitService = () => window.location.host.split(".")[0];
 
 let BaseGitRemoteAPI = {
@@ -76,14 +78,35 @@ let BitbucketAPI = {
   },
 
   getAPICaller(uriPath) {
-    const uri = `https://api.bitbucket.org/1.0/${uriPath}/`;
+    // TODO(arjun): need to verify bitbucket api version
+    const uri = `https://api.bitbucket.org/2.0/${uriPath}/`;
     return axios.get(uri, { headers: { Authorization: "" } });
   },
 
   getFilesTree(username, reponame, branch) {
     const uriPath = `repositories/${username}/${reponame}/src/${branch}`;
     return this.makeConditionalGet(uriPath);
-  }
+  },
+
+  getPRFiles(username, reponame, pr) {
+    const uriPath = `repositories/${username}/${reponame}/pullrequests/${pr}/diff`;
+    return this.makeConditionalGet(uriPath).then(response => {
+      const parsedDiff = parse.parse(response);
+      console.log(parsedDiff);
+      const newFiles = parsedDiff
+        .filter(element => element.newPath !== null)
+        .map(element => element.newPath.replace("b/", ""));
+      const oldFiles = parsedDiff
+        .filter(element => element.oldPath !== null)
+        .map(element => element.oldPath.replace("b/", ""));
+      // Merge the two arrays and remove the duplicates
+      return newFiles
+        .concat(oldFiles)
+        .filter((item, index, self) => self.indexOf(item) == index);
+    });
+  },
+
+  getPRInfo(username, reponame, pr) {}
 };
 
 let GitRemoteAPI = {};

@@ -9,8 +9,7 @@ import Sidebar from "./Sidebar";
 import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
-import { pathAdapter } from "../adapters";
-import * as DataUtils from "../utils/data";
+import { pathAdapter, treeAdapter } from "../adapters";
 
 let document = window.document;
 
@@ -115,16 +114,17 @@ class Extension extends React.Component {
 
   getFileTreeAPI(repoDetails) {
     const { username, reponame, type } = repoDetails;
-    const pullId = repoDetails.prId;
+    const pullId = repoDetails.prId || 14; // TODO(arjun): infer this
     const branch = repoDetails.branch || "master";
     this.DataActions.setTreeLoading(true);
-    if (type === "pull") {
+    if (type === "pull" || type === "pull-requests") {
       return API.getPRFiles(username, reponame, pullId).then(response => {
-        return DataUtils.getPRChildren(reponame, response);
+        console.log("response", response);
+        return treeAdapter.getPRChildren(reponame, response);
       });
     } else {
       return API.getFilesTree(username, reponame, branch).then(response => {
-        return DataUtils.getTreeChildren(reponame, response.tree);
+        return treeAdapter.getTreeChildren(reponame, response);
       });
     }
   }

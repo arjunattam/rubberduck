@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { renderChildren } from "./Folder";
 import { BaseSection } from "../section";
-import { flattenChildren } from "../../utils/data";
+import { treeAdapter } from "../../adapters";
 import "./Tree.css";
 
 class Tree extends BaseSection {
@@ -35,7 +35,7 @@ class Tree extends BaseSection {
     // For example, src/org/eclipse/ls/... (often found in Java)
     const tree = this.props.data.fileTree;
     if (tree.children) {
-      return flattenChildren(tree).children;
+      return treeAdapter.flattenChildren(tree).children;
     }
     return this.props.data.fileTree.children;
   };
