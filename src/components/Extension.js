@@ -118,14 +118,14 @@ class Extension extends React.Component {
     const branch = repoDetails.branch || "master";
     this.DataActions.setTreeLoading(true);
     if (type === "pull" || type === "pull-requests") {
-      return API.getPRFiles(username, reponame, pullId).then(response => {
-        console.log("response", response);
-        return treeAdapter.getPRChildren(reponame, response);
-      });
+      // TODO(arjun): can't have two types for PRs
+      return API.getPRFiles(username, reponame, pullId).then(response =>
+        treeAdapter.getPRChildren(reponame, response)
+      );
     } else {
-      return API.getFilesTree(username, reponame, branch).then(response => {
-        return treeAdapter.getTreeChildren(reponame, response);
-      });
+      return API.getFilesTree(username, reponame, branch).then(response =>
+        treeAdapter.getTreeChildren(reponame, response)
+      );
     }
   }
 
@@ -138,6 +138,7 @@ class Extension extends React.Component {
       if (this.props.storage.token) {
         this.getFileTreeAPI(repoDetails)
           .then(fileTreeData => {
+            console.log("data", fileTreeData);
             this.DataActions.setTreeLoading(false);
             this.DataActions.setFileTree(fileTreeData);
           })

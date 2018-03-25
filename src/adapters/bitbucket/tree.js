@@ -1,16 +1,4 @@
-export const getPRChildren = (reponame, response) => {
-  // fileList is a list of files that have been changed in the PR
-  //   const filenames = fileList.map(element => {
-  //     return element.filename;
-  //   });
-  let result = {
-    name: reponame,
-    path: "",
-    children: []
-  };
-  //   return appendDiffInfo([result], fileList)[0];
-  return result;
-};
+import { buildTree, fillPaths, appendDiffInfo } from "../base/tree";
 
 export const getTreeChildren = (reponame, response) => {
   // response has directories and files
@@ -40,6 +28,4 @@ export const getTreeChildren = (reponame, response) => {
   };
 };
 
-export const flattenChildren = tree => {
-  return tree;
-};
+export { getPRChildren, flattenChildren } from "../base/tree";

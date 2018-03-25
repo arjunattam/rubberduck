@@ -5,30 +5,15 @@ import * as BitbucketTreeAdapter from "./bitbucket/tree";
 
 const getGitService = () => window.location.host.split(".")[0];
 
-const GitPathAdapter = () => {
-  // Check which adapter to send
-  switch (getGitService()) {
-    case "github":
-      return GithubPathAdapter;
-    case "bitbucket":
-      return BitbucketPathAdapter;
-    default:
-      throw new Error("invalid git service");
-  }
+const pathAdapterMap = {
+  github: GithubPathAdapter,
+  bitbucket: BitbucketPathAdapter
 };
 
-const GitTreeAdapter = () => {
-  // Check which adapter to send
-  switch (getGitService()) {
-    case "github":
-      return GithubTreeAdapter;
-    case "bitbucket":
-      return BitbucketTreeAdapter;
-      break;
-    default:
-      throw new Error("invalid git service");
-  }
+const treeAdapterMap = {
+  github: GithubTreeAdapter,
+  bitbucket: BitbucketTreeAdapter
 };
 
-export const pathAdapter = GitPathAdapter();
-export const treeAdapter = GitTreeAdapter();
+export const pathAdapter = pathAdapterMap[getGitService()];
+export const treeAdapter = treeAdapterMap[getGitService()];

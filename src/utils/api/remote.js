@@ -26,9 +26,7 @@ let BaseGitRemoteAPI = {
       // for efficient rate limit utilisation.
       const caller = this.getAPICaller(uriPath);
       return caller
-        .then(response => {
-          return response.data ? response.data : response;
-        })
+        .then(response => (response.data ? response.data : response))
         .catch(error => {
           if (error.response.status >= 400 && error.response.status < 500) {
             this.dispatchAuthenticated(false);
@@ -44,7 +42,7 @@ let GithubAPI = {
   },
 
   getPassthroughPath() {
-    return "github_passthrough/";
+    return `github_passthrough/`;
   },
 
   getAPICaller(uriPath) {
@@ -74,7 +72,7 @@ let BitbucketAPI = {
   },
 
   getPassthroughPath() {
-    return "bitbucket_passthrough/";
+    return `bitbucket_passthrough/`;
   },
 
   getAPICaller(uriPath) {
@@ -88,21 +86,36 @@ let BitbucketAPI = {
     return this.makeConditionalGet(uriPath);
   },
 
+  parseLines(element, charToCheck) {
+    const hunkValues = element.hunks.map(hunk => {
+      const lines = hunk.lines;
+      return lines.reduce((total, line) => {
+        const num = line[0] === charToCheck ? 1 : 0;
+        return total + num;
+      }, 0);
+    });
+    return hunkValues.reduce((total, num) => total + num);
+  },
+
+  getDiffData(parsedDiff) {
+    // Return file path, additions and deletions by parsing the diff
+    return parsedDiff.map(element => {
+      const additions = this.parseLines(element, "+");
+      const deletions = this.parseLines(element, "-");
+      const filePath = element.newPath || element.oldPath;
+      return {
+        filename: filePath.replace("b/", ""),
+        additions: additions,
+        deletions: deletions
+      };
+    });
+  },
+
   getPRFiles(username, reponame, pr) {
     const uriPath = `repositories/${username}/${reponame}/pullrequests/${pr}/diff`;
     return this.makeConditionalGet(uriPath).then(response => {
       const parsedDiff = parse.parse(response);
-      console.log(parsedDiff);
-      const newFiles = parsedDiff
-        .filter(element => element.newPath !== null)
-        .map(element => element.newPath.replace("b/", ""));
-      const oldFiles = parsedDiff
-        .filter(element => element.oldPath !== null)
-        .map(element => element.oldPath.replace("b/", ""));
-      // Merge the two arrays and remove the duplicates
-      return newFiles
-        .concat(oldFiles)
-        .filter((item, index, self) => self.indexOf(item) == index);
+      return this.getDiffData(parsedDiff);
     });
   },
 

@@ -189,6 +189,7 @@ const getRepoFromPath = () => {
 };
 
 export default class GithubPathAdapter {
+  // TODO(arjun): should this not extend the base path adapter?
   static constructPath = (subPath, orgname, reponame, branch) => {
     // return relative path which follows a domain name, like
     // github.com, from given sub-path
