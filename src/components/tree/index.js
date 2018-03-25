@@ -37,7 +37,7 @@ class Tree extends BaseSection {
     if (tree.children) {
       return treeAdapter.flattenChildren(tree).children;
     }
-    return this.props.data.fileTree.children;
+    return tree.children;
   };
 
   render() {

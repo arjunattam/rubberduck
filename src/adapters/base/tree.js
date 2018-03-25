@@ -89,11 +89,18 @@ export const getPRChildren = (reponame, response) => {
 };
 
 export const flattenChildren = tree => {
-  if (tree.children.length === 0 || tree.children.length > 1) {
+  const children = tree.children || [];
+  if (children.length === 0 || children.length > 1) {
     let newTree = Object.assign({}, tree);
-    newTree.children = tree.children.map(element => {
-      return flattenChildren(element);
-    });
+
+    if (children.length > 0) {
+      newTree.children = tree.children.map(element => {
+        return flattenChildren(element);
+      });
+    } else {
+      newTree.children = new Array();
+    }
+
     return newTree;
   } else {
     // There is only one child. If this child has >=1 children,

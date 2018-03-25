@@ -8,7 +8,7 @@ const getRepoFromPath = () => {
 
   // (username)/(reponame)[/(type)]
   const match = window.location.pathname.match(
-    /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?/
+    /([^\/]+)\/([^\/]+)(?:\/([^\/]+))?(?:\/([^\/]+))?/
   );
   //   if (!match) {
   //     return cb();
@@ -17,6 +17,7 @@ const getRepoFromPath = () => {
   const username = match[1];
   const reponame = match[2];
   const type = match[3];
+  const typeId = match[4] || null;
 
   // Not a repository, skip
   //   if (
@@ -30,7 +31,8 @@ const getRepoFromPath = () => {
   return {
     username: username,
     reponame: reponame,
-    type: type
+    type: type,
+    typeId: typeId
   };
 };
 
@@ -52,9 +54,10 @@ export default class BitbucketPathAdapter extends BasePathAdapter {
     const repoFromPath = getRepoFromPath();
     repoDetails.username = repoFromPath.username;
     repoDetails.reponame = repoFromPath.reponame;
-    repoDetails.type = repoFromPath.type;
-    // repoDetails.prId =
-    //   repoFromPath.type === "pull" ? repoFromPath.typeId : null;
+    repoDetails.type =
+      repoFromPath.type === "pull-requests" ? "pull" : repoFromPath.type;
+    repoDetails.prId =
+      repoFromPath.type === "pull-requests" ? repoFromPath.typeId : null;
 
     // repoDetails.branch = getBranch() || null;
 

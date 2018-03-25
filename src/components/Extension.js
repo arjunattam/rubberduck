@@ -114,11 +114,10 @@ class Extension extends React.Component {
 
   getFileTreeAPI(repoDetails) {
     const { username, reponame, type } = repoDetails;
-    const pullId = repoDetails.prId || 14; // TODO(arjun): infer this
+    const pullId = repoDetails.prId;
     const branch = repoDetails.branch || "master";
     this.DataActions.setTreeLoading(true);
-    if (type === "pull" || type === "pull-requests") {
-      // TODO(arjun): can't have two types for PRs
+    if (type === "pull") {
       return API.getPRFiles(username, reponame, pullId).then(response =>
         treeAdapter.getPRChildren(reponame, response)
       );
