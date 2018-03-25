@@ -1,5 +1,5 @@
 import React from "react";
-import { constructPath } from "../../adapters/github/path";
+import { pathAdapter } from "../../adapters";
 import TreeLabel from "./TreeLabel";
 
 const PADDING_CONST = 12; // in pixels -- same as folder
@@ -55,7 +55,7 @@ export default class File extends React.Component {
 
   renderBasicFile = () => {
     const pl = this.getPadding();
-    const path = constructPath(
+    const path = pathAdapter.constructPath(
       this.props.path,
       this.props.data.repoDetails.username,
       this.props.data.repoDetails.reponame,

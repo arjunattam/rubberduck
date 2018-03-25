@@ -4,7 +4,7 @@ import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
 import { getListener } from "../../adapters/github/views/helper";
 import HoverElement from "./HoverElement";
-import * as GitPathAdapter from "../../adapters/github/path";
+import { pathAdapter } from "../../adapters";
 
 class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
@@ -55,11 +55,11 @@ class HoverListener extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const isSameSessionPath = GitPathAdapter.isSameSessionPath(
+    const isSameSessionPath = pathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
-    const hasChangedPath = GitPathAdapter.hasChangedPath(
+    const hasChangedPath = pathAdapter.hasChangedPath(
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
