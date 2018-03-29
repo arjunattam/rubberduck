@@ -7,6 +7,7 @@ import { Authorization } from "../../utils/authorization";
 import * as StorageUtils from "../../utils/storage";
 import AuthPrompt from "./auth";
 import { SettingsButton, Settings } from "./settings";
+import { getGitService } from "../../adapters";
 
 const StatusComponent = props => (
   <div className="status-main-container">
@@ -72,6 +73,7 @@ class StatusBar extends React.Component {
     // We can unlink github profile with this user with the logout flow
     let token = this.props.storage.token;
     this.setLoadingState();
+
     Authorization.triggerLogoutFlow(token, response => {
       if (response === null) {
         console.log("Could not log out.");
@@ -89,24 +91,45 @@ class StatusBar extends React.Component {
     });
   };
 
+  getServiceUsername = decodedJWT => {
+    const service = getGitService();
+
+    if (service === "github") {
+      return decodedJWT.github_username;
+    } else if (service === "bitbucket") {
+      return decodedJWT.bitbucket_username;
+    }
+  };
+
+  getLoginPrompt = () => {
+    const service = getGitService();
+
+    if (service === "github") {
+      return "Login with GitHub";
+    } else if (service === "bitbucket") {
+      return "Login with Bitbucket";
+    }
+  };
+
   getAuthState = () => {
     // Three possible situations: 1. token unavailable, 2. token available but
     // no github login, and 3. token and github login both available
     const decodedJWT = this.props.storage.token
       ? Authorization.decodeJWT(this.props.storage.token)
       : {};
-    const githubUser = decodedJWT.github_username;
+
+    const serviceUser = this.getServiceUsername(decodedJWT);
     const hasToken = this.props.storage.token !== null;
-    const hasBoth = githubUser !== undefined && githubUser !== "";
+    const hasBoth = serviceUser !== undefined && serviceUser !== "";
 
     let authState = "No token found";
 
     if (hasBoth) {
-      authState = "Logged in as " + githubUser;
+      authState = "Logged in as " + serviceUser;
     } else if (hasToken) {
       authState = (
         <a className="pointer" onClick={() => this.launchOAuthFlow()}>
-          Login with GitHub
+          {this.getLoginPrompt()}
         </a>
       );
     }

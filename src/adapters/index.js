@@ -3,7 +3,7 @@ import BitbucketPathAdapter from "./bitbucket/path";
 import * as GithubTreeAdapter from "./github/tree";
 import * as BitbucketTreeAdapter from "./bitbucket/tree";
 
-const getGitService = () => window.location.host.split(".")[0];
+export const getGitService = () => window.location.host.split(".")[0];
 
 const pathAdapterMap = {
   github: GithubPathAdapter,
