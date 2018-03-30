@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import SectionHeader from "./Section";
-import { getReader } from "../../adapters/github/views/helper";
+import { getReader } from "../../adapters/github/views";
 
 export class BaseSection extends React.Component {
   componentWillReceiveProps(newProps) {
