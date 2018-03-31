@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import Extension from "./components/Extension";
 import store from "./store.js";
 import Raven from "raven-js";
+import { getGitService } from "./adapters";
 // import registerServiceWorker from "./registerServiceWorker";
 
 const Pjax = require("pjax");
@@ -32,10 +33,19 @@ const loadSentry = () => {
   ).install();
 };
 
+const getPjaxSelector = () => {
+  const service = getGitService();
+  if (service === "github") {
+    return ["#js-repo-pjax-container"];
+  } else if (service === "bitbucket") {
+    return ["#source-container"];
+  }
+};
+
 const createPjax = () => {
   GlobalPjax = new Pjax({
     elements: "a", // default is "a[href], form[action]"
-    selectors: ["#js-repo-pjax-container"],
+    selectors: getPjaxSelector(),
     disablePjaxHeader: true,
     cacheBust: false,
     currentUrlFullReload: false

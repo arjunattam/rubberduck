@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
-import { getListener } from "../../adapters/github/views/helper";
+import { getPageListener } from "../../adapters/";
 import HoverElement from "./HoverElement";
 import { pathAdapter } from "../../adapters";
 
@@ -91,7 +91,7 @@ class HoverListener extends React.Component {
   }
 
   setupListener = () => {
-    this.listener = getListener();
+    this.listener = getPageListener();
 
     if (this.listener !== null) {
       document.body.onmouseover = null;

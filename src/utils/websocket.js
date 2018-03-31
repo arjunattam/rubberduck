@@ -1,6 +1,7 @@
 import Store from "../store";
 import WebSocketAsPromised from "websocket-as-promised";
 import { rootUrl } from "./api";
+import { getGitService } from "../adapters";
 
 function exponentialBackoff(attempt, delay) {
   return Math.floor(Math.random() * Math.pow(2, attempt) * delay);
@@ -80,7 +81,7 @@ class BaseWebSocket {
       payload: {
         organisation,
         name,
-        service: "github",
+        service: getGitService(),
         pull_request_id
       }
     });
@@ -92,7 +93,7 @@ class BaseWebSocket {
       payload: {
         organisation,
         name,
-        service: "github",
+        service: getGitService(),
         head_sha,
         base_sha
       }

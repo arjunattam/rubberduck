@@ -3,7 +3,7 @@ import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
 const debounce = require("debounce");
 
-const DEBOUNCE_TIMEOUT = 500; // ms
+const DEBOUNCE_TIMEOUT = 1200; // ms
 const CURSOR_RADIUS = 20; // pixels
 
 export default class HoverElement extends React.Component {
@@ -113,10 +113,12 @@ export default class HoverElement extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (
-      this.props.hoverResult.lineNumber !== prevProps.hoverResult.lineNumber ||
-      this.props.hoverResult.charNumber !== prevProps.hoverResult.charNumber
-    ) {
+    const didChangeLine =
+      this.props.hoverResult.lineNumber !== prevProps.hoverResult.lineNumber;
+    const didChangeChar =
+      this.props.hoverResult.charNumber !== prevProps.hoverResult.charNumber;
+
+    if (didChangeChar || didChangeLine) {
       // Props have been updated, so make API call if we are on new line/char
       this.clear();
       this.dFunc = debounce(() => this.update(), DEBOUNCE_TIMEOUT);

@@ -15,6 +15,12 @@
   background: #fff;
 }
 
+.expanded-content pre,
+.expanded-content code {
+  margin: 0;
+  padding: 0;
+}
+
 .expanded-title {
   background: #f1f8ff;
   border-bottom: 1px solid #c8e1ff;

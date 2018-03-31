@@ -175,7 +175,6 @@ class Extension extends React.Component {
   }
 
   render() {
-    console.log(this.props.data);
     return this.props.data.repoDetails.reponame ? <Sidebar /> : null;
   }
 }

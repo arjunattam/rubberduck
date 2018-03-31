@@ -1,7 +1,7 @@
+import { getGitService } from "../../adapters";
+
 const axios = require("axios");
 const parse = require("what-the-diff");
-
-const getGitService = () => window.location.host.split(".")[0];
 
 let BaseGitRemoteAPI = {
   isRemoteAuthorized() {
@@ -75,12 +75,12 @@ let BitbucketAPI = {
   },
 
   getAPICaller(uriPath) {
-    const uri = `https://api.bitbucket.org/2.0/${uriPath}/`;
+    const uri = `https://api.bitbucket.org/2.0/${uriPath}`;
     return axios.get(uri, { headers: { Authorization: "" } });
   },
 
   getFilesTree(username, reponame, branch) {
-    const uriPath = `repositories/${username}/${reponame}/src/${branch}`;
+    const uriPath = `repositories/${username}/${reponame}/src/${branch}/`;
     return this.makeConditionalGet(uriPath);
   },
 
@@ -110,7 +110,7 @@ let BitbucketAPI = {
   },
 
   getPRFiles(username, reponame, pr) {
-    const uriPath = `repositories/${username}/${reponame}/pullrequests/${pr}/diff`;
+    const uriPath = `repositories/${username}/${reponame}/pullrequests/${pr}/diff/`;
     return this.makeConditionalGet(uriPath).then(response => {
       const parsedDiff = parse.parse(response);
       return this.getDiffData(parsedDiff);
