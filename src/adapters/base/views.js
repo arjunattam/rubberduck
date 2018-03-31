@@ -16,7 +16,7 @@ export default class BaseViewListener {
       fileSha: this.getFileSha(element),
       lineNumber: this.getLineNumber(element),
       charNumber: this.getCharNumber(element, x, y),
-      boundRect: this.getBoundRect(element),
+      boundRect: this.getBoundRect(element, x, y),
       mouseX: x,
       mouseY: y
     };
