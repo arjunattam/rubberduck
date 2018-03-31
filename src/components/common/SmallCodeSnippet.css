@@ -3,6 +3,13 @@
   margin: 12px 0;
 }
 
+.small-code code,
+.small-code pre {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 .small-code pre code span * {
   word-wrap: break-word;
   white-space: normal;

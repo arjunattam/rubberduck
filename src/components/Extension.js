@@ -9,8 +9,7 @@ import Sidebar from "./Sidebar";
 import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
-import * as GitPathAdapter from "../adapters/github/path";
-import * as DataUtils from "../utils/data";
+import { pathAdapter, treeAdapter } from "../adapters";
 
 let document = window.document;
 
@@ -34,7 +33,7 @@ class Extension extends React.Component {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
     }
-    let isSameSessionPath = GitPathAdapter.isSameSessionPath(
+    let isSameSessionPath = pathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
@@ -84,7 +83,7 @@ class Extension extends React.Component {
   }
 
   updateRepoDetailsFromPath() {
-    GitPathAdapter.fetchRepoDetails().then(repoDetails => {
+    pathAdapter.fetchRepoDetails().then(repoDetails => {
       this.DataActions.setRepoDetails(repoDetails);
     });
   }
@@ -119,13 +118,13 @@ class Extension extends React.Component {
     const branch = repoDetails.branch || "master";
     this.DataActions.setTreeLoading(true);
     if (type === "pull") {
-      return API.getPRFiles(username, reponame, pullId).then(response => {
-        return DataUtils.getPRChildren(reponame, response);
-      });
+      return API.getPRFiles(username, reponame, pullId).then(response =>
+        treeAdapter.getPRChildren(reponame, response)
+      );
     } else {
-      return API.getFilesTree(username, reponame, branch).then(response => {
-        return DataUtils.getTreeChildren(reponame, response.tree);
-      });
+      return API.getFilesTree(username, reponame, branch).then(response =>
+        treeAdapter.getTreeChildren(reponame, response)
+      );
     }
   }
 

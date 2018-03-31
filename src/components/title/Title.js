@@ -1,12 +1,22 @@
 import React from "react";
 import { connect } from "react-redux";
 import Octicon from "react-component-octicons";
+import { getGitService } from "../../adapters";
 import "./Title.css";
 
+const getPRTitleSelector = () => {
+  const service = getGitService();
+
+  if (service === "github") {
+    return "#partial-discussion-header > div.gh-header-show > h1";
+  } else if (service === "bitbucket") {
+    return "#content > header > div.app-header--primary > div > h1 > span";
+  }
+};
+
 const getPRTitle = () => {
-  const element = document.querySelector(
-    "#partial-discussion-header > div.gh-header-show > h1"
-  );
+  const element = document.querySelector(getPRTitleSelector());
+
   if (element) {
     return element.textContent;
   } else {
@@ -14,16 +24,18 @@ const getPRTitle = () => {
   }
 };
 
+const iconStyle = { height: 12, color: "#999" };
+
 class Title extends React.Component {
   renderBranch = repoDetails => (
     <div className="branch">
-      <Octicon name="git-branch" style={{ height: 12 }} /> {repoDetails.branch}
+      <Octicon name="git-branch" style={iconStyle} /> {repoDetails.branch}
     </div>
   );
 
   renderPR = repoDetails => (
     <div className="branch">
-      <Octicon name="git-pull-request" style={{ height: 12 }} /> {getPRTitle()}
+      <Octicon name="git-pull-request" style={iconStyle} /> {getPRTitle()}
     </div>
   );
 

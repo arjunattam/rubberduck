@@ -1,6 +1,7 @@
 import React from "react";
-import { constructPath } from "../../adapters/github/path";
+import { pathAdapter } from "../../adapters";
 import TreeLabel from "./TreeLabel";
+import { getGitService } from "../../adapters";
 
 const PADDING_CONST = 12; // in pixels -- same as folder
 
@@ -11,7 +12,9 @@ export default class File extends React.Component {
   };
 
   clickHandler = event => {
-    if (window.location.pathname.indexOf("files") < 0) {
+    const service = getGitService();
+
+    if (service === "github" && window.location.pathname.indexOf("files") < 0) {
       // This is not the files changed view, so the scroll to will break
       // This check will break if the org/repo name has the word "files" in it
       // TODO(arjun): We might also want to abstract this out for bitbucket
@@ -25,15 +28,25 @@ export default class File extends React.Component {
     }
   };
 
+  getFileboxSelector = path => {
+    const service = getGitService();
+
+    if (service === "github") {
+      return `div.file-header[data-path="${path}"]`;
+    } else if (service === "bitbucket") {
+      return `section.iterable-item[data-path="${path}"]`;
+    }
+  };
+
   scrollTo = () => {
     // Can check for event.triggerElement -- in pjax:success call
     // Remove the event listener that we added
     document.removeEventListener("pjax:success", this.scrollTo);
+    const elementSelector = this.getFileboxSelector(this.props.path);
 
-    const fileBox = document.querySelectorAll(
-      `div.file-header[data-path="${this.props.path}"]`
-    )[0];
+    const fileBox = document.querySelector(elementSelector);
     const yOffset = window.scrollY + fileBox.getBoundingClientRect().y - 75;
+
     setTimeout(function() {
       // Without the timeout, the scrollTo does not work for pjax
       window.scrollTo(0, yOffset);
@@ -55,7 +68,7 @@ export default class File extends React.Component {
 
   renderBasicFile = () => {
     const pl = this.getPadding();
-    const path = constructPath(
+    const path = pathAdapter.constructPath(
       this.props.path,
       this.props.data.repoDetails.username,
       this.props.data.repoDetails.reponame,

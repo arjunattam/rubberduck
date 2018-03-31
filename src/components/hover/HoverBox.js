@@ -91,11 +91,7 @@ export default class HoverBox extends React.Component {
               <div className="status-loader" />
             </div>
           ) : (
-            <CodeNode
-              name={this.props.name}
-              file={this.props.filePath}
-              showButton={false}
-            />
+            <CodeNode {...this.props} showButton={false} />
           )}
         </div>
         <div className="docstring">{Docstring(this.props.docstring)}</div>

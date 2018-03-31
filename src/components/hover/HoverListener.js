@@ -2,9 +2,9 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
-import { getListener } from "../../adapters/github/views/helper";
+import { getPageListener } from "../../adapters/";
 import HoverElement from "./HoverElement";
-import * as GitPathAdapter from "../../adapters/github/path";
+import { pathAdapter } from "../../adapters";
 
 class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
@@ -55,11 +55,11 @@ class HoverListener extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const isSameSessionPath = GitPathAdapter.isSameSessionPath(
+    const isSameSessionPath = pathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
-    const hasChangedPath = GitPathAdapter.hasChangedPath(
+    const hasChangedPath = pathAdapter.hasChangedPath(
       prevProps.data.repoDetails,
       this.props.data.repoDetails
     );
@@ -91,7 +91,7 @@ class HoverListener extends React.Component {
   }
 
   setupListener = () => {
-    this.listener = getListener();
+    this.listener = getPageListener();
 
     if (this.listener !== null) {
       document.body.onmouseover = null;

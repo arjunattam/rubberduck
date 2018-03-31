@@ -1,9 +1,9 @@
 // Github blob (file view) view handler
 // Exports a hover listener method with a callback param
 // Callback gets object: filePath, fileSha, lineNumber, charNumber, name
-import BaseListener from "./base";
+import BaseGithubListener from "./base";
 
-class BlobPageListener extends BaseListener {
+class BlobPageListener extends BaseGithubListener {
   constructor(fileSha) {
     super();
     this.fileSha = fileSha;

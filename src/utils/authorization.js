@@ -2,6 +2,7 @@
 import { sendMessage, constructMessage } from "./chrome";
 import { rootUrl } from "./api";
 import { API } from "./api";
+import { getGitService } from "../adapters";
 const Moment = require("moment");
 
 const JWT = require("jsonwebtoken");
@@ -24,13 +25,29 @@ export class AuthUtils {
   }
 
   triggerOAuthFlow(jwt, cb) {
-    const url = `${rootUrl}github_oauth/?token=${jwt}`;
+    const service = getGitService();
+    let url;
+
+    if (service === "github") {
+      url = `${rootUrl}github_oauth/?token=${jwt}`;
+    } else if (service === "bitbucket") {
+      url = `${rootUrl}bitbucket_oauth/?token=${jwt}`;
+    }
+
     const message = constructMessage("AUTH_TRIGGER", { url: url });
     sendMessage(message, cb);
   }
 
   triggerLogoutFlow(jwt, cb) {
-    const url = `${rootUrl}github_oauth_logout/?token=${jwt}`;
+    const service = getGitService();
+    let url;
+
+    if (service === "github") {
+      url = `${rootUrl}github_oauth_logout/?token=${jwt}`;
+    } else if (service === "bitbucket") {
+      url = `${rootUrl}bitbucket_oauth_logout/?token=${jwt}`;
+    }
+
     const message = constructMessage("AUTH_TRIGGER", { url: url });
     sendMessage(message, cb);
   }
@@ -87,7 +104,7 @@ export class AuthUtils {
   }
 
   refreshToken(existingToken) {
-    return API.refreshTokenBackground(existingToken).then(response => {
+    return API.refreshToken(existingToken).then(response => {
       return response.token;
     });
   }

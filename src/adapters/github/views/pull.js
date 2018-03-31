@@ -1,6 +1,6 @@
-import BaseListener from "./base";
+import BaseGithubListener from "./base";
 
-class PRPageListener extends BaseListener {
+class PRPageListener extends BaseGithubListener {
   hasTextUnderMouseForDiff = (element, x, y) => {
     // Compute if there is text below the element
     const boundRect = element.parentElement.getBoundingClientRect();
