@@ -1,9 +1,9 @@
-import { listener as pullListener } from "./pull";
+import { listener as pullListener, readXY as pullReadXY } from "./pull";
 
 export const getListener = () => {
   return pullListener;
 };
 
-// export const getReader = () => {
-//   return getHelper(blobReadXY, pullReadXY);
-// };
+export const getReader = () => {
+  return pullReadXY;
+};

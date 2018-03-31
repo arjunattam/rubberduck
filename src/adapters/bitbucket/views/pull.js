@@ -59,3 +59,8 @@ export const listener = (event, callback) => {
   const result = pageListener.readXY(event.x, event.y);
   callback(result);
 };
+
+export const readXY = (x, y, fileSha) => {
+  const pageListener = new PRPageListener();
+  return pageListener.readXY(x, y);
+};

@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import SectionHeader from "./Section";
-import { getReader } from "../../adapters/github/views";
+import { getPageReader } from "../../adapters";
 
 export class BaseSection extends React.Component {
   componentWillReceiveProps(newProps) {
@@ -43,7 +43,7 @@ export class BaseReaderSection extends BaseSection {
   }
 
   readPage = () => {
-    const reader = getReader();
+    const reader = getPageReader();
 
     if (reader !== null) {
       return reader(
