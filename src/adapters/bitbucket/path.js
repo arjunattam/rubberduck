@@ -36,6 +36,17 @@ const getRepoFromPath = () => {
   };
 };
 
+const passthroughFeatureFlag = repoDetails => {
+  if (repoDetails.type === "pull" && repoDetails.prId !== null) {
+    return repoDetails;
+  } else {
+    return {
+      username: null,
+      reponame: null
+    };
+  }
+};
+
 export default class BitbucketPathAdapter extends BasePathAdapter {
   static fetchRepoDetails = () => {
     // Build the repo details object, with path parsing or API calls.
@@ -86,7 +97,7 @@ export default class BitbucketPathAdapter extends BasePathAdapter {
     // }
 
     return new Promise((resolve, reject) => {
-      resolve(repoDetails);
+      resolve(passthroughFeatureFlag(repoDetails));
     });
   };
 }
