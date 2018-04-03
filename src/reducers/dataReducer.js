@@ -5,6 +5,8 @@ const initialState = {
   repoDetails: {},
   openSection: "tree",
   textSelection: {},
+
+  // Sidebar visible
   isSidebarVisible: true,
 
   // Files tree
