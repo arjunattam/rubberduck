@@ -5,7 +5,6 @@ const initialState = {
   repoDetails: {},
   openSection: "tree",
   textSelection: {},
-  isSidebarVisible: true,
 
   // Files tree
   fileTree: {
@@ -76,12 +75,6 @@ export default createReducer(initialState, {
         sessionStatus: action.sessionStatus
       };
     }
-  },
-  UPDATE_IS_UNAUTHENTICATED: (state, action) => {
-    return {
-      ...state,
-      isUnauthenticated: action.isUnauthenticated
-    };
   },
   UPDATE_DATA: (state, action) => {
     return {

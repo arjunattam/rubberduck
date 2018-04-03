@@ -4,7 +4,10 @@ const initialState = {
   initialized: false,
   clientId: null,
   token: null,
-  sessions: {}
+  sessions: {},
+
+  // Sidebar visible
+  isSidebarVisible: true
 };
 
 const sanitizeChromeStoratePayload = payload => {
