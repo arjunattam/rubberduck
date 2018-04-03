@@ -79,12 +79,6 @@ export default createReducer(initialState, {
       };
     }
   },
-  UPDATE_IS_UNAUTHENTICATED: (state, action) => {
-    return {
-      ...state,
-      isUnauthenticated: action.isUnauthenticated
-    };
-  },
   UPDATE_DATA: (state, action) => {
     return {
       ...state,

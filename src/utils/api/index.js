@@ -1,8 +1,9 @@
-import { sendMessage, constructMessage } from "../chrome";
 import Store from "../../store";
-import { Authorization } from "../authorization";
+import { bindActionCreators } from "redux";
+import * as DataActions from "../../actions/dataActions";
 
 import BaseRequest from "./base";
+import { Authorization } from "../authorization";
 import { rootUrl, baseApiUrl } from "./url";
 import { encodeQueryData } from "./utils";
 import { GitRemoteAPI } from "./remote";
@@ -14,6 +15,7 @@ export class BaseAPI {
     this.baseRequest = new BaseRequest(rootUrl);
     this.baseURI = this.baseRequest.getAPIUrl();
     Store.subscribe(() => this.updateBaseRequest());
+    this.DataActions = bindActionCreators(DataActions, Store.dispatch);
   }
 
   getDecodedToken() {
@@ -27,8 +29,7 @@ export class BaseAPI {
   }
 
   dispatchAuthenticated(isAuthenticated) {
-    Store.dispatch({
-      type: "UPDATE_IS_UNAUTHENTICATED",
+    this.DataActions.updateData({
       isUnauthenticated: !isAuthenticated
     });
   }
