@@ -46,13 +46,15 @@ To be able to pack crx, you need to setup `keys/development_key.pem` in your pro
 
 1.  To publish the extension, ensure that your account on the [Chrome developer dashboard](https://chrome.google.com/webstore/developer/dashboard) is setup.
 
-2.  Generate the zip file for uploading using:
+2.  Bump the version -- open `manifest.json` and bump the version depending on your changes.
+
+3.  Generate the zip file for uploading using:
 
     ```
     npm run chrome-zip
     ```
 
-3.  Upload the generated zip file (`bundle.zip`) on the Chrome dashboard.
+4.  Upload the generated zip file (`bundle.zip`) on the Chrome dashboard.
 
 ## Architecture
 

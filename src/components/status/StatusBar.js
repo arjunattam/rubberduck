@@ -1,13 +1,14 @@
 import React from "react";
-import Store from "../../store";
 import { connect } from "react-redux";
-import "./StatusBar.css";
+import { bindActionCreators } from "redux";
+import * as DataActions from "../../actions/dataActions";
+import { getGitService } from "../../adapters";
 import { getParameterByName } from "../../utils/api";
 import { Authorization } from "../../utils/authorization";
 import * as StorageUtils from "../../utils/storage";
 import AuthPrompt from "./auth";
 import { SettingsButton, Settings } from "./settings";
-import { getGitService } from "../../adapters";
+import "./StatusBar.css";
 
 const StatusComponent = props => (
   <div className="status-main-container">
@@ -30,6 +31,11 @@ const StatusComponent = props => (
 );
 
 class StatusBar extends React.Component {
+  constructor(props) {
+    super(props);
+    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
+  }
+
   state = {
     showAuthPrompt: false,
     showSettings: false,
@@ -42,9 +48,7 @@ class StatusBar extends React.Component {
       showSettings: false,
       isLoading: true
     });
-    // Use an action for this update.
-    Store.dispatch({
-      type: "UPDATE_IS_UNAUTHENTICATED",
+    this.DataActions.updateData({
       isUnauthenticated: false
     });
   };
