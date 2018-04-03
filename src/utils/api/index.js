@@ -5,10 +5,7 @@ import * as DataActions from "../../actions/dataActions";
 import BaseRequest from "./base";
 import { Authorization } from "../authorization";
 import { rootUrl, baseApiUrl } from "./url";
-import { encodeQueryData } from "./utils";
 import { GitRemoteAPI } from "./remote";
-
-const axios = require("axios");
 
 export class BaseAPI {
   constructor() {

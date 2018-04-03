@@ -4,6 +4,7 @@ import { bindActionCreators } from "redux";
 import "./../index.css";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
+import * as StorageUtils from "../utils/storage";
 import Title from "./title/Title";
 import StatusBar from "./status/StatusBar";
 import CollapseButton from "./collapse/CollapseButton";
@@ -13,6 +14,8 @@ import Definitions from "./definitions";
 import HoverListener from "./hover/HoverListener";
 import SessionStatus from "./session";
 import * as GithubLayout from "./../adapters/github/layout";
+
+const SIDEBAR_WIDTH = 232; // pixels
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -34,19 +37,15 @@ class Sidebar extends React.Component {
   };
 
   toggleCollapse() {
-    if (this.props.data.isSidebarVisible) {
+    if (this.props.storage.isSidebarVisible) {
       // To trigger the left slide animation, we follow this:
       // https://css-tricks.com/restart-css-animation/#article-header-id-0
       this.triggerReflow();
       setTimeout(() => {
-        this.DataActions.updateData({
-          isSidebarVisible: false
-        });
+        StorageUtils.setAllInStore({ isSidebarVisible: false });
       }, 190);
     } else {
-      this.DataActions.updateData({
-        isSidebarVisible: true
-      });
+      StorageUtils.setAllInStore({ isSidebarVisible: true });
     }
   }
 
@@ -61,7 +60,7 @@ class Sidebar extends React.Component {
     return (
       <CollapseButton
         onClick={() => this.toggleCollapse()}
-        isVisible={this.props.data.isSidebarVisible}
+        isVisible={this.props.storage.isSidebarVisible}
       />
     );
   }
@@ -71,7 +70,7 @@ class Sidebar extends React.Component {
       <Title>
         <CollapseButton
           onClick={() => this.toggleCollapse()}
-          isVisible={this.props.data.isSidebarVisible}
+          isVisible={this.props.storage.isSidebarVisible}
         />
       </Title>
     );
@@ -104,9 +103,10 @@ class Sidebar extends React.Component {
   }
 
   render() {
-    GithubLayout.updateLayout(this.props.data.isSidebarVisible, 232); // 232 = sidebar width in pixels
+    const { isSidebarVisible } = this.props.storage;
+    GithubLayout.updateLayout(isSidebarVisible, SIDEBAR_WIDTH);
 
-    if (this.props.data.isSidebarVisible) {
+    if (isSidebarVisible) {
       return (
         <div className="sidebar-container will-slide-right">
           {this.renderTitle()}

@@ -6,9 +6,6 @@ const initialState = {
   openSection: "tree",
   textSelection: {},
 
-  // Sidebar visible
-  isSidebarVisible: true,
-
   // Files tree
   fileTree: {
     name: "",
