@@ -19,7 +19,12 @@ let BaseGitRemoteAPI = {
       // If user is logged in with github, we will send
       // this API call to pass through via backend.
       const uri = `${this.getPassthroughPath()}${uriPath.replace("?", "%3F")}/`;
-      return this.baseRequest.fetch(uri);
+      return this.baseRequest.fetch(uri).then(
+        response =>
+          // This is required for non-json responses, as the passthrough api
+          // JSONifies them with the jsonified key
+          response.jsonified || response
+      );
     } else {
       // Make call directly to github using client IP address
       // for efficient rate limit utilisation.
@@ -112,6 +117,7 @@ let BitbucketAPI = {
   getPRFiles(username, reponame, pr) {
     const uriPath = `repositories/${username}/${reponame}/pullrequests/${pr}/diff/`;
     return this.makeConditionalGet(uriPath).then(response => {
+      console.log("response", response);
       const parsedDiff = parse.parse(response);
       return this.getDiffData(parsedDiff);
     });
