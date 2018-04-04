@@ -3,12 +3,6 @@ import Octicon from "react-component-octicons";
 import { getGitService } from "../../../adapters";
 import "./auth.css";
 
-const CloseButton = props => (
-  <div className="close-dot" onClick={props.onClick}>
-    <Octicon name="x" style={{ height: 11, width: 11 }} />
-  </div>
-);
-
 export default class AuthPrompt extends React.Component {
   render() {
     const style = this.props.isExpanded
