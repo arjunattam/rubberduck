@@ -17,7 +17,6 @@ export default class File extends React.Component {
     if (service === "github" && window.location.pathname.indexOf("files") < 0) {
       // This is not the files changed view, so the scroll to will break
       // This check will break if the org/repo name has the word "files" in it
-      // TODO(arjun): We might also want to abstract this out for bitbucket
 
       // Wait for pjax to trigger, and then call this method again, when we will
       // be on the files changed view.

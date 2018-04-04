@@ -45,8 +45,9 @@
 }
 
 .folder-structure-container {
-  transition: max-height 0.4s ease-in-out;
+  transition: max-height 0.5s ease-in-out;
   overflow: hidden;
+  max-height: 3000px; /* Hopefully this will be enough for all cases */
 }
 
 .folder-structure-container.collapsed {
