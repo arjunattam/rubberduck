@@ -88,6 +88,7 @@ const getCompareViewSha = () => {
   branches.map(element => {
     const match = element.match(/(base|compare): (.+)/);
     result[match[1] === "compare" ? "head" : match[1]] = match[2];
+    return result;
   });
   return result;
 };

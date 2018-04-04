@@ -1,4 +1,4 @@
-import { buildTree, fillPaths, appendDiffInfo } from "../base/tree";
+import { buildTree, fillPaths } from "../base/tree";
 
 export const getTreeChildren = (reponame, response) => {
   const { tree } = response;

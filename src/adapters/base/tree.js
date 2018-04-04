@@ -98,7 +98,7 @@ export const flattenChildren = tree => {
         return flattenChildren(element);
       });
     } else {
-      newTree.children = new Array();
+      newTree.children = [];
     }
 
     return newTree;

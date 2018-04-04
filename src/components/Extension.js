@@ -133,7 +133,6 @@ class Extension extends React.Component {
 
     if (repoDetails.username && repoDetails.reponame) {
       // Repo details have been figured
-      const { username, reponame } = repoDetails;
       if (this.props.storage.token) {
         this.getFileTreeAPI(repoDetails)
           .then(fileTreeData => {

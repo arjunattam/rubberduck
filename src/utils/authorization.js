@@ -85,7 +85,6 @@ export class AuthUtils {
     let decodedToken = JWT.decode(token);
     let currentMoment = Moment();
     let tokenOriginalIssueMoment = Moment.unix(decodedToken.orig_iat);
-    let tokenExpiryMoment = Moment.unix(decodedToken.exp);
     let tokenRefreshExpiryMoment = Moment(tokenOriginalIssueMoment).add(
       30,
       "days"
