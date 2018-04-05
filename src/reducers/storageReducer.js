@@ -4,25 +4,9 @@ const initialState = {
   initialized: false,
   clientId: null,
   token: null,
-  sessions: {},
 
   // Sidebar visible
   isSidebarVisible: true
-};
-
-const sanitizeChromeStoratePayload = payload => {
-  let sanitizedPayload = { ...payload };
-  for (let key in payload) {
-    if (sanitizedPayload[key]) continue;
-    switch (key) {
-      case "sessions":
-        sanitizedPayload[key] = {};
-        break;
-      default:
-        break;
-    }
-  }
-  return sanitizedPayload;
 };
 
 export default createReducer(initialState, {
@@ -39,7 +23,7 @@ export default createReducer(initialState, {
       ...state,
       ...action.payload
     });
-    let sanitizedPayload = sanitizeChromeStoratePayload(action.payload);
+    let sanitizedPayload = action.payload;
     return {
       ...state,
       ...sanitizedPayload
