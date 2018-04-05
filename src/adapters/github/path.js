@@ -16,8 +16,8 @@ const GH_RESERVED_USER_NAMES = [ // These cannot be usernames
     'pricing', 'marketplace'
   ]
 const GH_RESERVED_REPO_NAMES = ["followers", "following", "repositories"];
+const GH_RESERVED_SUB_PAGES = ["issues", "graphs"];
 const GH_404_SEL = "#parallax_wrapper";
-
 const GH_RAW_CONTENT = "body > pre";
 
 const checkIfSkipped = () => {
@@ -175,6 +175,11 @@ const getRepoFromPath = () => {
     ~GH_RESERVED_REPO_NAMES.indexOf(reponame)
   ) {
     // Not a repository, skip
+    return repoDetails;
+  }
+
+  if (~GH_RESERVED_SUB_PAGES.indexOf(type)) {
+    // These aren't code pages
     return repoDetails;
   }
 

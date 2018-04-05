@@ -10,6 +10,9 @@ import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
 import { pathAdapter, treeAdapter } from "../adapters";
+import * as GithubLayout from "./../adapters/github/layout";
+
+const SIDEBAR_WIDTH = 232; // pixels
 
 let document = window.document;
 
@@ -115,7 +118,7 @@ class Extension extends React.Component {
   getFileTreeAPI(repoDetails) {
     const { username, reponame, type } = repoDetails;
     const pullId = repoDetails.prId;
-    const branch = repoDetails.branch || "master";
+    const branch = repoDetails.branch || "master"; // TODO(arjun): check for default branch
     this.DataActions.setTreeLoading(true);
     if (type === "pull") {
       return API.getPRFiles(username, reponame, pullId).then(response =>
@@ -174,7 +177,13 @@ class Extension extends React.Component {
   }
 
   render() {
-    return this.props.data.repoDetails.reponame ? <Sidebar /> : null;
+    const willRenderSidebar = this.props.data.repoDetails.reponame !== null;
+
+    if (!willRenderSidebar) {
+      GithubLayout.updateLayout(false, SIDEBAR_WIDTH);
+    }
+
+    return willRenderSidebar ? <Sidebar /> : null;
   }
 }
 
