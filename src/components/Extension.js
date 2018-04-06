@@ -33,8 +33,8 @@ class Extension extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
-      this.updateSessionAndTree(prevProps, this.props);
     }
+    this.updateSessionAndTree(prevProps, this.props);
   }
 
   updateSessionAndTree(prevProps, newProps) {
@@ -84,7 +84,12 @@ class Extension extends React.Component {
   }
 
   handleUrlUpdate() {
-    this.updateRepoDetailsFromPath();
+    // Due to pjax, there are cases when the url has been updated but
+    // the DOM elements have not loaded up, so repoDetails cannot be calculated
+    // Hence we keep a timeout of 1 sec.
+    setTimeout(() => {
+      this.updateRepoDetailsFromPath();
+    }, 1000);
   }
 
   updateRepoDetailsFromPath() {
@@ -95,7 +100,10 @@ class Extension extends React.Component {
 
   handleSessionInitialization() {
     const repoDetails = this.props.data.repoDetails;
-    if (repoDetails.username && repoDetails.reponame) {
+    const hasSessionParams =
+      repoDetails.prId || repoDetails.headSha || repoDetails.branch;
+
+    if (repoDetails.username && repoDetails.reponame && hasSessionParams) {
       const params = {
         organisation: repoDetails.username,
         name: repoDetails.reponame,
@@ -104,8 +112,6 @@ class Extension extends React.Component {
         head_sha: repoDetails.headSha || repoDetails.branch,
         base_sha: repoDetails.baseSha
       };
-
-      console.log("initializing", params);
 
       if (this.props.storage.token) {
         WS.createNewSession(params)
