@@ -33,12 +33,16 @@ class Extension extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
+      this.updateSessionAndTree(prevProps, this.props);
     }
+  }
+
+  updateSessionAndTree(prevProps, newProps) {
     let isSameSessionPath = pathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
-      this.props.data.repoDetails
+      newProps.data.repoDetails
     );
-    let hasTokenChanged = prevProps.storage.token !== this.props.storage.token;
+    let hasTokenChanged = prevProps.storage.token !== newProps.storage.token;
     if (hasTokenChanged || !isSameSessionPath) {
       this.handleSessionInitialization();
       this.handleFileTreeUpdate();
@@ -100,6 +104,8 @@ class Extension extends React.Component {
         head_sha: repoDetails.headSha || repoDetails.branch,
         base_sha: repoDetails.baseSha
       };
+
+      console.log("initializing", params);
 
       if (this.props.storage.token) {
         WS.createNewSession(params)
@@ -176,12 +182,6 @@ class Extension extends React.Component {
 
   render() {
     const willRenderSidebar = this.props.data.repoDetails.reponame !== null;
-
-    // if (!willRenderSidebar) {
-    //   const SIDEBAR_WIDTH = 232; // pixels
-    //   GithubLayout.updateLayout(false, SIDEBAR_WIDTH);
-    // }
-
     return willRenderSidebar ? <Sidebar /> : null;
   }
 }
