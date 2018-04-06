@@ -43,8 +43,11 @@ const getPjaxSelector = () => {
 };
 
 const createPjax = () => {
+  // The `elements` needs to be namespaced or it shows weird
+  // behaviour on Github. The PR buttons gets disabled on going from
+  // repo home page --> open new PR page.
   GlobalPjax = new Pjax({
-    elements: "a", // default is "a[href], form[action]"
+    elements: "#mercury-sidebar a", // default is "a[href], form[action]"
     selectors: getPjaxSelector(),
     disablePjaxHeader: true,
     cacheBust: false,
