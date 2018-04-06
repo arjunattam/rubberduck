@@ -288,7 +288,6 @@ class WebSocketManager {
       return method(...params);
     } else {
       return new Promise((resolve, reject) => {
-        console.log("session not ready");
         this.dispatchStatus("not_ready");
         reject();
       });

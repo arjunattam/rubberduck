@@ -21,6 +21,11 @@
   padding: 0;
 }
 
+.expanded-content pre code {
+  /* For bitbucket */
+  background-color: #fff;
+}
+
 .expanded-title {
   background: #f1f8ff;
   border-bottom: 1px solid #c8e1ff;

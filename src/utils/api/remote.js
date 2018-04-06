@@ -118,7 +118,6 @@ let BitbucketAPI = {
   getPRFiles(username, reponame, pr) {
     const uriPath = `repositories/${username}/${reponame}/pullrequests/${pr}/diff/`;
     return this.makeConditionalGet(uriPath).then(response => {
-      console.log("response", response);
       const parsedDiff = parse.parse(response);
       return this.getDiffData(parsedDiff);
     });
