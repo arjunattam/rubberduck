@@ -10,6 +10,7 @@ import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
 import { pathAdapter, treeAdapter } from "../adapters";
+import * as GithubLayout from "./../adapters/github/layout";
 
 let document = window.document;
 
@@ -33,11 +34,15 @@ class Extension extends React.Component {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
       this.setupAuthorization();
     }
+    this.updateSessionAndTree(prevProps, this.props);
+  }
+
+  updateSessionAndTree(prevProps, newProps) {
     let isSameSessionPath = pathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
-      this.props.data.repoDetails
+      newProps.data.repoDetails
     );
-    let hasTokenChanged = prevProps.storage.token !== this.props.storage.token;
+    let hasTokenChanged = prevProps.storage.token !== newProps.storage.token;
     if (hasTokenChanged || !isSameSessionPath) {
       this.handleSessionInitialization();
       this.handleFileTreeUpdate();
@@ -79,7 +84,12 @@ class Extension extends React.Component {
   }
 
   handleUrlUpdate() {
-    this.updateRepoDetailsFromPath();
+    // Due to pjax, there are cases when the url has been updated but
+    // the DOM elements have not loaded up, so repoDetails cannot be calculated
+    // Hence we keep a timeout of 1 sec.
+    setTimeout(() => {
+      this.updateRepoDetailsFromPath();
+    }, 1000);
   }
 
   updateRepoDetailsFromPath() {
@@ -90,7 +100,10 @@ class Extension extends React.Component {
 
   handleSessionInitialization() {
     const repoDetails = this.props.data.repoDetails;
-    if (repoDetails.username && repoDetails.reponame) {
+    const hasSessionParams =
+      repoDetails.prId || repoDetails.headSha || repoDetails.branch;
+
+    if (repoDetails.username && repoDetails.reponame && hasSessionParams) {
       const params = {
         organisation: repoDetails.username,
         name: repoDetails.reponame,
@@ -115,7 +128,7 @@ class Extension extends React.Component {
   getFileTreeAPI(repoDetails) {
     const { username, reponame, type } = repoDetails;
     const pullId = repoDetails.prId;
-    const branch = repoDetails.branch || "master";
+    const branch = repoDetails.branch || "master"; // TODO(arjun): check for default branch
     this.DataActions.setTreeLoading(true);
     if (type === "pull") {
       return API.getPRFiles(username, reponame, pullId).then(response =>
@@ -133,7 +146,6 @@ class Extension extends React.Component {
 
     if (repoDetails.username && repoDetails.reponame) {
       // Repo details have been figured
-      const { username, reponame } = repoDetails;
       if (this.props.storage.token) {
         this.getFileTreeAPI(repoDetails)
           .then(fileTreeData => {
@@ -175,7 +187,8 @@ class Extension extends React.Component {
   }
 
   render() {
-    return this.props.data.repoDetails.reponame ? <Sidebar /> : null;
+    const willRenderSidebar = this.props.data.repoDetails.reponame !== null;
+    return willRenderSidebar ? <Sidebar /> : null;
   }
 }
 

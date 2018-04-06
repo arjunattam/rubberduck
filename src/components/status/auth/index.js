@@ -1,5 +1,4 @@
 import React from "react";
-import Octicon from "react-component-octicons";
 import { getGitService } from "../../../adapters";
 import "./auth.css";
 

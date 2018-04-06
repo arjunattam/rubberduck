@@ -32,7 +32,8 @@ let BaseGitRemoteAPI = {
       return caller
         .then(response => (response.data ? response.data : response))
         .catch(error => {
-          if (error.response.status >= 400 && error.response.status < 500) {
+          if (error.response.status > 400 && error.response.status < 404) {
+            // Remote has returned auth error
             this.dispatchAuthenticated(false);
           }
         });
@@ -117,7 +118,6 @@ let BitbucketAPI = {
   getPRFiles(username, reponame, pr) {
     const uriPath = `repositories/${username}/${reponame}/pullrequests/${pr}/diff/`;
     return this.makeConditionalGet(uriPath).then(response => {
-      console.log("response", response);
       const parsedDiff = parse.parse(response);
       return this.getDiffData(parsedDiff);
     });

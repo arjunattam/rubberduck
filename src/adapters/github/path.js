@@ -13,11 +13,19 @@ const GH_RESERVED_USER_NAMES = [ // These cannot be usernames
     'security', 'join', 'login', 'watching',
     'new', 'integrations', 'gist', 'business',
     'mirrors', 'open-source', 'personal',
-    'pricing', 'marketplace'
+    'pricing', 'marketplace', 'apps'
   ]
 const GH_RESERVED_REPO_NAMES = ["followers", "following", "repositories"];
+const GH_RESERVED_SUB_PAGES = [
+  "issues",
+  "pulls",
+  "graphs",
+  "settings",
+  "pulse",
+  "wiki",
+  "projects"
+];
 const GH_404_SEL = "#parallax_wrapper";
-
 const GH_RAW_CONTENT = "body > pre";
 
 const checkIfSkipped = () => {
@@ -88,6 +96,7 @@ const getCompareViewSha = () => {
   branches.map(element => {
     const match = element.match(/(base|compare): (.+)/);
     result[match[1] === "compare" ? "head" : match[1]] = match[2];
+    return result;
   });
   return result;
 };
@@ -176,6 +185,11 @@ const getRepoFromPath = () => {
     // Not a repository, skip
     return repoDetails;
   }
+
+  // if (~GH_RESERVED_SUB_PAGES.indexOf(type)) {
+  //   // These aren't code pages
+  //   return repoDetails;
+  // }
 
   // Check if this is a Tree/Blob view
   const isFileView = type === null || type === "tree" || type === "blob";
