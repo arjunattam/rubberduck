@@ -16,7 +16,15 @@ const GH_RESERVED_USER_NAMES = [ // These cannot be usernames
     'pricing', 'marketplace'
   ]
 const GH_RESERVED_REPO_NAMES = ["followers", "following", "repositories"];
-const GH_RESERVED_SUB_PAGES = ["issues", "graphs"];
+const GH_RESERVED_SUB_PAGES = [
+  "issues",
+  "pulls",
+  "graphs",
+  "settings",
+  "pulse",
+  "wiki",
+  "projects"
+];
 const GH_404_SEL = "#parallax_wrapper";
 const GH_RAW_CONTENT = "body > pre";
 
@@ -178,10 +186,10 @@ const getRepoFromPath = () => {
     return repoDetails;
   }
 
-  if (~GH_RESERVED_SUB_PAGES.indexOf(type)) {
-    // These aren't code pages
-    return repoDetails;
-  }
+  // if (~GH_RESERVED_SUB_PAGES.indexOf(type)) {
+  //   // These aren't code pages
+  //   return repoDetails;
+  // }
 
   // Check if this is a Tree/Blob view
   const isFileView = type === null || type === "tree" || type === "blob";

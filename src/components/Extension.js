@@ -12,8 +12,6 @@ import { Authorization } from "./../utils/authorization";
 import { pathAdapter, treeAdapter } from "../adapters";
 import * as GithubLayout from "./../adapters/github/layout";
 
-const SIDEBAR_WIDTH = 232; // pixels
-
 let document = window.document;
 
 class Extension extends React.Component {
@@ -179,9 +177,10 @@ class Extension extends React.Component {
   render() {
     const willRenderSidebar = this.props.data.repoDetails.reponame !== null;
 
-    if (!willRenderSidebar) {
-      GithubLayout.updateLayout(false, SIDEBAR_WIDTH);
-    }
+    // if (!willRenderSidebar) {
+    //   const SIDEBAR_WIDTH = 232; // pixels
+    //   GithubLayout.updateLayout(false, SIDEBAR_WIDTH);
+    // }
 
     return willRenderSidebar ? <Sidebar /> : null;
   }
