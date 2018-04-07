@@ -188,7 +188,8 @@ class Extension extends React.Component {
   }
 
   render() {
-    const willRenderSidebar = this.props.data.repoDetails.reponame !== null;
+    const { reponame } = this.props.data.repoDetails;
+    const willRenderSidebar = reponame !== null && reponame !== undefined;
     return willRenderSidebar ? <Sidebar /> : null;
   }
 }
