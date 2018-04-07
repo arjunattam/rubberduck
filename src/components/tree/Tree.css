@@ -100,3 +100,13 @@
 .tree-deletions::before {
   content: "-";
 }
+
+.tree-status {
+  text-transform: uppercase;
+  font-size: 9px;
+  font-weight: bold;
+  color: #333;
+  background: #eee;
+  padding: 3px;
+  vertical-align: middle;
+}

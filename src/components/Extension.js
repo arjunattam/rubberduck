@@ -127,14 +127,25 @@ class Extension extends React.Component {
 
   getFileTreeAPI(repoDetails) {
     const { username, reponame, type } = repoDetails;
-    const pullId = repoDetails.prId;
-    const branch = repoDetails.branch || "master"; // TODO(arjun): check for default branch
     this.DataActions.setTreeLoading(true);
+
     if (type === "pull") {
-      return API.getPRFiles(username, reponame, pullId).then(response =>
+      const { prId } = repoDetails;
+      return API.getPRFiles(username, reponame, prId).then(response =>
         treeAdapter.getPRChildren(reponame, response)
       );
+    } else if (type === "commit") {
+      const { headSha } = repoDetails;
+      return API.getCommitFiles(username, reponame, headSha).then(response =>
+        treeAdapter.getPRChildren(reponame, response)
+      );
+    } else if (type === "compare") {
+      const { headSha, baseSha } = repoDetails;
+      return API.getCompareFiles(username, reponame, headSha, baseSha).then(
+        response => treeAdapter.getPRChildren(reponame, response)
+      );
     } else {
+      const branch = repoDetails.branch || "master"; // TODO(arjun): check for default branch
       return API.getFilesTree(username, reponame, branch).then(response =>
         treeAdapter.getTreeChildren(reponame, response)
       );
@@ -187,7 +198,8 @@ class Extension extends React.Component {
   }
 
   render() {
-    const willRenderSidebar = this.props.data.repoDetails.reponame !== null;
+    const { reponame } = this.props.data.repoDetails;
+    const willRenderSidebar = reponame !== null && reponame !== undefined;
     return willRenderSidebar ? <Sidebar /> : null;
   }
 }

@@ -65,6 +65,18 @@ let GithubAPI = {
     return this.makeConditionalGet(uriPath);
   },
 
+  getCommitFiles(username, reponame, commitSha) {
+    const uriPath = `repos/${username}/${reponame}/commits/${commitSha}`;
+    return this.makeConditionalGet(uriPath).then(response => response.files);
+  },
+
+  getCompareFiles(username, reponame, headSha, baseSha) {
+    // TODO(arjun): known issue: this does not work with 2 repositories
+    // eg, when branch in the fork is compared to base
+    const uriPath = `repos/${username}/${reponame}/compare/${baseSha}...${headSha}`;
+    return this.makeConditionalGet(uriPath).then(response => response.files);
+  },
+
   getPRInfo(username, reponame, pr) {
     const uriPath = `repos/${username}/${reponame}/pulls/${pr}`;
     return this.makeConditionalGet(uriPath);
@@ -103,14 +115,17 @@ let BitbucketAPI = {
 
   getDiffData(parsedDiff) {
     // Return file path, additions and deletions by parsing the diff
+    // Also uses git diff statuses: `added`, `renamed`, `modified`, `deleted`
     return parsedDiff.map(element => {
+      console.log(element);
       const additions = this.parseLines(element, "+");
       const deletions = this.parseLines(element, "-");
       const filePath = element.newPath || element.oldPath;
       return {
         filename: filePath.replace("b/", ""),
         additions: additions,
-        deletions: deletions
+        deletions: deletions,
+        status: element.status
       };
     });
   },

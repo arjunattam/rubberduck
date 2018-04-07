@@ -1,6 +1,22 @@
 import React from "react";
 import FileIcon from "./fileIcon/FileIcon";
 
+const renderStatus = status => {
+  switch (status) {
+    case "renamed":
+      return <span className="tree-status">renamed</span>;
+      break;
+    case "added":
+      return <span className="tree-status">new</span>;
+      break;
+    case "deleted":
+      return <span className="tree-status">deleted</span>;
+      break;
+    default:
+      return null;
+  }
+};
+
 const TreeLabel = props => {
   const additions = props.additions ? (
     <span className="tree-additions">{props.additions}</span>
@@ -8,11 +24,14 @@ const TreeLabel = props => {
   const deletions = props.deletions ? (
     <span className="tree-deletions">{props.deletions}</span>
   ) : null;
+  const status = renderStatus(props.status);
+
   let labelStyle = {
     paddingTop: "4px",
     paddingBottom: "4px",
     marginRight: "4px"
   };
+
   return (
     <span>
       <FileIcon
@@ -21,7 +40,7 @@ const TreeLabel = props => {
         octColor={props.iconColor}
       />
       <span style={labelStyle}>{props.name}</span>
-      {additions} {deletions}
+      {additions} {deletions} {status}
     </span>
   );
 };

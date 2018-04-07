@@ -34,7 +34,4 @@ export const updateLayout = (isSidebarVisible, width) => {
 
   // Modifying page styles
   document.body.style.marginLeft = shouldPushLeft ? width + "px" : "";
-  containerElements.forEach(element => {
-    element.style.marginLeft = shouldPushLeft ? spacing + "px" : "";
-  });
 };
