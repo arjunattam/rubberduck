@@ -65,6 +65,11 @@ let GithubAPI = {
     return this.makeConditionalGet(uriPath);
   },
 
+  getCommitFiles(username, reponame, commitSha) {
+    const uriPath = `repos/${username}/${reponame}/commits/${commitSha}`;
+    return this.makeConditionalGet(uriPath).then(response => response.files);
+  },
+
   getPRInfo(username, reponame, pr) {
     const uriPath = `repos/${username}/${reponame}/pulls/${pr}`;
     return this.makeConditionalGet(uriPath);
