@@ -3,7 +3,7 @@
   "name": "Rubberduck",
   "short_name": "Rubberduck",
   "description": "Code review assistant for GitHub",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "background": {
     "persistent": false,
     "scripts": ["background.js"]
