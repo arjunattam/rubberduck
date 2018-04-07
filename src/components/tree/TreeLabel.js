@@ -9,6 +9,9 @@ const renderStatus = status => {
     case "added":
       return <span className="tree-status">new</span>;
       break;
+    case "deleted":
+      return <span className="tree-status">deleted</span>;
+      break;
     default:
       return null;
   }

@@ -103,14 +103,17 @@ let BitbucketAPI = {
 
   getDiffData(parsedDiff) {
     // Return file path, additions and deletions by parsing the diff
+    // Also uses git diff statuses: `added`, `renamed`, `modified`, `deleted`
     return parsedDiff.map(element => {
+      console.log(element);
       const additions = this.parseLines(element, "+");
       const deletions = this.parseLines(element, "-");
       const filePath = element.newPath || element.oldPath;
       return {
         filename: filePath.replace("b/", ""),
         additions: additions,
-        deletions: deletions
+        deletions: deletions,
+        status: element.status
       };
     });
   },
