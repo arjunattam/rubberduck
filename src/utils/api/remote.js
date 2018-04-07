@@ -70,6 +70,13 @@ let GithubAPI = {
     return this.makeConditionalGet(uriPath).then(response => response.files);
   },
 
+  getCompareFiles(username, reponame, headSha, baseSha) {
+    // TODO(arjun): known issue: this does not work with 2 repositories
+    // eg, when branch in the fork is compared to base
+    const uriPath = `repos/${username}/${reponame}/compare/${baseSha}...${headSha}`;
+    return this.makeConditionalGet(uriPath).then(response => response.files);
+  },
+
   getPRInfo(username, reponame, pr) {
     const uriPath = `repos/${username}/${reponame}/pulls/${pr}`;
     return this.makeConditionalGet(uriPath);

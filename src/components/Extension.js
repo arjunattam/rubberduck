@@ -139,6 +139,11 @@ class Extension extends React.Component {
       return API.getCommitFiles(username, reponame, headSha).then(response =>
         treeAdapter.getPRChildren(reponame, response)
       );
+    } else if (type === "compare") {
+      const { headSha, baseSha } = repoDetails;
+      return API.getCompareFiles(username, reponame, headSha, baseSha).then(
+        response => treeAdapter.getPRChildren(reponame, response)
+      );
     } else {
       const branch = repoDetails.branch || "master"; // TODO(arjun): check for default branch
       return API.getFilesTree(username, reponame, branch).then(response =>
