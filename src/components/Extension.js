@@ -130,6 +130,7 @@ class Extension extends React.Component {
     const pullId = repoDetails.prId;
     const branch = repoDetails.branch || "master"; // TODO(arjun): check for default branch
     this.DataActions.setTreeLoading(true);
+
     if (type === "pull") {
       return API.getPRFiles(username, reponame, pullId).then(response =>
         treeAdapter.getPRChildren(reponame, response)

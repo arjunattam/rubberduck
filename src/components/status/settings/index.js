@@ -3,11 +3,8 @@ import Octicon from "react-component-octicons";
 import "./settings.css";
 import RubberduckIcon from "./icon";
 
-const chatBadge = (
-  <a href="https://gitter.im/rubberduckio/Lobby" target="_blank">
-    <img src="https://badges.gitter.im/gitterHQ/gitter.png" />
-  </a>
-);
+const slackLink =
+  "https://join.slack.com/t/karigarihq/shared_invite/enQtMzM5NzQxNjQxNTA1LTM0ZDFhNWQ3YmEyYmExZTY1ODJmM2U3NzExM2E0YmQxODcxYTgwYzczOTVkOGY5ODk2MWE0MzE2ODliNGU1ZDc";
 
 export const SettingsButton = props => (
   <div className="button-div" onClick={props.onClick}>
@@ -27,8 +24,10 @@ const SettingsInternal = props => (
     </div>
     <div className="settings-sub-section">
       <h4>Support</h4>
-      <div>{chatBadge}</div>
-      <div>team@karigari.io</div>
+      <div>
+        <a href={slackLink}>Join us on Slack</a>
+      </div>
+      <div>team@rubberduck.io</div>
     </div>
     <div className="settings-sub-section">
       <a className="pointer" onClick={props.onLogout}>

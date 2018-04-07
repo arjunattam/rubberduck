@@ -55,6 +55,17 @@ const sumOfKey = (children, key) => {
   return sum;
 };
 
+const returnIfSame = (children, key) => {
+  // Return value of key if all children have the same value
+  if (children.length === 1) {
+    return children[0][key];
+  }
+
+  return children.reduce(function(a, b) {
+    return a && b && a[key] === b[key] ? a[key] : null;
+  });
+};
+
 export const appendDiffInfo = (tree, prResponse) => {
   for (var index = 0; index < tree.length; index++) {
     const element = tree[index];
@@ -64,11 +75,13 @@ export const appendDiffInfo = (tree, prResponse) => {
       const prFile = prResponse.find(x => x.filename === element.path);
       tree[index].additions = prFile.additions;
       tree[index].deletions = prFile.deletions;
+      tree[index].status = prFile.status;
     } else {
       // Need to sum up from children
       tree[index].children = appendDiffInfo(tree[index].children, prResponse);
       tree[index].additions = sumOfKey(tree[index].children, "additions");
       tree[index].deletions = sumOfKey(tree[index].children, "deletions");
+      tree[index].status = returnIfSame(tree[index].children, "status");
     }
   }
 
