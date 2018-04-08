@@ -63,7 +63,7 @@ export default class HoverBox extends React.Component {
 
       if (top < MAX_HEIGHT) {
         // The box should be at the bottom of the element
-        top = boundRect.bottom - TOP_MARGIN;
+        top = boundRect.bottom + TOP_MARGIN;
         return { left, top };
       }
     }

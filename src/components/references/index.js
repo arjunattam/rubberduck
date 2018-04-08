@@ -61,12 +61,8 @@ class References extends BaseReaderSection {
 
     if (isValidResult && this.state.isVisible) {
       this.startLoading();
-      WS.getReferences(
-        hoverResult.fileSha,
-        hoverResult.filePath,
-        hoverResult.lineNumber,
-        hoverResult.charNumber
-      )
+      const { fileSha, filePath, lineNumber, charNumber } = hoverResult;
+      WS.getReferences(fileSha, filePath, lineNumber, charNumber)
         .then(response => {
           this.stopLoading();
           this.setState({
