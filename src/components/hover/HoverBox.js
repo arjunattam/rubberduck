@@ -2,7 +2,6 @@ import React from "react";
 import PropTypes from "prop-types";
 import Docstring from "../common/Docstring";
 import HoverSignature from "./HoverSignature";
-import { setupObserver } from "./SpanFill";
 import "./Hover.css";
 
 const MAX_HEIGHT = 240;
@@ -132,11 +131,10 @@ export default class HoverBox extends React.Component {
     document.addEventListener("keydown", this.onKeyDown);
     document.addEventListener("keyup", this.onKeyUp);
     document.addEventListener("click", this.onClick);
-    setupObserver();
   }
 
   componentWillReceiveProps(newProps) {
-    if (newProps.x != this.props.x && newProps.x > 0) {
+    if (newProps.x !== this.props.x && newProps.x > 0) {
       // Reset the expanded state whenever we get new props
       this.setState({
         isExpanded: false

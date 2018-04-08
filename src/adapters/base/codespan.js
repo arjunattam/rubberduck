@@ -1,8 +1,8 @@
-import { getGitService } from "../../adapters";
-
-const delimiterChars = "'.:\\\"$+<=>^` \\t,\\(\\)\\{\\}\\[\\]";
+import { getGitService } from "../index";
 
 var observer;
+
+const delimiterChars = "'.:\\\"$+<=>^` \\t,\\(\\)\\{\\}\\[\\]";
 
 const delimiterSplit = string => {
   // This method splits the string with the delimiters
@@ -36,10 +36,14 @@ const reconstructTd = codeTd => {
       // This is a text child node
       const childText = childNode.nodeValue;
       const splitText = delimiterSplit(childText);
-      console.log(splitText);
-      const spannedChild = splitText.map(
-        text => (text.length > 0 ? `<span>${text}</span>` : text)
-      );
+      const spannedChild = splitText.map(text => {
+        const delimiterMatcher = new RegExp(`[${delimiterChars}]`);
+        if (text.match(delimiterMatcher) || text.length < 1) {
+          return text;
+        } else {
+          return `<span>${text}</span>`;
+        }
+      });
       reconstructedElements.push(...spannedChild);
     } else {
       reconstructedElements.push(childNode.outerHTML);
@@ -48,12 +52,25 @@ const reconstructTd = codeTd => {
   codeTd.innerHTML = reconstructedElements.join("");
 };
 
-export const fillUpSpans = () => {
+const isGithubCompareView = () => {
+  const { pathname } = window.location;
+  return (
+    pathname.indexOf("pull") >= 0 ||
+    pathname.indexOf("commit") >= 0 ||
+    pathname.indexOf("compare") >= 0
+  );
+};
+
+const fillUpSpans = () => {
   let codeTds;
 
   switch (getGitService()) {
     case "github":
-      codeTds = document.querySelectorAll("td.blob-code-inner");
+      if (isGithubCompareView()) {
+        codeTds = document.querySelectorAll("span.blob-code-inner");
+      } else {
+        codeTds = document.querySelectorAll("td.blob-code-inner");
+      }
       break;
     case "bitbucket":
       codeTds = document.querySelectorAll("div.udiff-line pre");
@@ -80,7 +97,6 @@ const getCodeParentSelector = () => {
 };
 
 export const setupObserver = () => {
-  // TODO(arjun): gets triggered twice on github
   var targetNode = document.querySelector(getCodeParentSelector());
   var config = { childList: true, subtree: true };
   var callback = function(mutationsList) {
