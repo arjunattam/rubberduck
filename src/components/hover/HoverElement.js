@@ -11,7 +11,7 @@ export default class HoverElement extends React.Component {
   state = {
     x: -1000,
     y: -1000,
-    boundRect: {},
+    element: {},
     isLoading: false
   };
 
@@ -41,38 +41,31 @@ export default class HoverElement extends React.Component {
     });
   };
 
+  getDefinitionPath = response => {
+    const { definition } = response.result;
+    return definition ? definition.location.path : "";
+  };
+
   callAPI = () => {
-    const hoverXY = {
-      x: this.props.hoverResult.mouseX,
-      y: this.props.hoverResult.mouseY
-    };
     this.startLoading();
-    WS.getHover(
-      this.props.hoverResult.fileSha,
-      this.props.hoverResult.filePath,
-      this.props.hoverResult.lineNumber,
-      this.props.hoverResult.charNumber
-    )
+    const { mouseX, mouseY, element } = this.props.hoverResult;
+    const { fileSha, filePath } = this.props.hoverResult;
+    const { lineNumber, charNumber } = this.props.hoverResult;
+
+    WS.getHover(fileSha, filePath, lineNumber, charNumber)
       .then(response => {
         this.stopLoading();
-        const isForCurrentMouse = this.isOverlappingWithCurrent(
-          hoverXY.x,
-          hoverXY.y
-        );
+        const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
+
         if (isForCurrentMouse) {
           // We will set state only if the current
           // mouse location overlaps with the response
-          let definitionPath = "";
-          if (response.result.definition !== null) {
-            definitionPath = response.result.definition.location.path;
-          }
-
           this.setState({
             ...response.result,
-            filePath: definitionPath,
-            x: this.props.hoverResult.mouseX,
-            y: this.props.hoverResult.mouseY,
-            boundRect: this.props.hoverResult.boundRect
+            filePath: this.getDefinitionPath(response),
+            x: mouseX,
+            y: mouseY,
+            element
           });
         }
       })
@@ -89,11 +82,8 @@ export default class HoverElement extends React.Component {
 
     if (hasText) {
       this.callAPI();
-      this.setState({
-        x: this.props.mouseX,
-        y: this.props.mouseY,
-        boundRect: this.props.hoverResult.boundRect
-      });
+      const { mouseX: x, mouseY: y, element } = this.props.hoverResult;
+      this.setState({ x, y, element });
     }
   };
 
@@ -103,8 +93,9 @@ export default class HoverElement extends React.Component {
       this.setState({
         x: -1000,
         y: -1000,
-        boundRect: {},
+        element: {},
         name: "",
+        signature: "",
         type: "",
         docstring: "",
         filePath: ""

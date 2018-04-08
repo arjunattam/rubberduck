@@ -38,7 +38,7 @@ export default class HoverBox extends React.Component {
     fileSha: PropTypes.string,
     x: PropTypes.number,
     y: PropTypes.number,
-    boundRect: PropTypes.object,
+    element: PropTypes.object,
     onReferences: PropTypes.func,
     onDefinition: PropTypes.func
   };
@@ -50,10 +50,12 @@ export default class HoverBox extends React.Component {
     // bounding rectangle of the element and the window.
     let left = this.props.x;
     let top = this.props.y;
+    const { element } = this.props;
 
-    if (this.props.boundRect) {
-      left = this.props.boundRect.left || left;
-      top = this.props.boundRect.top || top;
+    if (element && element.getBoundingClientRect) {
+      const boundRect = element.getBoundingClientRect();
+      left = boundRect.left || left;
+      top = boundRect.top || top;
 
       if (left + MAX_WIDTH > window.innerWidth) {
         left = window.innerWidth - MAX_WIDTH - 20;
@@ -61,7 +63,7 @@ export default class HoverBox extends React.Component {
 
       if (top < MAX_HEIGHT) {
         // The box should be at the bottom of the element
-        top = this.props.boundRect.bottom - TOP_MARGIN;
+        top = boundRect.bottom - TOP_MARGIN;
         return { left, top };
       }
     }
@@ -143,10 +145,14 @@ export default class HoverBox extends React.Component {
   }
 
   renderBasic() {
-    const { signature, language } = this.props;
+    const { name, signature, language } = this.props;
+    console.log(this.props);
     return (
       <div className="basic monospace">
-        <HoverSignature language={language || ""} signature={signature || ""} />
+        <HoverSignature
+          language={language || ""}
+          signature={signature || name || ""}
+        />
       </div>
     );
   }
