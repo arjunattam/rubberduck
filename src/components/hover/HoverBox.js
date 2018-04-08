@@ -26,7 +26,8 @@ const ExpandHelper = props => (
 export default class HoverBox extends React.Component {
   // Presentation component for the hover box
   state = {
-    isExpanded: false
+    isExpanded: false,
+    lastElement: null // To remove selection color
   };
 
   static propTypes = {
@@ -139,8 +140,14 @@ export default class HoverBox extends React.Component {
     if (newProps.x !== this.props.x && newProps.x > 0) {
       // Reset the expanded state whenever we get new props
       this.setState({
-        isExpanded: false
+        isExpanded: false,
+        lastElement: newProps.element
       });
+    }
+
+    if (newProps.x < 0) {
+      // Clear selection
+      this.removeSelectedElement();
     }
   }
 
@@ -169,9 +176,25 @@ export default class HoverBox extends React.Component {
 
   renderExpanded = () => this.renderDocstring("expanded");
 
+  removeSelectedElement = () => {
+    if (this.state.lastElement !== null) {
+      this.state.lastElement.style.backgroundColor = null;
+    }
+  };
+
+  selectElement = () => {
+    const { element } = this.props;
+    if (element.getBoundingClientRect) {
+      const fontColor = window.getComputedStyle(element).color;
+      const withOpacity = fontColor.slice(0, -1) + ", 0.075)";
+      element.style.backgroundColor = withOpacity;
+    }
+  };
+
   render() {
     const action = this.isDefinition() ? "usages" : "definition";
     const isExpandable = this.props.docstring ? true : false;
+    this.selectElement();
 
     return (
       <div className="hover-box" style={this.getStyle()}>
