@@ -13,6 +13,15 @@ import {
 
 export const getGitService = () => window.location.host.split(".")[0];
 
+export const isGithubCompareView = () => {
+  const { pathname } = window.location;
+  return (
+    pathname.indexOf("pull") >= 0 ||
+    pathname.indexOf("commit") >= 0 ||
+    pathname.indexOf("compare") >= 0
+  );
+};
+
 const pathAdapterMap = {
   github: GithubPathAdapter,
   bitbucket: BitbucketPathAdapter

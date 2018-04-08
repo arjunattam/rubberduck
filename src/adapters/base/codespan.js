@@ -1,4 +1,4 @@
-import { getGitService } from "../index";
+import { getGitService, isGithubCompareView } from "../index";
 
 var observer;
 
@@ -52,15 +52,6 @@ const reconstructTd = codeTd => {
   codeTd.innerHTML = reconstructedElements.join("");
 };
 
-const isGithubCompareView = () => {
-  const { pathname } = window.location;
-  return (
-    pathname.indexOf("pull") >= 0 ||
-    pathname.indexOf("commit") >= 0 ||
-    pathname.indexOf("compare") >= 0
-  );
-};
-
 const fillUpSpans = () => {
   let codeTds;
 
@@ -82,6 +73,7 @@ const fillUpSpans = () => {
   if (codeTds.length > 0) {
     observer.disconnect(); // disconnect the MutationObserver
     codeTds.forEach(codeTd => reconstructTd(codeTd));
+    setupMutationObserver();
   }
 };
 
@@ -96,7 +88,7 @@ const getCodeParentSelector = () => {
   }
 };
 
-export const setupObserver = () => {
+const setupMutationObserver = () => {
   var targetNode = document.querySelector(getCodeParentSelector());
   var config = { childList: true, subtree: true };
   var callback = function(mutationsList) {
@@ -105,6 +97,10 @@ export const setupObserver = () => {
   observer = new MutationObserver(callback);
   if (targetNode) {
     observer.observe(targetNode, config);
-    fillUpSpans();
   }
+};
+
+export const setupObserver = () => {
+  setupMutationObserver();
+  fillUpSpans();
 };

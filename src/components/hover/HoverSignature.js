@@ -7,7 +7,6 @@ const HoverSignature = props => (
     language={props.language}
     children={props.signature}
     style={githubStyle}
-    wrapLines={true}
   />
 );
 

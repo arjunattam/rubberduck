@@ -90,7 +90,6 @@ class Extension extends React.Component {
     // Hence we keep a timeout of 1 sec.
     setTimeout(() => {
       this.updateRepoDetailsFromPath();
-      setupCodeObserver();
     }, 1000);
   }
 
