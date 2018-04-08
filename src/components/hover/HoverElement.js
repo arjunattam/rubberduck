@@ -66,10 +66,9 @@ export default class HoverElement extends React.Component {
           if (response.result.definition !== null) {
             definitionPath = response.result.definition.location.path;
           }
+
           this.setState({
-            name: response.result.name,
-            type: response.result.type,
-            docstring: response.result.docstring,
+            ...response.result,
             filePath: definitionPath,
             x: this.props.hoverResult.mouseX,
             y: this.props.hoverResult.mouseY,

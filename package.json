@@ -16,6 +16,7 @@
     "react": "^16.2.0",
     "react-component-octicons": "^1.5.0",
     "react-dom": "^16.2.0",
+    "react-markdown": "^3.3.0",
     "react-redux": "^5.0.6",
     "react-scripts": "1.1.0",
     "react-syntax-highlighter": "^7.0.0",

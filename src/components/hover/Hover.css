@@ -1,10 +1,42 @@
 .hover-box {
-  background: #f1f8ff;
-  width: 300px;
+  background-color: #fff;
+  min-width: 200px;
+  max-width: 300px;
   z-index: 10000;
   position: fixed;
   border: solid 1px #c8e1ff;
   animation: fade-in 0.15s linear;
+  font-size: 12px;
+}
+
+.hover-box .basic code,
+.hover-box .basic pre {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.hover-box .basic pre code span,
+.hover-box .basic pre code span * {
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.hover-box .expanded {
+  padding: 5px 5px 1px 5px;
+  max-height: 300px;
+  background: #f1f8ff;
+}
+
+.hover-box .expand-helper {
+  background-color: #eee;
+  color: #666;
+  font-size: 10px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px;
 }
 
 .hover-box .title {
@@ -15,7 +47,6 @@
 
 .hover-box .docstring {
   padding: 10px;
-  border-bottom: solid 1px #c8e1ff;
   overflow: auto;
   max-height: 150px;
 }

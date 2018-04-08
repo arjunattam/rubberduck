@@ -10,7 +10,6 @@ import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
 import { pathAdapter, treeAdapter } from "../adapters";
-import * as GithubLayout from "./../adapters/github/layout";
 
 let document = window.document;
 
