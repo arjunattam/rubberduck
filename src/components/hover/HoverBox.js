@@ -1,10 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Docstring from "../common/Docstring";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { githubGist as githubStyle } from "react-syntax-highlighter/styles/hljs";
-// import CodeNode from "../common/CodeNode";
-
+import HoverSignature from "./HoverSignature";
+import { setupObserver } from "./SpanFill";
 import "./Hover.css";
 
 const MAX_HEIGHT = 240;
@@ -26,15 +24,6 @@ const ExpandHelper = props => (
   </div>
 );
 
-const HoverSignature = props => (
-  <SyntaxHighlighter
-    language={props.language}
-    children={props.signature}
-    style={githubStyle}
-    wrapLines={true}
-  />
-);
-
 export default class HoverBox extends React.Component {
   // Presentation component for the hover box
   state = {
@@ -54,25 +43,6 @@ export default class HoverBox extends React.Component {
     onReferences: PropTypes.func,
     onDefinition: PropTypes.func
   };
-
-  // renderButtons = () => {
-  //   return (
-  //     <div className="button-container">
-  //       <a
-  //         className="button-div hover-button"
-  //         onClick={this.props.onReferences}
-  //       >
-  //         Find usages
-  //       </a>
-  //       <a
-  //         className="button-div hover-button"
-  //         onClick={this.props.onDefinition}
-  //       >
-  //         Open definition
-  //       </a>
-  //     </div>
-  //   );
-  // };
 
   isVisibleToUser = () => this.props.x > 0;
 
@@ -104,7 +74,7 @@ export default class HoverBox extends React.Component {
   };
 
   getDisplay = () => {
-    // Adding display styling for the animation to trigger
+    // Adding display styling for the opacity animation to trigger
     if (this.isVisibleToUser()) {
       return { display: "block" };
     } else {
@@ -115,24 +85,6 @@ export default class HoverBox extends React.Component {
   getStyle = () => {
     return { ...this.getPosition(), ...this.getDisplay() };
   };
-
-  // render() {
-  //   return (
-  //     <div className="hover-box" style={this.getStyle()}>
-  //       <div className="title">
-  //         {this.props.isLoading ? (
-  //           <div className="loader-container">
-  //             <div className="status-loader" />
-  //           </div>
-  //         ) : (
-  //           <CodeNode {...this.props} showButton={false} />
-  //         )}
-  //       </div>
-  //       <div className="docstring">{Docstring(this.props.docstring)}</div>
-  //       {this.renderButtons()}
-  //     </div>
-  //   );
-  // }
 
   getLine = location => location.range.start.line;
 
@@ -180,6 +132,16 @@ export default class HoverBox extends React.Component {
     document.addEventListener("keydown", this.onKeyDown);
     document.addEventListener("keyup", this.onKeyUp);
     document.addEventListener("click", this.onClick);
+    setupObserver();
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.x != this.props.x && newProps.x > 0) {
+      // Reset the expanded state whenever we get new props
+      this.setState({
+        isExpanded: false
+      });
+    }
   }
 
   renderBasic() {

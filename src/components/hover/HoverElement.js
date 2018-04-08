@@ -1,7 +1,7 @@
 import React from "react";
 import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
-const debounce = require("debounce");
+import debounce from "debounce";
 
 const DEBOUNCE_TIMEOUT = 1200; // ms
 const CURSOR_RADIUS = 20; // pixels

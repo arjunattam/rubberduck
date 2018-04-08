@@ -9,19 +9,6 @@
   font-size: 12px;
 }
 
-.hover-box .basic code,
-.hover-box .basic pre {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
-.hover-box .basic pre code span,
-.hover-box .basic pre code span * {
-  word-wrap: break-word;
-  white-space: normal;
-}
-
 .hover-box .expanded {
   padding: 5px 5px 1px 5px;
   max-height: 300px;
@@ -39,33 +26,6 @@
   padding: 2px;
 }
 
-.hover-box .title {
-  background: #fff;
-  height: 55px;
-  border-bottom: solid 1px #c8e1ff;
-}
-
-.hover-box .docstring {
-  padding: 10px;
-  overflow: auto;
-  max-height: 150px;
-}
-
-.hover-box .button-container {
-  display: flex;
-  justify-content: space-around;
-  padding: 7px 0px;
-  background: #fff;
-}
-
-.hover-box .hover-button {
-  color: #24292e;
-  padding: 6px 12px;
-  font-size: 14px;
-  width: auto;
-  height: auto;
-}
-
 @keyframes fade-in {
   0% {
     opacity: 0;
@@ -73,4 +33,18 @@
   100% {
     opacity: 1;
   }
+}
+
+/* Following styles for syntax highlighted component */
+.hover-box .basic code,
+.hover-box .basic pre {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.hover-box .basic pre code span,
+.hover-box .basic pre code span * {
+  word-wrap: break-word;
+  white-space: normal;
 }
