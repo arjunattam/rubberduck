@@ -28,6 +28,10 @@ const renderExtension = () => {
 };
 
 const loadSentry = () => {
+  if (process.env.REACT_APP_BACKEND_ENV === "local") {
+    return;
+  }
+
   Raven.config(
     "https://c59b970dd8d74935ab8a0001e5cdbe14@sentry.io/417166"
   ).install();

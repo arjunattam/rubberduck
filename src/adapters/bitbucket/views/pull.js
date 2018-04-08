@@ -52,14 +52,6 @@ class PRPageListener extends BaseBitbucketListener {
       return -1;
     }
   };
-
-  getBoundRect = (element, mouseX, mouseY) => {
-    const rect = element.parentElement.getBoundingClientRect();
-    const PADDING = 50;
-    let copyRect = Object.assign({}, rect);
-    copyRect.left = mouseX - PADDING;
-    return copyRect;
-  };
 }
 
 export const listener = (event, callback) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
-const debounce = require("debounce");
+import debounce from "debounce";
 
 const DEBOUNCE_TIMEOUT = 1200; // ms
 const CURSOR_RADIUS = 20; // pixels
@@ -11,16 +11,18 @@ export default class HoverElement extends React.Component {
   state = {
     x: -1000,
     y: -1000,
-    boundRect: {},
+    element: {},
     isLoading: false
   };
 
   onReferences = () => {
-    this.props.onReferences({ x: this.state.x, y: this.state.y });
+    const { x, y } = this.state;
+    this.props.onReferences({ x, y });
   };
 
   onDefinition = () => {
-    this.props.onDefinition({ x: this.state.x, y: this.state.y });
+    const { x, y } = this.state;
+    this.props.onDefinition({ x, y });
   };
 
   isOverlappingWithCurrent = (x, y) => {
@@ -41,39 +43,31 @@ export default class HoverElement extends React.Component {
     });
   };
 
+  getDefinitionPath = response => {
+    const { definition } = response.result;
+    return definition ? definition.location.path : "";
+  };
+
   callAPI = () => {
-    const hoverXY = {
-      x: this.props.hoverResult.mouseX,
-      y: this.props.hoverResult.mouseY
-    };
     this.startLoading();
-    WS.getHover(
-      this.props.hoverResult.fileSha,
-      this.props.hoverResult.filePath,
-      this.props.hoverResult.lineNumber,
-      this.props.hoverResult.charNumber
-    )
+    const { mouseX, mouseY, element } = this.props.hoverResult;
+    const { fileSha, filePath } = this.props.hoverResult;
+    const { lineNumber, charNumber } = this.props.hoverResult;
+
+    WS.getHover(fileSha, filePath, lineNumber, charNumber)
       .then(response => {
         this.stopLoading();
-        const isForCurrentMouse = this.isOverlappingWithCurrent(
-          hoverXY.x,
-          hoverXY.y
-        );
+        const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
+
         if (isForCurrentMouse) {
           // We will set state only if the current
           // mouse location overlaps with the response
-          let definitionPath = "";
-          if (response.result.definition !== null) {
-            definitionPath = response.result.definition.location.path;
-          }
           this.setState({
-            name: response.result.name,
-            type: response.result.type,
-            docstring: response.result.docstring,
-            filePath: definitionPath,
-            x: this.props.hoverResult.mouseX,
-            y: this.props.hoverResult.mouseY,
-            boundRect: this.props.hoverResult.boundRect
+            ...response.result,
+            filePath: this.getDefinitionPath(response),
+            x: mouseX,
+            y: mouseY,
+            element
           });
         }
       })
@@ -90,11 +84,8 @@ export default class HoverElement extends React.Component {
 
     if (hasText) {
       this.callAPI();
-      this.setState({
-        x: this.props.mouseX,
-        y: this.props.mouseY,
-        boundRect: this.props.hoverResult.boundRect
-      });
+      const { mouseX: x, mouseY: y, element } = this.props.hoverResult;
+      this.setState({ x, y, element });
     }
   };
 
@@ -104,8 +95,9 @@ export default class HoverElement extends React.Component {
       this.setState({
         x: -1000,
         y: -1000,
-        boundRect: {},
+        element: {},
         name: "",
+        signature: "",
         type: "",
         docstring: "",
         filePath: ""

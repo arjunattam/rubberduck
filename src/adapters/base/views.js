@@ -16,7 +16,7 @@ export default class BaseViewListener {
       fileSha: this.getFileSha(element),
       lineNumber: this.getLineNumber(element),
       charNumber: this.getCharNumber(element, x, y),
-      boundRect: this.getBoundRect(element, x, y),
+      element: element.parentElement,
       mouseX: x,
       mouseY: y
     };
@@ -54,8 +54,6 @@ export default class BaseViewListener {
     const tabSize = this.getTabSize(element);
     return lineContentLength + numTabs * (tabSize - 1);
   };
-
-  getBoundRect = element => element.parentElement.getBoundingClientRect();
 
   getFontAspectRatio = () => {
     // This will have to change if we need to support other fonts

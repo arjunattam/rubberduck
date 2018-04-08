@@ -14,8 +14,6 @@ class HoverListener extends React.Component {
   }
 
   state = {
-    mouseX: -1000,
-    mouseY: -1000,
     hoverResult: {}
   };
 
@@ -45,12 +43,10 @@ class HoverListener extends React.Component {
     if (hasValidMouseLocation) {
       // Show hover box, and make API call
       this.setState({
-        mouseX: hoverResult.mouseX,
-        mouseY: hoverResult.mouseY,
         hoverResult: hoverResult
       });
     } else {
-      this.setState({ mouseX: -1000, mouseY: -1000, hoverResult: {} });
+      this.setState({ hoverResult: {} });
     }
   };
 

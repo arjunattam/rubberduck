@@ -10,7 +10,7 @@ import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
 import { pathAdapter, treeAdapter } from "../adapters";
-import * as GithubLayout from "./../adapters/github/layout";
+import { setupObserver as setupCodeObserver } from "../adapters/base/codespan";
 
 let document = window.document;
 
@@ -28,6 +28,7 @@ class Extension extends React.Component {
     this.setupChromeListener();
     this.initializeStorage();
     this.updateRepoDetailsFromPath();
+    setupCodeObserver();
   }
 
   componentDidUpdate(prevProps, prevState) {

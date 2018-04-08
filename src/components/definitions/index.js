@@ -29,24 +29,22 @@ class Definitions extends BaseReaderSection {
 
     if (isValidResult && this.state.isVisible) {
       this.startLoading();
-      WS.getDefinition(
-        hoverResult.fileSha,
-        hoverResult.filePath,
-        hoverResult.lineNumber,
-        hoverResult.charNumber
-      )
+      const { fileSha, filePath, lineNumber, charNumber } = hoverResult;
+      WS.getDefinition(fileSha, filePath, lineNumber, charNumber)
         .then(response => {
           this.stopLoading();
-          let filePath = response.result.definition.location
-            ? response.result.definition.location.path
+          const result = response.result;
+          let filePath = result.definition.location
+            ? result.definition.location.path
             : "";
+
           const definition = {
-            name: response.result.name,
+            name: result.name,
             filePath: filePath,
-            startLineNumber: response.result.definition.contents_start_line,
-            lineNumber: response.result.definition.location.range.start.line,
-            docstring: response.result.docstring,
-            codeSnippet: response.result.definition.contents
+            startLineNumber: result.definition.contents_start_line,
+            lineNumber: result.definition.location.range.start.line,
+            docstring: result.docstring,
+            codeSnippet: result.definition.contents
           };
           this.setState({ definition: definition });
         })

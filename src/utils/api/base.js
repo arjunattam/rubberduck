@@ -1,6 +1,5 @@
+import axios from "axios";
 import axiosRetry from "axios-retry";
-
-const axios = require("axios");
 
 const RETRY_LIMIT = 100;
 
