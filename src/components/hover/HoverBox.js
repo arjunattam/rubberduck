@@ -11,12 +11,12 @@ const TOP_MARGIN = 4;
 const ExpandHelper = props => (
   <div className="expand-helper">
     {props.isExpandable ? (
-      <div>
+      <div style={{ textAlign: "left" }}>
         {"⌘ "}
         <strong>{"expand"}</strong>
       </div>
     ) : null}
-    <div>
+    <div style={{ textAlign: "right" }}>
       {"⌘ + click "}
       <strong>{`${props.action}`}</strong>
     </div>
@@ -144,11 +144,10 @@ export default class HoverBox extends React.Component {
     }
   }
 
-  renderBasic() {
+  renderSignature() {
     const { name, signature, language } = this.props;
-    console.log(this.props);
     return (
-      <div className="basic monospace">
+      <div className="signature monospace">
         <HoverSignature
           language={language || ""}
           signature={signature || name || ""}
@@ -157,22 +156,28 @@ export default class HoverBox extends React.Component {
     );
   }
 
-  renderExpanded() {
-    return (
-      <div>
-        <div className="expanded">{Docstring(this.props.docstring)}</div>
-        {this.renderBasic()}
+  renderDocstring = className => {
+    const { docstring } = this.props;
+    return docstring ? (
+      <div className={`docstring ${className}`}>
+        <Docstring docstring={this.props.docstring} />
       </div>
-    );
-  }
+    ) : null;
+  };
+
+  renderBasic = () => this.renderDocstring("basic");
+
+  renderExpanded = () => this.renderDocstring("expanded");
 
   render() {
     const action = this.isDefinition() ? "usages" : "definition";
+    const isExpandable = this.props.docstring ? true : false;
 
     return (
       <div className="hover-box" style={this.getStyle()}>
-        <ExpandHelper isExpandable={true} action={action} />
+        <ExpandHelper isExpandable={isExpandable} action={action} />
         {this.state.isExpanded ? this.renderExpanded() : this.renderBasic()}
+        {this.renderSignature()}
       </div>
     );
   }

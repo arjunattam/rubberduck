@@ -1,22 +1,40 @@
 .hover-box {
   background-color: #fff;
-  min-width: 200px;
+  min-width: 225px; /* Minimum to fit expand helper for definition */
   max-width: 300px;
   z-index: 10000;
   position: fixed;
-  border: solid 1px #c8e1ff;
+  border: solid 1px #eaeaea;
   animation: fade-in 0.15s linear;
   font-size: 12px;
 }
 
-.hover-box .expanded {
-  padding: 5px 5px 1px 5px;
-  max-height: 300px;
+.hover-box .docstring {
+  padding: 5px;
   background: #f1f8ff;
 }
 
+.hover-box .docstring div p:last-child {
+  /* Don't want to have the margin for the last child */
+  margin-bottom: 0;
+}
+
+.hover-box .basic {
+  max-height: 24px;
+}
+
+.hover-box .basic div p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-box .expanded {
+  max-height: 350px;
+}
+
 .hover-box .expand-helper {
-  background-color: #eee;
+  background-color: #f1f1f1;
   color: #666;
   font-size: 10px;
   text-transform: uppercase;
@@ -24,6 +42,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 2px;
+}
+
+.hover-box .expand-helper div {
+  width: 100%;
 }
 
 @keyframes fade-in {
@@ -36,15 +58,15 @@
 }
 
 /* Following styles for syntax highlighted component */
-.hover-box .basic code,
-.hover-box .basic pre {
+.hover-box .signature code,
+.hover-box .signature pre {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
 }
 
-.hover-box .basic pre code span,
-.hover-box .basic pre code span * {
+.hover-box .signature pre code span,
+.hover-box .signature pre code span * {
   word-wrap: break-word;
   white-space: normal;
 }
