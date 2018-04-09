@@ -91,7 +91,7 @@ export default class HoverElement extends React.Component {
 
   clear = () => {
     if (this.dFunc !== undefined) this.dFunc.clear();
-    if (this.state.x > 0)
+    if (this.state.x > 0) {
       this.setState({
         x: -1000,
         y: -1000,
@@ -102,6 +102,7 @@ export default class HoverElement extends React.Component {
         docstring: "",
         filePath: ""
       });
+    }
   };
 
   componentDidUpdate(prevProps, prevState) {

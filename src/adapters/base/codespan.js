@@ -88,7 +88,11 @@ const getCodeParentSelector = () => {
 const getCodeboxSelector = () => {
   switch (getGitService()) {
     case "github":
-      return `div.js-file-content`;
+      if (isGithubCompareView()) {
+        return `div.js-file-content`;
+      } else {
+        return `div.blob-wrapper`;
+      }
     case "bitbucket":
       return `div.diff-container`;
   }

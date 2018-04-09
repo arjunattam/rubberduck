@@ -33,6 +33,21 @@ class HoverListener extends React.Component {
     this.triggerAction("definitions", coordinates);
   };
 
+  selectElement = element => {
+    if (element.getBoundingClientRect) {
+      const fontColor = window.getComputedStyle(element).color;
+      const withOpacity = fontColor.slice(0, -1) + ", 0.075)";
+      element.style.backgroundColor = withOpacity;
+    }
+  };
+
+  removeSelectedElement = () => {
+    if (this.state.hoverResult.element !== null) {
+      const element = this.state.hoverResult.element;
+      if (element && element.style) element.style.backgroundColor = null;
+    }
+  };
+
   receiver = hoverResult => {
     // Callback for the hover listener. API call is made if the
     // mouse locations were correctly infered by the view adapter,
@@ -43,6 +58,7 @@ class HoverListener extends React.Component {
 
     if (hasValidMouseLocation) {
       // Show hover box, and make API call
+      this.selectElement(hoverResult.element);
       this.setState({
         hoverResult: hoverResult
       });
@@ -83,6 +99,7 @@ class HoverListener extends React.Component {
 
   onMouseOverListener(e, listener) {
     if (!this.isOnHoverBox(e.x, e.y)) {
+      this.removeSelectedElement();
       listener(e, this.receiver, this.props.data.repoDetails.branch);
     }
   }

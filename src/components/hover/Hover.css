@@ -1,7 +1,6 @@
 .hover-box {
   background-color: #fff;
-  min-width: 225px; /* Minimum to fit expand helper for definition */
-  max-width: 300px;
+  width: 275px; /* 225px is min to fit "cmd + click for definition" */
   z-index: 10000;
   position: fixed;
   border: solid 1px #eaeaea;
