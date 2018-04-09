@@ -5,8 +5,9 @@ const initialState = {
   clientId: null,
   token: null,
 
-  // Sidebar visible
-  isSidebarVisible: true
+  // Sidebar props
+  isSidebarVisible: true,
+  sidebarWidth: 235
 };
 
 export default createReducer(initialState, {

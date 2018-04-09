@@ -93,8 +93,11 @@ class References extends BaseReaderSection {
     );
 
   render() {
+    const { sidebarWidth } = this.props.storage;
     const referenceItems = this.state.references.map((reference, index) => {
-      return <ReferenceItem {...reference} key={index} />;
+      return (
+        <ReferenceItem {...reference} key={index} sidebarWidth={sidebarWidth} />
+      );
     });
 
     let referencesClassName = this.state.isVisible

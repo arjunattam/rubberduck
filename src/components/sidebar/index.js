@@ -26,10 +26,6 @@ class Sidebar extends React.Component {
     );
   }
 
-  state = {
-    width: 232 // default
-  };
-
   triggerReflow = () => {
     const element = document.querySelector(
       "#mercury-sidebar .sidebar-container"
@@ -38,16 +34,20 @@ class Sidebar extends React.Component {
     element.classList.add("will-slide-left");
   };
 
+  updateStorage = data => {
+    StorageUtils.setAllInStore(data);
+  };
+
   toggleCollapse() {
     if (this.props.storage.isSidebarVisible) {
       // To trigger the left slide animation, we follow this:
       // https://css-tricks.com/restart-css-animation/#article-header-id-0
       this.triggerReflow();
       setTimeout(() => {
-        StorageUtils.setAllInStore({ isSidebarVisible: false });
+        this.updateStorage({ isSidebarVisible: false });
       }, 190);
     } else {
-      StorageUtils.setAllInStore({ isSidebarVisible: true });
+      this.updateStorage({ isSidebarVisible: true });
     }
   }
 
@@ -94,26 +94,24 @@ class Sidebar extends React.Component {
   }
 
   onResize = (e, direction, ref, delta, position) => {
-    this.setState({
-      width: ref.offsetWidth
-    });
+    this.updateStorage({ sidebarWidth: ref.offsetWidth });
   };
 
   updatePageLayout = () => {
-    const { isSidebarVisible } = this.props.storage;
-    GithubLayout.updateLayout(isSidebarVisible, this.state.width);
+    const { isSidebarVisible, sidebarWidth } = this.props.storage;
+    GithubLayout.updateLayout(isSidebarVisible, sidebarWidth);
   };
 
   renderCollapseButton = () => (
     <CollapseButton
       onClick={() => this.toggleCollapse()}
       isVisible={this.props.storage.isSidebarVisible}
-      sidebarWidth={this.state.width}
+      sidebarWidth={this.props.storage.sidebarWidth}
     />
   );
 
   renderSidebar = () => (
-    <Resizable width={this.state.width} onResize={this.onResize}>
+    <Resizable width={this.props.storage.sidebarWidth} onResize={this.onResize}>
       <Title />
       {this.renderCollapseButton()}
       <div className="repo-info-sections">

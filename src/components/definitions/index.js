@@ -72,6 +72,7 @@ class Definitions extends BaseReaderSection {
         {...this.state.definition}
         fileLink={this.getFileLink()}
         visible={this.state.isVisible}
+        sidebarWidth={this.props.storage.sidebarWidth}
       />
     ) : (
       this.renderZeroState()

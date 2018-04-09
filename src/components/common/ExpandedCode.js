@@ -105,7 +105,7 @@ export default class ExpandedCode extends React.Component {
     </div>
   );
 
-  getStyle = () => ({ top: this.props.top, left: 234 });
+  getStyle = () => ({ top: this.props.top, left: this.props.sidebarWidth + 2 });
 
   render() {
     return (
