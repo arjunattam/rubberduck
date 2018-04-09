@@ -60,7 +60,7 @@ class HoverListener extends React.Component {
       this.props.data.repoDetails
     );
     if (!isSameSessionPath || hasChangedPath || !this.listener) {
-      this.setupListener();
+      this.setupListeners();
     }
   }
 
@@ -86,7 +86,16 @@ class HoverListener extends React.Component {
     }
   }
 
-  setupListener = () => {
+  setupListeners = () => {
+    // There are two listeners: one to fill up spans in code elements, other
+    // to listen for those spans.
+    this.setupCodeboxListener();
+    this.setupSpanListener();
+  };
+
+  setupCodeboxListener = () => {};
+
+  setupSpanListener = () => {
     this.listener = getPageListener();
 
     if (this.listener !== null) {

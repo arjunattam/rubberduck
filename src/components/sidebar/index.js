@@ -45,7 +45,7 @@ class Sidebar extends React.Component {
       this.triggerReflow();
       setTimeout(() => {
         this.updateStorage({ isSidebarVisible: false });
-      }, 190);
+      }, 180);
     } else {
       this.updateStorage({ isSidebarVisible: true });
     }

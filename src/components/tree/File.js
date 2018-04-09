@@ -14,24 +14,29 @@ export default class File extends React.Component {
   clickHandler = event => {
     const service = getGitService();
 
-    if (service === "github") {
-      const { pathname } = window.location;
-
-      if (pathname.indexOf("commit") >= 0) {
-        // This is a commits page, we can scroll now
-        return this.scrollTo();
-      } else if (pathname.indexOf("compare") >= 0) {
-        // This is a compare page, we can scroll now
-        return this.scrollTo();
-      } else if (pathname.indexOf("pull") >= 0) {
-        // This is a PR page. Can be conversation or files changed
-        if (pathname.indexOf("files") >= 0) {
+    switch (service) {
+      case "github":
+        const { pathname } = window.location;
+        if (pathname.indexOf("commit") >= 0) {
+          // This is a commits page, we can scroll now
           return this.scrollTo();
-        } else {
-          // This is the conversation page
-          document.addEventListener("pjax:success", this.scrollTo);
+        } else if (pathname.indexOf("compare") >= 0) {
+          // This is a compare page, we can scroll now
+          return this.scrollTo();
+        } else if (pathname.indexOf("pull") >= 0) {
+          // This is a PR page. Can be conversation or files changed
+          if (pathname.indexOf("files") >= 0) {
+            return this.scrollTo();
+          } else {
+            // This is the conversation page
+            document.addEventListener("pjax:success", this.scrollTo);
+          }
         }
-      }
+        break;
+      case "bitbucket":
+        return this.scrollTo();
+      default:
+        return;
     }
   };
 
