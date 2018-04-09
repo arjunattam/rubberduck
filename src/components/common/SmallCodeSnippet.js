@@ -1,6 +1,5 @@
 import React from "react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { github as githubStyle } from "react-syntax-highlighter/styles/hljs";
+import SyntaxHighlight from "./SyntaxHighlight";
 import "./SmallCodeSnippet.css";
 import { decodeBase64 } from "../../utils/data";
 
@@ -25,17 +24,10 @@ export default class SmallCodeSnippet extends React.Component {
   render() {
     return (
       <div className="small-code">
-        <SyntaxHighlighter
+        <SyntaxHighlight
           language={this.props.language}
-          style={githubStyle}
-          wrapLines={true}
-          lineStyle={lineNumber => {
-            let style = { display: "block", width: 220 };
-            return style;
-          }}
-        >
-          {this.getMiddleLine(decodeBase64(this.props.contents))}
-        </SyntaxHighlighter>
+          children={this.getMiddleLine(decodeBase64(this.props.contents))}
+        />
       </div>
     );
   }

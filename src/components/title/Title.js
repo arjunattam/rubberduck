@@ -4,6 +4,8 @@ import Octicon from "react-component-octicons";
 import { getGitService } from "../../adapters";
 import "./Title.css";
 
+const iconStyle = { height: 12, color: "#999" };
+
 const getPRTitle = () => {
   let selector = null;
 
@@ -37,8 +39,6 @@ const getCompareTitle = () => {
   return element ? element.getAttribute("title") : "";
 };
 
-const iconStyle = { height: 12, color: "#999" };
-
 class Title extends React.Component {
   renderSubtitle = repoDetails => {
     let inner = null;
@@ -68,21 +68,26 @@ class Title extends React.Component {
     );
   };
 
-  render() {
-    const repoDetails = this.props.data.repoDetails;
+  renderTitle = repoDetails => {
     const reponameHref =
       "/" + repoDetails.username + "/" + repoDetails.reponame;
 
     return (
+      <div className="reponame">
+        <Octicon name="repo" style={{ height: 21 }} />{" "}
+        <a href={reponameHref}>
+          <strong>{repoDetails.reponame}</strong>
+        </a>
+      </div>
+    );
+  };
+
+  render() {
+    const repoDetails = this.props.data.repoDetails;
+    return (
       <div className="header">
-        <p>
-          <Octicon name="repo" style={{ height: 21 }} />{" "}
-          <a href={reponameHref}>
-            <strong>{repoDetails.reponame}</strong>
-          </a>
-        </p>
+        {this.renderTitle(repoDetails)}
         {this.renderSubtitle(repoDetails)}
-        <div>{this.props.children}</div>
       </div>
     );
   }

@@ -1,9 +1,8 @@
 import React from "react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { githubGist as githubStyle } from "react-syntax-highlighter/styles/hljs";
 import Octicon from "react-component-octicons";
-import "./ExpandedCode.css";
+import SyntaxHighlight from "./SyntaxHighlight";
 import { decodeBase64 } from "../../utils/data";
+import "./ExpandedCode.css";
 
 export default class ExpandedCode extends React.Component {
   // Line numbers are zero-indexed in the API, so we need to +1
@@ -75,38 +74,44 @@ export default class ExpandedCode extends React.Component {
     this.setScrollTop();
   }
 
-  renderCode = children => (
-    <SyntaxHighlighter
-      language={this.getLanguage()}
-      style={githubStyle}
-      showLineNumbers={true}
-      startingLineNumber={this.props.startLineNumber + 1}
-      lineNumberStyle={{ color: "rgba(27,31,35,0.3)" }}
-      wrapLines={true}
-      lineStyle={lineNo => {
-        return this.getHighligtedLineStyle(lineNo);
-      }}
-    >
-      {children}
-    </SyntaxHighlighter>
+  renderCode = () => (
+    <div className="expanded-content">
+      <SyntaxHighlight
+        children={this.getContent()}
+        language={this.getLanguage()}
+        showLineNumbers={true}
+        startingLineNumber={this.props.startLineNumber + 1}
+        lineStyle={lineNo => {
+          return this.getHighligtedLineStyle(lineNo);
+        }}
+      />
+    </div>
   );
+
+  renderLink = () => (
+    <div className="expanded-button">
+      <a href={this.props.fileLink} target="_blank">
+        Open file ↗
+      </a>
+    </div>
+  );
+
+  renderTitleSection = () => (
+    <div className="expanded-title">
+      <div className="expanded-filepath">
+        <Octicon name="file" /> {this.props.filePath}
+      </div>
+      {this.renderLink()}
+    </div>
+  );
+
+  getStyle = () => ({ top: this.props.top, left: this.props.sidebarWidth + 2 });
 
   render() {
     return (
-      <div className="expanded-code" style={{ top: this.props.top }}>
-        <div className="expanded-title">
-          <div className="expanded-filepath">
-            <Octicon name="file" /> {this.props.filePath}
-          </div>
-          <div className="expanded-button">
-            <a href={this.props.fileLink} target="_blank">
-              Open file ↗
-            </a>
-          </div>
-        </div>
-        <div className="expanded-content">
-          {this.renderCode(this.getContent())}
-        </div>
+      <div className="expanded-code" style={this.getStyle()}>
+        {this.renderTitleSection()}
+        {this.renderCode()}
       </div>
     );
   }

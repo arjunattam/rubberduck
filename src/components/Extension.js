@@ -5,7 +5,7 @@ import { API } from "../utils/api";
 import { WS } from "../utils/websocket";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
-import Sidebar from "./Sidebar";
+import Sidebar from "./sidebar";
 import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
