@@ -21,6 +21,19 @@ class Definitions extends BaseReaderSection {
     });
   };
 
+  getFilePath = result =>
+    result.definition && result.definition.location
+      ? result.definition.location.path
+      : "";
+
+  getStartLine = result =>
+    result.definition ? result.definition.contents_start_line : null;
+
+  getLine = result =>
+    result.definition && result.definition.location
+      ? result.definition.location.range.start.line
+      : null;
+
   getSelectionData = () => {
     const hoverResult = this.readPage();
     const isValidResult =
@@ -34,17 +47,13 @@ class Definitions extends BaseReaderSection {
         .then(response => {
           this.stopLoading();
           const result = response.result;
-          let filePath = result.definition.location
-            ? result.definition.location.path
-            : "";
-
           const definition = {
             name: result.name,
-            filePath: filePath,
-            startLineNumber: result.definition.contents_start_line,
-            lineNumber: result.definition.location.range.start.line,
+            filePath: this.getFilePath(result),
+            startLineNumber: this.getStartLine(result),
+            lineNumber: this.getLine(result),
             docstring: result.docstring,
-            codeSnippet: result.definition.contents
+            codeSnippet: result.definition ? result.definition.contents : ""
           };
           this.setState({ definition: definition });
         })

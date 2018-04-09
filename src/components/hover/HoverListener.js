@@ -2,9 +2,10 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
-import { getPageListener } from "../../adapters/";
+import { getPageListener, getGitService } from "../../adapters/";
 import HoverElement from "./HoverElement";
 import { pathAdapter } from "../../adapters";
+import { fillUpSpans } from "../../adapters/base/codespan";
 
 class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
@@ -87,29 +88,20 @@ class HoverListener extends React.Component {
   }
 
   setupListeners = () => {
-    // There are two listeners: one to fill up spans in code elements, other
-    // to listen for those spans.
-    this.setupCodeboxListener();
-    this.setupSpanListener();
-  };
-
-  setupCodeboxListener = () => {};
-
-  setupSpanListener = () => {
     this.listener = getPageListener();
 
     if (this.listener !== null) {
-      document.body.onmouseover = null;
-      document.body.onmouseover = e => {
+      document.body.onmousemove = null;
+      document.body.onmousemove = e => {
         this.onMouseOverListener(e, this.listener);
       };
     } else {
-      document.body.onmouseover = null;
+      document.body.onmousemove = null;
     }
   };
 
   componentWillUnmount() {
-    document.body.onmouseover = null;
+    document.body.onmousemove = null;
   }
 
   render() {

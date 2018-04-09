@@ -1,7 +1,5 @@
 import { getGitService, isGithubCompareView } from "../index";
 
-var observer;
-
 const delimiterChars = "'.:\\\"$+<=>^` \\t,\\(\\)\\{\\}\\[\\]";
 
 const delimiterSplit = string => {
@@ -52,28 +50,27 @@ const reconstructTd = codeTd => {
   codeTd.innerHTML = reconstructedElements.join("");
 };
 
-const fillUpSpans = () => {
+export const fillUpSpans = rootElement => {
+  console.log("fill up spans");
   let codeTds;
 
   switch (getGitService()) {
     case "github":
       if (isGithubCompareView()) {
-        codeTds = document.querySelectorAll("span.blob-code-inner");
+        codeTds = rootElement.querySelectorAll("span.blob-code-inner");
       } else {
-        codeTds = document.querySelectorAll("td.blob-code-inner");
+        codeTds = rootElement.querySelectorAll("td.blob-code-inner");
       }
       break;
     case "bitbucket":
-      codeTds = document.querySelectorAll("div.udiff-line pre");
+      codeTds = rootElement.querySelectorAll("div.udiff-line pre");
       break;
     default:
       codeTds = [];
   }
 
   if (codeTds.length > 0) {
-    observer.disconnect(); // disconnect the MutationObserver
     codeTds.forEach(codeTd => reconstructTd(codeTd));
-    setupMutationObserver();
   }
 };
 
@@ -88,19 +85,37 @@ const getCodeParentSelector = () => {
   }
 };
 
+const getCodeboxSelector = () => {
+  switch (getGitService()) {
+    case "github":
+      return `div.js-file-content`;
+    case "bitbucket":
+      return `div.diff-container`;
+  }
+};
+
+const setupCodeboxListener = () => {
+  const codeboxElements = document.querySelectorAll(getCodeboxSelector());
+  console.log("setup codebox listener", codeboxElements.length);
+  codeboxElements.forEach(element => {
+    element.onmouseenter = null;
+    element.onmouseenter = e => fillUpSpans(element);
+  });
+};
+
 const setupMutationObserver = () => {
   var targetNode = document.querySelector(getCodeParentSelector());
   var config = { childList: true, subtree: true };
   var callback = function(mutationsList) {
-    fillUpSpans();
+    setupCodeboxListener();
   };
-  observer = new MutationObserver(callback);
+  var observer = new MutationObserver(callback);
   if (targetNode) {
     observer.observe(targetNode, config);
+    setupCodeboxListener();
   }
 };
 
 export const setupObserver = () => {
   setupMutationObserver();
-  fillUpSpans();
 };
