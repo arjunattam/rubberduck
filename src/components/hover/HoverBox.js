@@ -178,7 +178,8 @@ export default class HoverBox extends React.Component {
 
   removeSelectedElement = () => {
     if (this.state.lastElement !== null) {
-      this.state.lastElement.style.backgroundColor = null;
+      const element = this.state.lastElement;
+      element.style.backgroundColor = null;
     }
   };
 
