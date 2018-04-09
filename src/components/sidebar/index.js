@@ -1,32 +1,34 @@
 import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import "./../index.css";
-import * as DataActions from "../actions/dataActions";
-import * as StorageActions from "../actions/storageActions";
-import * as StorageUtils from "../utils/storage";
-import Title from "./title/Title";
-import StatusBar from "./status/StatusBar";
-import CollapseButton from "./collapse/CollapseButton";
-import Tree from "./tree";
-import References from "./references";
-import Definitions from "./definitions";
-import HoverListener from "./hover/HoverListener";
-import SessionStatus from "./session";
-import * as GithubLayout from "./../adapters/github/layout";
-
-const SIDEBAR_WIDTH = 232; // pixels
+import * as DataActions from "../../actions/dataActions";
+import * as StorageActions from "../../actions/storageActions";
+import * as StorageUtils from "../../utils/storage";
+import Title from "../title/Title";
+import StatusBar from "../status/StatusBar";
+import CollapseButton from "../collapse/CollapseButton";
+import Tree from "../tree";
+import References from "../references";
+import Definitions from "../definitions";
+import HoverListener from "../hover/HoverListener";
+import SessionStatus from "../session";
+import * as GithubLayout from "../../adapters/github/layout";
+import Resizable from "./Resizable";
+import "../../index.css";
 
 class Sidebar extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
     this.StorageActions = bindActionCreators(
       StorageActions,
       this.props.dispatch
     );
   }
+
+  state = {
+    width: 232 // default
+  };
 
   triggerReflow = () => {
     const element = document.querySelector(
@@ -65,17 +67,6 @@ class Sidebar extends React.Component {
     );
   }
 
-  renderTitle() {
-    return (
-      <Title>
-        <CollapseButton
-          onClick={() => this.toggleCollapse()}
-          isVisible={this.props.storage.isSidebarVisible}
-        />
-      </Title>
-    );
-  }
-
   renderTree() {
     if (this.hasRepoDetails()) {
       return <Tree isVisible={this.props.data.openSection === "tree"} />;
@@ -102,32 +93,45 @@ class Sidebar extends React.Component {
     );
   }
 
-  render() {
-    const { isSidebarVisible } = this.props.storage;
-    GithubLayout.updateLayout(isSidebarVisible, SIDEBAR_WIDTH);
+  onResize = (e, direction, ref, delta, position) => {
+    this.setState({
+      width: ref.offsetWidth
+    });
+  };
 
-    if (isSidebarVisible) {
-      return (
-        <div className="sidebar-container will-slide-right">
-          {this.renderTitle()}
-          <div className="repo-info-sections">
-            <SessionStatus />
-            {this.renderTree()}
-            {this.renderReferences()}
-            {this.renderDefinitions()}
-          </div>
-          <HoverListener />
-          <StatusBar />
-        </div>
-      );
-    } else {
-      return (
-        <CollapseButton
-          onClick={() => this.toggleCollapse()}
-          isVisible={false}
-        />
-      );
-    }
+  updatePageLayout = () => {
+    const { isSidebarVisible } = this.props.storage;
+    GithubLayout.updateLayout(isSidebarVisible, this.state.width);
+  };
+
+  renderCollapseButton = () => (
+    <CollapseButton
+      onClick={() => this.toggleCollapse()}
+      isVisible={this.props.storage.isSidebarVisible}
+      sidebarWidth={this.state.width}
+    />
+  );
+
+  renderSidebar = () => (
+    <Resizable width={this.state.width} onResize={this.onResize}>
+      <Title />
+      {this.renderCollapseButton()}
+      <div className="repo-info-sections">
+        <SessionStatus />
+        {this.renderTree()}
+        {this.renderReferences()}
+        {this.renderDefinitions()}
+      </div>
+      <HoverListener />
+      <StatusBar />
+    </Resizable>
+  );
+
+  render() {
+    this.updatePageLayout();
+    return this.props.storage.isSidebarVisible
+      ? this.renderSidebar()
+      : this.renderCollapseButton();
   }
 }
 

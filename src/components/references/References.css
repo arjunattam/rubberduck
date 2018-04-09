@@ -24,7 +24,6 @@
 
 .reference-name {
   font-weight: bold;
-  width: 210px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
