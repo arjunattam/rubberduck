@@ -34,10 +34,48 @@ class HoverListener extends React.Component {
   };
 
   selectElement = element => {
-    if (element.getBoundingClientRect) {
+    if (element.getBoundingClientRect && element.tagName === "SPAN") {
       const fontColor = window.getComputedStyle(element).color;
       const withOpacity = fontColor.slice(0, -1) + ", 0.075)";
       element.style.backgroundColor = withOpacity;
+    }
+  };
+
+  isExpandKeyCode = keyCode => {
+    // Handles command key left/right on Mac
+    return keyCode === 91 || keyCode === 93;
+  };
+
+  onKeyDown = event => {
+    if (this.isExpandKeyCode(event.keyCode)) {
+      this.underlineElement();
+    }
+  };
+
+  onKeyUp = event => {
+    if (this.isExpandKeyCode(event.keyCode)) {
+      this.removeUnderlineElement();
+    }
+  };
+
+  componentDidMount() {
+    document.addEventListener("keydown", this.onKeyDown);
+    document.addEventListener("keyup", this.onKeyUp);
+  }
+
+  underlineElement = () => {
+    const element = this.state.hoverResult.element;
+
+    if (element && element.getBoundingClientRect) {
+      element.classList.add("underlined");
+    }
+  };
+
+  removeUnderlineElement = () => {
+    const element = this.state.hoverResult.element;
+
+    if (element && element.getBoundingClientRect) {
+      element.classList.remove("underlined");
     }
   };
 

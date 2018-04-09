@@ -9,7 +9,6 @@
 }
 
 .hover-box .docstring {
-  padding: 5px;
   background: #f1f8ff;
 }
 
@@ -27,14 +26,27 @@
   max-height: 24px;
 }
 
+.hover-box .basic div {
+  overflow: hidden;
+  max-height: inherit;
+  padding: 5px;
+}
+
 .hover-box .basic div p {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.hover-box .expanded {
-  max-height: 350px;
+.hover-box .expanded div {
+  max-height: 300px;
+  overflow: auto;
+  padding: 5px;
+}
+
+.underlined {
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .hover-box .expand-helper {
