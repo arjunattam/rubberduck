@@ -50,7 +50,7 @@ class Definitions extends BaseReaderSection {
           this.stopLoading();
           const result = response.result;
           const definition = {
-            name: hoverResult.element.nodeValue,
+            name: result.name,
             filePath: this.getFilePath(result),
             startLineNumber: this.getStartLine(result),
             lineNumber: this.getLine(result),

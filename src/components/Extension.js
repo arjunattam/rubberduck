@@ -10,7 +10,7 @@ import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
 import { pathAdapter, treeAdapter } from "../adapters";
-import { fillUpSpans } from "../adapters/base/codespan";
+import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 
 let document = window.document;
 
@@ -28,7 +28,7 @@ class Extension extends React.Component {
     this.setupChromeListener();
     this.initializeStorage();
     this.updateRepoDetailsFromPath();
-    fillUpSpans(document);
+    setupSpanObserver();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -90,8 +90,8 @@ class Extension extends React.Component {
     // Hence we keep a timeout of 1 sec.
     setTimeout(() => {
       this.updateRepoDetailsFromPath();
-      fillUpSpans(document);
     }, 1000);
+    setupSpanObserver();
   }
 
   updateRepoDetailsFromPath() {
