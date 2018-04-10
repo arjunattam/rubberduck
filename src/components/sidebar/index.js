@@ -67,31 +67,21 @@ class Sidebar extends React.Component {
     );
   }
 
-  renderTree() {
-    if (this.hasRepoDetails()) {
-      return <Tree isVisible={this.props.data.openSection === "tree"} />;
-    }
-  }
+  renderTree = () => <Tree />;
 
-  renderReferences() {
-    return (
-      <References
-        isVisible={this.props.data.openSection === "references"}
-        selectionX={this.props.data.textSelection.x}
-        selectionY={this.props.data.textSelection.y}
-      />
-    );
-  }
+  renderReferences = () => (
+    <References
+      selectionX={this.props.data.textSelection.x}
+      selectionY={this.props.data.textSelection.y}
+    />
+  );
 
-  renderDefinitions() {
-    return (
-      <Definitions
-        isVisible={this.props.data.openSection === "definitions"}
-        selectionX={this.props.data.textSelection.x}
-        selectionY={this.props.data.textSelection.y}
-      />
-    );
-  }
+  renderDefinitions = () => (
+    <Definitions
+      selectionX={this.props.data.textSelection.x}
+      selectionY={this.props.data.textSelection.y}
+    />
+  );
 
   onResize = (e, direction, ref, delta, position) => {
     this.updateStorage({ sidebarWidth: ref.offsetWidth });

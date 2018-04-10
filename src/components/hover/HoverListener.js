@@ -17,8 +17,11 @@ class HoverListener extends React.Component {
   };
 
   triggerAction = (actionName, coordinates) => {
+    let newSection = {};
+    newSection[actionName] = true;
+    const openSection = { ...this.props.data.openSection, ...newSection };
     this.DataActions.updateData({
-      openSection: actionName,
+      openSection,
       textSelection: coordinates
     });
   };

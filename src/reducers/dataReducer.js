@@ -3,8 +3,14 @@ import { createReducer } from "redux-create-reducer";
 const initialState = {
   sessions: {},
   repoDetails: {},
-  openSection: "tree",
   textSelection: {},
+
+  // Open section (default states)
+  openSection: {
+    tree: true,
+    references: false,
+    definitions: false
+  },
 
   // Files tree
   fileTree: {

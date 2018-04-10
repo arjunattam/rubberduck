@@ -1,19 +1,27 @@
 import React from "react";
+import { bindActionCreators } from "redux";
 import PropTypes from "prop-types";
 import SectionHeader from "./Section";
 import { getPageReader } from "../../adapters";
+import * as DataActions from "../../actions/dataActions";
 
 export class BaseSection extends React.Component {
+  constructor(props) {
+    super(props);
+    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
+  }
+
   componentWillReceiveProps(newProps) {
-    if (newProps.isVisible !== this.state.isVisible) {
-      this.setState({ isVisible: newProps.isVisible });
+    const nowVisible = newProps.data.openSection[this.sectionName];
+    if (nowVisible !== this.state.isVisible) {
+      this.setState({ isVisible: nowVisible });
     }
   }
 
   toggleVisibility = () => {
-    this.setState({
-      isVisible: !this.state.isVisible
-    });
+    let openSection = { ...this.props.data.openSection };
+    openSection[this.sectionName] = !this.state.isVisible;
+    this.DataActions.updateData({ openSection });
   };
 
   renderSectionHeader = name => (

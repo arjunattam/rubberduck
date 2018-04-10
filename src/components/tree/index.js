@@ -1,26 +1,24 @@
 import React from "react";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
 import { renderChildren } from "./Folder";
 import { BaseSection } from "../section";
 import { treeAdapter } from "../../adapters";
-import * as DataActions from "../../actions/dataActions";
 import "./Tree.css";
 
 class Tree extends BaseSection {
-  constructor(props) {
-    super(props);
-    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
-  }
+  sectionName = "tree";
 
   state = {
-    isVisible: this.props.isVisible,
+    isVisible: this.props.data.openSection.tree,
     isLoading: false
   };
 
   componentWillReceiveProps(newProps) {
-    if (newProps.isVisible !== this.state.isVisible) {
-      this.setState({ isVisible: newProps.isVisible });
+    // Overriden for loading state
+    const nowVisible = newProps.data.openSection.tree;
+
+    if (nowVisible !== this.state.isVisible) {
+      this.setState({ isVisible: nowVisible });
     }
 
     if (newProps.data.isTreeLoading !== this.state.isLoading) {
@@ -35,20 +33,6 @@ class Tree extends BaseSection {
       <div className="status-loader" />
     </div>
   );
-
-  toggleVisibility = () => {
-    // Overriding this to save the openSection data field
-    if (!this.state.isVisible) {
-      console.log("updating data");
-      this.DataActions.updateData({
-        openSection: "tree"
-      });
-    }
-
-    this.setState({
-      isVisible: !this.state.isVisible
-    });
-  };
 
   flattenSingleDirectory = () => {
     // This method flattens the tree in the case when there is a chain

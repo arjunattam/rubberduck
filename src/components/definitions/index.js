@@ -9,6 +9,8 @@ class Definitions extends BaseReaderSection {
   // This gets x and y of the selected text, constructs the
   // API call payload by reading DOM, and then display the
   // result of the API call.
+  sectionName = "definitions";
+
   state = {
     isVisible: false,
     isLoading: false,
