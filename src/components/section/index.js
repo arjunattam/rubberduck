@@ -16,6 +16,7 @@ export class BaseSection extends React.Component {
     if (nowVisible !== this.state.isVisible) {
       this.setState({ isVisible: nowVisible });
     }
+    if (this.postCWRPHook) this.postCWRPHook(newProps);
   }
 
   toggleVisibility = () => {

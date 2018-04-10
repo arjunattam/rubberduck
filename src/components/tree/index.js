@@ -13,14 +13,7 @@ class Tree extends BaseSection {
     isLoading: false
   };
 
-  componentWillReceiveProps(newProps) {
-    // Overriden for loading state
-    const nowVisible = newProps.data.openSection.tree;
-
-    if (nowVisible !== this.state.isVisible) {
-      this.setState({ isVisible: nowVisible });
-    }
-
+  postCWRPHook(newProps) {
     if (newProps.data.isTreeLoading !== this.state.isLoading) {
       this.setState({
         isLoading: newProps.data.isTreeLoading

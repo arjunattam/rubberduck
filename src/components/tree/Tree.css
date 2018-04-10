@@ -5,7 +5,7 @@
 
 .tree-content {
   overflow: hidden;
-  transition: max-height 750ms ease-in;
+  transition: max-height 400ms linear;
 }
 
 .tree-content-visible {
