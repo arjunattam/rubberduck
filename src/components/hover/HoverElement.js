@@ -111,8 +111,15 @@ export default class HoverElement extends React.Component {
     if (element && element.style) element.style.backgroundColor = null;
   };
 
-  isValidElement = element =>
-    element && element.getBoundingClientRect && element.tagName === "SPAN";
+  isValidElement = element => {
+    const isElement = element && element.getBoundingClientRect;
+    if (isElement) {
+      const validTags = ["SPAN", "INS", "DEL"];
+      return validTags.indexOf(element.tagName) >= 0;
+    } else {
+      return false;
+    }
+  };
 
   underlineElement = element => {
     if (this.isValidElement(element)) {

@@ -28,23 +28,53 @@ const delimiterSplit = string => {
   return finalSplit;
 };
 
+const constructNodeHTML = childText => {
+  // const childText = node.nodeValue;
+  const splitText = delimiterSplit(childText);
+  const spannedChild = splitText.map(text => {
+    const delimiterMatcher = new RegExp(`[${delimiterChars}]`);
+    if (text.match(delimiterMatcher) || text.length < 1) {
+      return text;
+    } else {
+      return `<span>${text}</span>`;
+    }
+  });
+  return spannedChild;
+};
+
+const isDarkDiffElement = node => {
+  switch (getGitService()) {
+    case "github":
+      return node.classList.contains("x") && node.tagName === "SPAN";
+    case "bitbucket":
+      return node.tagName === "DEL" || node.tagName === "INS";
+    default:
+      return false;
+  }
+};
+
 const reconstructTd = codeTd => {
   const childNodes = codeTd.childNodes;
   let reconstructedElements = [];
   childNodes.forEach(childNode => {
-    if (childNode.nodeType === 3) {
+    if (childNode.nodeType === 3 && childNode.nodeValue) {
       // This is a text child node
-      const childText = childNode.nodeValue;
-      const splitText = delimiterSplit(childText);
-      const spannedChild = splitText.map(text => {
-        const delimiterMatcher = new RegExp(`[${delimiterChars}]`);
-        if (text.match(delimiterMatcher) || text.length < 1) {
-          return text;
-        } else {
-          return `<span>${text}</span>`;
-        }
-      });
+      const spannedChild = constructNodeHTML(childNode.nodeValue);
       reconstructedElements.push(...spannedChild);
+    } else if (isDarkDiffElement(childNode)) {
+      // To fix the cases where `darker diff colors` break span-fill,
+      // we will check if this span element's nodeValue contains delimiters
+      const childText = childNode.textContent;
+      const splitText = delimiterSplit(childText);
+
+      if (splitText.length > 1) {
+        // This has delimiters, we need to split the inner elements
+        const newInnerHTML = constructNodeHTML(childText);
+        childNode.innerHTML = newInnerHTML.join("");
+        reconstructedElements.push(childNode.outerHTML);
+      } else {
+        reconstructedElements.push(childNode.outerHTML);
+      }
     } else {
       reconstructedElements.push(childNode.outerHTML);
     }
@@ -53,7 +83,6 @@ const reconstructTd = codeTd => {
 };
 
 export const fillUpSpans = rootElement => {
-  console.log("fill up spans");
   let codeTds;
 
   switch (getGitService()) {
@@ -107,10 +136,9 @@ const getCodeboxSelector = () => {
 
 const setupCodeboxListener = () => {
   const codeboxElements = document.querySelectorAll(getCodeboxSelector());
-  console.log("setup codebox listener", codeboxElements.length);
   codeboxElements.forEach(element => {
-    element.onmouseenter = null;
-    element.onmouseenter = e => {
+    element.onmouseover = null;
+    element.onmouseover = e => {
       if (!element.classList.contains(POST_FILL_CLASS)) fillUpSpans(element);
     };
   });
