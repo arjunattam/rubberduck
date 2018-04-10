@@ -12,7 +12,7 @@ export default class HoverElement extends React.Component {
     apiResult: {},
     hoverResult: {},
     isLoading: false,
-    isExpanded: false
+    isHighlighted: false
   };
 
   onReferences = () => {
@@ -23,6 +23,11 @@ export default class HoverElement extends React.Component {
   onDefinition = () => {
     const { mouseX, mouseY } = this.state.hoverResult;
     this.props.onDefinition({ x: mouseX, y: mouseY });
+  };
+
+  callActions = () => {
+    this.onReferences();
+    this.onDefinition();
   };
 
   isOverlappingWithCurrent = (x, y) => {
@@ -49,16 +54,14 @@ export default class HoverElement extends React.Component {
     return definition ? definition.location.path : "";
   };
 
-  getLine = location => location.range.start.line;
-
-  isDefinition = response => {
-    const { definition, location } = response.result;
-    return (
-      definition && this.getLine(definition.location) === this.getLine(location)
-    );
+  isValidHoverResult = () => {
+    const hoverName = this.props.hoverResult.name;
+    const hasText = hoverName && hoverName.trim() !== "";
+    return hasText;
   };
 
   callAPI = () => {
+    if (!this.isValidHoverResult()) return;
     this.startLoading();
     const { fileSha, filePath } = this.props.hoverResult;
     const { lineNumber, charNumber } = this.props.hoverResult;
@@ -72,54 +75,27 @@ export default class HoverElement extends React.Component {
         if (isForCurrentMouse) {
           // We will set state only if the current
           // mouse location overlaps with the response
+          const apiResult = {
+            ...response.result,
+            filePath: this.getDefinitionPath(response)
+          };
           this.setState({
-            apiResult: response.result,
+            apiResult,
             hoverResult: this.props.hoverResult,
-            filePath: this.getDefinitionPath(response),
-            isDefinition: this.isDefinition(response)
+            isVisible: true
           });
         }
       })
       .catch(error => {
         this.stopLoading();
-        this.clear();
+        this.clearDebouce();
         console.log("Error in API call", error);
       });
   };
 
-  update = () => {
-    const hoverName = this.props.hoverResult.name;
-    const hasText = hoverName && hoverName.trim() !== "";
-
-    if (hasText) {
-      this.callAPI();
-      const { hoverResult } = this.props;
-      this.setState({ hoverResult });
-    }
-  };
-
-  clear = () => {
-    if (this.dFunc !== undefined) this.dFunc.clear();
-    if (this.state.hoverResult.mouseX > 0) {
-      this.setState({
-        hoverResult: {},
-        apiResult: {}
-      });
-    }
-  };
-
   onClick = event => {
-    const isVisible = this.props.hoverResult.mouseX > 0;
-    if (this.state.isExpanded && isVisible) {
-      this.doDefaultAction();
-    }
-  };
-
-  doDefaultAction = () => {
-    if (this.state.isDefinition) {
-      this.onReferences();
-    } else {
-      this.onDefinition();
+    if (this.state.isHighlighted) {
+      this.callActions();
     }
   };
 
@@ -139,17 +115,13 @@ export default class HoverElement extends React.Component {
     if (element && element.style) element.style.backgroundColor = null;
   };
 
-  underlineElement = () => {
-    const element = this.props.hoverResult.element;
-
+  underlineElement = element => {
     if (element && element.getBoundingClientRect) {
       element.classList.add("underlined");
     }
   };
 
-  removeUnderlineElement = () => {
-    const element = this.props.hoverResult.element;
-
+  removeUnderlineElement = element => {
     if (element && element.getBoundingClientRect) {
       element.classList.remove("underlined");
     }
@@ -162,15 +134,15 @@ export default class HoverElement extends React.Component {
 
   onKeyDown = event => {
     if (this.isExpandKeyCode(event.keyCode)) {
-      this.underlineElement();
-      this.setState({ isExpanded: true });
+      this.underlineElement(this.props.hoverResult.element);
+      this.setState({ isHighlighted: true });
     }
   };
 
   onKeyUp = event => {
     if (this.isExpandKeyCode(event.keyCode)) {
-      this.removeUnderlineElement();
-      this.setState({ isExpanded: false });
+      this.removeUnderlineElement(this.props.hoverResult.element);
+      this.setState({ isHighlighted: false });
     }
   };
 
@@ -184,6 +156,10 @@ export default class HoverElement extends React.Component {
     if (newProps.hoverResult.element !== this.props.hoverResult.element) {
       this.removeSelectedElement(this.props.hoverResult.element);
       this.selectElement(newProps.hoverResult.element);
+
+      if (!newProps.hoverResult.mouseX) {
+        this.removeUnderlineElement(this.props.hoverResult.element);
+      }
     }
   }
 
@@ -194,12 +170,17 @@ export default class HoverElement extends React.Component {
     const didChangeChar = currentResult.charNumber !== prevResult.charNumber;
 
     if (didChangeChar || didChangeLine) {
-      // Props have been updated, so make API call if we are on new line/char
-      this.clear();
-      this.dFunc = debounce(() => this.update(), DEBOUNCE_TIMEOUT);
+      this.clearDebouce();
+      const { hoverResult } = this.props;
+      this.setState({ hoverResult, isVisible: false });
+      this.dFunc = debounce(() => this.callAPI(), DEBOUNCE_TIMEOUT);
       this.dFunc();
     }
   }
+
+  clearDebouce = () => {
+    if (this.dFunc !== undefined) this.dFunc.clear();
+  };
 
   render() {
     return <HoverBox {...this.state} />;

@@ -117,8 +117,8 @@ class Sidebar extends React.Component {
       <div className="repo-info-sections">
         <SessionStatus />
         {this.renderTree()}
-        {this.renderReferences()}
         {this.renderDefinitions()}
+        {this.renderReferences()}
       </div>
       <HoverListener />
       <StatusBar />

@@ -2,10 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
-import { getPageListener, getGitService } from "../../adapters/";
+import { getPageListener, pathAdapter } from "../../adapters/";
 import HoverElement from "./HoverElement";
-import { pathAdapter } from "../../adapters";
-import { fillUpSpans } from "../../adapters/base/codespan";
 
 class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page

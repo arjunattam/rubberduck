@@ -10,25 +10,26 @@ const TOP_MARGIN = 4;
 
 const ExpandHelper = props => (
   <div className="expand-helper">
+    <div style={{ textAlign: "left" }}>
+      {"⌘ + click "}
+      <strong>{"actions"}</strong>
+    </div>
     {props.isExpandable ? (
-      <div style={{ textAlign: "left" }}>
+      <div style={{ textAlign: "right" }}>
         {"⌘ "}
         <strong>{"expand"}</strong>
       </div>
     ) : null}
-    <div style={{ textAlign: "right" }}>
-      {"⌘ + click "}
-      <strong>{`${props.action}`}</strong>
-    </div>
   </div>
 );
 
 export default class HoverBox extends React.Component {
   static propTypes = {
-    apiResult: PropTypes.string,
+    apiResult: PropTypes.object,
     hoverResult: PropTypes.object,
-    isDefinition: PropTypes.bool,
-    isExpanded: PropTypes.bool
+    isVisible: PropTypes.bool,
+    isLoading: PropTypes.bool,
+    isHighlighted: PropTypes.bool
   };
 
   isVisibleToUser = () => this.props.hoverResult.mouseX > 0;
@@ -63,28 +64,37 @@ export default class HoverBox extends React.Component {
   };
 
   getDisplay = () => {
-    // Adding display styling for the opacity animation to trigger
     if (this.isVisibleToUser()) {
+      // Adding display styling for the opacity animation to trigger
       return { display: "block" };
     } else {
       return { display: "none" };
     }
   };
 
+  hasHoverResponse = () => {
+    return this.props.apiResult.name ? true : false;
+  };
+
   getStyle = () => {
-    return { ...this.getPosition(), ...this.getDisplay() };
+    const width = this.hasHoverResponse() ? 275 : 150;
+    return {
+      ...this.getPosition(),
+      ...this.getDisplay(),
+      width
+    };
   };
 
   renderSignature() {
     const { name, signature, language } = this.props.apiResult;
-    return (
+    return this.hasHoverResponse() ? (
       <div className="signature monospace">
         <HoverSignature
           language={language || ""}
           signature={signature || name || ""}
         />
       </div>
-    );
+    ) : null;
   }
 
   renderDocstring = className => {
@@ -101,15 +111,14 @@ export default class HoverBox extends React.Component {
   renderExpanded = () => this.renderDocstring("expanded");
 
   render() {
-    const action = this.props.isDefinition ? "usages" : "definition";
     const isExpandable = this.props.apiResult.docstring ? true : false;
 
-    return (
+    return this.props.isVisible ? (
       <div className="hover-box" style={this.getStyle()}>
-        <ExpandHelper isExpandable={isExpandable} action={action} />
-        {this.props.isExpanded ? this.renderExpanded() : this.renderBasic()}
+        <ExpandHelper isExpandable={isExpandable} />
+        {this.props.isHighlighted ? this.renderExpanded() : this.renderBasic()}
         {this.renderSignature()}
       </div>
-    );
+    ) : null;
   }
 }
