@@ -59,7 +59,9 @@ export const fillUpSpans = rootElement => {
   switch (getGitService()) {
     case "github":
       if (isGithubCompareView()) {
-        codeTds = rootElement.querySelectorAll("span.blob-code-inner");
+        codeTds = rootElement.querySelectorAll(
+          "span.blob-code-inner, td.blob-code-inner"
+        );
       } else {
         codeTds = rootElement.querySelectorAll("td.blob-code-inner");
       }
@@ -89,15 +91,17 @@ const getCodeParentSelector = () => {
 };
 
 const getCodeboxSelector = () => {
+  // This needs to be same as the mutation targets when
+  // a non-diff view is opened (only for compare views)
   switch (getGitService()) {
     case "github":
       if (isGithubCompareView()) {
-        return `div.js-file-content`;
+        return `table.diff-table tbody`;
       } else {
         return `div.blob-wrapper`;
       }
     case "bitbucket":
-      return `div.diff-container`;
+      return `div.refract-content-container`;
   }
 };
 
@@ -112,10 +116,23 @@ const setupCodeboxListener = () => {
   });
 };
 
+const removeClassNameIfRequired = mutationsList => {
+  // In the case where non-diff sections are opened in a git diff view
+  // we need to refill the spans. Hence we need to remove our custom
+  // class name
+  mutationsList.forEach(mutation => {
+    const { target } = mutation;
+    if (target && target.classList.contains(POST_FILL_CLASS)) {
+      mutation.target.classList.remove(POST_FILL_CLASS);
+    }
+  });
+};
+
 const setupMutationObserver = () => {
   var targetNode = document.querySelector(getCodeParentSelector());
   var config = { childList: true, subtree: true };
   var callback = function(mutationsList) {
+    removeClassNameIfRequired(mutationsList);
     setupCodeboxListener();
   };
   var observer = new MutationObserver(callback);
