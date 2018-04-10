@@ -25,10 +25,6 @@ const ExpandHelper = props => (
 
 export default class HoverBox extends React.Component {
   // Presentation component for the hover box
-  state = {
-    isExpanded: false
-  };
-
   static propTypes = {
     name: PropTypes.string,
     docstring: PropTypes.string,
@@ -39,8 +35,8 @@ export default class HoverBox extends React.Component {
     x: PropTypes.number,
     y: PropTypes.number,
     element: PropTypes.object,
-    onReferences: PropTypes.func,
-    onDefinition: PropTypes.func
+    isDefinition: PropTypes.bool,
+    isExpanded: PropTypes.bool
   };
 
   isVisibleToUser = () => this.props.x > 0;
@@ -87,63 +83,6 @@ export default class HoverBox extends React.Component {
     return { ...this.getPosition(), ...this.getDisplay() };
   };
 
-  getLine = location => location.range.start.line;
-
-  isDefinition = () =>
-    this.props.definition &&
-    this.getLine(this.props.definition.location) ===
-      this.getLine(this.props.location);
-
-  isExpandKeyCode = keyCode => {
-    // Handles command key left/right on Mac
-    return keyCode === 91 || keyCode === 93;
-  };
-
-  onKeyDown = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
-      this.setState({
-        isExpanded: true
-      });
-    }
-  };
-
-  onKeyUp = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
-      this.setState({
-        isExpanded: false
-      });
-    }
-  };
-
-  doDefaultAction = () => {
-    if (this.isDefinition()) {
-      this.props.onReferences();
-    } else {
-      this.props.onDefinition();
-    }
-  };
-
-  onClick = event => {
-    if (this.state.isExpanded && this.isVisibleToUser()) {
-      this.doDefaultAction();
-    }
-  };
-
-  componentDidMount() {
-    document.addEventListener("keydown", this.onKeyDown);
-    document.addEventListener("keyup", this.onKeyUp);
-    document.addEventListener("click", this.onClick);
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (newProps.x !== this.props.x && newProps.x > 0) {
-      // Reset the expanded state whenever we get new props
-      this.setState({
-        isExpanded: false
-      });
-    }
-  }
-
   renderSignature() {
     const { name, signature, language } = this.props;
     return (
@@ -170,13 +109,13 @@ export default class HoverBox extends React.Component {
   renderExpanded = () => this.renderDocstring("expanded");
 
   render() {
-    const action = this.isDefinition() ? "usages" : "definition";
+    const action = this.props.isDefinition ? "usages" : "definition";
     const isExpandable = this.props.docstring ? true : false;
 
     return (
       <div className="hover-box" style={this.getStyle()}>
         <ExpandHelper isExpandable={isExpandable} action={action} />
-        {this.state.isExpanded ? this.renderExpanded() : this.renderBasic()}
+        {this.props.isExpanded ? this.renderExpanded() : this.renderBasic()}
         {this.renderSignature()}
       </div>
     );

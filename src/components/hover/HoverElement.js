@@ -12,7 +12,8 @@ export default class HoverElement extends React.Component {
     x: -1000,
     y: -1000,
     element: {},
-    isLoading: false
+    isLoading: false,
+    isExpanded: false
   };
 
   onReferences = () => {
@@ -48,6 +49,15 @@ export default class HoverElement extends React.Component {
     return definition ? definition.location.path : "";
   };
 
+  getLine = location => location.range.start.line;
+
+  isDefinition = response => {
+    const { definition, location } = response.result;
+    return (
+      definition && this.getLine(definition.location) === this.getLine(location)
+    );
+  };
+
   callAPI = () => {
     this.startLoading();
     const { mouseX, mouseY, element } = this.props.hoverResult;
@@ -67,7 +77,8 @@ export default class HoverElement extends React.Component {
             filePath: this.getDefinitionPath(response),
             x: mouseX,
             y: mouseY,
-            element
+            element,
+            isDefinition: this.isDefinition(response)
           });
         }
       })
@@ -105,11 +116,91 @@ export default class HoverElement extends React.Component {
     }
   };
 
+  onClick = event => {
+    const isVisible = this.props.hoverResult.mouseX > 0;
+    if (this.state.isExpanded && isVisible) {
+      this.doDefaultAction();
+    }
+  };
+
+  doDefaultAction = () => {
+    if (this.state.isDefinition) {
+      this.onReferences();
+    } else {
+      this.onDefinition();
+    }
+  };
+
+  selectElement = element => {
+    if (
+      element &&
+      element.getBoundingClientRect &&
+      element.tagName === "SPAN"
+    ) {
+      const fontColor = window.getComputedStyle(element).color;
+      const withOpacity = fontColor.slice(0, -1) + ", 0.075)";
+      element.style.backgroundColor = withOpacity;
+    }
+  };
+
+  removeSelectedElement = element => {
+    console.log("removing", element);
+    if (element && element.style) element.style.backgroundColor = null;
+  };
+
+  underlineElement = () => {
+    const element = this.props.hoverResult.element;
+
+    if (element && element.getBoundingClientRect) {
+      element.classList.add("underlined");
+    }
+  };
+
+  removeUnderlineElement = () => {
+    const element = this.props.hoverResult.element;
+
+    if (element && element.getBoundingClientRect) {
+      element.classList.remove("underlined");
+    }
+  };
+
+  isExpandKeyCode = keyCode => {
+    // Handles command key left/right on Mac
+    return keyCode === 91 || keyCode === 93;
+  };
+
+  onKeyDown = event => {
+    if (this.isExpandKeyCode(event.keyCode)) {
+      this.underlineElement();
+      this.setState({ isExpanded: true });
+    }
+  };
+
+  onKeyUp = event => {
+    if (this.isExpandKeyCode(event.keyCode)) {
+      this.removeUnderlineElement();
+      this.setState({ isExpanded: false });
+    }
+  };
+
+  componentDidMount() {
+    document.addEventListener("keydown", this.onKeyDown);
+    document.addEventListener("keyup", this.onKeyUp);
+    document.addEventListener("click", this.onClick);
+  }
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.hoverResult.element !== this.props.hoverResult.element) {
+      this.removeSelectedElement(this.props.hoverResult.element);
+      this.selectElement(newProps.hoverResult.element);
+    }
+  }
+
   componentDidUpdate(prevProps, prevState) {
-    const didChangeLine =
-      this.props.hoverResult.lineNumber !== prevProps.hoverResult.lineNumber;
-    const didChangeChar =
-      this.props.hoverResult.charNumber !== prevProps.hoverResult.charNumber;
+    const { hoverResult: prevResult } = prevProps;
+    const { hoverResult: currentResult } = this.props;
+    const didChangeLine = currentResult.lineNumber !== prevResult.lineNumber;
+    const didChangeChar = currentResult.charNumber !== prevResult.charNumber;
 
     if (didChangeChar || didChangeLine) {
       // Props have been updated, so make API call if we are on new line/char
@@ -120,12 +211,6 @@ export default class HoverElement extends React.Component {
   }
 
   render() {
-    return (
-      <HoverBox
-        {...this.state}
-        onReferences={() => this.onReferences()}
-        onDefinition={() => this.onDefinition()}
-      />
-    );
+    return <HoverBox {...this.state} />;
   }
 }

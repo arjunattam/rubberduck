@@ -33,76 +33,8 @@ class HoverListener extends React.Component {
     this.triggerAction("definitions", coordinates);
   };
 
-  selectElement = element => {
-    if (element.getBoundingClientRect && element.tagName === "SPAN") {
-      const fontColor = window.getComputedStyle(element).color;
-      const withOpacity = fontColor.slice(0, -1) + ", 0.075)";
-      element.style.backgroundColor = withOpacity;
-    }
-  };
-
-  isExpandKeyCode = keyCode => {
-    // Handles command key left/right on Mac
-    return keyCode === 91 || keyCode === 93;
-  };
-
-  onKeyDown = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
-      this.underlineElement();
-    }
-  };
-
-  onKeyUp = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
-      this.removeUnderlineElement();
-    }
-  };
-
-  componentDidMount() {
-    document.addEventListener("keydown", this.onKeyDown);
-    document.addEventListener("keyup", this.onKeyUp);
-  }
-
-  underlineElement = () => {
-    const element = this.state.hoverResult.element;
-
-    if (element && element.getBoundingClientRect) {
-      element.classList.add("underlined");
-    }
-  };
-
-  removeUnderlineElement = () => {
-    const element = this.state.hoverResult.element;
-
-    if (element && element.getBoundingClientRect) {
-      element.classList.remove("underlined");
-    }
-  };
-
-  removeSelectedElement = () => {
-    if (this.state.hoverResult.element !== null) {
-      const element = this.state.hoverResult.element;
-      if (element && element.style) element.style.backgroundColor = null;
-    }
-  };
-
   receiver = hoverResult => {
-    // Callback for the hover listener. API call is made if the
-    // mouse locations were correctly infered by the view adapter,
-    // and there is text below the mouse.
-    const hasValidMouseLocation =
-      hoverResult.hasOwnProperty("fileSha") &&
-      hoverResult.hasOwnProperty("lineNumber");
-
-    if (hasValidMouseLocation) {
-      // Show hover box, and make API call
-      this.selectElement(hoverResult.element);
-      this.setState({
-        hoverResult: hoverResult
-      });
-    } else {
-      this.setState({ hoverResult: {} });
-    }
+    this.setState({ hoverResult });
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -137,7 +69,6 @@ class HoverListener extends React.Component {
 
   onMouseOverListener(e, listener) {
     if (!this.isOnHoverBox(e.x, e.y)) {
-      this.removeSelectedElement();
       listener(e, this.receiver, this.props.data.repoDetails.branch);
     }
   }
