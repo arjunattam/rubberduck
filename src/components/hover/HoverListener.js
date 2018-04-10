@@ -2,9 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
-import { getPageListener } from "../../adapters/";
+import { getPageListener, pathAdapter } from "../../adapters/";
 import HoverElement from "./HoverElement";
-import { pathAdapter } from "../../adapters";
 
 class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
@@ -18,8 +17,11 @@ class HoverListener extends React.Component {
   };
 
   triggerAction = (actionName, coordinates) => {
+    let newSection = {};
+    newSection[actionName] = true;
+    const openSection = { ...this.props.data.openSection, ...newSection };
     this.DataActions.updateData({
-      openSection: actionName,
+      openSection,
       textSelection: coordinates
     });
   };
@@ -33,21 +35,7 @@ class HoverListener extends React.Component {
   };
 
   receiver = hoverResult => {
-    // Callback for the hover listener. API call is made if the
-    // mouse locations were correctly infered by the view adapter,
-    // and there is text below the mouse.
-    const hasValidMouseLocation =
-      hoverResult.hasOwnProperty("fileSha") &&
-      hoverResult.hasOwnProperty("lineNumber");
-
-    if (hasValidMouseLocation) {
-      // Show hover box, and make API call
-      this.setState({
-        hoverResult: hoverResult
-      });
-    } else {
-      this.setState({ hoverResult: {} });
-    }
+    this.setState({ hoverResult });
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -87,29 +75,20 @@ class HoverListener extends React.Component {
   }
 
   setupListeners = () => {
-    // There are two listeners: one to fill up spans in code elements, other
-    // to listen for those spans.
-    this.setupCodeboxListener();
-    this.setupSpanListener();
-  };
-
-  setupCodeboxListener = () => {};
-
-  setupSpanListener = () => {
     this.listener = getPageListener();
 
     if (this.listener !== null) {
-      document.body.onmouseover = null;
-      document.body.onmouseover = e => {
+      document.body.onmousemove = null;
+      document.body.onmousemove = e => {
         this.onMouseOverListener(e, this.listener);
       };
     } else {
-      document.body.onmouseover = null;
+      document.body.onmousemove = null;
     }
   };
 
   componentWillUnmount() {
-    document.body.onmouseover = null;
+    document.body.onmousemove = null;
   }
 
   render() {

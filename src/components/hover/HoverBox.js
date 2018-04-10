@@ -10,48 +10,36 @@ const TOP_MARGIN = 4;
 
 const ExpandHelper = props => (
   <div className="expand-helper">
+    <div style={{ textAlign: "left" }}>
+      {"⌘ + click "}
+      <strong>{"actions"}</strong>
+    </div>
     {props.isExpandable ? (
-      <div style={{ textAlign: "left" }}>
+      <div style={{ textAlign: "right" }}>
         {"⌘ "}
         <strong>{"expand"}</strong>
       </div>
     ) : null}
-    <div style={{ textAlign: "right" }}>
-      {"⌘ + click "}
-      <strong>{`${props.action}`}</strong>
-    </div>
   </div>
 );
 
 export default class HoverBox extends React.Component {
-  // Presentation component for the hover box
-  state = {
-    isExpanded: false,
-    lastElement: null // To remove selection color
-  };
-
   static propTypes = {
-    name: PropTypes.string,
-    docstring: PropTypes.string,
-    lineNumber: PropTypes.number,
-    charNumber: PropTypes.number,
-    filePath: PropTypes.string,
-    fileSha: PropTypes.string,
-    x: PropTypes.number,
-    y: PropTypes.number,
-    element: PropTypes.object,
-    onReferences: PropTypes.func,
-    onDefinition: PropTypes.func
+    apiResult: PropTypes.object,
+    hoverResult: PropTypes.object,
+    isVisible: PropTypes.bool,
+    isLoading: PropTypes.bool,
+    isHighlighted: PropTypes.bool
   };
 
-  isVisibleToUser = () => this.props.x > 0;
+  isVisibleToUser = () => this.props.hoverResult.mouseX > 0;
 
   getPosition = () => {
     // This decides where the hover box should be placed, looking at the
     // bounding rectangle of the element and the window.
-    let left = this.props.x;
-    let top = this.props.y;
-    const { element } = this.props;
+    const { mouseX, mouseY, element } = this.props.hoverResult;
+    let left = mouseX || -1000;
+    let top = mouseY || -1000;
 
     if (element && element.getBoundingClientRect) {
       const boundRect = element.getBoundingClientRect();
@@ -76,98 +64,44 @@ export default class HoverBox extends React.Component {
   };
 
   getDisplay = () => {
-    // Adding display styling for the opacity animation to trigger
     if (this.isVisibleToUser()) {
+      // Adding display styling for the opacity animation to trigger
       return { display: "block" };
     } else {
       return { display: "none" };
     }
   };
 
+  hasHoverResponse = () => {
+    return this.props.apiResult.name ? true : false;
+  };
+
   getStyle = () => {
-    return { ...this.getPosition(), ...this.getDisplay() };
+    const width = this.hasHoverResponse() ? 275 : 150;
+    return {
+      ...this.getPosition(),
+      ...this.getDisplay(),
+      width
+    };
   };
-
-  getLine = location => location.range.start.line;
-
-  isDefinition = () =>
-    this.props.definition &&
-    this.getLine(this.props.definition.location) ===
-      this.getLine(this.props.location);
-
-  isExpandKeyCode = keyCode => {
-    // Handles command key left/right on Mac
-    return keyCode === 91 || keyCode === 93;
-  };
-
-  onKeyDown = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
-      this.setState({
-        isExpanded: true
-      });
-    }
-  };
-
-  onKeyUp = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
-      this.setState({
-        isExpanded: false
-      });
-    }
-  };
-
-  doDefaultAction = () => {
-    if (this.isDefinition()) {
-      this.props.onReferences();
-    } else {
-      this.props.onDefinition();
-    }
-  };
-
-  onClick = event => {
-    if (this.state.isExpanded && this.isVisibleToUser()) {
-      this.doDefaultAction();
-    }
-  };
-
-  componentDidMount() {
-    document.addEventListener("keydown", this.onKeyDown);
-    document.addEventListener("keyup", this.onKeyUp);
-    document.addEventListener("click", this.onClick);
-  }
-
-  componentWillReceiveProps(newProps) {
-    if (newProps.x !== this.props.x && newProps.x > 0) {
-      // Reset the expanded state whenever we get new props
-      this.setState({
-        isExpanded: false,
-        lastElement: newProps.element
-      });
-    }
-
-    if (newProps.x < 0) {
-      // Clear selection
-      this.removeSelectedElement();
-    }
-  }
 
   renderSignature() {
-    const { name, signature, language } = this.props;
-    return (
+    const { name, signature, language } = this.props.apiResult;
+    return this.hasHoverResponse() ? (
       <div className="signature monospace">
         <HoverSignature
           language={language || ""}
           signature={signature || name || ""}
         />
       </div>
-    );
+    ) : null;
   }
 
   renderDocstring = className => {
-    const { docstring } = this.props;
+    const { docstring } = this.props.apiResult;
     return docstring ? (
       <div className={`docstring ${className}`}>
-        <Docstring docstring={this.props.docstring} />
+        <Docstring docstring={docstring} />
       </div>
     ) : null;
   };
@@ -176,33 +110,15 @@ export default class HoverBox extends React.Component {
 
   renderExpanded = () => this.renderDocstring("expanded");
 
-  removeSelectedElement = () => {
-    if (this.state.lastElement !== null) {
-      const element = this.state.lastElement;
-      element.style.backgroundColor = null;
-    }
-  };
-
-  selectElement = () => {
-    const { element } = this.props;
-    if (element.getBoundingClientRect) {
-      const fontColor = window.getComputedStyle(element).color;
-      const withOpacity = fontColor.slice(0, -1) + ", 0.075)";
-      element.style.backgroundColor = withOpacity;
-    }
-  };
-
   render() {
-    const action = this.isDefinition() ? "usages" : "definition";
-    const isExpandable = this.props.docstring ? true : false;
-    this.selectElement();
+    const isExpandable = this.props.apiResult.docstring ? true : false;
 
-    return (
+    return this.props.isVisible ? (
       <div className="hover-box" style={this.getStyle()}>
-        <ExpandHelper isExpandable={isExpandable} action={action} />
-        {this.state.isExpanded ? this.renderExpanded() : this.renderBasic()}
+        <ExpandHelper isExpandable={isExpandable} />
+        {this.props.isHighlighted ? this.renderExpanded() : this.renderBasic()}
         {this.renderSignature()}
       </div>
-    );
+    ) : null;
   }
 }

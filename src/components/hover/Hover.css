@@ -1,7 +1,5 @@
 .hover-box {
   background-color: #fff;
-  min-width: 225px; /* Minimum to fit expand helper for definition */
-  max-width: 300px;
   z-index: 10000;
   position: fixed;
   border: solid 1px #eaeaea;
@@ -10,7 +8,6 @@
 }
 
 .hover-box .docstring {
-  padding: 5px;
   background: #f1f8ff;
 }
 
@@ -25,7 +22,13 @@
 }
 
 .hover-box .basic {
-  max-height: 24px;
+  max-height: 28px;
+}
+
+.hover-box .basic div {
+  overflow: hidden;
+  max-height: inherit;
+  padding: 5px;
 }
 
 .hover-box .basic div p {
@@ -34,8 +37,15 @@
   text-overflow: ellipsis;
 }
 
-.hover-box .expanded {
-  max-height: 350px;
+.hover-box .expanded div {
+  max-height: 300px;
+  overflow: auto;
+  padding: 5px;
+}
+
+.underlined {
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .hover-box .expand-helper {
