@@ -73,7 +73,8 @@ export default class HoverBox extends React.Component {
   };
 
   hasHoverResponse = () => {
-    return this.props.apiResult.name ? true : false;
+    const { name, docstring } = this.props.apiResult;
+    return name || docstring ? true : false;
   };
 
   getStyle = () => {

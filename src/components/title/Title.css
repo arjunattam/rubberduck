@@ -2,8 +2,9 @@
   height: 48px; /* same as github title */
   padding: 4px;
   padding-left: 10px;
-  background: rgb(250, 251, 252);
   font-size: 15px;
+  background: rgb(250, 251, 252);
+  border-bottom: 1px #ccc solid;
 }
 
 .header .branch {

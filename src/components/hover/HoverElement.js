@@ -115,14 +115,16 @@ export default class HoverElement extends React.Component {
     if (element && element.style) element.style.backgroundColor = null;
   };
 
+  isValidElement = element => element && element.getBoundingClientRect;
+
   underlineElement = element => {
-    if (element && element.getBoundingClientRect) {
+    if (this.isValidElement(element)) {
       element.classList.add("underlined");
     }
   };
 
   removeUnderlineElement = element => {
-    if (element && element.getBoundingClientRect) {
+    if (this.isValidElement(element)) {
       element.classList.remove("underlined");
     }
   };
@@ -134,14 +136,12 @@ export default class HoverElement extends React.Component {
 
   onKeyDown = event => {
     if (this.isExpandKeyCode(event.keyCode)) {
-      this.underlineElement(this.props.hoverResult.element);
       this.setState({ isHighlighted: true });
     }
   };
 
   onKeyUp = event => {
     if (this.isExpandKeyCode(event.keyCode)) {
-      this.removeUnderlineElement(this.props.hoverResult.element);
       this.setState({ isHighlighted: false });
     }
   };
@@ -152,29 +152,29 @@ export default class HoverElement extends React.Component {
     document.addEventListener("click", this.onClick);
   }
 
-  componentWillReceiveProps(newProps) {
-    if (newProps.hoverResult.element !== this.props.hoverResult.element) {
-      this.removeSelectedElement(this.props.hoverResult.element);
-      this.selectElement(newProps.hoverResult.element);
-
-      if (!newProps.hoverResult.mouseX) {
-        this.removeUnderlineElement(this.props.hoverResult.element);
-      }
-    }
-  }
-
   componentDidUpdate(prevProps, prevState) {
     const { hoverResult: prevResult } = prevProps;
     const { hoverResult: currentResult } = this.props;
     const didChangeLine = currentResult.lineNumber !== prevResult.lineNumber;
     const didChangeChar = currentResult.charNumber !== prevResult.charNumber;
+    const didChangeElement = currentResult.element !== prevResult.element;
 
     if (didChangeChar || didChangeLine) {
       this.clearDebouce();
       const { hoverResult } = this.props;
-      this.setState({ hoverResult, isVisible: false });
+      this.setState({ hoverResult, isVisible: false, isHighlighted: false });
       this.dFunc = debounce(() => this.callAPI(), DEBOUNCE_TIMEOUT);
       this.dFunc();
+    }
+
+    if (didChangeElement || !this.state.isHighlighted) {
+      this.removeSelectedElement(prevResult.element);
+      this.removeUnderlineElement(prevResult.element);
+      this.selectElement(currentResult.element);
+    }
+
+    if (this.state.isHighlighted) {
+      this.underlineElement(currentResult.element);
     }
   }
 
