@@ -17,7 +17,7 @@ const SettingsInternal = props => (
     <div className="settings-sub-section">
       <RubberduckIcon size="60" />
       <h3>Rubberduck</h3>
-      <div>Version 0.1.22</div>
+      <div>Version 0.2.0</div>
       <div>
         <a href="https://www.rubberduck.io">Visit website</a>
       </div>
