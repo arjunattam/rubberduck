@@ -1,8 +1,7 @@
+import React from "react";
 import ExpandedCode from "../common/ExpandedCode";
 import CodeNode from "../common/CodeNode";
 import Docstring from "../common/Docstring";
-
-import React from "react";
 
 export default class DefinitionItem extends React.Component {
   state = {
@@ -19,6 +18,14 @@ export default class DefinitionItem extends React.Component {
     return this.refs.container.getBoundingClientRect().top;
   };
 
+  renderDocstring = () => {
+    return this.props.docstring ? (
+      <div className="definition-docstring">
+        <Docstring docstring={this.props.docstring} />
+      </div>
+    ) : null;
+  };
+
   render() {
     return (
       <div
@@ -27,15 +34,7 @@ export default class DefinitionItem extends React.Component {
         onMouseLeave={this.handleMouseHover}
         ref={"container"}
       >
-        <CodeNode {...this.props}>
-          <div className="definition-docstring">
-            {this.props.docstring ? (
-              <Docstring docstring={this.props.docstring} />
-            ) : (
-              "No docstring found"
-            )}
-          </div>
-        </CodeNode>
+        <CodeNode {...this.props} children={this.renderDocstring()} />
 
         {this.state.isHovering ? (
           <ExpandedCode {...this.props} top={this.getTop()} />
