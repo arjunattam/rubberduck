@@ -80,6 +80,9 @@ class References extends BaseReaderSection {
     }
   };
 
+  getCountText = () =>
+    this.state.count === 1 ? `1 usage` : `${this.state.count} usages`;
+
   renderTitle = () =>
     this.state.isLoading ? (
       <div className="loader-container" style={{ marginTop: 20 }}>
@@ -88,7 +91,7 @@ class References extends BaseReaderSection {
     ) : this.props.selectionX ? (
       <div className="reference-title">
         <div className="reference-name monospace">{this.state.name}</div>
-        <div className="reference-count">{this.state.count} references</div>
+        <div className="reference-count">{this.getCountText()}</div>
       </div>
     ) : (
       this.renderZeroState()

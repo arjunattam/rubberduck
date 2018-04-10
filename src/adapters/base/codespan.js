@@ -1,5 +1,7 @@
 import { getGitService, isGithubCompareView } from "../index";
 
+const POST_FILL_CLASS = "mercury-span-filled";
+
 const delimiterChars = "'.:\\\"$+<=>^` \\t,\\(\\)\\{\\}\\[\\]";
 
 const delimiterSplit = string => {
@@ -71,6 +73,7 @@ export const fillUpSpans = rootElement => {
 
   if (codeTds.length > 0) {
     codeTds.forEach(codeTd => reconstructTd(codeTd));
+    rootElement.classList.add(POST_FILL_CLASS);
   }
 };
 
@@ -103,7 +106,9 @@ const setupCodeboxListener = () => {
   console.log("setup codebox listener", codeboxElements.length);
   codeboxElements.forEach(element => {
     element.onmouseenter = null;
-    element.onmouseenter = e => fillUpSpans(element);
+    element.onmouseenter = e => {
+      if (!element.classList.contains(POST_FILL_CLASS)) fillUpSpans(element);
+    };
   });
 };
 

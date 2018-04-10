@@ -2,6 +2,7 @@
   overflow: hidden;
   max-height: 3000px;
   transition: max-height 200ms ease-in;
+  font-size: 12px;
 }
 
 .references-section.collapsed {
@@ -20,7 +21,6 @@
 }
 
 .reference-name {
-  font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
