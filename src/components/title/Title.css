@@ -2,23 +2,23 @@
   height: 48px; /* same as github title */
   padding: 4px;
   padding-left: 10px;
-  background: rgb(250, 251, 252);
   font-size: 15px;
+  background: rgb(250, 251, 252);
+  border-bottom: 1px #ccc solid;
 }
 
 .header .branch {
   font-size: 11px;
   color: #000;
   margin-left: 3px;
+  margin-right: 44px; /* To fit the collapse button */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 180px;
 }
 
-.header p {
-  margin-top: 3px;
-  margin-bottom: 3px;
+.header .reponame {
+  margin: 3px 44px 3px 0;
   color: #999;
   white-space: nowrap;
   overflow: hidden;

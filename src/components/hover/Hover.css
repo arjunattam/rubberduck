@@ -1,38 +1,66 @@
 .hover-box {
-  background: #f1f8ff;
-  width: 300px;
+  background-color: #fff;
   z-index: 10000;
   position: fixed;
-  border: solid 1px #c8e1ff;
+  border: solid 1px #eaeaea;
   animation: fade-in 0.15s linear;
-}
-
-.hover-box .title {
-  background: #fff;
-  height: 55px;
-  border-bottom: solid 1px #c8e1ff;
+  font-size: 12px;
 }
 
 .hover-box .docstring {
-  padding: 10px;
-  border-bottom: solid 1px #c8e1ff;
+  background: #f1f8ff;
+}
+
+.hover-box .docstring * ul {
+  /* ul bullets should lie inside the div */
+  list-style-position: inside;
+}
+
+.hover-box .docstring div p:last-child {
+  /* Don't want to have the margin for the last child */
+  margin-bottom: 0;
+}
+
+.hover-box .basic {
+  max-height: 28px;
+}
+
+.hover-box .basic div {
+  overflow: hidden;
+  max-height: inherit;
+  padding: 5px;
+}
+
+.hover-box .basic div p {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hover-box .expanded div {
+  max-height: 300px;
   overflow: auto;
-  max-height: 150px;
+  padding: 5px;
 }
 
-.hover-box .button-container {
+.underlined {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hover-box .expand-helper {
+  background-color: #f1f1f1;
+  color: #666;
+  font-size: 10px;
+  text-transform: uppercase;
   display: flex;
-  justify-content: space-around;
-  padding: 7px 0px;
-  background: #fff;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px;
 }
 
-.hover-box .hover-button {
-  color: #24292e;
-  padding: 6px 12px;
-  font-size: 14px;
-  width: auto;
-  height: auto;
+.hover-box .expand-helper div {
+  width: 100%;
 }
 
 @keyframes fade-in {
@@ -42,4 +70,18 @@
   100% {
     opacity: 1;
   }
+}
+
+/* Following styles for syntax highlighted component */
+.hover-box .signature code,
+.hover-box .signature pre {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.hover-box .signature pre code span,
+.hover-box .signature pre code span * {
+  word-wrap: break-word;
+  white-space: normal;
 }

@@ -45,5 +45,5 @@ export class BaseAPI {
 Object.assign(BaseAPI.prototype, GitRemoteAPI);
 
 export const API = new BaseAPI();
-export { encodeQueryData, getParameterByName } from "./utils";
+export { getParameterByName } from "./utils";
 export { rootUrl };

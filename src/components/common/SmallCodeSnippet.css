@@ -1,5 +1,4 @@
 .small-code {
-  width: 230px;
   margin: 12px 0;
 }
 
@@ -10,12 +9,8 @@
   overflow-x: hidden;
 }
 
+.small-code pre code span,
 .small-code pre code span * {
-  word-wrap: break-word;
-  white-space: normal;
-}
-
-.small-code pre code span {
   word-wrap: break-word;
   white-space: normal;
 }

@@ -9,6 +9,8 @@ class Definitions extends BaseReaderSection {
   // This gets x and y of the selected text, constructs the
   // API call payload by reading DOM, and then display the
   // result of the API call.
+  sectionName = "definitions";
+
   state = {
     isVisible: false,
     isLoading: false,
@@ -21,6 +23,19 @@ class Definitions extends BaseReaderSection {
     });
   };
 
+  getFilePath = result =>
+    result.definition && result.definition.location
+      ? result.definition.location.path
+      : "";
+
+  getStartLine = result =>
+    result.definition ? result.definition.contents_start_line : null;
+
+  getLine = result =>
+    result.definition && result.definition.location
+      ? result.definition.location.range.start.line
+      : null;
+
   getSelectionData = () => {
     const hoverResult = this.readPage();
     const isValidResult =
@@ -29,24 +44,18 @@ class Definitions extends BaseReaderSection {
 
     if (isValidResult && this.state.isVisible) {
       this.startLoading();
-      WS.getDefinition(
-        hoverResult.fileSha,
-        hoverResult.filePath,
-        hoverResult.lineNumber,
-        hoverResult.charNumber
-      )
+      const { fileSha, filePath, lineNumber, charNumber } = hoverResult;
+      WS.getDefinition(fileSha, filePath, lineNumber, charNumber)
         .then(response => {
           this.stopLoading();
-          let filePath = response.result.definition.location
-            ? response.result.definition.location.path
-            : "";
+          const result = response.result;
           const definition = {
-            name: response.result.name,
-            filePath: filePath,
-            startLineNumber: response.result.definition.contents_start_line,
-            lineNumber: response.result.definition.location.range.start.line,
-            docstring: response.result.docstring,
-            codeSnippet: response.result.definition.contents
+            name: result.name,
+            filePath: this.getFilePath(result),
+            startLineNumber: this.getStartLine(result),
+            lineNumber: this.getLine(result),
+            docstring: result.docstring,
+            codeSnippet: result.definition ? result.definition.contents : ""
           };
           this.setState({ definition: definition });
         })
@@ -74,6 +83,7 @@ class Definitions extends BaseReaderSection {
         {...this.state.definition}
         fileLink={this.getFileLink()}
         visible={this.state.isVisible}
+        sidebarWidth={this.props.storage.sidebarWidth}
       />
     ) : (
       this.renderZeroState()

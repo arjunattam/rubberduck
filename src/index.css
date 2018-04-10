@@ -15,7 +15,6 @@ body {
   top: 0;
   bottom: 0;
   left: 0;
-  width: 232px;
   z-index: 10000;
   background: rgb(250, 251, 252);
   border-right: #dadada solid 1px;
@@ -51,6 +50,8 @@ body {
 
 .repo-info-sections {
   flex-grow: 1;
+  max-height: calc(100vh - 121px);
+  overflow: auto;
 }
 
 .monospace {

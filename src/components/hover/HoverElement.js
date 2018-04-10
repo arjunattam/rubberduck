@@ -1,7 +1,7 @@
 import React from "react";
 import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
-const debounce = require("debounce");
+import debounce from "debounce";
 
 const DEBOUNCE_TIMEOUT = 1200; // ms
 const CURSOR_RADIUS = 20; // pixels
@@ -9,23 +9,31 @@ const CURSOR_RADIUS = 20; // pixels
 export default class HoverElement extends React.Component {
   // Makes the API call and shows the presentation component: HoverBox
   state = {
-    x: -1000,
-    y: -1000,
-    boundRect: {},
-    isLoading: false
+    apiResult: {},
+    hoverResult: {},
+    isLoading: false,
+    isHighlighted: false
   };
 
   onReferences = () => {
-    this.props.onReferences({ x: this.state.x, y: this.state.y });
+    const { mouseX, mouseY } = this.state.hoverResult;
+    this.props.onReferences({ x: mouseX, y: mouseY });
   };
 
   onDefinition = () => {
-    this.props.onDefinition({ x: this.state.x, y: this.state.y });
+    const { mouseX, mouseY } = this.state.hoverResult;
+    this.props.onDefinition({ x: mouseX, y: mouseY });
+  };
+
+  callActions = () => {
+    this.onReferences();
+    this.onDefinition();
   };
 
   isOverlappingWithCurrent = (x, y) => {
-    const xdiff = Math.abs(x - this.state.x);
-    const ydiff = Math.abs(y - this.state.y);
+    const { mouseX, mouseY } = this.state.hoverResult;
+    const xdiff = Math.abs(x - mouseX);
+    const ydiff = Math.abs(y - mouseY);
     return xdiff <= CURSOR_RADIUS && ydiff <= CURSOR_RADIUS;
   };
 
@@ -41,98 +49,149 @@ export default class HoverElement extends React.Component {
     });
   };
 
+  getDefinitionPath = response => {
+    const { definition } = response.result;
+    return definition ? definition.location.path : "";
+  };
+
+  isValidHoverResult = () => {
+    const hoverName = this.props.hoverResult.name;
+    const hasText = hoverName && hoverName.trim() !== "";
+    return hasText;
+  };
+
   callAPI = () => {
-    const hoverXY = {
-      x: this.props.hoverResult.mouseX,
-      y: this.props.hoverResult.mouseY
-    };
+    if (!this.isValidHoverResult()) return;
     this.startLoading();
-    WS.getHover(
-      this.props.hoverResult.fileSha,
-      this.props.hoverResult.filePath,
-      this.props.hoverResult.lineNumber,
-      this.props.hoverResult.charNumber
-    )
+    const { fileSha, filePath } = this.props.hoverResult;
+    const { lineNumber, charNumber } = this.props.hoverResult;
+
+    WS.getHover(fileSha, filePath, lineNumber, charNumber)
       .then(response => {
         this.stopLoading();
-        const isForCurrentMouse = this.isOverlappingWithCurrent(
-          hoverXY.x,
-          hoverXY.y
-        );
+        const { mouseX, mouseY } = this.props.hoverResult;
+        const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
+
         if (isForCurrentMouse) {
           // We will set state only if the current
           // mouse location overlaps with the response
-          let definitionPath = "";
-          if (response.result.definition !== null) {
-            definitionPath = response.result.definition.location.path;
-          }
+          const apiResult = {
+            ...response.result,
+            filePath: this.getDefinitionPath(response)
+          };
           this.setState({
-            name: response.result.name,
-            type: response.result.type,
-            docstring: response.result.docstring,
-            filePath: definitionPath,
-            x: this.props.hoverResult.mouseX,
-            y: this.props.hoverResult.mouseY,
-            boundRect: this.props.hoverResult.boundRect
+            apiResult,
+            hoverResult: this.props.hoverResult,
+            isVisible: true
           });
         }
       })
       .catch(error => {
         this.stopLoading();
-        this.clear();
+        this.clearDebouce();
         console.log("Error in API call", error);
       });
   };
 
-  update = () => {
-    const hoverName = this.props.hoverResult.name;
-    const hasText = hoverName && hoverName.trim() !== "";
-
-    if (hasText) {
-      this.callAPI();
-      this.setState({
-        x: this.props.mouseX,
-        y: this.props.mouseY,
-        boundRect: this.props.hoverResult.boundRect
-      });
+  onClick = event => {
+    if (this.state.isHighlighted) {
+      this.callActions();
     }
   };
 
-  clear = () => {
-    if (this.dFunc !== undefined) this.dFunc.clear();
-    if (this.state.x > 0)
-      this.setState({
-        x: -1000,
-        y: -1000,
-        boundRect: {},
-        name: "",
-        type: "",
-        docstring: "",
-        filePath: ""
-      });
+  selectElement = element => {
+    if (this.isValidElement(element)) {
+      const fontColor = window.getComputedStyle(element).color;
+      const withOpacity = fontColor.slice(0, -1) + ", 0.075)";
+      element.style.backgroundColor = withOpacity;
+    }
   };
 
+  removeSelectedElement = element => {
+    if (element && element.style) element.style.backgroundColor = null;
+  };
+
+  isValidElement = element => {
+    const isElement = element && element.getBoundingClientRect;
+    if (isElement) {
+      const validTags = ["SPAN", "INS", "DEL"];
+      return validTags.indexOf(element.tagName) >= 0;
+    } else {
+      return false;
+    }
+  };
+
+  underlineElement = element => {
+    if (this.isValidElement(element)) {
+      element.classList.add("underlined");
+    }
+  };
+
+  removeUnderlineElement = element => {
+    if (this.isValidElement(element)) {
+      element.classList.remove("underlined");
+    }
+  };
+
+  isExpandKeyCode = keyCode => {
+    // Handles command key left/right on Mac
+    return keyCode === 91 || keyCode === 93;
+  };
+
+  onKeyDown = event => {
+    if (this.isExpandKeyCode(event.keyCode)) {
+      this.setState({ isHighlighted: true });
+    }
+  };
+
+  onKeyUp = event => {
+    if (this.isExpandKeyCode(event.keyCode)) {
+      this.setState({ isHighlighted: false });
+    }
+  };
+
+  componentDidMount() {
+    document.addEventListener("keydown", this.onKeyDown);
+    document.addEventListener("keyup", this.onKeyUp);
+    document.addEventListener("click", this.onClick);
+  }
+
+  didChangeElement(newResult, oldResult) {
+    if (!newResult.element || !oldResult.element) return true;
+    return newResult.element.nodeValue !== oldResult.element.nodeValue;
+  }
+
   componentDidUpdate(prevProps, prevState) {
-    const didChangeLine =
-      this.props.hoverResult.lineNumber !== prevProps.hoverResult.lineNumber;
-    const didChangeChar =
-      this.props.hoverResult.charNumber !== prevProps.hoverResult.charNumber;
+    const { hoverResult: prevResult } = prevProps;
+    const { hoverResult: currentResult } = this.props;
+    const didChangeLine = currentResult.lineNumber !== prevResult.lineNumber;
+    const didChangeChar = currentResult.charNumber !== prevResult.charNumber;
+    const didChangeElement = this.didChangeElement(currentResult, prevResult);
 
     if (didChangeChar || didChangeLine) {
-      // Props have been updated, so make API call if we are on new line/char
-      this.clear();
-      this.dFunc = debounce(() => this.update(), DEBOUNCE_TIMEOUT);
+      this.clearDebouce();
+      const { hoverResult } = this.props;
+      this.setState({ hoverResult, isVisible: false });
+      this.dFunc = debounce(() => this.callAPI(), DEBOUNCE_TIMEOUT);
       this.dFunc();
+    }
+
+    if (didChangeElement || !this.state.isHighlighted) {
+      this.removeSelectedElement(prevResult.element);
+      this.removeUnderlineElement(prevResult.element);
+      this.selectElement(currentResult.element);
+    }
+
+    if (this.state.isHighlighted) {
+      this.underlineElement(currentResult.element);
     }
   }
 
+  clearDebouce = () => {
+    if (this.dFunc !== undefined) this.dFunc.clear();
+  };
+
   render() {
-    return (
-      <HoverBox
-        {...this.state}
-        onReferences={() => this.onReferences()}
-        onDefinition={() => this.onDefinition()}
-      />
-    );
+    return <HoverBox {...this.state} />;
   }
 }

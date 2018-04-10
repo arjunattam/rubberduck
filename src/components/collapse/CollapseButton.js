@@ -2,23 +2,25 @@ import React from "react";
 import Octicon from "react-component-octicons";
 import "./CollapseButton.css";
 
-export default class CollapseButton extends React.Component {
-  render() {
-    const icon = (
-      <Octicon
-        name={this.props.isVisible ? "chevron-left" : "chevron-right"}
-        style={{ height: 20, width: 20 }}
-      />
-    );
-    const classMod = this.props.isVisible ? "shown" : "";
+const CollapseIcon = props => (
+  <Octicon
+    name={props.isVisible ? "chevron-left" : "chevron-right"}
+    style={{ height: 20, width: 20 }}
+  />
+);
 
-    return (
-      <div
-        className={"button-div collapse-container " + classMod}
-        onClick={this.props.onClick}
-      >
-        {icon}
-      </div>
-    );
-  }
-}
+// button width is 34px => 44 when the sidebar is visible
+const getCollapseStyle = props =>
+  props.isVisible ? { left: props.sidebarWidth - 44 } : { left: 10 };
+
+const CollapseButton = props => (
+  <div
+    className="collapse-container button-div"
+    onClick={props.onClick}
+    style={getCollapseStyle(props)}
+  >
+    <CollapseIcon {...props} />
+  </div>
+);
+
+export default CollapseButton;

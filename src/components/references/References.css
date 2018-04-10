@@ -1,7 +1,8 @@
 .references-section {
   overflow: hidden;
-  max-height: calc(100vh - 207px);
+  max-height: 3000px;
   transition: max-height 200ms ease-in;
+  font-size: 12px;
 }
 
 .references-section.collapsed {
@@ -11,9 +12,6 @@
 .reference-container {
   background: rgb(250, 251, 252);
   padding-bottom: 10px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: calc(100vh - 207px);
   transition: max-height 200ms ease-in;
 }
 
@@ -23,8 +21,6 @@
 }
 
 .reference-name {
-  font-weight: bold;
-  width: 210px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -47,9 +43,4 @@
 .reference-item:hover {
   border-top: 1px solid #c8e1ff;
   border-bottom: 1px solid #c8e1ff;
-}
-
-.reference-item-line {
-  padding: 0px 0 5px 0;
-  width: 232px;
 }

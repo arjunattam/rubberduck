@@ -9,6 +9,8 @@ class References extends BaseReaderSection {
   // This gets x and y of the selected text, constructs the
   // API call payload by reading DOM, and then display the
   // result of the API call.
+  sectionName = "references";
+
   state = {
     isVisible: false,
     isLoading: false,
@@ -61,12 +63,8 @@ class References extends BaseReaderSection {
 
     if (isValidResult && this.state.isVisible) {
       this.startLoading();
-      WS.getReferences(
-        hoverResult.fileSha,
-        hoverResult.filePath,
-        hoverResult.lineNumber,
-        hoverResult.charNumber
-      )
+      const { fileSha, filePath, lineNumber, charNumber } = hoverResult;
+      WS.getReferences(fileSha, filePath, lineNumber, charNumber)
         .then(response => {
           this.stopLoading();
           this.setState({
@@ -82,6 +80,9 @@ class References extends BaseReaderSection {
     }
   };
 
+  getCountText = () =>
+    this.state.count === 1 ? `1 usage` : `${this.state.count} usages`;
+
   renderTitle = () =>
     this.state.isLoading ? (
       <div className="loader-container" style={{ marginTop: 20 }}>
@@ -90,15 +91,18 @@ class References extends BaseReaderSection {
     ) : this.props.selectionX ? (
       <div className="reference-title">
         <div className="reference-name monospace">{this.state.name}</div>
-        <div className="reference-count">{this.state.count} references</div>
+        <div className="reference-count">{this.getCountText()}</div>
       </div>
     ) : (
       this.renderZeroState()
     );
 
   render() {
+    const { sidebarWidth } = this.props.storage;
     const referenceItems = this.state.references.map((reference, index) => {
-      return <ReferenceItem {...reference} key={index} />;
+      return (
+        <ReferenceItem {...reference} key={index} sidebarWidth={sidebarWidth} />
+      );
     });
 
     let referencesClassName = this.state.isVisible

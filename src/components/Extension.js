@@ -5,12 +5,12 @@ import { API } from "../utils/api";
 import { WS } from "../utils/websocket";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
-import Sidebar from "./Sidebar";
+import Sidebar from "./sidebar";
 import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
 import { pathAdapter, treeAdapter } from "../adapters";
-import * as GithubLayout from "./../adapters/github/layout";
+import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 
 let document = window.document;
 
@@ -28,6 +28,7 @@ class Extension extends React.Component {
     this.setupChromeListener();
     this.initializeStorage();
     this.updateRepoDetailsFromPath();
+    setupSpanObserver();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -90,6 +91,7 @@ class Extension extends React.Component {
     setTimeout(() => {
       this.updateRepoDetailsFromPath();
     }, 1000);
+    setupSpanObserver();
   }
 
   updateRepoDetailsFromPath() {

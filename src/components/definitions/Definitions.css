@@ -16,15 +16,11 @@
 }
 
 .definition-item {
-  max-height: calc(100vh - 207px);
-  overflow-y: hidden;
-  overflow-x: hidden;
   background: #fff;
   cursor: pointer;
   border-top: 1px solid #f1f8ff;
   border-bottom: 1px solid #f1f8ff;
-  margin-top: 10px;
-  transition: max-height 200ms ease-in;
+  margin: 10px 0px;
 }
 
 .definition-item:hover {
@@ -34,6 +30,6 @@
 
 .definition-docstring {
   background: #f1f8ff;
-  padding: 10px;
+  padding: 5px;
   margin: 5px 0px 5px 0px;
 }

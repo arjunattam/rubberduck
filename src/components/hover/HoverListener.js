@@ -2,9 +2,19 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
-import { getPageListener } from "../../adapters/";
+import { getPageListener, pathAdapter } from "../../adapters/";
 import HoverElement from "./HoverElement";
-import { pathAdapter } from "../../adapters";
+
+const isTreeTooBig = () => {
+  const ACCEPTABLE_TREE_COVERAGE = 0.55;
+  const treeElement = document.querySelector("div.tree-content");
+  const sidebarElement = document.querySelector("div.sidebar-container");
+  if (treeElement && sidebarElement) {
+    const treeCoverage = treeElement.offsetHeight / sidebarElement.offsetHeight;
+    return treeCoverage >= ACCEPTABLE_TREE_COVERAGE;
+  }
+  return false;
+};
 
 class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
@@ -14,14 +24,19 @@ class HoverListener extends React.Component {
   }
 
   state = {
-    mouseX: -1000,
-    mouseY: -1000,
     hoverResult: {}
   };
 
   triggerAction = (actionName, coordinates) => {
+    let openSection = { ...this.props.data.openSection };
+    openSection[actionName] = true;
+
+    if (isTreeTooBig()) {
+      openSection.tree = false;
+    }
+
     this.DataActions.updateData({
-      openSection: actionName,
+      openSection,
       textSelection: coordinates
     });
   };
@@ -35,23 +50,7 @@ class HoverListener extends React.Component {
   };
 
   receiver = hoverResult => {
-    // Callback for the hover listener. API call is made if the
-    // mouse locations were correctly infered by the view adapter,
-    // and there is text below the mouse.
-    const hasValidMouseLocation =
-      hoverResult.hasOwnProperty("fileSha") &&
-      hoverResult.hasOwnProperty("lineNumber");
-
-    if (hasValidMouseLocation) {
-      // Show hover box, and make API call
-      this.setState({
-        mouseX: hoverResult.mouseX,
-        mouseY: hoverResult.mouseY,
-        hoverResult: hoverResult
-      });
-    } else {
-      this.setState({ mouseX: -1000, mouseY: -1000, hoverResult: {} });
-    }
+    this.setState({ hoverResult });
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -64,7 +63,7 @@ class HoverListener extends React.Component {
       this.props.data.repoDetails
     );
     if (!isSameSessionPath || hasChangedPath || !this.listener) {
-      this.setupListener();
+      this.setupListeners();
     }
   }
 
@@ -90,21 +89,21 @@ class HoverListener extends React.Component {
     }
   }
 
-  setupListener = () => {
+  setupListeners = () => {
     this.listener = getPageListener();
 
     if (this.listener !== null) {
-      document.body.onmouseover = null;
-      document.body.onmouseover = e => {
+      document.body.onmousemove = null;
+      document.body.onmousemove = e => {
         this.onMouseOverListener(e, this.listener);
       };
     } else {
-      document.body.onmouseover = null;
+      document.body.onmousemove = null;
     }
   };
 
   componentWillUnmount() {
-    document.body.onmouseover = null;
+    document.body.onmousemove = null;
   }
 
   render() {

@@ -1,15 +1,11 @@
 import React from "react";
+import ReactMarkdown from "react-markdown";
 import { decodeBase64 } from "../../utils/data";
 
-export default function Docstring(docstringData) {
-  const decodedData = decodeBase64(docstringData || "");
-  const jsx = decodedData.split("\n").map((line, index) => {
-    return (
-      <span key={index}>
-        {line}
-        <br />
-      </span>
-    );
-  });
-  return jsx;
-}
+const Docstring = props => {
+  const { docstring } = props;
+  const decodedData = decodeBase64(docstring || "");
+  return <ReactMarkdown source={decodedData} />;
+};
+
+export default Docstring;

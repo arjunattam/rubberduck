@@ -1,7 +1,6 @@
+import axios from "axios";
+import parse from "what-the-diff";
 import { getGitService } from "../../adapters";
-
-const axios = require("axios");
-const parse = require("what-the-diff");
 
 let BaseGitRemoteAPI = {
   isRemoteAuthorized() {
@@ -117,7 +116,6 @@ let BitbucketAPI = {
     // Return file path, additions and deletions by parsing the diff
     // Also uses git diff statuses: `added`, `renamed`, `modified`, `deleted`
     return parsedDiff.map(element => {
-      console.log(element);
       const additions = this.parseLines(element, "+");
       const deletions = this.parseLines(element, "-");
       const filePath = element.newPath || element.oldPath;

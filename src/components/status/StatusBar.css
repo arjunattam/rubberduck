@@ -1,18 +1,18 @@
 .status {
   height: 32px;
-  line-height: 32px;
   border-top: 1px #ccc solid;
   border-bottom: 1px #ccc solid;
   padding: 15px;
   display: flex;
   justify-content: space-between;
+  align-content: center;
 }
 
 .status-main-container {
+  width: 100%;
   position: fixed;
   bottom: 0;
   left: 0;
-  width: 232px;
 }
 
 .status-container {
