@@ -20,9 +20,9 @@ export const isGithubCompareView = () => {
   if (pathMatch) {
     const typeClass = pathMatch[3];
     return (
-      typeClass.indexOf("pull") == 0 ||
-      typeClass.indexOf("commit") == 0 ||
-      typeClass.indexOf("compare") == 0
+      typeClass.indexOf("pull") === 0 ||
+      typeClass.indexOf("commit") === 0 ||
+      typeClass.indexOf("compare") === 0
     );
   } else {
     return false;
