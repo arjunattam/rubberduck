@@ -50,6 +50,8 @@ body {
 
 .repo-info-sections {
   flex-grow: 1;
+  max-height: calc(100vh - 135px);
+  overflow: auto;
 }
 
 .monospace {
