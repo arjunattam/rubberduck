@@ -100,11 +100,7 @@ export default class HoverElement extends React.Component {
   };
 
   selectElement = element => {
-    if (
-      element &&
-      element.getBoundingClientRect &&
-      element.tagName === "SPAN"
-    ) {
+    if (this.isValidElement(element)) {
       const fontColor = window.getComputedStyle(element).color;
       const withOpacity = fontColor.slice(0, -1) + ", 0.075)";
       element.style.backgroundColor = withOpacity;
@@ -115,7 +111,8 @@ export default class HoverElement extends React.Component {
     if (element && element.style) element.style.backgroundColor = null;
   };
 
-  isValidElement = element => element && element.getBoundingClientRect;
+  isValidElement = element =>
+    element && element.getBoundingClientRect && element.tagName === "SPAN";
 
   underlineElement = element => {
     if (this.isValidElement(element)) {
@@ -152,17 +149,22 @@ export default class HoverElement extends React.Component {
     document.addEventListener("click", this.onClick);
   }
 
+  didChangeElement(newResult, oldResult) {
+    if (!newResult.element || !oldResult.element) return true;
+    return newResult.element.nodeValue !== oldResult.element.nodeValue;
+  }
+
   componentDidUpdate(prevProps, prevState) {
     const { hoverResult: prevResult } = prevProps;
     const { hoverResult: currentResult } = this.props;
     const didChangeLine = currentResult.lineNumber !== prevResult.lineNumber;
     const didChangeChar = currentResult.charNumber !== prevResult.charNumber;
-    const didChangeElement = currentResult.element !== prevResult.element;
+    const didChangeElement = this.didChangeElement(currentResult, prevResult);
 
     if (didChangeChar || didChangeLine) {
       this.clearDebouce();
       const { hoverResult } = this.props;
-      this.setState({ hoverResult, isVisible: false, isHighlighted: false });
+      this.setState({ hoverResult, isVisible: false });
       this.dFunc = debounce(() => this.callAPI(), DEBOUNCE_TIMEOUT);
       this.dFunc();
     }
