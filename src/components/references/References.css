@@ -1,6 +1,6 @@
 .references-section {
   overflow: hidden;
-  max-height: calc(100vh - 207px);
+  max-height: 3000px;
   transition: max-height 200ms ease-in;
 }
 
@@ -11,9 +11,6 @@
 .reference-container {
   background: rgb(250, 251, 252);
   padding-bottom: 10px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  max-height: calc(100vh - 207px);
   transition: max-height 200ms ease-in;
 }
 
