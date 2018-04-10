@@ -9,26 +9,26 @@ const CURSOR_RADIUS = 20; // pixels
 export default class HoverElement extends React.Component {
   // Makes the API call and shows the presentation component: HoverBox
   state = {
-    x: -1000,
-    y: -1000,
-    element: {},
+    apiResult: {},
+    hoverResult: {},
     isLoading: false,
     isExpanded: false
   };
 
   onReferences = () => {
-    const { x, y } = this.state;
-    this.props.onReferences({ x, y });
+    const { mouseX, mouseY } = this.state.hoverResult;
+    this.props.onReferences({ x: mouseX, y: mouseY });
   };
 
   onDefinition = () => {
-    const { x, y } = this.state;
-    this.props.onDefinition({ x, y });
+    const { mouseX, mouseY } = this.state.hoverResult;
+    this.props.onDefinition({ x: mouseX, y: mouseY });
   };
 
   isOverlappingWithCurrent = (x, y) => {
-    const xdiff = Math.abs(x - this.state.x);
-    const ydiff = Math.abs(y - this.state.y);
+    const { mouseX, mouseY } = this.state.hoverResult;
+    const xdiff = Math.abs(x - mouseX);
+    const ydiff = Math.abs(y - mouseY);
     return xdiff <= CURSOR_RADIUS && ydiff <= CURSOR_RADIUS;
   };
 
@@ -60,24 +60,22 @@ export default class HoverElement extends React.Component {
 
   callAPI = () => {
     this.startLoading();
-    const { mouseX, mouseY, element } = this.props.hoverResult;
     const { fileSha, filePath } = this.props.hoverResult;
     const { lineNumber, charNumber } = this.props.hoverResult;
 
     WS.getHover(fileSha, filePath, lineNumber, charNumber)
       .then(response => {
         this.stopLoading();
+        const { mouseX, mouseY } = this.props.hoverResult;
         const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
 
         if (isForCurrentMouse) {
           // We will set state only if the current
           // mouse location overlaps with the response
           this.setState({
-            ...response.result,
+            apiResult: response.result,
+            hoverResult: this.props.hoverResult,
             filePath: this.getDefinitionPath(response),
-            x: mouseX,
-            y: mouseY,
-            element,
             isDefinition: this.isDefinition(response)
           });
         }
@@ -95,23 +93,17 @@ export default class HoverElement extends React.Component {
 
     if (hasText) {
       this.callAPI();
-      const { mouseX: x, mouseY: y, element } = this.props.hoverResult;
-      this.setState({ x, y, element });
+      const { hoverResult } = this.props;
+      this.setState({ hoverResult });
     }
   };
 
   clear = () => {
     if (this.dFunc !== undefined) this.dFunc.clear();
-    if (this.state.x > 0) {
+    if (this.state.hoverResult.mouseX > 0) {
       this.setState({
-        x: -1000,
-        y: -1000,
-        element: {},
-        name: "",
-        signature: "",
-        type: "",
-        docstring: "",
-        filePath: ""
+        hoverResult: {},
+        apiResult: {}
       });
     }
   };
@@ -144,7 +136,6 @@ export default class HoverElement extends React.Component {
   };
 
   removeSelectedElement = element => {
-    console.log("removing", element);
     if (element && element.style) element.style.backgroundColor = null;
   };
 

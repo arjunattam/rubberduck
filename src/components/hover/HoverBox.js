@@ -24,29 +24,21 @@ const ExpandHelper = props => (
 );
 
 export default class HoverBox extends React.Component {
-  // Presentation component for the hover box
   static propTypes = {
-    name: PropTypes.string,
-    docstring: PropTypes.string,
-    lineNumber: PropTypes.number,
-    charNumber: PropTypes.number,
-    filePath: PropTypes.string,
-    fileSha: PropTypes.string,
-    x: PropTypes.number,
-    y: PropTypes.number,
-    element: PropTypes.object,
+    apiResult: PropTypes.string,
+    hoverResult: PropTypes.object,
     isDefinition: PropTypes.bool,
     isExpanded: PropTypes.bool
   };
 
-  isVisibleToUser = () => this.props.x > 0;
+  isVisibleToUser = () => this.props.hoverResult.mouseX > 0;
 
   getPosition = () => {
     // This decides where the hover box should be placed, looking at the
     // bounding rectangle of the element and the window.
-    let left = this.props.x;
-    let top = this.props.y;
-    const { element } = this.props;
+    const { mouseX, mouseY, element } = this.props.hoverResult;
+    let left = mouseX || -1000;
+    let top = mouseY || -1000;
 
     if (element && element.getBoundingClientRect) {
       const boundRect = element.getBoundingClientRect();
@@ -84,7 +76,7 @@ export default class HoverBox extends React.Component {
   };
 
   renderSignature() {
-    const { name, signature, language } = this.props;
+    const { name, signature, language } = this.props.apiResult;
     return (
       <div className="signature monospace">
         <HoverSignature
@@ -96,10 +88,10 @@ export default class HoverBox extends React.Component {
   }
 
   renderDocstring = className => {
-    const { docstring } = this.props;
+    const { docstring } = this.props.apiResult;
     return docstring ? (
       <div className={`docstring ${className}`}>
-        <Docstring docstring={this.props.docstring} />
+        <Docstring docstring={docstring} />
       </div>
     ) : null;
   };
@@ -110,7 +102,7 @@ export default class HoverBox extends React.Component {
 
   render() {
     const action = this.props.isDefinition ? "usages" : "definition";
-    const isExpandable = this.props.docstring ? true : false;
+    const isExpandable = this.props.apiResult.docstring ? true : false;
 
     return (
       <div className="hover-box" style={this.getStyle()}>
