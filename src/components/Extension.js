@@ -1,14 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { API } from "../utils/api";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
 import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
 import { Authorization } from "./../utils/authorization";
-import { pathAdapter, treeAdapter } from "../adapters";
+import { pathAdapter } from "../adapters";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 
 let document = window.document;
@@ -120,47 +119,19 @@ class Extension extends React.Component {
     }
   }
 
-  getFileTreeAPI(repoDetails) {
-    const { username, reponame, type } = repoDetails;
-    this.DataActions.setTreeLoading(true);
-
-    if (type === "pull") {
-      const { prId } = repoDetails;
-      return API.getPRFiles(username, reponame, prId).then(response =>
-        treeAdapter.getPRChildren(reponame, response)
-      );
-    } else if (type === "commit") {
-      const { headSha } = repoDetails;
-      return API.getCommitFiles(username, reponame, headSha).then(response =>
-        treeAdapter.getPRChildren(reponame, response)
-      );
-    } else if (type === "compare") {
-      const { headSha, baseSha } = repoDetails;
-      return API.getCompareFiles(username, reponame, headSha, baseSha).then(
-        response => treeAdapter.getPRChildren(reponame, response)
-      );
-    } else {
-      const branch = repoDetails.branch || "master"; // TODO(arjun): check for default branch
-      return API.getFilesTree(username, reponame, branch).then(response =>
-        treeAdapter.getTreeChildren(reponame, response)
-      );
-    }
-  }
-
   handleFileTreeUpdate() {
     let repoDetails = this.props.data.repoDetails;
 
     if (repoDetails.username && repoDetails.reponame) {
       // Repo details have been figured
       if (this.props.storage.token) {
-        this.getFileTreeAPI(repoDetails)
-          .then(fileTreeData => {
-            this.DataActions.setTreeLoading(false);
+        this.DataActions.callTree(repoDetails)
+          .then(response => {
+            const fileTreeData = response.value;
             this.DataActions.setFileTree(fileTreeData);
           })
           .catch(error => {
             // TODO(arjun): this needs to be better communicated
-            this.DataActions.setTreeLoading(false);
             console.log("Error in API call", error);
           });
       }

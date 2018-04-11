@@ -16,9 +16,6 @@ export class BaseSection extends React.Component {
       // For usages + definitions
       if (this.updateData) this.updateData(prevProps);
     }
-
-    // For tree loader
-    if (this.postLifecycleHook) this.postLifecycleHook();
   }
 
   toggleVisibility = () => {
@@ -30,12 +27,14 @@ export class BaseSection extends React.Component {
   renderSectionHeader = name => (
     <SectionHeader
       onClick={() => this.toggleVisibility()}
-      isVisible={this.state.isVisible}
+      isVisible={this.isVisible()}
       name={name}
     />
   );
 
   isVisible = () => this.props.data.openSection[this.sectionName];
+
+  isLoading = () => this.props.data.isLoading[this.sectionName];
 }
 
 export class BaseReaderSection extends BaseSection {
@@ -52,18 +51,6 @@ export class BaseReaderSection extends BaseSection {
       this.getSelectionData(newHoverResult);
     }
   }
-
-  startLoading = () => {
-    this.setState({
-      isLoading: true
-    });
-  };
-
-  stopLoading = () => {
-    this.setState({
-      isLoading: false
-    });
-  };
 
   getFileLink = (fileSha, filePath, lineNumber) => {
     let shaId = "";

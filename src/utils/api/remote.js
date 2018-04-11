@@ -1,6 +1,6 @@
 import axios from "axios";
 import parse from "what-the-diff";
-import { getGitService } from "../../adapters";
+import { getGitService, treeAdapter } from "../../adapters";
 
 let BaseGitRemoteAPI = {
   isRemoteAuthorized() {
@@ -36,6 +36,31 @@ let BaseGitRemoteAPI = {
             this.dispatchAuthenticated(false);
           }
         });
+    }
+  },
+
+  getTree(repoDetails) {
+    const { username, reponame, type } = repoDetails;
+    const { prId, headSha, baseSha, branch } = repoDetails;
+
+    switch (type) {
+      case "pull":
+        return this.getPRFiles(username, reponame, prId).then(response =>
+          treeAdapter.getPRChildren(reponame, response)
+        );
+      case "commit":
+        return this.getCommitFiles(username, reponame, headSha).then(response =>
+          treeAdapter.getPRChildren(reponame, response)
+        );
+      case "compare":
+        return this.getCompareFiles(username, reponame, headSha, baseSha).then(
+          response => treeAdapter.getPRChildren(reponame, response)
+        );
+      default:
+        const nonNullBranch = branch || "master"; // TODO(arjun): check for default branch
+        return this.getFilesTree(username, reponame, nonNullBranch).then(
+          response => treeAdapter.getTreeChildren(reponame, response)
+        );
     }
   }
 };

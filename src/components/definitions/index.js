@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
-import { WS } from "./../../utils/websocket";
 import DefinitionItem from "./DefinitionItem";
 import "./Definitions.css";
 
@@ -12,7 +11,6 @@ class Definitions extends BaseReaderSection {
   sectionName = "definitions";
 
   state = {
-    isLoading: false,
     definition: {}
   };
 
@@ -42,12 +40,9 @@ class Definitions extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
-      this.startLoading();
-      const { fileSha, filePath, lineNumber, charNumber } = hoverResult;
-      WS.getDefinition(fileSha, filePath, lineNumber, charNumber)
+      this.DataActions.callDefinitions(hoverResult)
         .then(response => {
-          this.stopLoading();
-          const result = response.result;
+          const result = response.value.result;
           const definition = {
             name: result.name,
             filePath: this.getFilePath(result),
@@ -60,7 +55,6 @@ class Definitions extends BaseReaderSection {
           this.setState({ definition: definition });
         })
         .catch(error => {
-          this.stopLoading();
           console.log("Error in API call", error);
         });
     }
@@ -75,7 +69,7 @@ class Definitions extends BaseReaderSection {
   };
 
   renderItems = () =>
-    this.state.isLoading ? (
+    this.isLoading() ? (
       <div className="loader-container" style={{ marginTop: 20 }}>
         <div className="status-loader" />
       </div>
