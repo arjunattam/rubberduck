@@ -23,13 +23,7 @@ class References extends BaseReaderSection {
     });
   };
 
-  getFileLink = (filePath, lineNumber) => {
-    const { username, reponame, branch } = this.props.data.repoDetails;
-    const offsetLine = lineNumber + 1;
-    return `/${username}/${reponame}/blob/${branch}/${filePath}#L${offsetLine}`;
-  };
-
-  getReferenceItems = apiResponse => {
+  getReferenceItems = (apiResponse, hoverResult) => {
     return apiResponse.references.map(reference => {
       const parent = reference.parent;
       let parentName = "";
@@ -44,6 +38,7 @@ class References extends BaseReaderSection {
         name: parentName,
         filePath: reference.location.path,
         fileLink: this.getFileLink(
+          hoverResult.fileSha,
           reference.location.path,
           reference.location.range.start.line
         ),
@@ -70,7 +65,7 @@ class References extends BaseReaderSection {
           this.setState({
             name: hoverResult.name,
             count: response.result.count,
-            references: this.getReferenceItems(response.result)
+            references: this.getReferenceItems(response.result, hoverResult)
           });
         })
         .catch(error => {

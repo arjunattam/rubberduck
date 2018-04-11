@@ -80,4 +80,20 @@ export class BaseReaderSection extends BaseSection {
       isLoading: false
     });
   };
+
+  getFileLink = (fileSha, filePath, lineNumber) => {
+    let shaId = "";
+    const currentSection = this.props.data.session;
+
+    if (fileSha === "base") {
+      shaId = currentSection.base.sha_id;
+    } else {
+      shaId = currentSection.head.sha_id;
+    }
+
+    const { username, reponame, branch } = this.props.data.repoDetails;
+    const gitId = shaId || branch;
+    const offsetLine = lineNumber + 1;
+    return `/${username}/${reponame}/blob/${gitId}/${filePath}#L${offsetLine}`;
+  };
 }

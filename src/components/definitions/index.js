@@ -52,6 +52,7 @@ class Definitions extends BaseReaderSection {
           const definition = {
             name: result.name,
             filePath: this.getFilePath(result),
+            fileSha: hoverResult.fileSha,
             startLineNumber: this.getStartLine(result),
             lineNumber: this.getLine(result),
             docstring: result.docstring,
@@ -66,11 +67,9 @@ class Definitions extends BaseReaderSection {
     }
   };
 
-  getFileLink = () => {
-    const { username, reponame, branch } = this.props.data.repoDetails;
-    const { filePath, lineNumber } = this.state.definition;
-    const offsetLine = lineNumber + 1;
-    return `/${username}/${reponame}/blob/${branch}/${filePath}#L${offsetLine}`;
+  buildFileLink = () => {
+    const { fileSha, filePath, lineNumber } = this.state.definition;
+    return this.getFileLink(fileSha, filePath, lineNumber);
   };
 
   renderItems = () =>
@@ -81,7 +80,7 @@ class Definitions extends BaseReaderSection {
     ) : this.props.selectionX ? (
       <DefinitionItem
         {...this.state.definition}
-        fileLink={this.getFileLink()}
+        fileLink={this.buildFileLink()}
         visible={this.state.isVisible}
         sidebarWidth={this.props.storage.sidebarWidth}
       />

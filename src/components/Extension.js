@@ -116,13 +116,7 @@ class Extension extends React.Component {
       };
 
       if (this.props.storage.token) {
-        WS.createNewSession(params)
-          .then(response => {
-            console.log("Session created", response);
-          })
-          .catch(error => {
-            console.log("Error in creating session", error);
-          });
+        this.DataActions.createNewSession({ params });
       }
     }
   }

@@ -1,4 +1,4 @@
-import { API } from "../utils/api";
+import { WS } from "../utils/websocket";
 import { encodeToBase64 } from "../utils/data";
 
 export function updateData(data) {
@@ -8,22 +8,10 @@ export function updateData(data) {
   };
 }
 
-export function createSession(data) {
+export function createNewSession(data) {
   return {
-    type: "CREATE_SESSION",
-    payload: API.createSession(
-      data.prNumber,
-      data.username,
-      data.reponame
-    ).then(response => {
-      let prId = encodeToBase64(
-        `${data.username}/${data.reponame}/${data.prNumber}`
-      );
-      return {
-        response,
-        data: prId
-      };
-    })
+    type: "CREATE_NEW_SESSION",
+    payload: WS.createNewSession(data.params)
   };
 }
 
