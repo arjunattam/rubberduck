@@ -69,8 +69,3 @@ export const listener = (event, callback, fileSha) => {
   const result = pageListener.readXY(event.x, event.y);
   callback(result);
 };
-
-export const readXY = (x, y, fileSha) => {
-  const pageListener = new BlobPageListener(fileSha);
-  return pageListener.readXY(x, y);
-};

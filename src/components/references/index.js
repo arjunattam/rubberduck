@@ -12,7 +12,6 @@ class References extends BaseReaderSection {
   sectionName = "references";
 
   state = {
-    isVisible: false,
     isLoading: false,
     references: []
   };
@@ -49,14 +48,12 @@ class References extends BaseReaderSection {
     });
   };
 
-  getSelectionData = () => {
-    const hoverResult = this.readPage();
-
+  getSelectionData = hoverResult => {
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
-    if (isValidResult && this.state.isVisible) {
+    if (isValidResult) {
       this.startLoading();
       const { fileSha, filePath, lineNumber, charNumber } = hoverResult;
       WS.getReferences(fileSha, filePath, lineNumber, charNumber)
@@ -83,13 +80,11 @@ class References extends BaseReaderSection {
       <div className="loader-container" style={{ marginTop: 20 }}>
         <div className="status-loader" />
       </div>
-    ) : this.props.selectionX ? (
+    ) : (
       <div className="reference-title">
         <div className="reference-name monospace">{this.state.name}</div>
         <div className="reference-count">{this.getCountText()}</div>
       </div>
-    ) : (
-      this.renderZeroState()
     );
 
   render() {
@@ -100,7 +95,7 @@ class References extends BaseReaderSection {
       );
     });
 
-    let referencesClassName = this.state.isVisible
+    let referencesClassName = this.isVisible()
       ? "references-section"
       : "references-section collapsed";
 

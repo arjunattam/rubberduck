@@ -15,19 +15,8 @@ export default class HoverElement extends React.Component {
     isHighlighted: false
   };
 
-  onReferences = () => {
-    const { mouseX, mouseY } = this.state.hoverResult;
-    this.props.onReferences({ x: mouseX, y: mouseY });
-  };
-
-  onDefinition = () => {
-    const { mouseX, mouseY } = this.state.hoverResult;
-    this.props.onDefinition({ x: mouseX, y: mouseY });
-  };
-
   callActions = () => {
-    this.onReferences();
-    this.onDefinition();
+    this.props.callActions();
   };
 
   isOverlappingWithCurrent = (x, y) => {

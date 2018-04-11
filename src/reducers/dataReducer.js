@@ -2,7 +2,6 @@ import { createReducer } from "redux-create-reducer";
 
 const initialState = {
   repoDetails: {},
-  textSelection: {},
 
   // Open section (default states)
   openSection: {
@@ -10,6 +9,9 @@ const initialState = {
     references: false,
     definitions: false
   },
+
+  // Current usages + definitions
+  hoverResult: {},
 
   // Files tree
   fileTree: {

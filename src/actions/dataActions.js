@@ -1,5 +1,4 @@
 import { WS } from "../utils/websocket";
-import { encodeToBase64 } from "../utils/data";
 
 export function updateData(data) {
   return {

@@ -9,14 +9,13 @@ class Tree extends BaseSection {
   sectionName = "tree";
 
   state = {
-    isVisible: this.props.data.openSection.tree,
     isLoading: false
   };
 
-  postCWRPHook(newProps) {
-    if (newProps.data.isTreeLoading !== this.state.isLoading) {
+  postLifecycleHook() {
+    if (this.props.data.isTreeLoading !== this.state.isLoading) {
       this.setState({
-        isLoading: newProps.data.isTreeLoading
+        isLoading: this.props.data.isTreeLoading
       });
     }
   }
@@ -48,7 +47,7 @@ class Tree extends BaseSection {
       this.props,
       this.props.data.repoDetails.path
     );
-    const styleClass = this.state.isVisible
+    const styleClass = this.isVisible()
       ? "tree-content-visible"
       : "tree-content-hidden";
 

@@ -1,8 +1,6 @@
 import React from "react";
 import { bindActionCreators } from "redux";
-import PropTypes from "prop-types";
 import SectionHeader from "./Section";
-import { getPageReader } from "../../adapters";
 import * as DataActions from "../../actions/dataActions";
 
 export class BaseSection extends React.Component {
@@ -11,17 +9,21 @@ export class BaseSection extends React.Component {
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
   }
 
-  componentWillReceiveProps(newProps) {
-    const nowVisible = newProps.data.openSection[this.sectionName];
-    if (nowVisible !== this.state.isVisible) {
-      this.setState({ isVisible: nowVisible });
+  componentDidUpdate(prevProps, prevState) {
+    const nowVisible = this.props.data.openSection[this.sectionName];
+
+    if (nowVisible) {
+      // For usages + definitions
+      if (this.updateData) this.updateData(prevProps);
     }
-    if (this.postCWRPHook) this.postCWRPHook(newProps);
+
+    // For tree loader
+    if (this.postLifecycleHook) this.postLifecycleHook();
   }
 
   toggleVisibility = () => {
     let openSection = { ...this.props.data.openSection };
-    openSection[this.sectionName] = !this.state.isVisible;
+    openSection[this.sectionName] = !openSection[this.sectionName];
     this.DataActions.updateData({ openSection });
   };
 
@@ -32,42 +34,24 @@ export class BaseSection extends React.Component {
       name={name}
     />
   );
+
+  isVisible = () => this.props.data.openSection[this.sectionName];
 }
 
 export class BaseReaderSection extends BaseSection {
-  static propTypes = {
-    selectionX: PropTypes.number,
-    selectionY: PropTypes.number
-  };
+  updateData(prevProps) {
+    const prevHoverResult = prevProps.data.hoverResult;
+    const newHoverResult = this.props.data.hoverResult;
 
-  componentDidUpdate(prevProps, prevState) {
-    const hasSelectionChanged =
-      prevProps.selectionX !== this.props.selectionX ||
-      prevProps.selectionY !== this.props.selectionY;
-    const hasVisibilityChanged = prevProps.isVisible !== this.props.isVisible;
-    if (hasSelectionChanged || hasVisibilityChanged) {
+    const hasResultChanged =
+      prevHoverResult.lineNumber !== newHoverResult.lineNumber ||
+      prevHoverResult.charNumber !== newHoverResult.charNumber;
+
+    if (hasResultChanged) {
       this.clearState();
-      this.getSelectionData();
+      this.getSelectionData(newHoverResult);
     }
   }
-
-  readPage = () => {
-    const reader = getPageReader();
-
-    if (reader !== null) {
-      return reader(
-        this.props.selectionX,
-        this.props.selectionY,
-        this.props.data.repoDetails.branch
-      );
-    }
-
-    return {};
-  };
-
-  renderZeroState = () => (
-    <div className="zero-state">Hover over symbols to trigger</div>
-  );
 
   startLoading = () => {
     this.setState({
