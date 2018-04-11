@@ -131,6 +131,8 @@ const getCodeboxSelector = () => {
       }
     case "bitbucket":
       return `div.refract-content-container`;
+    default:
+      return null;
   }
 };
 

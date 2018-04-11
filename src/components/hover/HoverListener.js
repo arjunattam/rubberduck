@@ -27,9 +27,12 @@ class HoverListener extends React.Component {
     hoverResult: {}
   };
 
-  triggerAction = (actionName, coordinates) => {
-    let openSection = { ...this.props.data.openSection };
-    openSection[actionName] = true;
+  callActions = () => {
+    let openSection = {
+      ...this.props.data.openSection,
+      references: true,
+      definitions: true
+    };
 
     if (isTreeTooBig()) {
       openSection.tree = false;
@@ -37,16 +40,8 @@ class HoverListener extends React.Component {
 
     this.DataActions.updateData({
       openSection,
-      textSelection: coordinates
+      hoverResult: this.state.hoverResult
     });
-  };
-
-  onReferences = coordinates => {
-    this.triggerAction("references", coordinates);
-  };
-
-  onDefinition = coordinates => {
-    this.triggerAction("definitions", coordinates);
   };
 
   receiver = hoverResult => {
@@ -108,11 +103,7 @@ class HoverListener extends React.Component {
 
   render() {
     return (
-      <HoverElement
-        {...this.state}
-        onReferences={coordinates => this.onReferences(coordinates)}
-        onDefinition={coordinates => this.onDefinition(coordinates)}
-      />
+      <HoverElement {...this.state} callActions={() => this.callActions()} />
     );
   }
 }

@@ -67,22 +67,6 @@ class Sidebar extends React.Component {
     );
   }
 
-  renderTree = () => <Tree />;
-
-  renderReferences = () => (
-    <References
-      selectionX={this.props.data.textSelection.x}
-      selectionY={this.props.data.textSelection.y}
-    />
-  );
-
-  renderDefinitions = () => (
-    <Definitions
-      selectionX={this.props.data.textSelection.x}
-      selectionY={this.props.data.textSelection.y}
-    />
-  );
-
   onResize = (e, direction, ref, delta, position) => {
     this.updateStorage({ sidebarWidth: ref.offsetWidth });
   };
@@ -106,9 +90,9 @@ class Sidebar extends React.Component {
       {this.renderCollapseButton()}
       <div className="repo-info-sections">
         <SessionStatus />
-        {this.renderTree()}
-        {this.renderDefinitions()}
-        {this.renderReferences()}
+        <Tree />
+        <Definitions />
+        <References />
       </div>
       <HoverListener />
       <StatusBar />
@@ -117,9 +101,8 @@ class Sidebar extends React.Component {
 
   render() {
     this.updatePageLayout();
-    return this.props.storage.isSidebarVisible
-      ? this.renderSidebar()
-      : this.renderCollapseButton();
+    const { isSidebarVisible: isVisible } = this.props.storage;
+    return isVisible ? this.renderSidebar() : this.renderCollapseButton();
   }
 }
 

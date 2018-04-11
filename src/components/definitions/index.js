@@ -12,7 +12,6 @@ class Definitions extends BaseReaderSection {
   sectionName = "definitions";
 
   state = {
-    isVisible: false,
     isLoading: false,
     definition: {}
   };
@@ -36,13 +35,13 @@ class Definitions extends BaseReaderSection {
       ? result.definition.location.range.start.line
       : null;
 
-  getSelectionData = () => {
-    const hoverResult = this.readPage();
+  getSelectionData = hoverResult => {
+    // const hoverResult = this.readPage();
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
-    if (isValidResult && this.state.isVisible) {
+    if (isValidResult) {
       this.startLoading();
       const { fileSha, filePath, lineNumber, charNumber } = hoverResult;
       WS.getDefinition(fileSha, filePath, lineNumber, charNumber)
@@ -52,6 +51,7 @@ class Definitions extends BaseReaderSection {
           const definition = {
             name: result.name,
             filePath: this.getFilePath(result),
+            fileSha: hoverResult.fileSha,
             startLineNumber: this.getStartLine(result),
             lineNumber: this.getLine(result),
             docstring: result.docstring,
@@ -66,11 +66,12 @@ class Definitions extends BaseReaderSection {
     }
   };
 
-  getFileLink = () => {
-    const { username, reponame, branch } = this.props.data.repoDetails;
-    const { filePath, lineNumber } = this.state.definition;
-    const offsetLine = lineNumber + 1;
-    return `/${username}/${reponame}/blob/${branch}/${filePath}#L${offsetLine}`;
+  buildFileLink = () => {
+    const { fileSha, filePath, lineNumber } = this.state.definition;
+
+    if (fileSha && filePath && lineNumber) {
+      return this.getFileLink(fileSha, filePath, lineNumber);
+    }
   };
 
   renderItems = () =>
@@ -78,19 +79,17 @@ class Definitions extends BaseReaderSection {
       <div className="loader-container" style={{ marginTop: 20 }}>
         <div className="status-loader" />
       </div>
-    ) : this.props.selectionX ? (
+    ) : (
       <DefinitionItem
         {...this.state.definition}
-        fileLink={this.getFileLink()}
-        visible={this.state.isVisible}
+        fileLink={this.buildFileLink()}
+        visible={this.isVisible()}
         sidebarWidth={this.props.storage.sidebarWidth}
       />
-    ) : (
-      this.renderZeroState()
     );
 
   render() {
-    let definitonClassName = this.state.isVisible
+    let definitonClassName = this.isVisible()
       ? "definitions-section"
       : "definitions-section collapsed";
     return (

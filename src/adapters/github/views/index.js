@@ -1,5 +1,5 @@
-import { listener as blobListener, readXY as blobReadXY } from "./blob";
-import { listener as pullListener, readXY as pullReadXY } from "./pull";
+import { listener as blobListener } from "./blob";
+import { listener as pullListener } from "./pull";
 
 const getHelper = (blobMethod, pullMethod) => {
   const isFileView = window.location.href.indexOf("blob") >= 0;
@@ -18,8 +18,4 @@ const getHelper = (blobMethod, pullMethod) => {
 
 export const getListener = () => {
   return getHelper(blobListener, pullListener);
-};
-
-export const getReader = () => {
-  return getHelper(blobReadXY, pullReadXY);
 };

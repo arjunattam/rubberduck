@@ -1,9 +1,7 @@
 import { createReducer } from "redux-create-reducer";
 
 const initialState = {
-  sessions: {},
   repoDetails: {},
-  textSelection: {},
 
   // Open section (default states)
   openSection: {
@@ -11,6 +9,9 @@ const initialState = {
     references: false,
     definitions: false
   },
+
+  // Current usages + definitions
+  hoverResult: {},
 
   // Files tree
   fileTree: {
@@ -21,6 +22,8 @@ const initialState = {
   isTreeLoading: false,
 
   // These are used to show session status
+  // and for the `open file` link
+  session: {},
   sessionStatus: "",
   showNotReady: null,
 
@@ -29,16 +32,16 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  CREATE_SESSION_FULFILLED: (state, action) => {
+  CREATE_NEW_SESSION_FULFILLED: (state, action) => {
+    console.log("Session created", action.payload);
     return {
       ...state,
-      sessions: {
-        ...state.sessions,
-        [action.payload.data]: action.payload.response
+      session: {
+        ...action.payload
       }
     };
   },
-  CREATE_SESSION_REJECTED: (state, action) => {
+  CREATE_NEW_SESSION_REJECTED: (state, action) => {
     console.log("Session creation failed", action.payload);
     return {
       ...state

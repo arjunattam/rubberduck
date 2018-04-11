@@ -2,7 +2,6 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { API } from "../utils/api";
-import { WS } from "../utils/websocket";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
@@ -116,13 +115,7 @@ class Extension extends React.Component {
       };
 
       if (this.props.storage.token) {
-        WS.createNewSession(params)
-          .then(response => {
-            console.log("Session created", response);
-          })
-          .catch(error => {
-            console.log("Error in creating session", error);
-          });
+        this.DataActions.createNewSession({ params });
       }
     }
   }
