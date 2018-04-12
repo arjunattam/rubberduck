@@ -8,13 +8,13 @@
 }
 
 .hover-debugger {
-  background-color: #f1f8ff;
+  padding: 10px;
+  background-color: rgba(241, 248, 255, 0.75);
   position: fixed;
   height: 230px;
-  width: 270px;
-  right: -310px;
+  width: 350px;
+  right: -400px;
   top: 20px;
-  padding: 10px;
 }
 
 .hover-debugger ul {

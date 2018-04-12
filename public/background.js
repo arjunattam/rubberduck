@@ -32,6 +32,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     return;
   }
 
+  // Setup context menu for references/definitions
+  CONTEXT_MENUS.forEach(contextMenu => {
+    chrome.contextMenus.create(contextMenu);
+  });
+
   chrome.tabs.executeScript(
     tabId,
     { code: injectFlagCode, runAt: "document_end" },
@@ -88,11 +93,6 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   handlers[req.message](req.data, sendRes);
   // Return true to inform that we will send response async
   return true;
-});
-
-// Setup context menu for references/definitions
-CONTEXT_MENUS.forEach(contextMenu => {
-  chrome.contextMenus.create(contextMenu);
 });
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
