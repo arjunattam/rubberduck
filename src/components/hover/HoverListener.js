@@ -101,9 +101,33 @@ class HoverListener extends React.Component {
     document.body.onmousemove = null;
   }
 
-  render() {
+  renderDebugger = () => {
+    const entries = Object.entries(this.state.hoverResult);
+    const liElements = entries.map(tuple => {
+      const value = tuple[1].outerHTML ? tuple[1].outerHTML : tuple[1];
+
+      return (
+        <li key={tuple[0]}>
+          <strong>{tuple[0]}</strong> {value}
+        </li>
+      );
+    });
+
     return (
-      <HoverElement {...this.state} callActions={() => this.callActions()} />
+      <div className="hover-debugger">
+        <ul>{liElements}</ul>
+      </div>
+    );
+  };
+
+  render() {
+    const { hasHoverDebug } = this.props.storage;
+
+    return (
+      <div>
+        <HoverElement {...this.state} callActions={() => this.callActions()} />
+        {hasHoverDebug ? this.renderDebugger() : null}
+      </div>
     );
   }
 }
