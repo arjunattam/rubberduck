@@ -18,37 +18,31 @@ class BlobPageListener extends BaseGithubListener {
   };
 
   getCharNumber = (element, mouseX) => {
-    const node = element.parentNode;
-    let actualElement = node;
-    if (node.id.indexOf("LC") < 0) {
-      // node or parentNode is the relevant `td` element we need
-      if (node.parentNode.id.indexOf("LC") >= 0) {
-        actualElement = node.parentNode;
-      } else {
-        return -1;
-      }
+    const lineElement = this.getLineElement(element);
+
+    if (lineElement) {
+      const bbox = lineElement.getBoundingClientRect();
+      const charInPixels = mouseX - bbox.x - this.getPaddingLeft(lineElement);
+      const fontSize = this.getFontSize(lineElement);
+      const estimatedChars = this.getCharsFromPixels(charInPixels, fontSize);
+      const tabSize = this.getTabSize(lineElement);
+      const numTabs = this.getNumTabs(lineElement);
+      return Math.round(estimatedChars - numTabs * (tabSize - 1));
     }
-    const bbox = actualElement.getBoundingClientRect();
-    const charInPixels = mouseX - bbox.x - this.getPaddingLeft(actualElement);
-    const fontSize = this.getFontSize(actualElement);
-    const estimatedChars = this.getCharsFromPixels(charInPixels, fontSize);
-    const tabSize = this.getTabSize(actualElement);
-    const numTabs = this.getNumTabs(actualElement);
-    return Math.round(estimatedChars - numTabs * (tabSize - 1));
+
+    return -1;
   };
 
-  getLineNumber = element => {
-    const node = element.parentNode;
-    const nodeId = node.id;
-    const parentNodeId = node.parentNode.id;
-    // One of these two needs to look like LC12
-    if (nodeId.indexOf("LC") >= 0) {
+  getLineNumber = node => {
+    // Find closest td element ancestor who id starts with LC
+    const lineElement = this.getLineElement(node);
+
+    if (lineElement) {
+      const nodeId = lineElement.id;
       return +nodeId.replace("LC", "") - 1; // for 0-indexed
-    } else if (parentNodeId.indexOf("LC") >= 0) {
-      return +parentNodeId.replace("LC", "") - 1; // for 0-indexed
-    } else {
-      return -1;
     }
+
+    return -1;
   };
 
   getFileUri = element => {
@@ -60,7 +54,11 @@ class BlobPageListener extends BaseGithubListener {
       return fullPath.slice(firstSlashIndex + 1);
     }
 
-    return "";
+    return -1;
+  };
+
+  getLineElement = node => {
+    return node.parentElement.closest("td[id^=LC]");
   };
 }
 
