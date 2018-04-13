@@ -8,18 +8,6 @@ import "./Tree.css";
 class Tree extends BaseSection {
   sectionName = "tree";
 
-  state = {
-    isLoading: false
-  };
-
-  postLifecycleHook() {
-    if (this.props.data.isTreeLoading !== this.state.isLoading) {
-      this.setState({
-        isLoading: this.props.data.isTreeLoading
-      });
-    }
-  }
-
   renderLoader = () => (
     <div className="loader-container" style={{ marginTop: 20 }}>
       <div className="status-loader" />
@@ -55,7 +43,7 @@ class Tree extends BaseSection {
       <div className="tree-container">
         {this.renderSectionHeader("Files tree")}
         <div className={"tree-content " + styleClass}>
-          {this.state.isLoading ? this.renderLoader() : renderedChildren}
+          {this.isLoading() ? this.renderLoader() : renderedChildren}
         </div>
       </div>
     );

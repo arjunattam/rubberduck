@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
-import { WS } from "../../utils/websocket";
 import ReferenceItem from "./ReferenceItem";
 import "./References.css";
 
@@ -12,7 +11,6 @@ class References extends BaseReaderSection {
   sectionName = "references";
 
   state = {
-    isLoading: false,
     references: []
   };
 
@@ -54,21 +52,14 @@ class References extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
-      this.startLoading();
-      const { fileSha, filePath, lineNumber, charNumber } = hoverResult;
-      WS.getReferences(fileSha, filePath, lineNumber, charNumber)
-        .then(response => {
-          this.stopLoading();
-          this.setState({
-            name: hoverResult.name,
-            count: response.result.count,
-            references: this.getReferenceItems(response.result, hoverResult)
-          });
-        })
-        .catch(error => {
-          this.stopLoading();
-          console.log("Error in API call", error);
+      this.DataActions.callReferences(hoverResult).then(response => {
+        const { result } = response.value;
+        this.setState({
+          name: hoverResult.name,
+          count: result.count,
+          references: this.getReferenceItems(result, hoverResult)
         });
+      });
     }
   };
 
@@ -76,7 +67,7 @@ class References extends BaseReaderSection {
     this.state.count === 1 ? `1 usage` : `${this.state.count} usages`;
 
   renderTitle = () =>
-    this.state.isLoading ? (
+    this.isLoading() ? (
       <div className="loader-container" style={{ marginTop: 20 }}>
         <div className="status-loader" />
       </div>

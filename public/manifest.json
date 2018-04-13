@@ -3,11 +3,12 @@
   "name": "Rubberduck",
   "short_name": "Rubberduck",
   "description": "Code review assistant for GitHub",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "background": {
     "persistent": false,
     "scripts": ["background.js"]
   },
+  "options_page": "options.html",
   "web_accessible_resources": ["fonts/*.woff2"],
   "content_scripts": [
     {
@@ -24,8 +25,7 @@
     "https://bitbucket.org/*",
     "https://www.codeview.io/*",
     "storage",
-    "identity",
-    "contextMenus"
+    "identity"
   ],
   "icons": {
     "16": "icons/icon-16.png",

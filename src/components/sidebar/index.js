@@ -58,16 +58,11 @@ class Sidebar extends React.Component {
     );
   }
 
-  renderCollapseButton() {
-    return (
-      <CollapseButton
-        onClick={() => this.toggleCollapse()}
-        isVisible={this.props.storage.isSidebarVisible}
-      />
-    );
-  }
+  onResize = (event, direction, ref, delta, position) => {
+    this.DataActions.updateData({ sidebarWidth: ref.offsetWidth });
+  };
 
-  onResize = (e, direction, ref, delta, position) => {
+  onResizeStop = (event, direction, ref, delta, position) => {
     this.updateStorage({ sidebarWidth: ref.offsetWidth });
   };
 
@@ -80,12 +75,18 @@ class Sidebar extends React.Component {
     <CollapseButton
       onClick={() => this.toggleCollapse()}
       isVisible={this.props.storage.isSidebarVisible}
-      sidebarWidth={this.props.storage.sidebarWidth}
+      sidebarWidth={
+        this.props.data.sidebarWidth || this.props.storage.sidebarWidth
+      }
     />
   );
 
   renderSidebar = () => (
-    <Resizable width={this.props.storage.sidebarWidth} onResize={this.onResize}>
+    <Resizable
+      width={this.props.storage.sidebarWidth}
+      onResize={this.onResize}
+      onResizeStop={this.onResizeStop}
+    >
       <Title />
       {this.renderCollapseButton()}
       <div className="repo-info-sections">

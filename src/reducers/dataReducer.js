@@ -3,9 +3,14 @@ import { createReducer } from "redux-create-reducer";
 const initialState = {
   repoDetails: {},
 
-  // Open section (default states)
+  // Section states
   openSection: {
     tree: true,
+    references: false,
+    definitions: false
+  },
+  isLoading: {
+    tree: false,
     references: false,
     definitions: false
   },
@@ -19,7 +24,6 @@ const initialState = {
     path: "",
     children: []
   },
-  isTreeLoading: false,
 
   // These are used to show session status
   // and for the `open file` link
@@ -45,6 +49,87 @@ export default createReducer(initialState, {
     console.log("Session creation failed", action.payload);
     return {
       ...state
+    };
+  },
+  CALL_TREE_PENDING: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        tree: true
+      }
+    };
+  },
+  CALL_TREE_FULFILLED: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        tree: false
+      }
+    };
+  },
+  CALL_TREE_REJECTED: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        tree: false
+      }
+    };
+  },
+  CALL_DEFINITIONS_PENDING: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        definitions: true
+      }
+    };
+  },
+  CALL_DEFINITIONS_FULFILLED: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        definitions: false
+      }
+    };
+  },
+  CALL_DEFINITIONS_REJECTED: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        definitions: false
+      }
+    };
+  },
+  CALL_REFERENCES_PENDING: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        references: true
+      }
+    };
+  },
+  CALL_REFERENCES_FULFILLED: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        references: false
+      }
+    };
+  },
+  CALL_REFERENCES_REJECTED: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        references: false
+      }
     };
   },
   SET_REPO_DETAILS: (state, action) => {

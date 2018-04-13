@@ -92,6 +92,21 @@ const updateManifestForLocalhost = buildPath => {
   updateManifestJson(buildPath, manifestContents);
 };
 
+/**
+ * Changes `//# sourceMappingURL=main.0a203304.js.map` in the js file to `//# sourceMappingURL=chrome-extension://mercury/main.0a203304.js.map`
+ * This is required for Sentry source mapping to work properly.
+ * @param {*} buildPath
+ */
+const updateSourceMapUrl = buildPath => {
+  const jsPath = `${buildPath}/static/js/`;
+  const jsFiles = fs.readdirSync(jsPath);
+  const mapFile = jsFiles.filter(name => name.endsWith(".map"))[0];
+  const jsFile = jsFiles.filter(name => name.endsWith(".js"))[0];
+  const lineToAppend = `\n//# sourceMappingURL=chrome-extension://mercury/${mapFile}`;
+  console.log("appending to", jsFile, lineToAppend);
+  fs.appendFileSync(`${buildPath}/static/js/${jsFile}`, lineToAppend);
+};
+
 module.exports = {
   updateManifestKey: updateManifestKey,
   updateBackground: updateBackground,
@@ -102,6 +117,7 @@ if (require.main === module) {
   // If this script is called as `node ...`, call these methods
   const buildPath = "./build";
   updateBackground(buildPath);
+  updateSourceMapUrl(buildPath);
 
   if (process.env.REACT_APP_CHROME_ZIP !== "true") {
     // We don't update the key in the manifest if the script is
