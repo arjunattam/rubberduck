@@ -1,19 +1,6 @@
 const jsLocation = JS_ASSET_LOCATION; // will be replaced with actual location by script
 const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location by script
 
-const CONTEXT_MENUS = [
-  {
-    title: "Find usages",
-    id: "REFERENCES_TRIGGER",
-    contexts: ["page", "selection"]
-  },
-  {
-    title: "Peek definition",
-    id: "DEFINITIONS_TRIGGER",
-    contexts: ["page", "selection"]
-  }
-];
-
 const INJECTABLE_URLS = ["github.com", "bitbucket.org"];
 
 // This file injects js and css to the github/bitbucket page
@@ -31,11 +18,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     // Tab hostname is not in the INJECTABLE_URLS
     return;
   }
-
-  // Setup context menu for references/definitions
-  CONTEXT_MENUS.forEach(contextMenu => {
-    chrome.contextMenus.create(contextMenu);
-  });
 
   chrome.tabs.executeScript(
     tabId,
@@ -93,15 +75,6 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   handlers[req.message](req.data, sendRes);
   // Return true to inform that we will send response async
   return true;
-});
-
-chrome.contextMenus.onClicked.addListener(function(info, tab) {
-  if (
-    info.menuItemId === "REFERENCES_TRIGGER" ||
-    info.menuItemId === "DEFINITIONS_TRIGGER"
-  ) {
-    sendMessageToCurrentTab(info.menuItemId, {});
-  }
 });
 
 // Helper method to send message to specific tab(by id) in content script.

@@ -3,6 +3,8 @@ import Octicon from "react-component-octicons";
 import "./settings.css";
 import RubberduckIcon from "./icon";
 
+export const VERSION = "0.2.1";
+
 const slackLink =
   "https://join.slack.com/t/karigarihq/shared_invite/enQtMzM5NzQxNjQxNTA1LTM0ZDFhNWQ3YmEyYmExZTY1ODJmM2U3NzExM2E0YmQxODcxYTgwYzczOTVkOGY5ODk2MWE0MzE2ODliNGU1ZDc";
 
@@ -17,7 +19,7 @@ const SettingsInternal = props => (
     <div className="settings-sub-section">
       <RubberduckIcon size="60" />
       <h3>Rubberduck</h3>
-      <div>Version 0.2.1</div>
+      <div>Version {VERSION}</div>
       <div>
         <a href="https://www.rubberduck.io">Visit website</a>
       </div>
