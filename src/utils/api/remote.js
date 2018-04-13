@@ -31,7 +31,7 @@ let BaseGitRemoteAPI = {
       return caller
         .then(response => (response.data ? response.data : response))
         .catch(error => {
-          if (error.response.status > 400 && error.response.status < 404) {
+          if (error.response.status > 400 && error.response.status <= 404) {
             // Remote has returned auth error
             this.dispatchAuthenticated(false);
           }
