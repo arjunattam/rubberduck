@@ -27,7 +27,15 @@ class HoverListener extends React.Component {
     hoverResult: {}
   };
 
+  isValidResult = () => {
+    return (
+      this.state.hoverResult.lineNumber && this.state.hoverResult.charNumber
+    );
+  };
+
   callActions = () => {
+    if (!this.isValidResult()) return;
+
     let openSection = {
       ...this.props.data.openSection,
       references: true,
