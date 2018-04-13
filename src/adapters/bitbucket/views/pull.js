@@ -1,12 +1,6 @@
 import BaseViewListener from "../../base/views";
 
-class BaseBitbucketListener extends BaseViewListener {}
-
-class PRPageListener extends BaseBitbucketListener {
-  isValidResult = (element, x, y, hoverResult) => {
-    return this.valuesAreValid(hoverResult);
-  };
-
+class PRPageListener extends BaseViewListener {
   getFileUri = element => {
     try {
       const fileContentDiv = element.parentNode.closest("div.diff-container");
@@ -20,7 +14,7 @@ class PRPageListener extends BaseBitbucketListener {
   getFileSha = element => {
     try {
       const lineDiv = element.parentNode.closest("div.udiff-line");
-      return lineDiv.classList.contains("deletion") ? "base" : "head";
+      return lineDiv.classList.contains("addition") ? "head" : "base";
     } catch (err) {
       return -1;
     }
@@ -29,10 +23,12 @@ class PRPageListener extends BaseBitbucketListener {
   getLineNumber = element => {
     try {
       const lineDiv = element.parentNode.closest("div.udiff-line");
-      const gutterDiv = lineDiv.querySelector("div.gutter");
-      const lineId = gutterDiv.id; // example: Lpybitbucket/auth.pyT58
-      const matched = lineId.match(/^(L.+)\/(.+)[TF]([0-9]+)$/);
-      return +matched[3] - 1; // for 0-indexed
+      const lineTag = lineDiv.querySelector("a.line-numbers");
+      // Attribute data-fnum has base line number and data-tnum has head number
+      const headLine = lineTag.getAttribute("data-tnum");
+      const baseLine = lineTag.getAttribute("data-fnum");
+      const whichLine = baseLine || headLine; // Base is first because of sha choice
+      return +whichLine - 1; // for 0-indexed
     } catch (err) {
       return -1;
     }

@@ -12,7 +12,8 @@ export default class HoverElement extends React.Component {
     apiResult: {},
     hoverResult: {},
     isLoading: false,
-    isHighlighted: false
+    isHighlighted: false,
+    underlinedElements: []
   };
 
   callActions = () => {
@@ -113,13 +114,19 @@ export default class HoverElement extends React.Component {
   underlineElement = element => {
     if (this.isValidElement(element)) {
       element.classList.add("underlined");
+      this.setState({
+        underlinedElements: [...this.state.underlinedElements, element]
+      });
     }
   };
 
-  removeUnderlineElement = element => {
-    if (this.isValidElement(element)) {
-      element.classList.remove("underlined");
-    }
+  removeUnderlineElements = () => {
+    this.state.underlinedElements.forEach(element =>
+      element.classList.remove("underlined")
+    );
+    this.setState({
+      underlinedElements: []
+    });
   };
 
   isExpandKeyCode = keyCode => {
@@ -156,6 +163,8 @@ export default class HoverElement extends React.Component {
     const didChangeLine = currentResult.lineNumber !== prevResult.lineNumber;
     const didChangeChar = currentResult.charNumber !== prevResult.charNumber;
     const didChangeElement = this.didChangeElement(currentResult, prevResult);
+    const didChangeHighlight =
+      this.state.isHighlighted !== prevState.isHighlighted;
 
     if (didChangeChar || didChangeLine) {
       this.clearDebouce();
@@ -167,12 +176,15 @@ export default class HoverElement extends React.Component {
 
     if (didChangeElement || !this.state.isHighlighted) {
       this.removeSelectedElement(prevResult.element);
-      this.removeUnderlineElement(prevResult.element);
       this.selectElement(currentResult.element);
     }
 
-    if (this.state.isHighlighted) {
-      this.underlineElement(currentResult.element);
+    if (didChangeHighlight) {
+      if (this.state.isHighlighted) {
+        this.underlineElement(currentResult.element);
+      } else {
+        this.removeUnderlineElements();
+      }
     }
   }
 

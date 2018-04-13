@@ -27,7 +27,15 @@ class HoverListener extends React.Component {
     hoverResult: {}
   };
 
+  isValidResult = () => {
+    const { lineNumber, charNumber } = this.state.hoverResult;
+    // we are relying on the fact that undefined >= 0 gives false
+    return lineNumber >= 0 && charNumber >= 0;
+  };
+
   callActions = () => {
+    if (!this.isValidResult()) return;
+
     let openSection = {
       ...this.props.data.openSection,
       references: true,
@@ -104,7 +112,10 @@ class HoverListener extends React.Component {
   renderDebugger = () => {
     const entries = Object.entries(this.state.hoverResult);
     const liElements = entries.map(tuple => {
-      const value = tuple[1].outerHTML ? tuple[1].outerHTML : tuple[1];
+      let value = "";
+      if (tuple.length > 1 && tuple[1]) {
+        value = tuple[1].outerHTML ? tuple[1].outerHTML : tuple[1];
+      }
 
       return (
         <li key={tuple[0]}>

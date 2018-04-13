@@ -134,7 +134,7 @@ let BitbucketAPI = {
         return total + num;
       }, 0);
     });
-    return hunkValues.reduce((total, num) => total + num);
+    return hunkValues.reduce((total, num) => total + num, 0);
   },
 
   getDiffData(parsedDiff) {

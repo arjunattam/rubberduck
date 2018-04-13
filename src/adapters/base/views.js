@@ -5,8 +5,13 @@ export default class BaseViewListener {
   readXY = (mouseX, mouseY) => {
     // Given x, y this will read the DOM element
     const range = document.caretRangeFromPoint(mouseX, mouseY);
-    const rangeElement = range.commonAncestorContainer;
-    return this.parseCommonAncestor(rangeElement, mouseX, mouseY);
+
+    if (range) {
+      const rangeElement = range.commonAncestorContainer;
+      return this.parseCommonAncestor(rangeElement, mouseX, mouseY);
+    }
+
+    return {};
   };
 
   parseCommonAncestor = (element, x, y) => {
@@ -16,35 +21,34 @@ export default class BaseViewListener {
       fileSha: this.getFileSha(element),
       lineNumber: this.getLineNumber(element),
       charNumber: this.getCharNumber(element, x, y),
-      element: element.parentElement,
+      element: this.getElement(element),
       mouseX: x,
       mouseY: y
     };
-    return this.isValidResult(element, x, y, result) ? result : {};
+    return this.isValidResult(result) ? result : {};
   };
 
-  isValidResult = (element, x, y, hoverResult) => {
+  getElement = element => element.parentElement.closest("span");
+
+  isValidResult = hoverResult => {
     return (
-      this.hasTextUnderMouse(element, x, y) && this.valuesAreValid(hoverResult)
+      this.hasTextUnderMouse(hoverResult) &&
+      this.areValuesValid(hoverResult) &&
+      this.isMouseOnElement(hoverResult)
     );
   };
 
-  hasTextUnderMouse = (element, x, y) => {
-    const node = element.parentElement; // This represents entire code line
+  isMouseOnElement = hoverResult => {
+    const { element, mouseX, mouseY } = hoverResult;
+    const { x, y, width, height } = element.getBoundingClientRect();
+    return (
+      mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
+    );
+  };
 
-    try {
-      const tdElement = node.closest("td.blob-code");
-      const lineContentLength = this.getContentLength(tdElement);
-      const lineHeight = this.getFontSize(tdElement);
-      // Check if line content width is greater than x
-      const widthWithText =
-        this.getPixelsFromChar(lineContentLength, lineHeight) +
-        tdElement.getBoundingClientRect().x +
-        this.getPaddingLeft(tdElement);
-      return widthWithText > x;
-    } catch (err) {
-      return false;
-    }
+  hasTextUnderMouse = hoverResult => {
+    const { element } = hoverResult;
+    return element ? element.textContent !== "" : false;
   };
 
   getContentLength = element => {
@@ -61,21 +65,14 @@ export default class BaseViewListener {
     return SF_MONO_ASPECT_RATIO;
   };
 
-  getPixelsFromChar = (chars, fontSize) => {
-    return chars * (this.getFontAspectRatio() * fontSize);
-  };
-
   getCharsFromPixels = (pixels, fontSize) => {
     return pixels / (this.getFontAspectRatio() * fontSize);
   };
 
-  valuesAreValid = result => {
-    // Returns true if the values in the result object
-    // are >= 0
-    return !Object.keys(result).some(function(k) {
+  areValuesValid = result =>
+    !Object.keys(result).some(function(k) {
       return result[k] < 0;
     });
-  };
 
   stripPx = value => +value.replace("px", "");
 
