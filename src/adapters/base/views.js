@@ -16,12 +16,14 @@ export default class BaseViewListener {
       fileSha: this.getFileSha(element),
       lineNumber: this.getLineNumber(element),
       charNumber: this.getCharNumber(element, x, y),
-      element: element.parentElement,
+      element: this.getElement(element),
       mouseX: x,
       mouseY: y
     };
     return this.isValidResult(element, x, y, result) ? result : {};
   };
+
+  getElement = element => element.parentElement.closest("span");
 
   isValidResult = (element, x, y, hoverResult) => {
     return (
@@ -29,22 +31,9 @@ export default class BaseViewListener {
     );
   };
 
-  hasTextUnderMouse = (element, x, y) => {
-    const node = element.parentElement; // This represents entire code line
-
-    try {
-      const tdElement = node.closest("td.blob-code");
-      const lineContentLength = this.getContentLength(tdElement);
-      const lineHeight = this.getFontSize(tdElement);
-      // Check if line content width is greater than x
-      const widthWithText =
-        this.getPixelsFromChar(lineContentLength, lineHeight) +
-        tdElement.getBoundingClientRect().x +
-        this.getPaddingLeft(tdElement);
-      return widthWithText > x;
-    } catch (err) {
-      return false;
-    }
+  hasTextUnderMouse = (node, x, y) => {
+    const element = this.getElement(node);
+    return element ? element.textContent !== "" : false;
   };
 
   getContentLength = element => {
@@ -59,10 +48,6 @@ export default class BaseViewListener {
     // This will have to change if we need to support other fonts
     // Returns aspect ratio (w/h) for SF-Mono font
     return SF_MONO_ASPECT_RATIO;
-  };
-
-  getPixelsFromChar = (chars, fontSize) => {
-    return chars * (this.getFontAspectRatio() * fontSize);
   };
 
   getCharsFromPixels = (pixels, fontSize) => {
