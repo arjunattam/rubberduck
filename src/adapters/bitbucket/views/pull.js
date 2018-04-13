@@ -1,8 +1,6 @@
 import BaseViewListener from "../../base/views";
 
-class BaseBitbucketListener extends BaseViewListener {}
-
-class PRPageListener extends BaseBitbucketListener {
+class PRPageListener extends BaseViewListener {
   isValidResult = (element, x, y, hoverResult) => {
     return this.valuesAreValid(hoverResult);
   };

@@ -43,7 +43,9 @@ class Definitions extends BaseReaderSection {
       this.DataActions.callDefinitions(hoverResult).then(response => {
         const result = response.value.result;
         const definition = {
-          name: result.name,
+          // Can use result.signature also for the name key
+          // Verify on go: https://github.com/samuel/go-zookeeper/blob/master/zk/server_help.go#L176
+          name: result.name || hoverResult.name,
           filePath: this.getFilePath(result),
           fileSha: hoverResult.fileSha,
           startLineNumber: this.getStartLine(result),

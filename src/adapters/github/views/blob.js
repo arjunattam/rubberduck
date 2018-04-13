@@ -55,7 +55,7 @@ class BlobPageListener extends BaseGithubListener {
       return fullPath.slice(firstSlashIndex + 1);
     }
 
-    return "";
+    return -1;
   };
 
   getLineElement = node => {

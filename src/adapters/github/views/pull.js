@@ -177,14 +177,12 @@ class PRPageListener extends BaseGithubListener {
             return "base";
           } else if (lineTd.id.indexOf("R" + lineNumber) >= 0) {
             return "head";
-          } else {
-            return -1;
           }
         }
       }
-    } else {
-      return -1;
     }
+
+    return -1;
   };
 }
 

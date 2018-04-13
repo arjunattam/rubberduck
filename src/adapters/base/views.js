@@ -5,8 +5,13 @@ export default class BaseViewListener {
   readXY = (mouseX, mouseY) => {
     // Given x, y this will read the DOM element
     const range = document.caretRangeFromPoint(mouseX, mouseY);
-    const rangeElement = range.commonAncestorContainer;
-    return this.parseCommonAncestor(rangeElement, mouseX, mouseY);
+
+    if (range) {
+      const rangeElement = range.commonAncestorContainer;
+      return this.parseCommonAncestor(rangeElement, mouseX, mouseY);
+    }
+
+    return {};
   };
 
   parseCommonAncestor = (element, x, y) => {

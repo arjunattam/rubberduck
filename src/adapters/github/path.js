@@ -13,7 +13,7 @@ const GH_RESERVED_USER_NAMES = [ // These cannot be usernames
     'security', 'join', 'login', 'watching',
     'new', 'integrations', 'gist', 'business',
     'mirrors', 'open-source', 'personal',
-    'pricing', 'marketplace', 'apps'
+    'pricing', 'marketplace', 'apps', 'topics'
   ]
 const GH_RESERVED_REPO_NAMES = ["followers", "following", "repositories"];
 const GH_RESERVED_SUB_PAGES = [
