@@ -25,19 +25,29 @@ export default class BaseViewListener {
       mouseX: x,
       mouseY: y
     };
-    return this.isValidResult(element, x, y, result) ? result : {};
+    return this.isValidResult(result) ? result : {};
   };
 
   getElement = element => element.parentElement.closest("span");
 
-  isValidResult = (element, x, y, hoverResult) => {
+  isValidResult = hoverResult => {
     return (
-      this.hasTextUnderMouse(element, x, y) && this.valuesAreValid(hoverResult)
+      this.hasTextUnderMouse(hoverResult) &&
+      this.areValuesValid(hoverResult) &&
+      this.isMouseOnElement(hoverResult)
     );
   };
 
-  hasTextUnderMouse = (node, x, y) => {
-    const element = this.getElement(node);
+  isMouseOnElement = hoverResult => {
+    const { element, mouseX, mouseY } = hoverResult;
+    const { x, y, width, height } = element.getBoundingClientRect();
+    return (
+      mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
+    );
+  };
+
+  hasTextUnderMouse = hoverResult => {
+    const { element } = hoverResult;
     return element ? element.textContent !== "" : false;
   };
 
@@ -59,13 +69,10 @@ export default class BaseViewListener {
     return pixels / (this.getFontAspectRatio() * fontSize);
   };
 
-  valuesAreValid = result => {
-    // Returns true if the values in the result object
-    // are >= 0
-    return !Object.keys(result).some(function(k) {
+  areValuesValid = result =>
+    !Object.keys(result).some(function(k) {
       return result[k] < 0;
     });
-  };
 
   stripPx = value => +value.replace("px", "");
 

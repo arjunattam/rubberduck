@@ -18,7 +18,6 @@ class BlobPageListener extends BaseGithubListener {
   };
 
   getCharNumber = (element, mouseX) => {
-    const node = element.parentNode;
     const lineElement = this.getLineElement(element);
 
     if (lineElement) {
