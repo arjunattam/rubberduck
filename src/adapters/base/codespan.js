@@ -67,12 +67,10 @@ const reconstructTd = codeTd => {
       const childText = childNode.textContent;
       const splitText = delimiterSplit(childText);
 
-      if (splitText.length > 1) {
-        // This has delimiters, we need to split the inner elements
+      if (splitText.length >= 1) {
+        // This has 0 or more delimiters, we will split the inner elements
         const newInnerHTML = constructNodeHTML(childText);
         childNode.innerHTML = newInnerHTML.join("");
-        reconstructedElements.push(childNode.outerHTML);
-      } else {
         reconstructedElements.push(childNode.outerHTML);
       }
     } else {
