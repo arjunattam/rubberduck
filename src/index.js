@@ -5,6 +5,7 @@ import Extension from "./components/Extension";
 import store from "./store.js";
 import Raven from "raven-js";
 import { getGitService } from "./adapters";
+import { VERSION } from "./components/status/settings";
 // import registerServiceWorker from "./registerServiceWorker";
 
 const Pjax = require("pjax");
@@ -27,14 +28,37 @@ const renderExtension = () => {
   );
 };
 
+function normalizeSentryUrl(url) {
+  return `chrome-extension://mercury/${url.replace(/^.*[\\\/]/, "")}`;
+}
+
 const loadSentry = () => {
   if (process.env.REACT_APP_BACKEND_ENV === "local") {
     return;
   }
 
-  Raven.config(
-    "https://c59b970dd8d74935ab8a0001e5cdbe14@sentry.io/417166"
-  ).install();
+  const SENTRY_DSN =
+    "https://c59b970dd8d74935ab8a0001e5cdbe14@sentry.io/417166";
+
+  Raven.config(SENTRY_DSN, {
+    release: VERSION,
+    dataCallback: function(data) {
+      // We normalize the urls so that the sourcemap work (also see scripts/sentry.sh)
+      if (data.culprit) {
+        data.culprit = normalizeSentryUrl(data.culprit);
+      }
+
+      if (data.exception) {
+        // if data.exception exists,
+        // all of the other keys are guaranteed to exist
+        data.exception.values[0].stacktrace.frames.forEach(function(frame) {
+          frame.filename = normalizeSentryUrl(frame.filename);
+        });
+      }
+
+      return data;
+    }
+  }).install();
 };
 
 const getPjaxSelector = () => {
@@ -80,9 +104,9 @@ const setupPjax = () => {
 
 // Content script setup -- on injection
 // registerServiceWorker();
+loadSentry();
 createExtensionContainer();
 renderExtension();
-loadSentry();
 
 // Wait for 2 seconds, and then setup pjax
 setTimeout(() => {

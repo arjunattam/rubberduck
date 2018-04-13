@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import Raven from "raven-js";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
@@ -74,6 +75,8 @@ class Extension extends React.Component {
     let existingToken = this.props.storage.token;
     Authorization.handleTokenState(clientId, existingToken).then(token => {
       StorageUtils.setAllInStore({ token, clientId }, () => {});
+      // Setup user context for sentry
+      Raven.setUserContext(Authorization.decodeJWT(token));
     });
   }
 

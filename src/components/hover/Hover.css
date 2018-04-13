@@ -7,6 +7,20 @@
   font-size: 12px;
 }
 
+.hover-debugger {
+  padding: 10px;
+  background-color: rgba(241, 248, 255, 0.75);
+  position: fixed;
+  height: 230px;
+  width: 350px;
+  right: -400px;
+  top: 20px;
+}
+
+.hover-debugger ul {
+  list-style-position: inside;
+}
+
 .hover-box .docstring {
   background: #f1f8ff;
 }

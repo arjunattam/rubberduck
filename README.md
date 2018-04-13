@@ -48,10 +48,10 @@ To be able to pack crx, you need to setup `keys/development_key.pem` in your pro
 
 2.  Bump the version -- open `manifest.json` and bump the version depending on your changes.
 
-3.  Generate the zip file for uploading using:
+3.  Generate the zip file for uploading using the following. This also uploads the source maps to Sentry.
 
     ```
-    npm run chrome-zip
+    npm run chrome-build
     ```
 
 4.  Upload the generated zip file (`bundle.zip`) on the Chrome dashboard.

@@ -20,6 +20,7 @@ module.exports = function override(config, env) {
     buildPath = "./build-local";
   }
 
+  // Write webpack output to file for chrome loading
   config.output.path = path.join(__dirname, buildPath);
   config.plugins.push(new WriteFilePlugin());
 
