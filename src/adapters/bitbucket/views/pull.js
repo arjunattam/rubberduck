@@ -1,10 +1,6 @@
 import BaseViewListener from "../../base/views";
 
 class PRPageListener extends BaseViewListener {
-  isValidResult = (element, x, y, hoverResult) => {
-    return this.valuesAreValid(hoverResult);
-  };
-
   getFileUri = element => {
     try {
       const fileContentDiv = element.parentNode.closest("div.diff-container");
