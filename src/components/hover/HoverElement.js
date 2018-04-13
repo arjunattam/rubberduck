@@ -78,7 +78,7 @@ export default class HoverElement extends React.Component {
       .catch(error => {
         this.stopLoading();
         this.clearDebouce();
-        console.log("Error in API call", error);
+        throw error;
       });
   };
 

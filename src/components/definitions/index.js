@@ -40,23 +40,19 @@ class Definitions extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
-      this.DataActions.callDefinitions(hoverResult)
-        .then(response => {
-          const result = response.value.result;
-          const definition = {
-            name: result.name,
-            filePath: this.getFilePath(result),
-            fileSha: hoverResult.fileSha,
-            startLineNumber: this.getStartLine(result),
-            lineNumber: this.getLine(result),
-            docstring: result.docstring,
-            codeSnippet: result.definition ? result.definition.contents : ""
-          };
-          this.setState({ definition: definition });
-        })
-        .catch(error => {
-          console.log("Error in API call", error);
-        });
+      this.DataActions.callDefinitions(hoverResult).then(response => {
+        const result = response.value.result;
+        const definition = {
+          name: result.name,
+          filePath: this.getFilePath(result),
+          fileSha: hoverResult.fileSha,
+          startLineNumber: this.getStartLine(result),
+          lineNumber: this.getLine(result),
+          docstring: result.docstring,
+          codeSnippet: result.definition ? result.definition.contents : ""
+        };
+        this.setState({ definition: definition });
+      });
     }
   };
 

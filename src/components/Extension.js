@@ -128,15 +128,10 @@ class Extension extends React.Component {
     if (repoDetails.username && repoDetails.reponame) {
       // Repo details have been figured
       if (this.props.storage.token) {
-        this.DataActions.callTree(repoDetails)
-          .then(response => {
-            const fileTreeData = response.value;
-            this.DataActions.setFileTree(fileTreeData);
-          })
-          .catch(error => {
-            // TODO(arjun): this needs to be better communicated
-            console.log("Error in API call", error);
-          });
+        this.DataActions.callTree(repoDetails).then(response => {
+          const fileTreeData = response.value;
+          this.DataActions.setFileTree(fileTreeData);
+        });
       }
     }
   }

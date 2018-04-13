@@ -52,18 +52,14 @@ class References extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
-      this.DataActions.callReferences(hoverResult)
-        .then(response => {
-          const { result } = response.value;
-          this.setState({
-            name: hoverResult.name,
-            count: result.count,
-            references: this.getReferenceItems(result, hoverResult)
-          });
-        })
-        .catch(error => {
-          console.log("Error in API call", error);
+      this.DataActions.callReferences(hoverResult).then(response => {
+        const { result } = response.value;
+        this.setState({
+          name: hoverResult.name,
+          count: result.count,
+          references: this.getReferenceItems(result, hoverResult)
         });
+      });
     }
   };
 
