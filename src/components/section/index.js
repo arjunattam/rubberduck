@@ -54,12 +54,12 @@ export class BaseReaderSection extends BaseSection {
 
   getFileLink = (fileSha, filePath, lineNumber) => {
     let shaId = "";
-    const currentSection = this.props.data.session;
+    const { base, head } = this.props.data.session;
 
     if (fileSha === "base") {
-      shaId = currentSection.base.sha_id;
+      shaId = base ? base.sha_id : "";
     } else {
-      shaId = currentSection.head.sha_id;
+      shaId = head ? head.sha_id : "";
     }
 
     const { username, reponame, branch } = this.props.data.repoDetails;
