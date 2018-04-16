@@ -68,7 +68,7 @@ export class AuthUtils {
     return currentMoment.isSameOrAfter(tokenExpiryMoment, "second");
   }
 
-  isTokenExpiring(token) {
+  isTokenExpiringSoon(token) {
     if (!token) {
       return true;
     }
@@ -78,7 +78,7 @@ export class AuthUtils {
     return tokenExpiryMoment.diff(currentMoment, "hours") < JWT_REFRESH_WINDOW;
   }
 
-  isTokenRefreshExpiring(token) {
+  isTokenRefreshExpiringSoon(token) {
     if (!token) {
       return true;
     }
@@ -108,19 +108,21 @@ export class AuthUtils {
   }
 
   handleTokenState(clientId, existingToken) {
-    const shouldIssueToken =
-      !existingToken ||
-      this.isTokenExpired(existingToken) ||
-      this.isTokenRefreshExpiring(existingToken);
-
-    if (shouldIssueToken) {
+    if (this.isTokenRefreshExpiringSoon(existingToken)) {
+      // Refreshing will not help, let's just issue a new token
       return this.issueToken(clientId);
-    } else if (this.isTokenExpiring(existingToken)) {
-      return this.refreshToken(existingToken);
+    }
+
+    if (this.isTokenValid(existingToken)) {
+      if (!this.isTokenExpiringSoon(existingToken)) {
+        return new Promise(resolve => {
+          resolve(existingToken);
+        });
+      } else {
+        return this.refreshToken(existingToken);
+      }
     } else {
-      return new Promise(resolve => {
-        resolve(existingToken);
-      });
+      return this.issueToken(clientId);
     }
   }
 }
