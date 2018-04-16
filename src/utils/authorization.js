@@ -54,6 +54,10 @@ export class AuthUtils {
     sendMessage(message, cb);
   }
 
+  isTokenValid(token) {
+    return !this.isTokenExpired(token);
+  }
+
   isTokenExpired(token) {
     if (!token) {
       return true;

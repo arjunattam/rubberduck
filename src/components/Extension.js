@@ -102,6 +102,11 @@ class Extension extends React.Component {
     });
   }
 
+  hasValidToken = () => {
+    const { token } = this.props.storage;
+    return token && Authorization.isTokenValid(token);
+  };
+
   handleSessionInitialization() {
     const repoDetails = this.props.data.repoDetails;
     const hasSessionParams =
@@ -117,7 +122,7 @@ class Extension extends React.Component {
         base_sha: repoDetails.baseSha
       };
 
-      if (this.props.storage.token) {
+      if (this.hasValidToken()) {
         this.DataActions.createNewSession({ params });
       }
     }
@@ -127,8 +132,7 @@ class Extension extends React.Component {
     let repoDetails = this.props.data.repoDetails;
 
     if (repoDetails.username && repoDetails.reponame) {
-      // Repo details have been figured
-      if (this.props.storage.token) {
+      if (this.hasValidToken()) {
         this.DataActions.callTree(repoDetails).then(response => {
           const fileTreeData = response.value;
           this.DataActions.setFileTree(fileTreeData);
