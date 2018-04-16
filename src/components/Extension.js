@@ -32,6 +32,7 @@ class Extension extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.storage.initialized && this.props.storage.initialized) {
+      // Checking to trigger this only after chrome storage is loaded
       this.setupAuthorization();
     }
     this.updateSessionAndTree(prevProps, this.props);

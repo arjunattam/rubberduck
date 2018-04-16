@@ -3,13 +3,15 @@ import { sendMessage, constructMessage } from "./chrome";
 import { rootUrl } from "./api";
 import { API } from "./api";
 import { getGitService } from "../adapters";
-const Moment = require("moment");
 
+const Moment = require("moment");
 const JWT = require("jsonwebtoken");
+
+const JWT_FINAL_EXPIRY = 60; // days
+const JWT_REFRESH_WINDOW = 48; // hours
 
 export class AuthUtils {
   generateClientId() {
-    // E.g. 8 * 32 = 256 bits token
     const randomPool = new Uint8Array(32);
     crypto.getRandomValues(randomPool);
     let hex = "";
@@ -59,10 +61,7 @@ export class AuthUtils {
     let decodedToken = JWT.decode(token);
     let tokenExpiryMoment = Moment.unix(decodedToken.exp);
     let currentMoment = Moment();
-    if (currentMoment.isSameOrAfter(tokenExpiryMoment, "second")) {
-      return true;
-    }
-    return false;
+    return currentMoment.isSameOrAfter(tokenExpiryMoment, "second");
   }
 
   isTokenExpiring(token) {
@@ -72,10 +71,7 @@ export class AuthUtils {
     let decodedToken = JWT.decode(token);
     let currentMoment = Moment();
     let tokenExpiryMoment = Moment.unix(decodedToken.exp);
-    if (tokenExpiryMoment.diff(currentMoment, "hours") < 24) {
-      return true;
-    }
-    return false;
+    return tokenExpiryMoment.diff(currentMoment, "hours") < JWT_REFRESH_WINDOW;
   }
 
   isTokenRefreshExpiring(token) {
@@ -86,13 +82,12 @@ export class AuthUtils {
     let currentMoment = Moment();
     let tokenOriginalIssueMoment = Moment.unix(decodedToken.orig_iat);
     let tokenRefreshExpiryMoment = Moment(tokenOriginalIssueMoment).add(
-      30,
+      JWT_FINAL_EXPIRY,
       "days"
     );
-    if (tokenRefreshExpiryMoment.diff(currentMoment, "hours") < 24) {
-      return true;
-    }
-    return false;
+    return (
+      tokenRefreshExpiryMoment.diff(currentMoment, "hours") < JWT_REFRESH_WINDOW
+    );
   }
 
   issueToken(clientId) {
@@ -109,11 +104,12 @@ export class AuthUtils {
   }
 
   handleTokenState(clientId, existingToken) {
-    if (
+    const shouldIssueToken =
       !existingToken ||
       this.isTokenExpired(existingToken) ||
-      this.isTokenRefreshExpiring(existingToken)
-    ) {
+      this.isTokenRefreshExpiring(existingToken);
+
+    if (shouldIssueToken) {
       return this.issueToken(clientId);
     } else if (this.isTokenExpiring(existingToken)) {
       return this.refreshToken(existingToken);
