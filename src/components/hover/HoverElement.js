@@ -1,7 +1,8 @@
 import React from "react";
+import Raven from "raven-js";
+import debounce from "debounce";
 import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
-import debounce from "debounce";
 
 const DEBOUNCE_TIMEOUT = 1200; // ms
 const CURSOR_RADIUS = 20; // pixels
@@ -79,7 +80,7 @@ export default class HoverElement extends React.Component {
       .catch(error => {
         this.stopLoading();
         this.clearDebouce();
-        throw error;
+        Raven.captureException(error);
       });
   };
 

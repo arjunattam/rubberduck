@@ -1,5 +1,6 @@
 import Store from "../store";
 import WebSocketAsPromised from "websocket-as-promised";
+import Raven from "raven-js";
 import { rootUrl } from "./api";
 import { getGitService } from "../adapters";
 
@@ -236,9 +237,10 @@ class WebSocketManager {
       } else if (error === "No session to be created") {
         this.dispatchStatus("no_session");
       } else {
+        // Unknown error, sent to Sentry
         this.dispatchStatus("error");
+        Raven.captureException(error);
       }
-      throw error;
     });
   };
 
