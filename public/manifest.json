@@ -8,7 +8,9 @@
     "persistent": false,
     "scripts": ["background.js"]
   },
-  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html"
+  },
   "web_accessible_resources": ["fonts/*.woff2"],
   "content_scripts": [
     {
@@ -20,12 +22,16 @@
       "css": ["css/fileicon.css"]
     }
   ],
+  "content_security_policy":
+    "script-src 'self'; object-src 'self'; connect-src 'self' ws://localhost:8000 http://localhost:8000",
   "permissions": [
     "https://github.com/*",
     "https://bitbucket.org/*",
     "https://www.codeview.io/*",
     "storage",
-    "identity"
+    "identity",
+    "tabs",
+    "<all_urls>"
   ],
   "icons": {
     "16": "icons/icon-16.png",
@@ -34,5 +40,11 @@
     "96": "icons/icon-96.png",
     "128": "icons/icon-128.png",
     "256": "icons/icon-256.png"
+  },
+  "applications": {
+    "gecko": {
+      "id": "addon@rubberduck.io",
+      "strict_min_version": "42.0"
+    }
   }
 }
