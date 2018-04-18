@@ -1,29 +1,16 @@
 import React from "react";
+import { BaseSectionItem } from "../section";
 import ExpandedCode from "../common/ExpandedCode";
 import SmallCodeSnippet from "../common/SmallCodeSnippet";
 import CodeNode from "../common/CodeNode";
 
-export default class ReferenceItem extends React.Component {
-  state = {
-    isHovering: false
-  };
-
-  handleMouseHover = () => {
-    this.setState({
-      isHovering: !this.state.isHovering
-    });
-  };
-
-  getTop = () => {
-    return this.refs.container.getBoundingClientRect().top;
-  };
-
+export default class ReferenceItem extends BaseSectionItem {
   render() {
     return (
       <div
         className="reference-item"
-        onMouseEnter={this.handleMouseHover}
-        onMouseLeave={this.handleMouseHover}
+        onMouseEnter={this.handleMouseEnter}
+        onMouseLeave={this.handleMouseLeave}
         ref={"container"}
       >
         <CodeNode {...this.props}>

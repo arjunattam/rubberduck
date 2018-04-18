@@ -68,3 +68,32 @@ export class BaseReaderSection extends BaseSection {
     return `/${username}/${reponame}/blob/${gitId}/${filePath}#L${offsetLine}`;
   };
 }
+
+export class BaseSectionItem extends React.Component {
+  state = {
+    isHovering: false
+  };
+
+  handleMouseEnter = event => {
+    this.setState({
+      isHovering: true
+    });
+  };
+
+  handleMouseLeave = event => {
+    const rect = this.refs.container.getBoundingClientRect();
+    const { clientX: x, clientY: y } = event;
+    const { top, bottom, right } = rect;
+    const PADDING = 20;
+
+    if (!(y < bottom && y > top && x <= right + PADDING)) {
+      this.setState({
+        isHovering: false
+      });
+    }
+  };
+
+  getTop = () => {
+    return this.refs.container.getBoundingClientRect().top;
+  };
+}

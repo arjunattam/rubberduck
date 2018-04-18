@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".", // This must be specified if "paths" is set
+    "paths": {
+      // Relative to "baseUrl"
+      "*": ["*", "src/components/*"]
+    },
+    "jsx": "react"
+  }
+}

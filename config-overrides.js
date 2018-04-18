@@ -37,6 +37,12 @@ module.exports = function override(config, env) {
     helpers.updateManifestForLocalhost(buildPath);
   }
 
+  // Modules resolve config
+  config.resolve.modules = [
+    path.resolve(__dirname, "src/components"),
+    "node_modules"
+  ];
+
   // All config manipulation is complete
   return config;
 };
