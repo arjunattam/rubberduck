@@ -44,10 +44,10 @@ export function callDefinitions(data) {
   };
 }
 
-export function callReferences(data) {
+export function callUsages(data) {
   const { fileSha, filePath, lineNumber, charNumber } = data;
   return {
-    type: "CALL_REFERENCES",
+    type: "CALL_USAGES",
     payload: WS.getReferences(fileSha, filePath, lineNumber, charNumber)
   };
 }

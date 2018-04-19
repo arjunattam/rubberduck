@@ -34,8 +34,8 @@
     "pack": "build/. -p keys/development_key.pem -o dist/mercury.crx"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "start-local": "REACT_APP_BACKEND_ENV=local npm run start",
+    "start": "BROWSER=none react-app-rewired start",
+    "start-local": "BROWSER=none REACT_APP_BACKEND_ENV=local npm run start",
     "prebuild": "node ./scripts/prebuild.js",
     "build": "react-app-rewired build && node scripts/helpers.js",
     "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",

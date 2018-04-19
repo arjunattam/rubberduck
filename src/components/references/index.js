@@ -5,19 +5,10 @@ import ReferenceItem from "./ReferenceItem";
 import "./References.css";
 
 class References extends BaseReaderSection {
-  // This gets x and y of the selected text, constructs the
-  // API call payload by reading DOM, and then display the
-  // result of the API call.
-  sectionName = "references";
+  sectionName = "usages";
 
   state = {
     references: []
-  };
-
-  clearState = () => {
-    this.setState({
-      references: []
-    });
   };
 
   getReferenceItems = (apiResponse, hoverResult) => {
@@ -52,7 +43,7 @@ class References extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
-      this.DataActions.callReferences(hoverResult).then(response => {
+      this.DataActions.callUsages(hoverResult).then(response => {
         const { result } = response.value;
         this.setState({
           name: hoverResult.name,
@@ -66,37 +57,40 @@ class References extends BaseReaderSection {
   getCountText = () =>
     this.state.count === 1 ? `1 usage` : `${this.state.count} usages`;
 
-  renderTitle = () =>
-    this.isLoading() ? (
-      <div className="loader-container" style={{ marginTop: 20 }}>
-        <div className="status-loader" />
+  renderContainerTitle = () => (
+    <div className="reference-title">
+      <div className="reference-name monospace">{this.state.name}</div>
+      <div className="reference-count">{this.getCountText()}</div>
+    </div>
+  );
+
+  renderItems = () => {
+    const { sidebarWidth } = this.props.storage;
+    const referenceItems = this.state.references.map((reference, index) => (
+      <ReferenceItem {...reference} key={index} sidebarWidth={sidebarWidth} />
+    ));
+    return <div className="reference-items">{referenceItems}</div>;
+  };
+
+  renderContents = () =>
+    this.state.name ? (
+      <div className="reference-container">
+        {this.renderContainerTitle()}
+        {this.renderItems()}
       </div>
     ) : (
-      <div className="reference-title">
-        <div className="reference-name monospace">{this.state.name}</div>
-        <div className="reference-count">{this.getCountText()}</div>
-      </div>
+      this.renderZeroState()
     );
 
   render() {
-    const { sidebarWidth } = this.props.storage;
-    const referenceItems = this.state.references.map((reference, index) => {
-      return (
-        <ReferenceItem {...reference} key={index} sidebarWidth={sidebarWidth} />
-      );
-    });
-
     let referencesClassName = this.isVisible()
       ? "references-section"
       : "references-section collapsed";
 
     return (
       <div className={referencesClassName}>
-        {this.renderSectionHeader("Usages")}
-        <div className="reference-container">
-          {this.renderTitle()}
-          <div className="reference-items">{referenceItems}</div>
-        </div>
+        {this.renderSectionHeader()}
+        {this.renderContents()}
       </div>
     );
   }

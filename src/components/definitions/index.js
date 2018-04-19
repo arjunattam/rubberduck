@@ -4,20 +4,15 @@ import { BaseReaderSection } from "../section";
 import DefinitionItem from "./DefinitionItem";
 import "./Definitions.css";
 
+/**
+ * This gets the `hoverResult`, makes API call, and then
+ * displays the result.
+ */
 class Definitions extends BaseReaderSection {
-  // This gets x and y of the selected text, constructs the
-  // API call payload by reading DOM, and then display the
-  // result of the API call.
   sectionName = "definitions";
 
   state = {
     definition: {}
-  };
-
-  clearState = () => {
-    this.setState({
-      definition: {}
-    });
   };
 
   getFilePath = result =>
@@ -66,18 +61,16 @@ class Definitions extends BaseReaderSection {
     }
   };
 
-  renderItems = () =>
-    this.isLoading() ? (
-      <div className="loader-container" style={{ marginTop: 20 }}>
-        <div className="status-loader" />
-      </div>
-    ) : (
+  renderContents = () =>
+    this.state.definition.name ? (
       <DefinitionItem
         {...this.state.definition}
         fileLink={this.buildFileLink()}
         visible={this.isVisible()}
         sidebarWidth={this.props.storage.sidebarWidth}
       />
+    ) : (
+      this.renderZeroState()
     );
 
   render() {
@@ -86,8 +79,8 @@ class Definitions extends BaseReaderSection {
       : "definitions-section collapsed";
     return (
       <div className={definitonClassName}>
-        {this.renderSectionHeader("Definitions")}
-        {this.renderItems()}
+        {this.renderSectionHeader()}
+        {this.renderContents()}
       </div>
     );
   }

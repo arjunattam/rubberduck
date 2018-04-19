@@ -5,7 +5,7 @@ import * as DataActions from "../../actions/dataActions";
 import { getPageListener, pathAdapter } from "../../adapters/";
 import HoverElement from "./HoverElement";
 
-const isTreeTooBig = () => {
+export const isTreeTooBig = () => {
   const ACCEPTABLE_TREE_COVERAGE = 0.55;
   const treeElement = document.querySelector("div.tree-content");
   const sidebarElement = document.querySelector("div.sidebar-container");
@@ -36,20 +36,18 @@ class HoverListener extends React.Component {
   callActions = () => {
     if (!this.isValidResult()) return;
 
-    let openSection = {
-      ...this.props.data.openSection,
-      references: true,
-      definitions: true
-    };
-
-    if (isTreeTooBig()) {
-      openSection.tree = false;
-    }
-
     this.DataActions.updateData({
-      openSection,
       hoverResult: this.state.hoverResult
     });
+
+    if (isTreeTooBig()) {
+      this.DataActions.updateData({
+        openSection: {
+          ...this.props.data.openSection,
+          tree: false
+        }
+      });
+    }
   };
 
   receiver = hoverResult => {

@@ -1,21 +1,14 @@
 import React from "react";
 import { bindActionCreators } from "redux";
 import SectionHeader from "./Section";
+import ExpandedCode from "../common/ExpandedCode";
 import * as DataActions from "../../actions/dataActions";
+import "./Section.css";
 
 export class BaseSection extends React.Component {
   constructor(props) {
     super(props);
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const nowVisible = this.props.data.openSection[this.sectionName];
-
-    if (nowVisible) {
-      // For usages + definitions
-      if (this.updateData) this.updateData(prevProps);
-    }
   }
 
   toggleVisibility = () => {
@@ -24,11 +17,15 @@ export class BaseSection extends React.Component {
     this.DataActions.updateData({ openSection });
   };
 
-  renderSectionHeader = name => (
+  getSectionTitle = () =>
+    this.sectionName === "tree" ? "files tree" : this.sectionName;
+
+  renderSectionHeader = () => (
     <SectionHeader
       onClick={() => this.toggleVisibility()}
       isVisible={this.isVisible()}
-      name={name}
+      name={this.getSectionTitle()}
+      isLoading={this.isLoading()}
     />
   );
 
@@ -38,7 +35,7 @@ export class BaseSection extends React.Component {
 }
 
 export class BaseReaderSection extends BaseSection {
-  updateData(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const prevHoverResult = prevProps.data.hoverResult;
     const newHoverResult = this.props.data.hoverResult;
 
@@ -47,10 +44,16 @@ export class BaseReaderSection extends BaseSection {
       prevHoverResult.charNumber !== newHoverResult.charNumber;
 
     if (hasResultChanged) {
-      this.clearState();
       this.getSelectionData(newHoverResult);
     }
   }
+
+  renderZeroState = () => (
+    <div className="section-zero-state">
+      <strong>{"⌘ + click"}</strong>
+      {` on symbol to trigger ${this.sectionName}`}
+    </div>
+  );
 
   getFileLink = (fileSha, filePath, lineNumber) => {
     let shaId = "";
@@ -85,15 +88,29 @@ export class BaseSectionItem extends React.Component {
     const { clientX: x, clientY: y } = event;
     const { top, bottom, right } = rect;
     const PADDING = 20;
+    const isOnCodeSnippet = y < bottom && y > top && x <= right + PADDING;
 
-    if (!(y < bottom && y > top && x <= right + PADDING)) {
+    if (!isOnCodeSnippet) {
       this.setState({
         isHovering: false
       });
     }
   };
 
-  getTop = () => {
-    return this.refs.container.getBoundingClientRect().top;
+  getPositionStyle = () => {
+    const { top, bottom } = this.refs.container.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const isCloseToBottom = windowHeight - bottom < 150;
+    return isCloseToBottom ? { bottom: windowHeight - bottom } : { top: top };
   };
+
+  getSnippetStyle = () => ({
+    left: this.props.sidebarWidth + 4,
+    ...this.getPositionStyle()
+  });
+
+  renderExpandedCode = () =>
+    this.state.isHovering ? (
+      <ExpandedCode {...this.props} style={this.getSnippetStyle()} />
+    ) : null;
 }

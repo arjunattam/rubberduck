@@ -1,6 +1,5 @@
 import React from "react";
 import { BaseSectionItem } from "../section";
-import ExpandedCode from "../common/ExpandedCode";
 import SmallCodeSnippet from "../common/SmallCodeSnippet";
 import CodeNode from "../common/CodeNode";
 
@@ -19,10 +18,7 @@ export default class ReferenceItem extends BaseSectionItem {
             lineNumber={this.props.lineNumber - this.props.startLineNumber}
           />
         </CodeNode>
-
-        {this.state.isHovering ? (
-          <ExpandedCode {...this.props} top={this.getTop()} />
-        ) : null}
+        {this.renderExpandedCode()}
       </div>
     );
   }

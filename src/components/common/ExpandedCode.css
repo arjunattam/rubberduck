@@ -1,7 +1,6 @@
 .expanded-code {
   width: 640px;
   position: fixed;
-  top: 40px;
   z-index: 10010;
   border: 1px solid #c8e1ff;
   cursor: text;

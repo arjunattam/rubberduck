@@ -10,11 +10,6 @@
   transition: max-height 200ms ease-in;
 }
 
-.definition-item.collapsed {
-  max-height: 0;
-  overflow: hidden;
-}
-
 .definition-item {
   background: #fff;
   cursor: pointer;
@@ -31,5 +26,6 @@
 .definition-docstring {
   background: #f1f8ff;
   padding: 5px;
+  padding-left: 20px;
   margin: 5px 0px 5px 0px;
 }

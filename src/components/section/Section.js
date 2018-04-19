@@ -16,10 +16,17 @@ const SectionHeaderIcon = props => {
   );
 };
 
+const SectionLoader = props => (
+  <div className="section-loader">
+    <div className="status-loader" />
+  </div>
+);
+
 const SectionHeader = props => (
   <div className="section-header" onClick={props.onClick}>
     <SectionHeaderIcon isOpen={props.isVisible} />
     {props.name}
+    {props.isLoading ? <SectionLoader /> : null}
   </div>
 );
 

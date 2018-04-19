@@ -54,9 +54,7 @@ class Extension extends React.Component {
     // Setup the chrome message passing listener for
     // messages from the background.
     ChromeUtils.addChromeListener((action, data) => {
-      if (ChromeUtils.CONTEXT_MENU_MESSAGE_TYPES.includes(action)) {
-        this.handleContextMenuTrigger(action);
-      } else if (action === "URL_UPDATE") {
+      if (action === "URL_UPDATE") {
         this.handleUrlUpdate(data);
       } else if (action === "STORAGE_UPDATED") {
         this.handleStorageUpdate(data);
@@ -138,31 +136,6 @@ class Extension extends React.Component {
           this.DataActions.setFileTree(fileTreeData);
         });
       }
-    }
-  }
-
-  handleContextMenuTrigger(action) {
-    const actionSections = {
-      REFERENCES_TRIGGER: "references",
-      DEFINITIONS_TRIGGER: "definitions"
-    };
-
-    const selection = document.getSelection();
-    const selectionRects =
-      selection && selection.rangeCount > 0
-        ? document
-            .getSelection()
-            .getRangeAt(0)
-            .getClientRects()
-        : [];
-    if (selectionRects.length > 0) {
-      const rect = selectionRects[0];
-      const x = rect.left + (rect.right - rect.left) / 2;
-      const y = rect.top + (rect.bottom - rect.top) / 2;
-      this.DataActions.updateData({
-        openSection: actionSections[action],
-        textSelection: { x: x, y: y }
-      });
     }
   }
 
