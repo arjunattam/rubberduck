@@ -1,6 +1,7 @@
 import React from "react";
 import { bindActionCreators } from "redux";
 import SectionHeader from "./Section";
+import ExpandedCode from "../common/ExpandedCode";
 import * as DataActions from "../../actions/dataActions";
 
 export class BaseSection extends React.Component {
@@ -93,7 +94,20 @@ export class BaseSectionItem extends React.Component {
     }
   };
 
-  getTop = () => {
-    return this.refs.container.getBoundingClientRect().top;
+  getPositionStyle = () => {
+    const { top, bottom } = this.refs.container.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    const isCloseToBottom = windowHeight - bottom < 150;
+    return isCloseToBottom ? { bottom: windowHeight - bottom } : { top: top };
   };
+
+  getSnippetStyle = () => ({
+    left: this.props.sidebarWidth + 4,
+    ...this.getPositionStyle()
+  });
+
+  renderExpandedCode = () =>
+    this.state.isHovering ? (
+      <ExpandedCode {...this.props} style={this.getSnippetStyle()} />
+    ) : null;
 }

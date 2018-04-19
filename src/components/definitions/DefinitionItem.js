@@ -1,6 +1,5 @@
 import React from "react";
 import { BaseSectionItem } from "../section";
-import ExpandedCode from "../common/ExpandedCode";
 import CodeNode from "../common/CodeNode";
 import Docstring from "../common/Docstring";
 
@@ -21,10 +20,7 @@ export default class DefinitionItem extends BaseSectionItem {
         ref={"container"}
       >
         <CodeNode {...this.props} children={this.renderDocstring()} />
-
-        {this.state.isHovering ? (
-          <ExpandedCode {...this.props} top={this.getTop()} />
-        ) : null}
+        {this.renderExpandedCode()}
       </div>
     );
   }

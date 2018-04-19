@@ -105,11 +105,9 @@ export default class ExpandedCode extends React.Component {
     </div>
   );
 
-  getStyle = () => ({ top: this.props.top, left: this.props.sidebarWidth + 2 });
-
   render() {
     return (
-      <div className="expanded-code" style={this.getStyle()}>
+      <div className="expanded-code" style={this.props.style}>
         {this.renderTitleSection()}
         {this.renderCode()}
       </div>
