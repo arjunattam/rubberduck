@@ -10,15 +10,6 @@ export class BaseSection extends React.Component {
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const nowVisible = this.props.data.openSection[this.sectionName];
-
-    if (nowVisible) {
-      // For usages + definitions
-      if (this.updateData) this.updateData(prevProps);
-    }
-  }
-
   toggleVisibility = () => {
     let openSection = { ...this.props.data.openSection };
     openSection[this.sectionName] = !openSection[this.sectionName];
@@ -40,7 +31,7 @@ export class BaseSection extends React.Component {
 }
 
 export class BaseReaderSection extends BaseSection {
-  updateData(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const prevHoverResult = prevProps.data.hoverResult;
     const newHoverResult = this.props.data.hoverResult;
 
@@ -87,8 +78,9 @@ export class BaseSectionItem extends React.Component {
     const { clientX: x, clientY: y } = event;
     const { top, bottom, right } = rect;
     const PADDING = 20;
+    const isOnCodeSnippet = y < bottom && y > top && x <= right + PADDING;
 
-    if (!(y < bottom && y > top && x <= right + PADDING)) {
+    if (!isOnCodeSnippet) {
       this.setState({
         isHovering: false
       });

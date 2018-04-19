@@ -5,17 +5,6 @@ import * as DataActions from "../../actions/dataActions";
 import { getPageListener, pathAdapter } from "../../adapters/";
 import HoverElement from "./HoverElement";
 
-const isTreeTooBig = () => {
-  const ACCEPTABLE_TREE_COVERAGE = 0.55;
-  const treeElement = document.querySelector("div.tree-content");
-  const sidebarElement = document.querySelector("div.sidebar-container");
-  if (treeElement && sidebarElement) {
-    const treeCoverage = treeElement.offsetHeight / sidebarElement.offsetHeight;
-    return treeCoverage >= ACCEPTABLE_TREE_COVERAGE;
-  }
-  return false;
-};
-
 class HoverListener extends React.Component {
   // Sets up a mouse over event to read the page
   constructor(props) {
@@ -35,19 +24,7 @@ class HoverListener extends React.Component {
 
   callActions = () => {
     if (!this.isValidResult()) return;
-
-    let openSection = {
-      ...this.props.data.openSection,
-      references: true,
-      definitions: true
-    };
-
-    if (isTreeTooBig()) {
-      openSection.tree = false;
-    }
-
     this.DataActions.updateData({
-      openSection,
       hoverResult: this.state.hoverResult
     });
   };

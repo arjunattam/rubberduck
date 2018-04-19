@@ -1,4 +1,5 @@
 import { createReducer } from "redux-create-reducer";
+import { isTreeTooBig } from "./utils";
 
 const initialState = {
   repoDetails: {},
@@ -88,11 +89,17 @@ export default createReducer(initialState, {
     };
   },
   CALL_DEFINITIONS_FULFILLED: (state, action) => {
+    const treeOpen = isTreeTooBig() ? { tree: false } : {};
     return {
       ...state,
       isLoading: {
         ...state.isLoading,
         definitions: false
+      },
+      openSection: {
+        ...state.openSection,
+        definitions: true,
+        ...treeOpen
       }
     };
   },
@@ -115,11 +122,17 @@ export default createReducer(initialState, {
     };
   },
   CALL_REFERENCES_FULFILLED: (state, action) => {
+    const treeOpen = isTreeTooBig() ? { tree: false } : {};
     return {
       ...state,
       isLoading: {
         ...state.isLoading,
         references: false
+      },
+      openSection: {
+        ...state.openSection,
+        references: true,
+        ...treeOpen
       }
     };
   },

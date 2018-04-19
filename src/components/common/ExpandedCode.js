@@ -11,9 +11,7 @@ export default class ExpandedCode extends React.Component {
     let decoded = "";
     try {
       decoded = decodeBase64(encodedString);
-    } catch (e) {
-      decoded = "";
-    }
+    } catch (e) {}
     return decoded;
   }
 
@@ -56,7 +54,7 @@ export default class ExpandedCode extends React.Component {
     }
   };
 
-  getContent = () => this.getBase64Decoded(this.props.codeSnippet);
+  getContent = () => this.getBase64Decoded(this.props.codeSnippet || "");
 
   setScrollTop = () => {
     const element = document.querySelector(".expanded-content");
