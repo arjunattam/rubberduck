@@ -5,16 +5,10 @@ import ReferenceItem from "./ReferenceItem";
 import "./References.css";
 
 class References extends BaseReaderSection {
-  sectionName = "references";
+  sectionName = "usages";
 
   state = {
     references: []
-  };
-
-  clearState = () => {
-    this.setState({
-      references: []
-    });
   };
 
   getReferenceItems = (apiResponse, hoverResult) => {
@@ -49,7 +43,7 @@ class References extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
-      this.DataActions.callReferences(hoverResult).then(response => {
+      this.DataActions.callUsages(hoverResult).then(response => {
         const { result } = response.value;
         this.setState({
           name: hoverResult.name,
@@ -78,6 +72,16 @@ class References extends BaseReaderSection {
     return <div className="reference-items">{referenceItems}</div>;
   };
 
+  renderContents = () =>
+    this.state.name ? (
+      <div className="reference-container">
+        {this.renderContainerTitle()}
+        {this.renderItems()}
+      </div>
+    ) : (
+      this.renderZeroState()
+    );
+
   render() {
     let referencesClassName = this.isVisible()
       ? "references-section"
@@ -85,11 +89,8 @@ class References extends BaseReaderSection {
 
     return (
       <div className={referencesClassName}>
-        {this.renderSectionHeader("Usages")}
-        <div className="reference-container">
-          {this.renderContainerTitle()}
-          {this.renderItems()}
-        </div>
+        {this.renderSectionHeader()}
+        {this.renderContents()}
       </div>
     );
   }

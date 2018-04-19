@@ -3,6 +3,7 @@ import { bindActionCreators } from "redux";
 import SectionHeader from "./Section";
 import ExpandedCode from "../common/ExpandedCode";
 import * as DataActions from "../../actions/dataActions";
+import "./Section.css";
 
 export class BaseSection extends React.Component {
   constructor(props) {
@@ -16,11 +17,14 @@ export class BaseSection extends React.Component {
     this.DataActions.updateData({ openSection });
   };
 
-  renderSectionHeader = name => (
+  getSectionTitle = () =>
+    this.sectionName === "tree" ? "files tree" : this.sectionName;
+
+  renderSectionHeader = () => (
     <SectionHeader
       onClick={() => this.toggleVisibility()}
       isVisible={this.isVisible()}
-      name={name}
+      name={this.getSectionTitle()}
       isLoading={this.isLoading()}
     />
   );
@@ -40,10 +44,16 @@ export class BaseReaderSection extends BaseSection {
       prevHoverResult.charNumber !== newHoverResult.charNumber;
 
     if (hasResultChanged) {
-      this.clearState();
       this.getSelectionData(newHoverResult);
     }
   }
+
+  renderZeroState = () => (
+    <div className="section-zero-state">
+      <strong>{"⌘ + click"}</strong>
+      {` on symbol to trigger ${this.sectionName}`}
+    </div>
+  );
 
   getFileLink = (fileSha, filePath, lineNumber) => {
     let shaId = "";

@@ -11,6 +11,18 @@
   color: #333;
 }
 
+.section-zero-state {
+  margin: 20px;
+  color: #666;
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 8px;
+  background: #f0f1f3;
+  text-align: center;
+  border-radius: 7px;
+  border: 1px solid #e8e8e8;
+}
+
 .section-loader {
   float: right;
   margin-right: 15px;

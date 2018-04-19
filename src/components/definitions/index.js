@@ -15,12 +15,6 @@ class Definitions extends BaseReaderSection {
     definition: {}
   };
 
-  clearState = () => {
-    this.setState({
-      definition: {}
-    });
-  };
-
   getFilePath = result =>
     result.definition && result.definition.location
       ? result.definition.location.path
@@ -67,14 +61,17 @@ class Definitions extends BaseReaderSection {
     }
   };
 
-  renderItems = () => (
-    <DefinitionItem
-      {...this.state.definition}
-      fileLink={this.buildFileLink()}
-      visible={this.isVisible()}
-      sidebarWidth={this.props.storage.sidebarWidth}
-    />
-  );
+  renderContents = () =>
+    this.state.definition.name ? (
+      <DefinitionItem
+        {...this.state.definition}
+        fileLink={this.buildFileLink()}
+        visible={this.isVisible()}
+        sidebarWidth={this.props.storage.sidebarWidth}
+      />
+    ) : (
+      this.renderZeroState()
+    );
 
   render() {
     let definitonClassName = this.isVisible()
@@ -82,8 +79,8 @@ class Definitions extends BaseReaderSection {
       : "definitions-section collapsed";
     return (
       <div className={definitonClassName}>
-        {this.renderSectionHeader("Definitions")}
-        {this.renderItems()}
+        {this.renderSectionHeader()}
+        {this.renderContents()}
       </div>
     );
   }

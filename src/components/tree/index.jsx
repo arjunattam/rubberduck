@@ -35,7 +35,7 @@ class Tree extends BaseSection {
 
     return (
       <div className="tree-container">
-        {this.renderSectionHeader("Files tree")}
+        {this.renderSectionHeader()}
         <div
           className={"tree-content " + styleClass}
           children={renderedChildren}

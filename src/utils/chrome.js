@@ -15,15 +15,7 @@ export const SEND_MESSAGE_TYPES = [
   "HTTP_GET"
 ];
 
-export const CONTEXT_MENU_MESSAGE_TYPES = [
-  "REFERENCES_TRIGGER",
-  "DEFINITIONS_TRIGGER"
-];
-
-export const RECEIVE_MESSAGE_TYPES = [
-  ...CONTEXT_MENU_MESSAGE_TYPES,
-  "URL_UPDATE"
-];
+export const RECEIVE_MESSAGE_TYPES = ["URL_UPDATE"];
 
 export const constructMessage = (type, data) => {
   // Check if this is a valid type

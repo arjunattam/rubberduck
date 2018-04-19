@@ -1,5 +1,4 @@
 import { createReducer } from "redux-create-reducer";
-import { isTreeTooBig } from "./utils";
 
 const initialState = {
   repoDetails: {},
@@ -7,12 +6,12 @@ const initialState = {
   // Section states
   openSection: {
     tree: true,
-    references: false,
+    usages: false,
     definitions: false
   },
   isLoading: {
     tree: false,
-    references: false,
+    usages: false,
     definitions: false
   },
 
@@ -89,7 +88,6 @@ export default createReducer(initialState, {
     };
   },
   CALL_DEFINITIONS_FULFILLED: (state, action) => {
-    const treeOpen = isTreeTooBig() ? { tree: false } : {};
     return {
       ...state,
       isLoading: {
@@ -98,8 +96,7 @@ export default createReducer(initialState, {
       },
       openSection: {
         ...state.openSection,
-        definitions: true,
-        ...treeOpen
+        definitions: true
       }
     };
   },
@@ -112,36 +109,34 @@ export default createReducer(initialState, {
       }
     };
   },
-  CALL_REFERENCES_PENDING: (state, action) => {
+  CALL_USAGES_PENDING: (state, action) => {
     return {
       ...state,
       isLoading: {
         ...state.isLoading,
-        references: true
+        usages: true
       }
     };
   },
-  CALL_REFERENCES_FULFILLED: (state, action) => {
-    const treeOpen = isTreeTooBig() ? { tree: false } : {};
+  CALL_USAGES_FULFILLED: (state, action) => {
     return {
       ...state,
       isLoading: {
         ...state.isLoading,
-        references: false
+        usages: false
       },
       openSection: {
         ...state.openSection,
-        references: true,
-        ...treeOpen
+        usages: true
       }
     };
   },
-  CALL_REFERENCES_REJECTED: (state, action) => {
+  CALL_USAGES_REJECTED: (state, action) => {
     return {
       ...state,
       isLoading: {
         ...state.isLoading,
-        references: false
+        usages: false
       }
     };
   },
