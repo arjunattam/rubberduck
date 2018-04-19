@@ -10,3 +10,36 @@
   cursor: pointer;
   color: #333;
 }
+
+.section-loader {
+  float: right;
+  margin-right: 15px;
+  width: 12px;
+  height: 12px;
+}
+
+.status-loader {
+  border: 2px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 2px solid #4483ad;
+  width: 100%;
+  height: 100%;
+  animation: spin 1s linear infinite;
+}
+
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

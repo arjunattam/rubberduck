@@ -8,12 +8,6 @@ import "./Tree.css";
 class Tree extends BaseSection {
   sectionName = "tree";
 
-  renderLoader = () => (
-    <div className="loader-container" style={{ marginTop: 20 }}>
-      <div className="status-loader" />
-    </div>
-  );
-
   flattenSingleDirectory = () => {
     // This method flattens the tree in the case when there is a chain
     // of single directories.
@@ -42,9 +36,10 @@ class Tree extends BaseSection {
     return (
       <div className="tree-container">
         {this.renderSectionHeader("Files tree")}
-        <div className={"tree-content " + styleClass}>
-          {this.isLoading() ? this.renderLoader() : renderedChildren}
-        </div>
+        <div
+          className={"tree-content " + styleClass}
+          children={renderedChildren}
+        />
       </div>
     );
   }

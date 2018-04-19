@@ -30,6 +30,7 @@ export class BaseSection extends React.Component {
       onClick={() => this.toggleVisibility()}
       isVisible={this.isVisible()}
       name={name}
+      isLoading={this.isLoading()}
     />
   );
 
