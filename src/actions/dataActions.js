@@ -51,3 +51,11 @@ export function callUsages(data) {
     payload: WS.getReferences(fileSha, filePath, lineNumber, charNumber)
   };
 }
+
+export function callFileContents(data) {
+  const { fileSha, filePath } = data;
+  return {
+    type: "CALL_FILE_CONTENTS",
+    payload: WS.getFileContents(fileSha, filePath)
+  };
+}

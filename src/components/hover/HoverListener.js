@@ -29,7 +29,7 @@ class HoverListener extends React.Component {
 
   isValidResult = () => {
     const { lineNumber, charNumber } = this.state.hoverResult;
-    // we are relying on the fact that undefined >= 0 gives false
+    // we are relying on the fact that `undefined >= 0` gives false
     return lineNumber >= 0 && charNumber >= 0;
   };
 

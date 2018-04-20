@@ -40,6 +40,7 @@ export default class ExpandedCode extends React.Component {
           case "py":
             return "python";
           case "js":
+          case "jsx": // unfortunately this doesn't work that well
             return "javascript";
           case "ts":
             return "typescript";
@@ -62,9 +63,8 @@ export default class ExpandedCode extends React.Component {
     if (element) {
       const totalHeight = element.scrollHeight;
       const totalLines = this.getContent().split("\n").length;
-      element.scrollTop =
-        (this.props.lineNumber - this.props.startingLineNumber) *
-        (totalHeight / totalLines);
+      const lineDiff = this.props.lineNumber - this.props.startLineNumber;
+      element.scrollTop = lineDiff * (totalHeight / totalLines);
     }
   };
 

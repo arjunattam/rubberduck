@@ -48,9 +48,23 @@ class Definitions extends BaseReaderSection {
           docstring: result.docstring,
           codeSnippet: result.definition ? result.definition.contents : ""
         };
-        this.setState({ definition: definition });
+        this.setState({ definition: definition }, () => this.getFileContents());
       });
     }
+  };
+
+  getFileContents = () => {
+    const { fileSha, filePath } = this.state.definition;
+    this.DataActions.callFileContents({ fileSha, filePath }).then(response => {
+      const { contents } = response.value.result;
+      this.setState({
+        definition: {
+          ...this.state.definition,
+          codeSnippet: contents,
+          startLineNumber: 0
+        }
+      });
+    });
   };
 
   buildFileLink = () => {

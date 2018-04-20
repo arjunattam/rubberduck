@@ -133,6 +133,17 @@ class BaseWebSocket {
       payload: queryParams
     });
   };
+
+  getFileContents = (baseOrHead, filePath) => {
+    const queryParams = {
+      is_base_repo: baseOrHead === "base" ? "true" : "false",
+      location_id: `${filePath}`
+    };
+    return this.sendRequest({
+      type: "session.file_contents",
+      payload: queryParams
+    });
+  };
 }
 
 class WebSocketManager {
@@ -304,6 +315,10 @@ class WebSocketManager {
 
   getDefinition = (...params) => {
     return this.getLSCallHelper(this.ws.getDefinition, ...params);
+  };
+
+  getFileContents = (...params) => {
+    return this.getLSCallHelper(this.ws.getFileContents, ...params);
   };
 }
 

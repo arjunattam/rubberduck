@@ -140,6 +140,21 @@ export default createReducer(initialState, {
       }
     };
   },
+  CALL_FILE_CONTENTS_PENDING: (state, action) => {
+    return {
+      ...state
+    };
+  },
+  CALL_FILE_CONTENTS_FULFILLED: (state, action) => {
+    return {
+      ...state
+    };
+  },
+  CALL_FILE_CONTENTS_REJECTED: (state, action) => {
+    return {
+      ...state
+    };
+  },
   SET_REPO_DETAILS: (state, action) => {
     return {
       ...state,
