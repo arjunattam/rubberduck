@@ -8,6 +8,13 @@ export function updateData(data) {
   };
 }
 
+export function setOpenSection(data) {
+  return {
+    type: "SET_OPEN_SECTION",
+    payload: data
+  };
+}
+
 export function createNewSession(data) {
   return {
     type: "CREATE_NEW_SESSION",
@@ -25,6 +32,13 @@ export function setRepoDetails(data) {
 export function setFileTree(data) {
   return {
     type: "SET_FILE_TREE",
+    payload: data
+  };
+}
+
+export function setHoverResult(data) {
+  return {
+    type: "SET_HOVER_RESULT",
     payload: data
   };
 }

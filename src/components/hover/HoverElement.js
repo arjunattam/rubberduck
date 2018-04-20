@@ -43,16 +43,13 @@ export default class HoverElement extends React.Component {
 
   callActions = () => {
     if (!this.isValidResult(this.state.hoverResult)) return;
-    this.DataActions.updateData({
-      hoverResult: this.state.hoverResult
-    });
+
+    const { hoverResult } = this.state;
+    this.DataActions.setHoverResult(hoverResult);
 
     if (isTreeTooBig()) {
-      this.DataActions.updateData({
-        openSection: {
-          ...this.props.data.openSection,
-          tree: false
-        }
+      this.DataActions.setOpenSection({
+        tree: false
       });
     }
   };

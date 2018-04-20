@@ -156,6 +156,7 @@ class WebSocketManager {
     this.ws = new BaseWebSocket();
   }
 
+  // TODO(arjun): use data actions
   dispatchStatus = status => {
     Store.dispatch({
       type: "UPDATE_SESSION_STATUS",

@@ -142,9 +142,9 @@ class StatusBar extends React.Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (newProps.data.isUnauthenticated !== this.state.showAuthPrompt) {
+    if (newProps.data.data.isUnauthenticated !== this.state.showAuthPrompt) {
       this.setState({
-        showAuthPrompt: newProps.data.isUnauthenticated
+        showAuthPrompt: newProps.data.data.isUnauthenticated
       });
     }
   }

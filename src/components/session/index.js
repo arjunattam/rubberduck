@@ -26,7 +26,7 @@ class SessionStatus extends React.Component {
   state = { showNotReady: null };
 
   renderIndicator = () => {
-    switch (this.props.data.sessionStatus) {
+    switch (this.props.data.data.sessionStatus) {
       case "ready":
         return <status-indicator positive />;
       case "disconnected":
@@ -41,7 +41,7 @@ class SessionStatus extends React.Component {
   };
 
   getText = () => {
-    switch (this.props.data.sessionStatus) {
+    switch (this.props.data.data.sessionStatus) {
       case "creating":
         return "initializing";
       case "created":
@@ -57,7 +57,7 @@ class SessionStatus extends React.Component {
       case "no_session":
         return "inactive";
       default:
-        return this.props.data.sessionStatus;
+        return this.props.data.data.sessionStatus;
     }
   };
 
@@ -69,10 +69,10 @@ class SessionStatus extends React.Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (newProps.data.showNotReady !== this.state.showNotReady) {
+    if (newProps.data.data.showNotReady !== this.state.showNotReady) {
       this.showNotReady();
       this.setState({
-        showNotReady: newProps.data.showNotReady
+        showNotReady: newProps.data.data.showNotReady
       });
     }
   }
