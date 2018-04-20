@@ -36,6 +36,14 @@ export function callTree(data) {
   };
 }
 
+export function callHover(data) {
+  const { fileSha, filePath, lineNumber, charNumber } = data;
+  return {
+    type: "CALL_HOVER",
+    payload: WS.getHover(fileSha, filePath, lineNumber, charNumber)
+  };
+}
+
 export function callDefinitions(data) {
   const { fileSha, filePath, lineNumber, charNumber } = data;
   return {

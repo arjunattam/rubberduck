@@ -11,6 +11,7 @@ const initialState = {
   },
   isLoading: {
     tree: false,
+    hover: false,
     usages: false,
     definitions: false
   },
@@ -137,6 +138,33 @@ export default createReducer(initialState, {
       isLoading: {
         ...state.isLoading,
         usages: false
+      }
+    };
+  },
+  CALL_HOVER_PENDING: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        hover: true
+      }
+    };
+  },
+  CALL_HOVER_FULFILLED: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        hover: false
+      }
+    };
+  },
+  CALL_HOVER_REJECTED: (state, action) => {
+    return {
+      ...state,
+      isLoading: {
+        ...state.isLoading,
+        hover: false
       }
     };
   },
