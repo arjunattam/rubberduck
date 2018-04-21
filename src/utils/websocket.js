@@ -1,6 +1,8 @@
 import Store from "../store";
+import { bindActionCreators } from "redux";
 import WebSocketAsPromised from "websocket-as-promised";
 import Raven from "raven-js";
+import * as DataActions from "../actions/dataActions";
 import { rootUrl } from "./api";
 import { getGitService } from "../adapters";
 
@@ -154,14 +156,12 @@ class WebSocketManager {
     this.reconnectAttempts = 0;
     this.sessionParams = {};
     this.ws = new BaseWebSocket();
+    this.DataActions = bindActionCreators(DataActions, Store.dispatch);
   }
 
   // TODO(arjun): use data actions
   dispatchStatus = status => {
-    Store.dispatch({
-      type: "UPDATE_SESSION_STATUS",
-      sessionStatus: status
-    });
+    this.DataActions.updateSessionStatus({ status });
   };
 
   statusUpdatesListener = message => {

@@ -22,6 +22,13 @@ export function createNewSession(data) {
   };
 }
 
+export function updateSessionStatus(data) {
+  return {
+    type: "UPDATE_SESSION_STATUS",
+    payload: data
+  };
+}
+
 export function setRepoDetails(data) {
   return {
     type: "SET_REPO_DETAILS",

@@ -57,7 +57,7 @@ export class BaseReaderSection extends BaseSection {
 
   getFileLink = (fileSha, filePath, lineNumber) => {
     let shaId = "";
-    const { base, head } = this.props.data.data.session;
+    const { base, head } = this.props.data.session.payload;
 
     if (fileSha === "base") {
       shaId = base ? base.sha_id : "";

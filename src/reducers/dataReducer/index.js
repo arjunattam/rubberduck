@@ -4,48 +4,14 @@ import section from "./section";
 import repoDetails from "./repoDetails";
 import fileTree from "./fileTree";
 import hoverResult from "./hoverResult";
+import session from "./session";
 
 const initialState = {
   // Triggers the 401 pop-up
-  isUnauthenticated: false,
-
-  // These are used to show session status
-  // and for the `open file` link
-  session: {},
-  sessionStatus: "",
-  showNotReady: null
+  isUnauthenticated: false
 };
 
 const data = createReducer(initialState, {
-  CREATE_NEW_SESSION_FULFILLED: (state, action) => {
-    console.log("Session created", action.payload);
-    return {
-      ...state,
-      session: {
-        ...action.payload
-      }
-    };
-  },
-  CREATE_NEW_SESSION_REJECTED: (state, action) => {
-    console.log("Session creation failed", action.payload);
-    return {
-      ...state
-    };
-  },
-  UPDATE_SESSION_STATUS: (state, action) => {
-    if (action.sessionStatus === "not_ready") {
-      // This is handled differently. Not saved as the status.
-      return {
-        ...state,
-        showNotReady: new Date()
-      };
-    } else {
-      return {
-        ...state,
-        sessionStatus: action.sessionStatus
-      };
-    }
-  },
   UPDATE_DATA: (state, action) => {
     return {
       ...state,
@@ -59,7 +25,8 @@ const dataReducer = combineReducers({
   fileTree,
   repoDetails,
   section,
-  hoverResult
+  hoverResult,
+  session
 });
 
 export default dataReducer;
