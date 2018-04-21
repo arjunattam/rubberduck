@@ -15,6 +15,8 @@
 
 .expanded-content pre,
 .expanded-content code {
+  /* overflow to ensure parent shows the scroll bar */
+  overflow: visible !important;
   margin: 0;
   padding: 0;
 }
