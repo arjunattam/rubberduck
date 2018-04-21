@@ -129,7 +129,7 @@ class References extends BaseReaderSection {
     return (
       <div className={referencesClassName}>
         {this.renderSectionHeader()}
-        {this.renderContents()}
+        {this.isVisible() ? this.renderContents() : null}
       </div>
     );
   }

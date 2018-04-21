@@ -1,11 +1,9 @@
 .definitions-section.collapsed {
   max-height: 25px;
-  overflow: hidden;
 }
 
 .definitions-section {
   background: rgb(250, 251, 252);
-  overflow: hidden;
   max-height: calc(100vh - 207px);
   transition: max-height 200ms ease-in;
 }

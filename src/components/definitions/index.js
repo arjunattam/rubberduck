@@ -96,7 +96,7 @@ class Definitions extends BaseReaderSection {
     return (
       <div className={definitonClassName}>
         {this.renderSectionHeader()}
-        {this.renderContents()}
+        {this.isVisible() ? this.renderContents() : null}
       </div>
     );
   }

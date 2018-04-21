@@ -1,6 +1,5 @@
 .tree-container {
   background: #fff;
-  overflow: hidden;
 }
 
 .tree-content {
@@ -9,7 +8,6 @@
 }
 
 .tree-content-visible {
-  padding-bottom: 10px;
   max-height: 3000px;
 }
 

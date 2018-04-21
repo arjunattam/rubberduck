@@ -1,5 +1,4 @@
 .references-section {
-  overflow: hidden;
   max-height: 5000px;
   transition: max-height 250ms ease-in;
   font-size: 12px;

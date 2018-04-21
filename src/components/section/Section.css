@@ -9,6 +9,8 @@
   border-bottom: 1px solid #c8e1ff;
   cursor: pointer;
   color: #333;
+  position: sticky;
+  top: 0px;
 }
 
 .section-zero-state {
