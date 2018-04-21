@@ -15,6 +15,10 @@ class HoverListener extends React.Component {
     this.setState({ hoverResult });
   };
 
+  componentDidMount() {
+    this.setupListeners();
+  }
+
   componentDidUpdate(prevProps, prevState) {
     const isSameSessionPath = pathAdapter.isSameSessionPath(
       prevProps.data.repoDetails,
