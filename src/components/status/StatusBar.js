@@ -19,7 +19,7 @@ const StatusComponent = props => (
     >
       <div className="status">
         {props.isLoading ? (
-          <div className="status-loader" />
+          <div className="status-loader" style={{ width: 15, height: 15 }} />
         ) : (
           <div className="status-auth">{props.authState}</div>
         )}
