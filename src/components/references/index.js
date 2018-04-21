@@ -25,6 +25,7 @@ class References extends BaseReaderSection {
       return {
         name: parentName,
         filePath: reference.location.path,
+        fileSha: hoverResult.fileSha,
         fileLink: this.getFileLink(
           hoverResult.fileSha,
           reference.location.path,
@@ -45,13 +46,35 @@ class References extends BaseReaderSection {
     if (isValidResult) {
       this.DataActions.callUsages(hoverResult).then(response => {
         const { result } = response.value;
-        this.setState({
-          name: hoverResult.name,
-          count: result.count,
-          references: this.getReferenceItems(result, hoverResult)
-        });
+        this.setState(
+          {
+            name: hoverResult.name,
+            count: result.count,
+            references: this.getReferenceItems(result, hoverResult)
+          },
+          () => this.getFileContents()
+        );
       });
     }
+  };
+
+  getFileContents = () => {
+    const filesToQuery = this.state.references.map(reference => {
+      return {
+        filePath: reference.filePath,
+        baseOrHead: reference.fileSha === "base" ? reference.fileSha : "head"
+      };
+    });
+    // Remove duplicates
+    let filtered = filesToQuery.reduce((accumulator, current) => {
+      if (!accumulator.find(({ filePath }) => filePath === current.filePath)) {
+        accumulator.push(current);
+      }
+      return accumulator;
+    }, []);
+    filtered.forEach(fileSignature => {
+      this.DataActions.callFileContents(fileSignature);
+    });
   };
 
   getCountText = () =>
@@ -66,9 +89,25 @@ class References extends BaseReaderSection {
 
   renderItems = () => {
     const { sidebarWidth } = this.props.storage;
-    const referenceItems = this.state.references.map((reference, index) => (
-      <ReferenceItem {...reference} key={index} sidebarWidth={sidebarWidth} />
-    ));
+    const { fileContents } = this.props.data;
+    const referenceItems = this.state.references.map((reference, index) => {
+      const { fileSha, filePath } = reference;
+      const baseOrHead = fileSha === "base" ? fileSha : "head";
+      const contentsInStore = fileContents[baseOrHead][filePath];
+      // Get contents from store if available, else use what we have
+      const fileProps = contentsInStore
+        ? { codeSnippet: contentsInStore, startLineNumber: 0 }
+        : {};
+
+      return (
+        <ReferenceItem
+          {...reference}
+          key={index}
+          sidebarWidth={sidebarWidth}
+          {...fileProps}
+        />
+      );
+    });
     return <div className="reference-items">{referenceItems}</div>;
   };
 

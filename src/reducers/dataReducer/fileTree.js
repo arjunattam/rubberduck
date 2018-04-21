@@ -7,10 +7,8 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  SET_FILE_TREE: (state, action) => {
-    return {
-      ...state,
-      ...action.payload
-    };
-  }
+  SET_FILE_TREE: (state, action) => ({
+    ...state,
+    ...action.payload
+  })
 });

@@ -1,5 +1,6 @@
 import { WS } from "../utils/websocket";
 import { API } from "../utils/api";
+import Store from "../store";
 
 export function updateData(data) {
   return {
@@ -82,9 +83,20 @@ export function callUsages(data) {
 }
 
 export function callFileContents(data) {
-  const { fileSha, filePath } = data;
+  const { baseOrHead, filePath } = data;
+  const existingContents = Store.getState().data.fileContents;
+  const fileContents = existingContents[baseOrHead][filePath];
+  const noOpPromise = new Promise((resolve, reject) => {
+    resolve({
+      ...data,
+      result: { contents: fileContents }
+    });
+  });
+
   return {
     type: "CALL_FILE_CONTENTS",
-    payload: WS.getFileContents(fileSha, filePath)
+    payload: fileContents
+      ? noOpPromise
+      : WS.getFileContents(baseOrHead, filePath)
   };
 }

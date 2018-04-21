@@ -144,7 +144,7 @@ class BaseWebSocket {
     return this.sendRequest({
       type: "session.file_contents",
       payload: queryParams
-    });
+    }).then(response => ({ ...response, filePath, baseOrHead }));
   };
 }
 

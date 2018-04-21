@@ -5,6 +5,7 @@ import repoDetails from "./repoDetails";
 import fileTree from "./fileTree";
 import hoverResult from "./hoverResult";
 import session from "./session";
+import fileContents from "./fileContents";
 
 const initialState = {
   // Triggers the 401 pop-up
@@ -12,12 +13,10 @@ const initialState = {
 };
 
 const data = createReducer(initialState, {
-  UPDATE_DATA: (state, action) => {
-    return {
-      ...state,
-      ...action.payload
-    };
-  }
+  UPDATE_DATA: (state, action) => ({
+    ...state,
+    ...action.payload
+  })
 });
 
 const dataReducer = combineReducers({
@@ -26,7 +25,8 @@ const dataReducer = combineReducers({
   repoDetails,
   section,
   hoverResult,
-  session
+  session,
+  fileContents
 });
 
 export default dataReducer;
