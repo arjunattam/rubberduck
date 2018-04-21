@@ -57,8 +57,9 @@ export default class File extends React.Component {
 
     setTimeout(function() {
       // Without the timeout, the scrollTo does not work for pjax
+      // Need a mutation observer?
       window.scrollTo(0, yOffset);
-    }, 1);
+    }, 1.5);
   };
 
   getFilesChangedUrl = () => {

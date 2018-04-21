@@ -44,6 +44,8 @@ const setupPjaxHelper = () => {
   }
 };
 
+export const loadUrl = path => GlobalPjax.loadUrl(path);
+
 export const setupPjax = () => {
   // Wait for 1 seconds, and then setup pjax
   setTimeout(() => {

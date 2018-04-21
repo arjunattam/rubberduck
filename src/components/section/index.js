@@ -99,7 +99,9 @@ export class BaseSectionItem extends React.Component {
 
   getSnippetStyle = () => ({
     left: this.props.sidebarWidth + 2,
-    top: this.refs.container.getBoundingClientRect().top
+    top: this.refs.container
+      ? this.refs.container.getBoundingClientRect().top
+      : 0
   });
 
   renderExpandedCode = () =>

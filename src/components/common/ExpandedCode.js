@@ -2,6 +2,8 @@ import React from "react";
 import Octicon from "react-component-octicons";
 import SyntaxHighlight from "./SyntaxHighlight";
 import { decodeBase64 } from "../../utils/data";
+import { getGitService, isGithubCompareView } from "../../adapters";
+import { loadUrl } from "../../components/sidebar/pjax";
 import "./ExpandedCode.css";
 
 const MAX_HEIGHT = 400; // pixels
@@ -89,20 +91,110 @@ export default class ExpandedCode extends React.Component {
     </div>
   );
 
-  renderLink = () => (
+  renderLink = (text, isBlank, onClick) => (
     <div className="expanded-button">
-      <a href={this.props.fileLink} target="_blank">
-        Open file ↗
+      <a
+        href={this.props.fileLink}
+        target={isBlank ? "_blank" : null}
+        onClick={onClick}
+      >
+        {text}
       </a>
     </div>
   );
 
+  renderNewTab = () => this.renderLink("Open file ↗", true);
+
+  getFileboxSelector = path => {
+    const service = getGitService();
+
+    if (service === "github") {
+      return `div.file-header[data-path="${path}"]`;
+    } else if (service === "bitbucket") {
+      return `section.iterable-item[data-path="${path}"]`;
+    }
+  };
+
+  hasFileinCompareView = () => {
+    return document.querySelector(this.getFileboxSelector(this.props.filePath))
+      ? true
+      : false;
+  };
+
+  scrollTo = () => {
+    const elementSelector = this.getFileboxSelector(this.props.filePath);
+    const fileBox = document.querySelector(elementSelector);
+    const yOffset = window.scrollY + fileBox.getBoundingClientRect().y - 75;
+    window.scrollTo(0, yOffset);
+  };
+
+  clickHandler = event => {
+    const service = getGitService();
+    event.preventDefault();
+
+    switch (service) {
+      case "github":
+        if (isGithubCompareView()) {
+          return this.scrollTo();
+        } else {
+          return loadUrl(this.props.fileLink);
+        }
+      case "bitbucket":
+        return this.scrollTo();
+      default:
+        return;
+    }
+  };
+
+  getSameTabLinkText = () => {
+    const service = getGitService();
+
+    switch (service) {
+      case "github":
+        if (isGithubCompareView()) {
+          return "Scroll to";
+        } else {
+          return "Open file";
+        }
+      case "bitbucket":
+        return "Scroll to";
+      default:
+        return;
+    }
+  };
+
+  shouldRenderSameTab = () => {
+    const service = getGitService();
+
+    switch (service) {
+      case "github":
+        if (isGithubCompareView()) {
+          return this.hasFileinCompareView();
+        } else {
+          return true;
+        }
+      case "bitbucket":
+        return this.hasFileinCompareView();
+      default:
+        return;
+    }
+  };
+
+  renderSameTab = () =>
+    this.shouldRenderSameTab()
+      ? this.renderLink(this.getSameTabLinkText(), false, event =>
+          this.clickHandler(event)
+        )
+      : null;
+
   renderTitleSection = () => (
     <div className="expanded-title">
       <div className="expanded-filepath">
-        <Octicon name="file" /> {this.props.filePath}
+        <Octicon style={{ verticalAlign: "text-bottom" }} name="file" />{" "}
+        <span>{this.props.filePath}</span>
       </div>
-      {this.renderLink()}
+      {this.renderSameTab()}
+      {this.renderNewTab()}
     </div>
   );
 
