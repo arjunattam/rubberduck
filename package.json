@@ -34,8 +34,8 @@
     "pack": "build/. -p keys/development_key.pem -o dist/mercury.crx"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "start-local": "REACT_APP_BACKEND_ENV=local npm run start",
+    "start": "BROWSER=none react-app-rewired start",
+    "start-local": "BROWSER=none REACT_APP_BACKEND_ENV=local npm run start",
     "prebuild": "node ./scripts/prebuild.js",
     "build": "react-app-rewired build && node scripts/helpers.js",
     "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",
@@ -43,8 +43,7 @@
     "test": "react-app-rewired test --env=jsdom",
     "sentry-upload": "sh scripts/sentry.sh",
     "gen-zip": "rm -f bundle.zip && zip -r9 bundle.zip build/* -x *.map",
-    "chrome-build":
-      "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip && npm run sentry-upload",
+    "chrome-build": "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip && npm run sentry-upload",
     "eject": "react-app-rewired eject"
   },
   "devDependencies": {

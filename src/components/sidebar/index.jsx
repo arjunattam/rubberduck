@@ -13,6 +13,7 @@ import Definitions from "definitions";
 import HoverListener from "hover/HoverListener";
 import SessionStatus from "session";
 import * as GithubLayout from "../../adapters/github/layout";
+import { setupPjax } from "./pjax";
 import Resizable from "./Resizable";
 import "../../index.css";
 
@@ -38,6 +39,10 @@ class Sidebar extends React.Component {
     StorageUtils.setAllInStore(data);
   };
 
+  componentDidMount() {
+    setupPjax();
+  }
+
   toggleCollapse() {
     if (this.props.storage.isSidebarVisible) {
       // To trigger the left slide animation, we follow this:
@@ -45,9 +50,10 @@ class Sidebar extends React.Component {
       this.triggerReflow();
       setTimeout(() => {
         this.updateStorage({ isSidebarVisible: false });
-      }, 180);
+      }, 150);
     } else {
       this.updateStorage({ isSidebarVisible: true });
+      setupPjax();
     }
   }
 
@@ -66,24 +72,21 @@ class Sidebar extends React.Component {
     this.updateStorage({ sidebarWidth: ref.offsetWidth });
   };
 
-  updatePageLayout = () => {
-    const { isSidebarVisible, sidebarWidth } = this.props.storage;
-    GithubLayout.updateLayout(isSidebarVisible, sidebarWidth);
+  updatePageLayout = (isVisible, width) => {
+    GithubLayout.updateLayout(isVisible, width);
   };
 
-  renderCollapseButton = () => (
+  renderCollapseButton = width => (
     <CollapseButton
       onClick={() => this.toggleCollapse()}
       isVisible={this.props.storage.isSidebarVisible}
-      sidebarWidth={
-        this.props.data.sidebarWidth || this.props.storage.sidebarWidth
-      }
+      sidebarWidth={width}
     />
   );
 
-  renderSidebar = () => (
+  renderSidebar = width => (
     <Resizable
-      width={this.props.storage.sidebarWidth}
+      width={width}
       onResize={this.onResize}
       onResizeStop={this.onResizeStop}
     >
@@ -101,9 +104,13 @@ class Sidebar extends React.Component {
   );
 
   render() {
-    this.updatePageLayout();
-    const { isSidebarVisible: isVisible } = this.props.storage;
-    return isVisible ? this.renderSidebar() : this.renderCollapseButton();
+    const { data, storage } = this.props;
+    const width = data.data.sidebarWidth || storage.sidebarWidth;
+    const { isSidebarVisible: isVisible } = storage;
+    this.updatePageLayout(isVisible, width);
+    return isVisible
+      ? this.renderSidebar(width)
+      : this.renderCollapseButton(width);
   }
 }
 

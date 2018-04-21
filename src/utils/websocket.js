@@ -1,6 +1,8 @@
 import Store from "../store";
+import { bindActionCreators } from "redux";
 import WebSocketAsPromised from "websocket-as-promised";
 import Raven from "raven-js";
+import * as DataActions from "../actions/dataActions";
 import { rootUrl } from "./api";
 import { getGitService } from "../adapters";
 
@@ -8,8 +10,10 @@ function exponentialBackoff(attempt, delay) {
   return Math.floor(Math.random() * Math.pow(2, attempt) * delay);
 }
 
+/**
+ * Base class that has methods for a socket connection
+ */
 class BaseWebSocket {
-  // Base class that has methods for a socket connection
   constructor() {
     this.wsp = null;
   }
@@ -133,23 +137,34 @@ class BaseWebSocket {
       payload: queryParams
     });
   };
+
+  getFileContents = (baseOrHead, filePath) => {
+    const queryParams = {
+      is_base_repo: baseOrHead === "base" ? "true" : "false",
+      location_id: `${filePath}`
+    };
+    return this.sendRequest({
+      type: "session.file_contents",
+      payload: queryParams
+    }).then(response => ({ ...response, filePath, baseOrHead }));
+  };
 }
 
+/**
+ * The manager maintains the socket connection for a session
+ * Ensures connectivity, handles session status updates
+ */
 class WebSocketManager {
-  // The manager maintains the socket connection for a session
-  // Ensures connectivity, handles session status updates
   constructor() {
     this.isReady = false;
     this.reconnectAttempts = 0;
     this.sessionParams = {};
     this.ws = new BaseWebSocket();
+    this.DataActions = bindActionCreators(DataActions, Store.dispatch);
   }
 
   dispatchStatus = status => {
-    Store.dispatch({
-      type: "UPDATE_SESSION_STATUS",
-      sessionStatus: status
-    });
+    this.DataActions.updateSessionStatus({ status });
   };
 
   statusUpdatesListener = message => {
@@ -228,14 +243,21 @@ class WebSocketManager {
     }
   };
 
+  isNoAccessError = error =>
+    error.indexOf("Repository not found") >= 0 ||
+    error.indexOf("Branch not found") >= 0 ||
+    error.indexOf("Pull Request not found") >= 0;
+
   createNewSession = params => {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
     return this.createSession().catch(error => {
-      if (error.error && error.error === "Language not supported") {
+      if (error.error && error.error.indexOf("Language not supported") >= 0) {
         this.dispatchStatus("unsupported_language");
       } else if (error === "No session to be created") {
         this.dispatchStatus("no_session");
+      } else if (error.error && this.isNoAccessError(error.error)) {
+        this.dispatchStatus("no_access");
       } else {
         // Unknown error, sent to Sentry
         this.dispatchStatus("error");
@@ -288,7 +310,6 @@ class WebSocketManager {
       return method(...params);
     } else {
       return new Promise((resolve, reject) => {
-        this.dispatchStatus("not_ready");
         reject();
       });
     }
@@ -304,6 +325,10 @@ class WebSocketManager {
 
   getDefinition = (...params) => {
     return this.getLSCallHelper(this.ws.getDefinition, ...params);
+  };
+
+  getFileContents = (...params) => {
+    return this.getLSCallHelper(this.ws.getFileContents, ...params);
   };
 }
 

@@ -1,18 +1,11 @@
 .definitions-section.collapsed {
   max-height: 25px;
-  overflow: hidden;
 }
 
 .definitions-section {
   background: rgb(250, 251, 252);
-  overflow: hidden;
   max-height: calc(100vh - 207px);
   transition: max-height 200ms ease-in;
-}
-
-.definition-item.collapsed {
-  max-height: 0;
-  overflow: hidden;
 }
 
 .definition-item {
@@ -31,5 +24,6 @@
 .definition-docstring {
   background: #f1f8ff;
   padding: 5px;
+  padding-left: 20px;
   margin: 5px 0px 5px 0px;
 }

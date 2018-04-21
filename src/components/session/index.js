@@ -20,13 +20,14 @@ Possible values
 
 - unsupported_language
 - no_session
+- no_access
 */
 
 class SessionStatus extends React.Component {
   state = { showNotReady: null };
 
   renderIndicator = () => {
-    switch (this.props.data.sessionStatus) {
+    switch (this.props.data.session.status) {
       case "ready":
         return <status-indicator positive />;
       case "disconnected":
@@ -34,6 +35,7 @@ class SessionStatus extends React.Component {
         return <status-indicator negative />;
       case "unsupported_language":
       case "no_session":
+      case "no_access":
         return <status-indicator active />;
       default:
         return <status-indicator intermediary pulse />;
@@ -41,7 +43,7 @@ class SessionStatus extends React.Component {
   };
 
   getText = () => {
-    switch (this.props.data.sessionStatus) {
+    switch (this.props.data.session.status) {
       case "creating":
         return "initializing";
       case "created":
@@ -56,8 +58,10 @@ class SessionStatus extends React.Component {
         return "language not supported";
       case "no_session":
         return "inactive";
+      case "no_access":
+        return "not authorised";
       default:
-        return this.props.data.sessionStatus;
+        return this.props.data.session.status;
     }
   };
 
@@ -69,10 +73,10 @@ class SessionStatus extends React.Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (newProps.data.showNotReady !== this.state.showNotReady) {
+    if (newProps.data.session.showNotReady !== this.state.showNotReady) {
       this.showNotReady();
       this.setState({
-        showNotReady: newProps.data.showNotReady
+        showNotReady: newProps.data.session.showNotReady
       });
     }
   }

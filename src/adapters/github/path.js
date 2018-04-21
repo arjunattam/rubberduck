@@ -26,6 +26,7 @@ const GH_RESERVED_SUB_PAGES = [
   "projects"
 ];
 const GH_404_SEL = "#parallax_wrapper";
+const GH_AUTH_FORM_SEL = ".auth-form-body";
 const GH_RAW_CONTENT = "body > pre";
 
 const checkIfSkipped = () => {
@@ -38,6 +39,11 @@ const checkIfSkipped = () => {
 
   if (document.querySelector(GH_RAW_CONTENT) != null) {
     // This is a raw page
+    return true;
+  }
+
+  if (document.querySelector(GH_AUTH_FORM_SEL) != null) {
+    // This is a login page
     return true;
   }
 

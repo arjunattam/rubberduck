@@ -8,12 +8,6 @@ import "./Tree.css";
 class Tree extends BaseSection {
   sectionName = "tree";
 
-  renderLoader = () => (
-    <div className="loader-container" style={{ marginTop: 20 }}>
-      <div className="status-loader" />
-    </div>
-  );
-
   flattenSingleDirectory = () => {
     // This method flattens the tree in the case when there is a chain
     // of single directories.
@@ -24,6 +18,15 @@ class Tree extends BaseSection {
     }
     return tree.children;
   };
+
+  componentDidMount() {
+    document.addEventListener("pjax:send", () =>
+      this.DataActions.setTreeLoading(true)
+    );
+    document.addEventListener("pjax:complete", () =>
+      this.DataActions.setTreeLoading(false)
+    );
+  }
 
   render() {
     // data.fileTree is a recursive tree structure, where every element
@@ -41,10 +44,11 @@ class Tree extends BaseSection {
 
     return (
       <div className="tree-container">
-        {this.renderSectionHeader("Files tree")}
-        <div className={"tree-content " + styleClass}>
-          {this.isLoading() ? this.renderLoader() : renderedChildren}
-        </div>
+        {this.renderSectionHeader()}
+        <div
+          className={"tree-content " + styleClass}
+          children={renderedChildren}
+        />
       </div>
     );
   }

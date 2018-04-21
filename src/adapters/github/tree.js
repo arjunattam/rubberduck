@@ -1,7 +1,7 @@
 import { buildTree, fillPaths } from "../base/tree";
 
 export const getTreeChildren = (reponame, response) => {
-  const { tree } = response;
+  const { tree } = response || { tree: [] };
   const filenames = tree.map(element => {
     return element.path;
   });

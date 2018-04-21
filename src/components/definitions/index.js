@@ -4,20 +4,15 @@ import { BaseReaderSection } from "../section";
 import DefinitionItem from "./DefinitionItem";
 import "./Definitions.css";
 
+/**
+ * This gets the `hoverResult`, makes API call, and then
+ * displays the result.
+ */
 class Definitions extends BaseReaderSection {
-  // This gets x and y of the selected text, constructs the
-  // API call payload by reading DOM, and then display the
-  // result of the API call.
   sectionName = "definitions";
 
   state = {
     definition: {}
-  };
-
-  clearState = () => {
-    this.setState({
-      definition: {}
-    });
   };
 
   getFilePath = result =>
@@ -53,32 +48,50 @@ class Definitions extends BaseReaderSection {
           docstring: result.docstring,
           codeSnippet: result.definition ? result.definition.contents : ""
         };
-        this.setState({ definition: definition });
+        this.setState({ definition: definition }, () => this.getFileContents());
       });
     }
   };
 
+  getFileContents = () => {
+    const { fileSha, filePath } = this.state.definition;
+    const baseOrHead = fileSha === "base" ? fileSha : "head";
+    return filePath
+      ? this.DataActions.callFileContents({ baseOrHead, filePath })
+      : null;
+  };
+
   buildFileLink = () => {
     const { fileSha, filePath, lineNumber } = this.state.definition;
-
     if (fileSha && filePath && lineNumber) {
       return this.getFileLink(fileSha, filePath, lineNumber);
     }
   };
 
-  renderItems = () =>
-    this.isLoading() ? (
-      <div className="loader-container" style={{ marginTop: 20 }}>
-        <div className="status-loader" />
-      </div>
-    ) : (
+  fileContentProps = () => {
+    const { fileContents } = this.props.data;
+    const { fileSha, filePath } = this.state.definition;
+    const baseOrHead = fileSha === "base" ? fileSha : "head";
+    const contentsInStore = fileContents[baseOrHead][filePath];
+    return contentsInStore
+      ? { codeSnippet: contentsInStore, startLineNumber: 0 }
+      : {};
+  };
+
+  renderResult = () =>
+    this.state.definition.filePath ? (
       <DefinitionItem
         {...this.state.definition}
+        {...this.fileContentProps()}
         fileLink={this.buildFileLink()}
-        visible={this.isVisible()}
         sidebarWidth={this.props.storage.sidebarWidth}
       />
+    ) : (
+      this.renderNoResults()
     );
+
+  renderContents = () =>
+    this.state.definition.name ? this.renderResult() : this.renderZeroState();
 
   render() {
     let definitonClassName = this.isVisible()
@@ -86,8 +99,8 @@ class Definitions extends BaseReaderSection {
       : "definitions-section collapsed";
     return (
       <div className={definitonClassName}>
-        {this.renderSectionHeader("Definitions")}
-        {this.renderItems()}
+        {this.renderSectionHeader()}
+        {this.isVisible() ? this.renderContents() : null}
       </div>
     );
   }
