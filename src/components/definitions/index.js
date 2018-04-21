@@ -78,8 +78,8 @@ class Definitions extends BaseReaderSection {
       : {};
   };
 
-  renderContents = () =>
-    this.state.definition.name ? (
+  renderResult = () =>
+    this.state.definition.filePath ? (
       <DefinitionItem
         {...this.state.definition}
         {...this.fileContentProps()}
@@ -87,8 +87,11 @@ class Definitions extends BaseReaderSection {
         sidebarWidth={this.props.storage.sidebarWidth}
       />
     ) : (
-      this.renderZeroState()
+      this.renderNoResults()
     );
+
+  renderContents = () =>
+    this.state.definition.name ? this.renderResult() : this.renderZeroState();
 
   render() {
     let definitonClassName = this.isVisible()

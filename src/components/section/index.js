@@ -55,6 +55,10 @@ export class BaseReaderSection extends BaseSection {
     </div>
   );
 
+  renderNoResults = () => (
+    <div className="section-zero-state">{`No results found`}</div>
+  );
+
   getFileLink = (fileSha, filePath, lineNumber) => {
     let shaId = "";
     const { base, head } = this.props.data.session.payload;

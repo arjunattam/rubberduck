@@ -111,15 +111,18 @@ class References extends BaseReaderSection {
     return <div className="reference-items">{referenceItems}</div>;
   };
 
-  renderContents = () =>
-    this.state.name ? (
+  renderReferences = () =>
+    this.state.count > 0 ? (
       <div className="reference-container">
         {this.renderContainerTitle()}
         {this.renderItems()}
       </div>
     ) : (
-      this.renderZeroState()
+      this.renderNoResults()
     );
+
+  renderContents = () =>
+    this.state.name ? this.renderReferences() : this.renderZeroState();
 
   render() {
     let referencesClassName = this.isVisible()

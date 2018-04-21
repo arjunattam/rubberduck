@@ -102,6 +102,7 @@ export default class ExpandedCode extends React.Component {
       <a
         href={this.props.fileLink}
         target={isBlank ? "_blank" : null}
+        title={isBlank ? "Open in new tab" : null}
         onClick={onClick}
       >
         {text}
