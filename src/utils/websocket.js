@@ -243,15 +243,20 @@ class WebSocketManager {
     }
   };
 
+  isNoAccessError = error =>
+    error.indexOf("Repository not found") >= 0 ||
+    error.indexOf("Branch not found") >= 0 ||
+    error.indexOf("Pull Request not found") >= 0;
+
   createNewSession = params => {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
     return this.createSession().catch(error => {
-      if (error.error && error.error === "Language not supported") {
+      if (error.error && error.error.indexOf("Language not supported") >= 0) {
         this.dispatchStatus("unsupported_language");
       } else if (error === "No session to be created") {
         this.dispatchStatus("no_session");
-      } else if (error.error && error.error.indexOf("Branch not found") >= 0) {
+      } else if (error.error && this.isNoAccessError(error.error)) {
         this.dispatchStatus("no_access");
       } else {
         // Unknown error, sent to Sentry
