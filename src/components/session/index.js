@@ -20,6 +20,7 @@ Possible values
 
 - unsupported_language
 - no_session
+- no_access
 */
 
 class SessionStatus extends React.Component {
@@ -34,6 +35,7 @@ class SessionStatus extends React.Component {
         return <status-indicator negative />;
       case "unsupported_language":
       case "no_session":
+      case "no_access":
         return <status-indicator active />;
       default:
         return <status-indicator intermediary pulse />;
@@ -56,6 +58,8 @@ class SessionStatus extends React.Component {
         return "language not supported";
       case "no_session":
         return "inactive";
+      case "no_access":
+        return "not authorised";
       default:
         return this.props.data.session.status;
     }

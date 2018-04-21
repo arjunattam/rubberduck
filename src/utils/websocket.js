@@ -10,8 +10,10 @@ function exponentialBackoff(attempt, delay) {
   return Math.floor(Math.random() * Math.pow(2, attempt) * delay);
 }
 
+/**
+ * Base class that has methods for a socket connection
+ */
 class BaseWebSocket {
-  // Base class that has methods for a socket connection
   constructor() {
     this.wsp = null;
   }
@@ -148,9 +150,11 @@ class BaseWebSocket {
   };
 }
 
+/**
+ * The manager maintains the socket connection for a session
+ * Ensures connectivity, handles session status updates
+ */
 class WebSocketManager {
-  // The manager maintains the socket connection for a session
-  // Ensures connectivity, handles session status updates
   constructor() {
     this.isReady = false;
     this.reconnectAttempts = 0;
@@ -159,7 +163,6 @@ class WebSocketManager {
     this.DataActions = bindActionCreators(DataActions, Store.dispatch);
   }
 
-  // TODO(arjun): use data actions
   dispatchStatus = status => {
     this.DataActions.updateSessionStatus({ status });
   };
@@ -248,6 +251,8 @@ class WebSocketManager {
         this.dispatchStatus("unsupported_language");
       } else if (error === "No session to be created") {
         this.dispatchStatus("no_session");
+      } else if (error.error && error.error.indexOf("Branch not found") >= 0) {
+        this.dispatchStatus("no_access");
       } else {
         // Unknown error, sent to Sentry
         this.dispatchStatus("error");
