@@ -51,6 +51,13 @@ export function setHoverResult(data) {
   };
 }
 
+export function setTreeLoading(data) {
+  return {
+    type: "SET_TREE_LOADING",
+    payload: data
+  };
+}
+
 export function callTree(data) {
   return {
     type: "CALL_TREE",

@@ -19,6 +19,15 @@ class Tree extends BaseSection {
     return tree.children;
   };
 
+  componentDidMount() {
+    document.addEventListener("pjax:send", () =>
+      this.DataActions.setTreeLoading(true)
+    );
+    document.addEventListener("pjax:complete", () =>
+      this.DataActions.setTreeLoading(false)
+    );
+  }
+
   render() {
     // data.fileTree is a recursive tree structure, where every element
     // has children, that denote the subtree

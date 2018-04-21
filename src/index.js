@@ -108,7 +108,7 @@ loadSentry();
 createExtensionContainer();
 renderExtension();
 
-// Wait for 2 seconds, and then setup pjax
+// Wait for 1 seconds, and then setup pjax
 setTimeout(() => {
   setupPjax();
-}, 2000);
+}, 1000);

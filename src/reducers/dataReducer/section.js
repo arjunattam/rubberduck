@@ -32,6 +32,9 @@ export default createReducer(initialState, {
   SET_OPEN_SECTION: (state, action) =>
     updateIsLoading(state, {}, action.payload),
 
+  SET_TREE_LOADING: (state, action) =>
+    updateIsLoading(state, { tree: action.payload }),
+
   CALL_TREE_PENDING: (state, action) => updateIsLoading(state, { tree: true }),
 
   CALL_TREE_FULFILLED: (state, action) =>
