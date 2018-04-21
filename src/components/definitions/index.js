@@ -56,7 +56,9 @@ class Definitions extends BaseReaderSection {
   getFileContents = () => {
     const { fileSha, filePath } = this.state.definition;
     const baseOrHead = fileSha === "base" ? fileSha : "head";
-    this.DataActions.callFileContents({ baseOrHead, filePath });
+    return filePath
+      ? this.DataActions.callFileContents({ baseOrHead, filePath })
+      : null;
   };
 
   buildFileLink = () => {
@@ -82,7 +84,6 @@ class Definitions extends BaseReaderSection {
         {...this.state.definition}
         {...this.fileContentProps()}
         fileLink={this.buildFileLink()}
-        visible={this.isVisible()}
         sidebarWidth={this.props.storage.sidebarWidth}
       />
     ) : (

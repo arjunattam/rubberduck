@@ -89,8 +89,9 @@ export class BaseSectionItem extends React.Component {
     const { top, bottom, right } = rect;
     const PADDING = 20;
     const isOnCodeSnippet = y < bottom && y > top && x <= right + PADDING;
+    const isOutsideWindow = x <= 0;
 
-    if (!isOnCodeSnippet) {
+    if (!isOnCodeSnippet || isOutsideWindow) {
       this.setState({
         isHovering: false
       });

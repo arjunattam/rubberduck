@@ -77,6 +77,12 @@ export default class ExpandedCode extends React.Component {
     this.setScrollTop();
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.codeSnippet !== this.props.codeSnippet) {
+      this.setScrollTop();
+    }
+  }
+
   renderCode = () => (
     <div className="expanded-content">
       <SyntaxHighlight
