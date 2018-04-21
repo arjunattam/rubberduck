@@ -310,7 +310,6 @@ class WebSocketManager {
       return method(...params);
     } else {
       return new Promise((resolve, reject) => {
-        this.dispatchStatus("not_ready");
         reject();
       });
     }

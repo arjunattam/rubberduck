@@ -8,8 +8,7 @@ import session from "./session";
 import fileContents from "./fileContents";
 
 const initialState = {
-  // Triggers the 401 pop-up
-  isUnauthenticated: false
+  isUnauthenticated: false // Triggers the 401 pop-up
 };
 
 const data = createReducer(initialState, {

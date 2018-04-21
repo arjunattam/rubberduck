@@ -6,6 +6,15 @@ const initialState = {
   showNotReady: null
 };
 
+function updateNotReady(state, action) {
+  const newNotReady =
+    state.status !== "ready" ? { showNotReady: new Date() } : {};
+  return {
+    ...state,
+    ...newNotReady
+  };
+}
+
 export default createReducer(initialState, {
   CREATE_NEW_SESSION_FULFILLED: (state, action) => {
     console.log("Session created", action.payload);
@@ -22,18 +31,12 @@ export default createReducer(initialState, {
       ...state
     };
   },
-  UPDATE_SESSION_STATUS: (state, action) => {
-    if (action.payload.status === "not_ready") {
-      // This is handled differently. Not saved as the status.
-      return {
-        ...state,
-        showNotReady: new Date()
-      };
-    } else {
-      return {
-        ...state,
-        status: action.payload.status
-      };
-    }
-  }
+  UPDATE_SESSION_STATUS: (state, action) => ({
+    ...state,
+    status: action.payload.status
+  }),
+
+  // We are not updating for usages, since usages and definitions happen together
+  CALL_DEFINITIONS_PENDING: (state, action) => updateNotReady(state, action),
+  CALL_HOVER_PENDING: (state, action) => updateNotReady(state, action)
 });

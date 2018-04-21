@@ -7,17 +7,6 @@ import HoverBox from "./HoverBox";
 const DEBOUNCE_TIMEOUT = 1200; // ms
 const CURSOR_RADIUS = 20; // pixels
 
-const isTreeTooBig = () => {
-  const ACCEPTABLE_TREE_COVERAGE = 0.55;
-  const treeElement = document.querySelector("div.tree-content");
-  const sidebarElement = document.querySelector("div.sidebar-container");
-  if (treeElement && sidebarElement) {
-    const treeCoverage = treeElement.offsetHeight / sidebarElement.offsetHeight;
-    return treeCoverage >= ACCEPTABLE_TREE_COVERAGE;
-  }
-  return false;
-};
-
 /**
  * This component is responsible for making the API call and showing
  * the result.
@@ -46,12 +35,6 @@ export default class HoverElement extends React.Component {
 
     const { hoverResult } = this.state;
     this.DataActions.setHoverResult(hoverResult);
-
-    if (isTreeTooBig()) {
-      this.DataActions.setOpenSection({
-        tree: false
-      });
-    }
   };
 
   isOverlappingWithCurrent = (x, y) => {
