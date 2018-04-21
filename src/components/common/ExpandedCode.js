@@ -4,6 +4,8 @@ import SyntaxHighlight from "./SyntaxHighlight";
 import { decodeBase64 } from "../../utils/data";
 import "./ExpandedCode.css";
 
+const MAX_HEIGHT = 400; // pixels
+
 export default class ExpandedCode extends React.Component {
   // Line numbers are zero-indexed in the API, so we need to +1
   // for display.
@@ -59,12 +61,13 @@ export default class ExpandedCode extends React.Component {
 
   setScrollTop = () => {
     const element = document.querySelector(".expanded-content");
+    const PADDING = 50;
 
     if (element) {
       const totalHeight = element.scrollHeight;
       const totalLines = this.getContent().split("\n").length;
       const lineDiff = this.props.lineNumber - this.props.startLineNumber;
-      element.scrollTop = lineDiff * (totalHeight / totalLines);
+      element.scrollTop = lineDiff * (totalHeight / totalLines) - PADDING;
     }
   };
 
@@ -103,9 +106,21 @@ export default class ExpandedCode extends React.Component {
     </div>
   );
 
+  getStyle = () => {
+    let { top } = this.props.style;
+    // This `top` could mean box is too close to the bottom of the window
+    const PADDING = 75;
+
+    if (top + MAX_HEIGHT + PADDING >= window.innerHeight) {
+      top = window.innerHeight - MAX_HEIGHT - PADDING;
+    }
+
+    return { ...this.props.style, top };
+  };
+
   render() {
     return (
-      <div className="expanded-code" style={this.props.style}>
+      <div className="expanded-code" style={this.getStyle()}>
         {this.renderTitleSection()}
         {this.renderCode()}
       </div>

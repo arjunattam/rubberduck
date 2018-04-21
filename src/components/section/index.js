@@ -97,16 +97,9 @@ export class BaseSectionItem extends React.Component {
     }
   };
 
-  getPositionStyle = () => {
-    const { top, bottom } = this.refs.container.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const isCloseToBottom = windowHeight - bottom < 150;
-    return isCloseToBottom ? { bottom: windowHeight - bottom } : { top: top };
-  };
-
   getSnippetStyle = () => ({
-    left: this.props.sidebarWidth + 4,
-    ...this.getPositionStyle()
+    left: this.props.sidebarWidth + 2,
+    top: this.refs.container.getBoundingClientRect().top
   });
 
   renderExpandedCode = () =>
