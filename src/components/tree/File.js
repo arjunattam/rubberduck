@@ -6,10 +6,7 @@ import { getGitService } from "../../adapters";
 const PADDING_CONST = 12; // in pixels -- same as folder
 
 export default class File extends React.Component {
-  getPadding = () => {
-    // padding is a function of depth
-    return (this.props.depth + 1) * PADDING_CONST + 2;
-  };
+  getPadding = () => (this.props.depth + 1) * PADDING_CONST + 2;
 
   clickHandler = event => {
     const service = getGitService();
@@ -55,14 +52,14 @@ export default class File extends React.Component {
     // Remove the event listener that we added
     document.removeEventListener("pjax:success", this.scrollTo);
     const elementSelector = this.getFileboxSelector(this.props.path);
-
     const fileBox = document.querySelector(elementSelector);
     const yOffset = window.scrollY + fileBox.getBoundingClientRect().y - 75;
 
     setTimeout(function() {
       // Without the timeout, the scrollTo does not work for pjax
+      // Need a mutation observer?
       window.scrollTo(0, yOffset);
-    }, 1);
+    }, 1.5);
   };
 
   getFilesChangedUrl = () => {
@@ -79,16 +76,17 @@ export default class File extends React.Component {
   };
 
   renderBasicFile = () => {
-    const pl = this.getPadding();
+    const padding = this.getPadding();
+    const { username, reponame, branch } = this.props.data.repoDetails;
     const path = pathAdapter.constructPath(
       this.props.path,
-      this.props.data.repoDetails.username,
-      this.props.data.repoDetails.reponame,
-      this.props.data.repoDetails.branch
+      username,
+      reponame,
+      branch
     );
 
     return (
-      <a href={path} style={{ paddingLeft: pl }}>
+      <a href={path} style={{ paddingLeft: padding }}>
         <TreeLabel {...this.props} icon="file" iconColor="#999" />
       </a>
     );
@@ -113,7 +111,8 @@ export default class File extends React.Component {
   };
 
   render() {
-    const isPRElement = this.props.additions || this.props.deletions;
+    const isPRElement =
+      this.props.additions || this.props.deletions || this.props.status;
     const isSelected = this.props.currentPath === this.props.path;
     let className = "file-container";
     className += isSelected ? " file-selected" : "";

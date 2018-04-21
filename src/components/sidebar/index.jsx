@@ -13,6 +13,7 @@ import Definitions from "definitions";
 import HoverListener from "hover/HoverListener";
 import SessionStatus from "session";
 import * as GithubLayout from "../../adapters/github/layout";
+import { setupPjax } from "./pjax";
 import Resizable from "./Resizable";
 import "../../index.css";
 
@@ -38,6 +39,10 @@ class Sidebar extends React.Component {
     StorageUtils.setAllInStore(data);
   };
 
+  componentDidMount() {
+    setupPjax();
+  }
+
   toggleCollapse() {
     if (this.props.storage.isSidebarVisible) {
       // To trigger the left slide animation, we follow this:
@@ -45,9 +50,10 @@ class Sidebar extends React.Component {
       this.triggerReflow();
       setTimeout(() => {
         this.updateStorage({ isSidebarVisible: false });
-      }, 180);
+      }, 150);
     } else {
       this.updateStorage({ isSidebarVisible: true });
+      setupPjax();
     }
   }
 

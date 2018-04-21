@@ -1,58 +1,23 @@
 import React from "react";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import * as DataActions from "../../actions/dataActions";
 import { getPageListener, pathAdapter } from "../../adapters/";
 import HoverElement from "./HoverElement";
 
-export const isTreeTooBig = () => {
-  const ACCEPTABLE_TREE_COVERAGE = 0.55;
-  const treeElement = document.querySelector("div.tree-content");
-  const sidebarElement = document.querySelector("div.sidebar-container");
-  if (treeElement && sidebarElement) {
-    const treeCoverage = treeElement.offsetHeight / sidebarElement.offsetHeight;
-    return treeCoverage >= ACCEPTABLE_TREE_COVERAGE;
-  }
-  return false;
-};
-
+/**
+ * This component sets up the mouse event listeners.
+ */
 class HoverListener extends React.Component {
-  // Sets up a mouse over event to read the page
-  constructor(props) {
-    super(props);
-    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
-  }
-
   state = {
     hoverResult: {}
-  };
-
-  isValidResult = () => {
-    const { lineNumber, charNumber } = this.state.hoverResult;
-    // we are relying on the fact that undefined >= 0 gives false
-    return lineNumber >= 0 && charNumber >= 0;
-  };
-
-  callActions = () => {
-    if (!this.isValidResult()) return;
-
-    this.DataActions.updateData({
-      hoverResult: this.state.hoverResult
-    });
-
-    if (isTreeTooBig()) {
-      this.DataActions.updateData({
-        openSection: {
-          ...this.props.data.openSection,
-          tree: false
-        }
-      });
-    }
   };
 
   receiver = hoverResult => {
     this.setState({ hoverResult });
   };
+
+  componentDidMount() {
+    this.setupListeners();
+  }
 
   componentDidUpdate(prevProps, prevState) {
     const isSameSessionPath = pathAdapter.isSameSessionPath(
@@ -131,10 +96,9 @@ class HoverListener extends React.Component {
 
   render() {
     const { hasHoverDebug } = this.props.storage;
-
     return (
       <div>
-        <HoverElement {...this.state} callActions={() => this.callActions()} />
+        <HoverElement {...this.props} {...this.state} />
         {hasHoverDebug ? this.renderDebugger() : null}
       </div>
     );

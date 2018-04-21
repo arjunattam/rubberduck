@@ -48,23 +48,39 @@ class Definitions extends BaseReaderSection {
           docstring: result.docstring,
           codeSnippet: result.definition ? result.definition.contents : ""
         };
-        this.setState({ definition: definition });
+        this.setState({ definition: definition }, () => this.getFileContents());
       });
     }
   };
 
+  getFileContents = () => {
+    const { fileSha, filePath } = this.state.definition;
+    const baseOrHead = fileSha === "base" ? fileSha : "head";
+    this.DataActions.callFileContents({ baseOrHead, filePath });
+  };
+
   buildFileLink = () => {
     const { fileSha, filePath, lineNumber } = this.state.definition;
-
     if (fileSha && filePath && lineNumber) {
       return this.getFileLink(fileSha, filePath, lineNumber);
     }
+  };
+
+  fileContentProps = () => {
+    const { fileContents } = this.props.data;
+    const { fileSha, filePath } = this.state.definition;
+    const baseOrHead = fileSha === "base" ? fileSha : "head";
+    const contentsInStore = fileContents[baseOrHead][filePath];
+    return contentsInStore
+      ? { codeSnippet: contentsInStore, startLineNumber: 0 }
+      : {};
   };
 
   renderContents = () =>
     this.state.definition.name ? (
       <DefinitionItem
         {...this.state.definition}
+        {...this.fileContentProps()}
         fileLink={this.buildFileLink()}
         visible={this.isVisible()}
         sidebarWidth={this.props.storage.sidebarWidth}
@@ -80,7 +96,7 @@ class Definitions extends BaseReaderSection {
     return (
       <div className={definitonClassName}>
         {this.renderSectionHeader()}
-        {this.renderContents()}
+        {this.isVisible() ? this.renderContents() : null}
       </div>
     );
   }

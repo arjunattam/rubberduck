@@ -12,9 +12,9 @@ export class BaseSection extends React.Component {
   }
 
   toggleVisibility = () => {
-    let openSection = { ...this.props.data.openSection };
+    let openSection = { ...this.props.data.section.openSection };
     openSection[this.sectionName] = !openSection[this.sectionName];
-    this.DataActions.updateData({ openSection });
+    this.DataActions.setOpenSection(openSection);
   };
 
   getSectionTitle = () =>
@@ -29,9 +29,9 @@ export class BaseSection extends React.Component {
     />
   );
 
-  isVisible = () => this.props.data.openSection[this.sectionName];
+  isVisible = () => this.props.data.section.openSection[this.sectionName];
 
-  isLoading = () => this.props.data.isLoading[this.sectionName];
+  isLoading = () => this.props.data.section.isLoading[this.sectionName];
 }
 
 export class BaseReaderSection extends BaseSection {
@@ -57,7 +57,7 @@ export class BaseReaderSection extends BaseSection {
 
   getFileLink = (fileSha, filePath, lineNumber) => {
     let shaId = "";
-    const { base, head } = this.props.data.session;
+    const { base, head } = this.props.data.session.payload;
 
     if (fileSha === "base") {
       shaId = base ? base.sha_id : "";
@@ -97,16 +97,11 @@ export class BaseSectionItem extends React.Component {
     }
   };
 
-  getPositionStyle = () => {
-    const { top, bottom } = this.refs.container.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const isCloseToBottom = windowHeight - bottom < 150;
-    return isCloseToBottom ? { bottom: windowHeight - bottom } : { top: top };
-  };
-
   getSnippetStyle = () => ({
-    left: this.props.sidebarWidth + 4,
-    ...this.getPositionStyle()
+    left: this.props.sidebarWidth + 2,
+    top: this.refs.container
+      ? this.refs.container.getBoundingClientRect().top
+      : 0
   });
 
   renderExpandedCode = () =>

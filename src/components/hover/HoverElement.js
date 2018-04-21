@@ -1,24 +1,57 @@
 import React from "react";
-import Raven from "raven-js";
+import { bindActionCreators } from "redux";
+import * as DataActions from "../../actions/dataActions";
 import debounce from "debounce";
-import { WS } from "../../utils/websocket";
 import HoverBox from "./HoverBox";
 
 const DEBOUNCE_TIMEOUT = 1200; // ms
 const CURSOR_RADIUS = 20; // pixels
 
+const isTreeTooBig = () => {
+  const ACCEPTABLE_TREE_COVERAGE = 0.55;
+  const treeElement = document.querySelector("div.tree-content");
+  const sidebarElement = document.querySelector("div.sidebar-container");
+  if (treeElement && sidebarElement) {
+    const treeCoverage = treeElement.offsetHeight / sidebarElement.offsetHeight;
+    return treeCoverage >= ACCEPTABLE_TREE_COVERAGE;
+  }
+  return false;
+};
+
+/**
+ * This component is responsible for making the API call and showing
+ * the result.
+ */
 export default class HoverElement extends React.Component {
-  // Makes the API call and shows the presentation component: HoverBox
+  constructor(props) {
+    super(props);
+    this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
+  }
+
   state = {
     apiResult: {},
     hoverResult: {},
-    isLoading: false,
     isHighlighted: false,
     underlinedElements: []
   };
 
+  isValidResult = hoverResult => {
+    const { name: hoverName } = hoverResult;
+    const hasText = hoverName && hoverName.trim() !== "";
+    return hasText;
+  };
+
   callActions = () => {
-    this.props.callActions();
+    if (!this.isValidResult(this.state.hoverResult)) return;
+
+    const { hoverResult } = this.state;
+    this.DataActions.setHoverResult(hoverResult);
+
+    if (isTreeTooBig()) {
+      this.DataActions.setOpenSection({
+        tree: false
+      });
+    }
   };
 
   isOverlappingWithCurrent = (x, y) => {
@@ -28,67 +61,36 @@ export default class HoverElement extends React.Component {
     return xdiff <= CURSOR_RADIUS && ydiff <= CURSOR_RADIUS;
   };
 
-  startLoading = () => {
-    this.setState({
-      isLoading: true
-    });
-  };
-
-  stopLoading = () => {
-    this.setState({
-      isLoading: false
-    });
-  };
-
-  getDefinitionPath = response => {
-    const { definition } = response.result;
+  getDefinitionPath = result => {
+    const { definition } = result;
     return definition ? definition.location.path : "";
   };
 
-  isValidHoverResult = () => {
-    const hoverName = this.props.hoverResult.name;
-    const hasText = hoverName && hoverName.trim() !== "";
-    return hasText;
-  };
-
   callAPI = () => {
-    if (!this.isValidHoverResult()) return;
-    this.startLoading();
-    const { fileSha, filePath } = this.props.hoverResult;
-    const { lineNumber, charNumber } = this.props.hoverResult;
+    if (!this.isValidResult(this.props.hoverResult)) return;
 
-    WS.getHover(fileSha, filePath, lineNumber, charNumber)
-      .then(response => {
-        this.stopLoading();
-        const { mouseX, mouseY } = this.props.hoverResult;
-        const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
+    this.DataActions.callHover(this.props.hoverResult).then(response => {
+      const { mouseX, mouseY } = this.props.hoverResult;
+      const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
+      const { result } = response.value;
 
-        if (isForCurrentMouse) {
-          // We will set state only if the current
-          // mouse location overlaps with the response
-          const apiResult = {
-            ...response.result,
-            filePath: this.getDefinitionPath(response)
-          };
-          this.setState({
-            apiResult,
-            hoverResult: this.props.hoverResult,
-            isVisible: true
-          });
-        }
-      })
-      .catch(error => {
-        this.stopLoading();
-        this.clearDebouce();
-        Raven.captureException(error);
-      });
+      if (isForCurrentMouse) {
+        // We will set state only if the current
+        // mouse location overlaps with the response
+        const apiResult = {
+          ...result,
+          filePath: this.getDefinitionPath(result)
+        };
+        this.setState({
+          apiResult,
+          hoverResult: this.props.hoverResult,
+          isVisible: true
+        });
+      }
+    });
   };
 
-  onClick = event => {
-    if (this.state.isHighlighted) {
-      this.callActions();
-    }
-  };
+  onClick = event => (this.state.isHighlighted ? this.callActions() : null);
 
   selectElement = element => {
     if (this.isValidElement(element)) {

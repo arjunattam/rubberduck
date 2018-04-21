@@ -1,9 +1,10 @@
 .expanded-code {
-  width: 640px;
+  width: 720px;
   position: fixed;
   z-index: 10010;
   border: 1px solid #c8e1ff;
   cursor: text;
+  box-shadow: 0 0 4px 0px #d3d6d8;
 }
 
 .expanded-content {
@@ -15,6 +16,8 @@
 
 .expanded-content pre,
 .expanded-content code {
+  /* overflow to ensure parent shows the scroll bar */
+  overflow: visible !important;
   margin: 0;
   padding: 0;
 }
@@ -31,8 +34,6 @@
   font-weight: bold;
   font-size: 12px;
   cursor: text;
-  display: flex;
-  justify-content: space-between;
   color: #333;
 }
 
@@ -41,15 +42,18 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 500px;
+  max-width: 500px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .expanded-button {
-  background: #eee;
-  width: 75px;
+  background: rgba(228, 230, 243, 0.8);
   text-align: center;
   border-radius: 10px;
-  padding: 1px 4px 1px 4px;
-  font-size: 12px;
+  margin-left: 15px;
+  padding: 2px 6px 2px 6px;
   cursor: pointer;
+  display: inline-block;
+  vertical-align: middle;
 }

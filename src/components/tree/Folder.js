@@ -28,7 +28,7 @@ const sortChildren = children => {
 export const renderChildren = (children, depth, parentProps, currentPath) => {
   // The parentProps are required to pass org/repo information down
   // the component chain, so that we can construct the link href. Can this be avoided?
-  const childrenToRender = sortChildren(children);
+  const childrenToRender = children ? sortChildren(children) : [];
   return (
     <div>
       {childrenToRender.map(element => {

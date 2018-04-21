@@ -1,6 +1,8 @@
 import Store from "../store";
+import { bindActionCreators } from "redux";
 import WebSocketAsPromised from "websocket-as-promised";
 import Raven from "raven-js";
+import * as DataActions from "../actions/dataActions";
 import { rootUrl } from "./api";
 import { getGitService } from "../adapters";
 
@@ -133,6 +135,17 @@ class BaseWebSocket {
       payload: queryParams
     });
   };
+
+  getFileContents = (baseOrHead, filePath) => {
+    const queryParams = {
+      is_base_repo: baseOrHead === "base" ? "true" : "false",
+      location_id: `${filePath}`
+    };
+    return this.sendRequest({
+      type: "session.file_contents",
+      payload: queryParams
+    }).then(response => ({ ...response, filePath, baseOrHead }));
+  };
 }
 
 class WebSocketManager {
@@ -143,13 +156,12 @@ class WebSocketManager {
     this.reconnectAttempts = 0;
     this.sessionParams = {};
     this.ws = new BaseWebSocket();
+    this.DataActions = bindActionCreators(DataActions, Store.dispatch);
   }
 
+  // TODO(arjun): use data actions
   dispatchStatus = status => {
-    Store.dispatch({
-      type: "UPDATE_SESSION_STATUS",
-      sessionStatus: status
-    });
+    this.DataActions.updateSessionStatus({ status });
   };
 
   statusUpdatesListener = message => {
@@ -304,6 +316,10 @@ class WebSocketManager {
 
   getDefinition = (...params) => {
     return this.getLSCallHelper(this.ws.getDefinition, ...params);
+  };
+
+  getFileContents = (...params) => {
+    return this.getLSCallHelper(this.ws.getFileContents, ...params);
   };
 }
 

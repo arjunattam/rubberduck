@@ -50,7 +50,7 @@ body {
 
 .repo-info-sections {
   flex-grow: 1;
-  max-height: calc(100vh - 121px);
+  max-height: calc(100vh - 136px);
   overflow: auto;
 }
 
