@@ -4,7 +4,8 @@ import * as DataActions from "../../actions/dataActions";
 import debounce from "debounce";
 import HoverBox from "./HoverBox";
 
-const DEBOUNCE_TIMEOUT = 1200; // ms
+const API_DEBOUNCE_TIMEOUT = 200; // ms
+const VISIBILITY_DEBOUNCE_TIMEOUT = 1000; // ms
 const CURSOR_RADIUS = 20; // pixels
 
 /**
@@ -66,8 +67,7 @@ export default class HoverElement extends React.Component {
         };
         this.setState({
           apiResult,
-          hoverResult: this.props.hoverResult,
-          isVisible: true
+          hoverResult: this.props.hoverResult
         });
       }
     });
@@ -157,6 +157,21 @@ export default class HoverElement extends React.Component {
     }
   }
 
+  clearDebouce = () => {
+    if (this.apiDebFunc !== undefined) this.apiDebFunc.clear();
+    if (this.visibilityDebFunc !== undefined) this.visibilityDebFunc.clear();
+  };
+
+  setupDebounce = () => {
+    this.apiDebFunc = debounce(() => this.callAPI(), API_DEBOUNCE_TIMEOUT);
+    this.visibilityDebFunc = debounce(
+      () => this.setState({ isVisible: true }),
+      VISIBILITY_DEBOUNCE_TIMEOUT
+    );
+    this.apiDebFunc();
+    this.visibilityDebFunc();
+  };
+
   componentDidUpdate(prevProps, prevState) {
     const { hoverResult: prevResult, isOnHoverBox: prevIsOnBox } = prevProps;
     const { hoverResult, isOnHoverBox } = this.props;
@@ -168,11 +183,12 @@ export default class HoverElement extends React.Component {
       this.state.isHighlighted !== prevState.isHighlighted;
 
     if (didChangeChar || didChangeLine) {
+      // The component maintains two debounce functions: one for the API call
+      // and the other for the hover box visibility.
       this.clearDebouce();
       const { hoverResult } = this.props;
       this.setState({ hoverResult, isVisible: false });
-      this.dFunc = debounce(() => this.callAPI(), DEBOUNCE_TIMEOUT);
-      this.dFunc();
+      this.setupDebounce();
     }
 
     if (didChangeElement || !this.state.isHighlighted) {
@@ -188,10 +204,6 @@ export default class HoverElement extends React.Component {
       }
     }
   }
-
-  clearDebouce = () => {
-    if (this.dFunc !== undefined) this.dFunc.clear();
-  };
 
   render() {
     return <HoverBox {...this.state} />;

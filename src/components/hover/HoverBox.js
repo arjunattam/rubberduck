@@ -13,22 +13,25 @@ const isMac = () => navigator.platform.indexOf("Mac") >= 0;
 
 const getMetaKey = () => (isMac() ? "⌘" : "ctrl");
 
-function isEllipsisActive() {
-  let e = document.querySelector("div.docstring.basic");
-  return e ? e.offsetWidth < e.scrollWidth : "null";
-}
+const HelperText = props => (
+  <div style={{ textAlign: props.textAlign }}>
+    {props.shortcut} <strong>{props.action}</strong>
+  </div>
+);
 
 const ExpandHelper = props => (
   <div className="expand-helper">
-    <div style={{ textAlign: "left" }}>
-      {`${getMetaKey()} + click `}
-      <strong>{"actions"}</strong>
-    </div>
+    <HelperText
+      textAlign={"left"}
+      shortcut={props.isHighlighted ? `click` : `${getMetaKey()} + click`}
+      action={"actions"}
+    />
     {props.isExpandable ? (
-      <div style={{ textAlign: "right" }}>
-        {`${getMetaKey()} `}
-        <strong>{"expand"}</strong>
-      </div>
+      <HelperText
+        textAlign={"right"}
+        shortcut={`${getMetaKey()}`}
+        action={"expand"}
+      />
     ) : null}
   </div>
 );
@@ -132,12 +135,18 @@ export default class HoverBox extends React.Component {
     return docstring && isLong && !isHighlighted;
   };
 
+  renderExpandHelper = () => (
+    <ExpandHelper
+      isExpandable={this.isDocstringExpandable()}
+      isHighlighted={this.props.isHighlighted}
+    />
+  );
+
   render() {
-    const isExpandable = this.isDocstringExpandable();
     const { isVisible, isHighlighted } = this.props;
     const hoverBox = (
       <div className="hover-box" style={this.getStyle()}>
-        <ExpandHelper isExpandable={isExpandable} />
+        {this.renderExpandHelper()}
         {isHighlighted ? this.renderExpanded() : this.renderBasic()}
         {this.renderSignature()}
       </div>
