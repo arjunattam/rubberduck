@@ -29,7 +29,9 @@ function normalizeSentryUrl(url) {
 }
 
 const loadSentry = () => {
-  if (process.env.REACT_APP_BACKEND_ENV === "local") {
+  const { REACT_APP_BACKEND_ENV } = process.env;
+  const noopEnvironments = ["local", "staging"];
+  if (noopEnvironments.indexOf(REACT_APP_BACKEND_ENV) >= 0) {
     return;
   }
 

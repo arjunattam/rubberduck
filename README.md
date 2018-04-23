@@ -13,7 +13,7 @@ This repo is the chrome extension for the mercury project.
 2.  For development, we will run the dev server, and load an unpacked extension on Chrome from `build/`. See [how to](https://developer.chrome.com/extensions/getstarted#unpacked). Open an [example github url](https://github.com/pallets/flask) to see this in action.
 
     ```
-    npm run start
+    npm run start-local
     ```
 
 3.  To distribute binary file, we pack the extension into a crx file, located at `dist/mercury.crx`. Generate new crx using the command. Packing needs keys (see below).
@@ -21,10 +21,6 @@ This repo is the chrome extension for the mercury project.
     ```
     npm run pack
     ```
-
-## Development keys setup
-
-To be able to pack crx, you need to setup `keys/development_key.pem` in your project directory. Get this key from [here](https://drive.google.com/drive/u/0/folders/1ABADv_hmG2FAsPYJokvv_FBw-z_nMQUT) (needs Google account).
 
 ## Testing with localhost
 
@@ -42,6 +38,22 @@ To be able to pack crx, you need to setup `keys/development_key.pem` in your pro
 
 3.  Load the unpacked extension in your Chrome from the build location: `build-local/`. The production and local builds can co-exist on Chrome, and you can enable/disable through `chrome://extensions`.
 
+## Testing with staging
+
+1.  Run the extension
+
+    ```
+    npm run start-staging
+    ```
+
+2.  Load the unpacked extension in your Chrome from the build location: `build-staging/`. The production and local builds can co-exist on Chrome, and you can enable/disable through `chrome://extensions`.
+
+## Development keys setup
+
+* To be able to pack crx (for production), you need to setup `keys/production_key.pem` in your project directory. Get this key from [here](https://drive.google.com/drive/u/0/folders/1ABADv_hmG2FAsPYJokvv_FBw-z_nMQUT) (needs Google account).
+
+* This should not be required if we are distributing the extension through the Chrome Store. See below for publishing.
+
 ## Publishing
 
 1.  To publish the extension, ensure that your account on the [Chrome developer dashboard](https://chrome.google.com/webstore/developer/dashboard) is setup.
@@ -58,11 +70,13 @@ To be able to pack crx, you need to setup `keys/development_key.pem` in your pro
 
 ## Architecture
 
-The extension has two components
+The extension has three components
 
 1.  [Background page](public/background.js): this is the main page of the extension (also called "event page") in the docs. The background page listens for some chrome events, and injects scripts to the page.
 
 2.  [Content script](src/index.js): this is the script that is injected in the page using [programmatic injection](https://developer.chrome.com/extensions/content_scripts#pi). Since the injected script renders elements, this is built using React.
+
+3.  [Options page](public/options.html): this is the settings page. Not much to see here.
 
 ### Docs
 
