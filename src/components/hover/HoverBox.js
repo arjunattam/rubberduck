@@ -125,10 +125,11 @@ export default class HoverBox extends React.Component {
 
   isDocstringExpandable = () => {
     const { docstring } = this.props.apiResult;
+    const { isHighlighted } = this.props;
     const decodedData = decodeBase64(docstring || "");
     // The length for expandable depends on the width of the box
     const isLong = decodedData.indexOf("\n") >= 0 || decodedData.length > 40;
-    return docstring && isLong;
+    return docstring && isLong && !isHighlighted;
   };
 
   render() {
