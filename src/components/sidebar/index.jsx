@@ -91,7 +91,7 @@ class Sidebar extends React.Component {
       onResizeStop={this.onResizeStop}
     >
       <Title />
-      {this.renderCollapseButton()}
+      {this.renderCollapseButton(width)}
       <div className="repo-info-sections">
         <SessionStatus />
         <Tree />
@@ -103,10 +103,14 @@ class Sidebar extends React.Component {
     </Resizable>
   );
 
+  getWidth = () =>
+    this.props.data.data.sidebarWidth > 0
+      ? this.props.data.data.sidebarWidth
+      : this.props.storage.sidebarWidth;
+
   render() {
-    const { data, storage } = this.props;
-    const width = data.data.sidebarWidth || storage.sidebarWidth;
-    const { isSidebarVisible: isVisible } = storage;
+    const width = this.getWidth();
+    const { isSidebarVisible: isVisible } = this.props.storage;
     this.updatePageLayout(isVisible, width);
     return isVisible
       ? this.renderSidebar(width)
