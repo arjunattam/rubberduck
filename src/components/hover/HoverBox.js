@@ -2,23 +2,36 @@ import React from "react";
 import PropTypes from "prop-types";
 import Docstring from "../common/Docstring";
 import HoverSignature from "./HoverSignature";
+import { decodeBase64 } from "../../utils/data";
 import "./Hover.css";
 
 const MAX_HEIGHT = 240;
 const MAX_WIDTH = 300;
-const TOP_MARGIN = 4;
+const TOP_MARGIN = 2;
+
+const isMac = () => navigator.platform.indexOf("Mac") >= 0;
+
+const getMetaKey = () => (isMac() ? "⌘" : "ctrl");
+
+const HelperText = props => (
+  <div style={{ textAlign: props.textAlign }}>
+    {props.shortcut} <strong>{props.action}</strong>
+  </div>
+);
 
 const ExpandHelper = props => (
   <div className="expand-helper">
-    <div style={{ textAlign: "left" }}>
-      {"⌘ + click "}
-      <strong>{"actions"}</strong>
-    </div>
+    <HelperText
+      textAlign={"left"}
+      shortcut={props.isHighlighted ? `click` : `${getMetaKey()} + click`}
+      action={"actions"}
+    />
     {props.isExpandable ? (
-      <div style={{ textAlign: "right" }}>
-        {"⌘ "}
-        <strong>{"expand"}</strong>
-      </div>
+      <HelperText
+        textAlign={"right"}
+        shortcut={`${getMetaKey()}`}
+        action={"expand"}
+      />
     ) : null}
   </div>
 );
@@ -34,9 +47,11 @@ export default class HoverBox extends React.Component {
 
   isVisibleToUser = () => this.props.hoverResult.mouseX > 0;
 
+  /**
+   * This decides where the hover box should be placed, looking at the
+   * bounding rectangle of the element and the window.
+   */
   getPosition = () => {
-    // This decides where the hover box should be placed, looking at the
-    // bounding rectangle of the element and the window.
     const { mouseX, mouseY, element } = this.props.hoverResult;
     let left = mouseX || -1000;
     let top = mouseY || -1000;
@@ -111,15 +126,31 @@ export default class HoverBox extends React.Component {
 
   renderExpanded = () => this.renderDocstring("expanded");
 
-  render() {
-    const isExpandable = this.props.apiResult.docstring ? true : false;
+  isDocstringExpandable = () => {
+    const { docstring } = this.props.apiResult;
+    const { isHighlighted } = this.props;
+    const decodedData = decodeBase64(docstring || "");
+    // The length for expandable depends on the width of the box
+    const isLong = decodedData.indexOf("\n") >= 0 || decodedData.length > 40;
+    return docstring && isLong && !isHighlighted;
+  };
 
-    return this.props.isVisible ? (
+  renderExpandHelper = () => (
+    <ExpandHelper
+      isExpandable={this.isDocstringExpandable()}
+      isHighlighted={this.props.isHighlighted}
+    />
+  );
+
+  render() {
+    const { isVisible, isHighlighted } = this.props;
+    const hoverBox = (
       <div className="hover-box" style={this.getStyle()}>
-        <ExpandHelper isExpandable={isExpandable} />
-        {this.props.isHighlighted ? this.renderExpanded() : this.renderBasic()}
+        {this.renderExpandHelper()}
+        {isHighlighted ? this.renderExpanded() : this.renderBasic()}
         {this.renderSignature()}
       </div>
-    ) : null;
+    );
+    return isVisible ? hoverBox : null;
   }
 }

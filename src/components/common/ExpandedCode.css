@@ -2,9 +2,10 @@
   width: 720px;
   position: fixed;
   z-index: 10010;
-  border: 1px solid #c8e1ff;
+  border: 1px solid #d8d8d8;
+  border-radius: 3px;
   cursor: text;
-  box-shadow: 0 0 4px 0px #d3d6d8;
+  box-shadow: 0 0 4px 0px rgba(191, 191, 191, 0.4);
 }
 
 .expanded-content {
@@ -28,8 +29,8 @@
 }
 
 .expanded-title {
-  background: #f1f8ff;
-  border-bottom: 1px solid #c8e1ff;
+  background: #f9fafc;
+  border-bottom: 1px solid #d8d8d8;
   padding: 5px;
   font-weight: bold;
   font-size: 12px;
@@ -48,9 +49,9 @@
 }
 
 .expanded-button {
-  background: rgba(228, 230, 243, 0.8);
+  background: #c8e1ff46;
   text-align: center;
-  border-radius: 10px;
+  border-radius: 5px;
   margin-left: 15px;
   padding: 2px 6px 2px 6px;
   cursor: pointer;

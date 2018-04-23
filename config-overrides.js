@@ -18,6 +18,8 @@ module.exports = function override(config, env) {
 
   if (process.env.REACT_APP_BACKEND_ENV === "local") {
     buildPath = "./build-local";
+  } else if (process.env.REACT_APP_BACKEND_ENV === "staging") {
+    buildPath = "./build-staging";
   }
 
   // Write webpack output to file for chrome loading
@@ -34,7 +36,7 @@ module.exports = function override(config, env) {
 
   // Add localhost to the manifest permissions on local
   if (process.env.REACT_APP_BACKEND_ENV === "local") {
-    helpers.updateManifestForLocalhost(buildPath);
+    helpers.updatePermissionsForLocalhost(buildPath);
   }
 
   // Modules resolve config

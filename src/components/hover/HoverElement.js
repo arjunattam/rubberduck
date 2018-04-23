@@ -4,7 +4,8 @@ import * as DataActions from "../../actions/dataActions";
 import debounce from "debounce";
 import HoverBox from "./HoverBox";
 
-const DEBOUNCE_TIMEOUT = 1200; // ms
+const API_DEBOUNCE_TIMEOUT = 200; // ms
+const VISIBILITY_DEBOUNCE_TIMEOUT = 1000; // ms
 const CURSOR_RADIUS = 20; // pixels
 
 /**
@@ -66,8 +67,7 @@ export default class HoverElement extends React.Component {
         };
         this.setState({
           apiResult,
-          hoverResult: this.props.hoverResult,
-          isVisible: true
+          hoverResult: this.props.hoverResult
         });
       }
     });
@@ -115,19 +115,22 @@ export default class HoverElement extends React.Component {
     });
   };
 
-  isExpandKeyCode = keyCode => {
-    // Handles command key left/right on Mac
-    return keyCode === 91 || keyCode === 93;
+  isMac = () => navigator.platform.indexOf("Mac") >= 0;
+
+  isExpandKeyCode = event => {
+    // Handles cmd key (left/right) on macOS and ctrl on other platforms
+    const allowedCodes = this.isMac() ? [91, 93] : [17];
+    return allowedCodes.indexOf(event.keyCode) >= 0;
   };
 
   onKeyDown = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
+    if (this.isExpandKeyCode(event)) {
       this.setState({ isHighlighted: true });
     }
   };
 
   onKeyUp = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
+    if (this.isExpandKeyCode(event)) {
       this.setState({ isHighlighted: false });
     }
   };
@@ -143,40 +146,64 @@ export default class HoverElement extends React.Component {
     return newResult.element.nodeValue !== oldResult.element.nodeValue;
   }
 
+  componentWillReceiveProps(newProps) {
+    const { isOnHoverBox: prevIsOnBox } = this.props;
+    const { isOnHoverBox } = newProps;
+    const didChangeMouseOnBox = isOnHoverBox !== prevIsOnBox;
+
+    if (didChangeMouseOnBox) {
+      if (isOnHoverBox) this.setState({ isHighlighted: true });
+      else this.setState({ isHighlighted: false });
+    }
+  }
+
+  clearDebouce = () => {
+    if (this.apiDebFunc !== undefined) this.apiDebFunc.clear();
+    if (this.visibilityDebFunc !== undefined) this.visibilityDebFunc.clear();
+  };
+
+  setupDebounce = () => {
+    this.apiDebFunc = debounce(() => this.callAPI(), API_DEBOUNCE_TIMEOUT);
+    this.visibilityDebFunc = debounce(
+      () => this.setState({ isVisible: true }),
+      VISIBILITY_DEBOUNCE_TIMEOUT
+    );
+    this.apiDebFunc();
+    this.visibilityDebFunc();
+  };
+
   componentDidUpdate(prevProps, prevState) {
-    const { hoverResult: prevResult } = prevProps;
-    const { hoverResult: currentResult } = this.props;
-    const didChangeLine = currentResult.lineNumber !== prevResult.lineNumber;
-    const didChangeChar = currentResult.charNumber !== prevResult.charNumber;
-    const didChangeElement = this.didChangeElement(currentResult, prevResult);
+    const { hoverResult: prevResult, isOnHoverBox: prevIsOnBox } = prevProps;
+    const { hoverResult, isOnHoverBox } = this.props;
+    const didChangeLine = hoverResult.lineNumber !== prevResult.lineNumber;
+    const didChangeChar = hoverResult.charNumber !== prevResult.charNumber;
+    const didChangeElement = this.didChangeElement(hoverResult, prevResult);
+
     const didChangeHighlight =
       this.state.isHighlighted !== prevState.isHighlighted;
 
     if (didChangeChar || didChangeLine) {
+      // The component maintains two debounce functions: one for the API call
+      // and the other for the hover box visibility.
       this.clearDebouce();
       const { hoverResult } = this.props;
       this.setState({ hoverResult, isVisible: false });
-      this.dFunc = debounce(() => this.callAPI(), DEBOUNCE_TIMEOUT);
-      this.dFunc();
+      this.setupDebounce();
     }
 
     if (didChangeElement || !this.state.isHighlighted) {
       this.removeSelectedElement(prevResult.element);
-      this.selectElement(currentResult.element);
+      this.selectElement(hoverResult.element);
     }
 
     if (didChangeHighlight) {
       if (this.state.isHighlighted) {
-        this.underlineElement(currentResult.element);
+        this.underlineElement(hoverResult.element);
       } else {
         this.removeUnderlineElements();
       }
     }
   }
-
-  clearDebouce = () => {
-    if (this.dFunc !== undefined) this.dFunc.clear();
-  };
 
   render() {
     return <HoverBox {...this.state} />;
