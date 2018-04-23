@@ -146,12 +146,24 @@ export default class HoverElement extends React.Component {
     return newResult.element.nodeValue !== oldResult.element.nodeValue;
   }
 
+  componentWillReceiveProps(newProps) {
+    const { isOnHoverBox: prevIsOnBox } = this.props;
+    const { isOnHoverBox } = newProps;
+    const didChangeMouseOnBox = isOnHoverBox !== prevIsOnBox;
+
+    if (didChangeMouseOnBox) {
+      if (isOnHoverBox) this.setState({ isHighlighted: true });
+      else this.setState({ isHighlighted: false });
+    }
+  }
+
   componentDidUpdate(prevProps, prevState) {
-    const { hoverResult: prevResult } = prevProps;
-    const { hoverResult: currentResult } = this.props;
-    const didChangeLine = currentResult.lineNumber !== prevResult.lineNumber;
-    const didChangeChar = currentResult.charNumber !== prevResult.charNumber;
-    const didChangeElement = this.didChangeElement(currentResult, prevResult);
+    const { hoverResult: prevResult, isOnHoverBox: prevIsOnBox } = prevProps;
+    const { hoverResult, isOnHoverBox } = this.props;
+    const didChangeLine = hoverResult.lineNumber !== prevResult.lineNumber;
+    const didChangeChar = hoverResult.charNumber !== prevResult.charNumber;
+    const didChangeElement = this.didChangeElement(hoverResult, prevResult);
+
     const didChangeHighlight =
       this.state.isHighlighted !== prevState.isHighlighted;
 
@@ -165,12 +177,12 @@ export default class HoverElement extends React.Component {
 
     if (didChangeElement || !this.state.isHighlighted) {
       this.removeSelectedElement(prevResult.element);
-      this.selectElement(currentResult.element);
+      this.selectElement(hoverResult.element);
     }
 
     if (didChangeHighlight) {
       if (this.state.isHighlighted) {
-        this.underlineElement(currentResult.element);
+        this.underlineElement(hoverResult.element);
       } else {
         this.removeUnderlineElements();
       }

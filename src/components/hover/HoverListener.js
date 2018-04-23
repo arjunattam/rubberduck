@@ -12,7 +12,7 @@ class HoverListener extends React.Component {
   };
 
   receiver = hoverResult => {
-    this.setState({ hoverResult });
+    this.setState({ hoverResult, isOnHoverBox: false });
   };
 
   componentDidMount() {
@@ -38,13 +38,13 @@ class HoverListener extends React.Component {
 
     if (hoverElement) {
       const rect = hoverElement.getBoundingClientRect();
-      const padding = 15; // For the mouse to hover inside the box comfortably
+      const PADDING = 20; // For the mouse to hover inside the box comfortably
 
       return (
         rect.x <= x &&
         x <= rect.x + rect.width &&
-        rect.y - padding <= y &&
-        y <= rect.y + rect.height + padding
+        rect.y - PADDING <= y &&
+        y <= rect.y + rect.height + PADDING
       );
     }
   };
@@ -52,6 +52,8 @@ class HoverListener extends React.Component {
   onMouseOverListener(e, listener) {
     if (!this.isOnHoverBox(e.x, e.y)) {
       listener(e, this.receiver, this.props.data.repoDetails.branch);
+    } else {
+      this.setState({ isOnHoverBox: true });
     }
   }
 

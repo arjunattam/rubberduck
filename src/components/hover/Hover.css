@@ -5,6 +5,7 @@
   border: solid 1px #eaeaea;
   animation: fade-in 0.15s linear;
   font-size: 12px;
+  box-shadow: 0 0 4px 0px rgba(191, 191, 191, 0.4);
 }
 
 .hover-debugger {
@@ -52,7 +53,7 @@
 }
 
 .hover-box .expanded div {
-  max-height: 300px;
+  max-height: 265px;
   overflow: auto;
   padding: 5px;
 }

@@ -4,7 +4,7 @@
   z-index: 10010;
   border: 1px solid #c8e1ff;
   cursor: text;
-  box-shadow: 0 0 4px 0px #d3d6d8;
+  box-shadow: 0 0 4px 0px rgba(191, 191, 191, 0.4);
 }
 
 .expanded-content {
