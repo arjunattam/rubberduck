@@ -115,19 +115,22 @@ export default class HoverElement extends React.Component {
     });
   };
 
-  isExpandKeyCode = keyCode => {
-    // Handles command key left/right on Mac
-    return keyCode === 91 || keyCode === 93;
+  isMac = () => navigator.platform.indexOf("Mac") >= 0;
+
+  isExpandKeyCode = event => {
+    // Handles cmd key (left/right) on macOS and ctrl on other platforms
+    const allowedCodes = this.isMac() ? [91, 93] : [17];
+    return allowedCodes.indexOf(event.keyCode) >= 0;
   };
 
   onKeyDown = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
+    if (this.isExpandKeyCode(event)) {
       this.setState({ isHighlighted: true });
     }
   };
 
   onKeyUp = event => {
-    if (this.isExpandKeyCode(event.keyCode)) {
+    if (this.isExpandKeyCode(event)) {
       this.setState({ isHighlighted: false });
     }
   };
