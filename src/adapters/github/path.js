@@ -107,17 +107,15 @@ const getCompareViewSha = () => {
   return result;
 };
 
-async function findPRBase() {
-  const repoDetails = getRepoFromPath();
-  const response = await API.getPRInfo(
-    repoDetails.username,
-    repoDetails.reponame,
-    repoDetails.typeId
-  );
-  return response.base.sha;
+async function findPRBase(repoDetails) {
+  // TODO(arjun): This is broken in the case of private repositories,
+  // because the JWT is not loaded before this API call is made.
+  // To repro, open https://github.com/karigari/mercury/pull/31/commits/0d9ca4212262f4406a4373a04bb1d7a0bcb139e5
+  const response = await API.getPRInfo(repoDetails);
+  return response ? response.base.sha : null;
 }
 
-const getPRCommitSha = () => {
+const getPRCommitSha = repoDetails => {
   // In cases where the PR diff view specifies some commits
   const match = window.location.pathname.match(
     /pull\/\d+\/(commits|files)\/([.0-9a-z]+)/
@@ -133,7 +131,7 @@ const getPRCommitSha = () => {
       // We have the head, and need to call API to get base
       let result = { base: null, head: shaPlaceholder };
 
-      return findPRBase().then(value => {
+      return findPRBase(repoDetails).then(value => {
         result.base = value;
         return result;
       });
@@ -159,6 +157,16 @@ const getFilePath = () => {
   }
 
   return null;
+};
+
+const getIsPrivate = () => {
+  const labelElement = document.querySelector("span.Label.Label--outline");
+
+  if (labelElement) {
+    return labelElement.textContent === "Private";
+  }
+
+  return false;
 };
 
 const getRepoFromPath = () => {
@@ -248,6 +256,7 @@ export default class GithubPathAdapter {
     let repoDetails = {
       username: null,
       reponame: null,
+      isPrivate: null,
       type: null,
       prId: null,
       branch: null,
@@ -264,7 +273,7 @@ export default class GithubPathAdapter {
       repoFromPath.type === "pull" ? repoFromPath.typeId : null;
 
     repoDetails.branch = getBranch() || null;
-
+    repoDetails.isPrivate = getIsPrivate();
     repoDetails.path = getFilePath();
 
     // Fill up base/head for types
@@ -277,7 +286,7 @@ export default class GithubPathAdapter {
       repoDetails.headSha = head;
       repoDetails.baseSha = base;
     } else if (repoDetails.type === "pull") {
-      const shaPromise = getPRCommitSha();
+      const shaPromise = getPRCommitSha(repoDetails);
 
       if (shaPromise !== null) {
         return shaPromise.then(shas => {
