@@ -10,6 +10,8 @@
   },
   "options_page": "options.html",
   "web_accessible_resources": ["fonts/*.woff2"],
+  "content_security_policy":
+    "default-src 'self'; script-src 'self' 'sha256-Op88lCYWqr0Z5F9bz8S7FKvE8PA3WrTpVJfdZ2pO/FA='",
   "content_scripts": [
     {
       "matches": [
