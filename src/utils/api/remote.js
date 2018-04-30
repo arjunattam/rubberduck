@@ -3,27 +3,50 @@ import parse from "what-the-diff";
 import { getGitService, treeAdapter } from "../../adapters";
 
 let BaseGitRemoteAPI = {
-  isRemoteAuthorized() {
+  isRemoteAuthorized(isPrivate) {
     const decoded = this.getDecodedToken();
     if (decoded !== null) {
+      // Oauth case: github + bitbucket. If username exists,
+      // then remote is definitely authorized.
       const username = this.getRemoteUsername(decoded);
-      return username !== "" && username !== undefined;
-    } else {
-      return false;
+
+      if (username !== "" && username !== undefined) {
+        return true;
+      }
     }
+
+    // Now this could be the github app scenario, where
+    // the decoded JWT does not have the Oauth username, but
+    // remote is still authorized via an app installation.
+    if (getGitService() === "github" && isPrivate) {
+      // Here, if the repo is public, we can return false. But if the
+      // repo is private, we should try reaching the server, just in case
+      // authentication is available.
+      return true;
+    }
+
+    return false;
   },
 
-  makeConditionalGet(uriPath) {
-    if (this.isRemoteAuthorized()) {
+  makeConditionalGet(uriPath, isPrivate) {
+    if (this.isRemoteAuthorized(isPrivate)) {
       // If user is logged in with github, we will send
       // this API call to pass through via backend.
       const uri = `${this.getPassthroughPath()}${uriPath.replace("?", "%3F")}/`;
-      return this.baseRequest.fetch(uri).then(
-        response =>
-          // This is required for non-json responses, as the passthrough api
-          // JSONifies them with the jsonified key
-          response.jsonified || response
-      );
+      return this.baseRequest
+        .fetch(uri)
+        .then(
+          response =>
+            // This is required for non-json responses, as the passthrough api
+            // JSONifies them with the jsonified key
+            response.jsonified || response
+        )
+        .catch(error => {
+          if (error.response.status === 401) {
+            // Remote has returned auth error
+            this.dispatchAuthenticated(false);
+          }
+        });
     } else {
       // Make call directly to github using client IP address
       // for efficient rate limit utilisation.
@@ -40,26 +63,24 @@ let BaseGitRemoteAPI = {
   },
 
   getTree(repoDetails) {
-    const { username, reponame, type } = repoDetails;
-    const { prId, headSha, baseSha, branch } = repoDetails;
+    const { reponame, type } = repoDetails;
 
     switch (type) {
       case "pull":
-        return this.getPRFiles(username, reponame, prId).then(response =>
+        return this.getPRFiles(repoDetails).then(response =>
           treeAdapter.getPRChildren(reponame, response)
         );
       case "commit":
-        return this.getCommitFiles(username, reponame, headSha).then(response =>
+        return this.getCommitFiles(repoDetails).then(response =>
           treeAdapter.getPRChildren(reponame, response)
         );
       case "compare":
-        return this.getCompareFiles(username, reponame, headSha, baseSha).then(
-          response => treeAdapter.getPRChildren(reponame, response)
+        return this.getCompareFiles(repoDetails).then(response =>
+          treeAdapter.getPRChildren(reponame, response)
         );
       default:
-        const nonNullBranch = branch || "master"; // TODO(arjun): check for default branch
-        return this.getFilesTree(username, reponame, nonNullBranch).then(
-          response => treeAdapter.getTreeChildren(reponame, response)
+        return this.getFilesTree(repoDetails).then(response =>
+          treeAdapter.getTreeChildren(reponame, response)
         );
     }
   }
@@ -79,31 +100,41 @@ let GithubAPI = {
     return axios.get(uri, { headers: { Authorization: "" } });
   },
 
-  getFilesTree(username, reponame, branch) {
-    const uriPath = `repos/${username}/${reponame}/git/trees/${branch}?recursive=1`;
-    return this.makeConditionalGet(uriPath);
+  getFilesTree(repoDetails) {
+    const { username, reponame, branch, isPrivate } = repoDetails;
+    const nonNullBranch = branch || "master"; // TODO(arjun): check for default branch
+    const uriPath = `repos/${username}/${reponame}/git/trees/${nonNullBranch}?recursive=1`;
+    return this.makeConditionalGet(uriPath, isPrivate);
   },
 
-  getPRFiles(username, reponame, pr) {
-    const uriPath = `repos/${username}/${reponame}/pulls/${pr}/files`;
-    return this.makeConditionalGet(uriPath);
+  getPRFiles(repoDetails) {
+    const { username, reponame, prId, isPrivate } = repoDetails;
+    const uriPath = `repos/${username}/${reponame}/pulls/${prId}/files`;
+    return this.makeConditionalGet(uriPath, isPrivate);
   },
 
-  getCommitFiles(username, reponame, commitSha) {
-    const uriPath = `repos/${username}/${reponame}/commits/${commitSha}`;
-    return this.makeConditionalGet(uriPath).then(response => response.files);
+  getCommitFiles(repoDetails) {
+    const { username, reponame, headSha, isPrivate } = repoDetails;
+    const uriPath = `repos/${username}/${reponame}/commits/${headSha}`;
+    return this.makeConditionalGet(uriPath, isPrivate).then(
+      response => response.files
+    );
   },
 
-  getCompareFiles(username, reponame, headSha, baseSha) {
+  getCompareFiles(repoDetails) {
+    const { username, reponame, headSha, baseSha, isPrivate } = repoDetails;
     // TODO(arjun): known issue: this does not work with 2 repositories
     // eg, when branch in the fork is compared to base
     const uriPath = `repos/${username}/${reponame}/compare/${baseSha}...${headSha}`;
-    return this.makeConditionalGet(uriPath).then(response => response.files);
+    return this.makeConditionalGet(uriPath, isPrivate).then(
+      response => response.files
+    );
   },
 
-  getPRInfo(username, reponame, pr) {
-    const uriPath = `repos/${username}/${reponame}/pulls/${pr}`;
-    return this.makeConditionalGet(uriPath);
+  getPRInfo(repoDetails) {
+    const { username, reponame, isPrivate, prId } = repoDetails;
+    const uriPath = `repos/${username}/${reponame}/pulls/${prId}`;
+    return this.makeConditionalGet(uriPath, isPrivate);
   }
 };
 
@@ -121,8 +152,10 @@ let BitbucketAPI = {
     return axios.get(uri, { headers: { Authorization: "" } });
   },
 
-  getFilesTree(username, reponame, branch) {
-    const uriPath = `repositories/${username}/${reponame}/src/${branch}/`;
+  getFilesTree(repoDetails) {
+    const { username, reponame, branch } = repoDetails;
+    const nonNullBranch = branch || "master"; // TODO(arjun): check for default branch
+    const uriPath = `repositories/${username}/${reponame}/src/${nonNullBranch}/`;
     return this.makeConditionalGet(uriPath);
   },
 
@@ -153,15 +186,16 @@ let BitbucketAPI = {
     });
   },
 
-  getPRFiles(username, reponame, pr) {
-    const uriPath = `repositories/${username}/${reponame}/pullrequests/${pr}/diff/`;
+  getPRFiles(repoDetails) {
+    const { username, reponame, prId } = repoDetails;
+    const uriPath = `repositories/${username}/${reponame}/pullrequests/${prId}/diff/`;
     return this.makeConditionalGet(uriPath).then(response => {
       const parsedDiff = parse.parse(response);
       return this.getDiffData(parsedDiff);
     });
   },
 
-  getPRInfo(username, reponame, pr) {}
+  getPRInfo(repoDetails) {}
 };
 
 let GitRemoteAPI = {};
