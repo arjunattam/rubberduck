@@ -91,18 +91,31 @@ const getCommitViewSha = () => {
   };
 };
 
-const getCompareViewSha = () => {
-  const shaElements = document.querySelectorAll(
-    "div.commitish-suggester span.js-select-button"
+const getCompareViewSha = username => {
+  const repoLabelElements = Array.from(
+    document.querySelectorAll("div.range-cross-repo-pair")
   );
-  const branches = Array.from(shaElements).map(element => {
-    return element.getAttribute("title");
-  });
   let result = {};
-  branches.map(element => {
-    const match = element.match(/(base|compare): (.+)/);
-    result[match[1] === "compare" ? "head" : match[1]] = match[2];
-    return result;
+  repoLabelElements.map(element => {
+    // each repo label has a branch name and repo name (in case of fork comparison)
+    const branchElement = element.querySelector(
+      "div.commitish-suggester span.js-select-button"
+    );
+    const repoElement = element.querySelector(
+      "div.fork-suggester span.js-select-button"
+    );
+    const branchText = branchElement.getAttribute("title");
+    const match = branchText.match(/(base|compare): (.+)/);
+    let prefix = "";
+
+    if (repoElement) {
+      const repoName = repoElement.textContent;
+      const repoNameMatch = repoName.match(/(.+)\/(.+)/);
+
+      if (repoNameMatch.length > 0 && repoNameMatch[1] !== username)
+        prefix = `${repoNameMatch[1]}:`;
+    }
+    result[match[1] === "compare" ? "head" : match[1]] = `${prefix}${match[2]}`;
   });
   return result;
 };
@@ -282,7 +295,7 @@ export default class GithubPathAdapter {
       repoDetails.headSha = head;
       repoDetails.baseSha = base;
     } else if (repoDetails.type === "compare") {
-      const { base, head } = getCompareViewSha();
+      const { base, head } = getCompareViewSha(repoDetails.username);
       repoDetails.headSha = head;
       repoDetails.baseSha = base;
     } else if (repoDetails.type === "pull") {
