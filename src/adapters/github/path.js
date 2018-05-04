@@ -17,8 +17,7 @@ const GH_RESERVED_USER_NAMES = [ // These cannot be usernames
   ]
 const GH_RESERVED_REPO_NAMES = ["followers", "following", "repositories"];
 const GH_RESERVED_SUB_PAGES = [
-  "issues",
-  "pulls",
+  "notifications",
   "graphs",
   "settings",
   "pulse",
@@ -213,10 +212,10 @@ const getRepoFromPath = () => {
     return repoDetails;
   }
 
-  // if (~GH_RESERVED_SUB_PAGES.indexOf(type)) {
-  //   // These aren't code pages
-  //   return repoDetails;
-  // }
+  if (~GH_RESERVED_SUB_PAGES.indexOf(type)) {
+    // These aren't code pages
+    return repoDetails;
+  }
 
   // Check if this is a Tree/Blob view
   const isFileView = type === null || type === "tree" || type === "blob";

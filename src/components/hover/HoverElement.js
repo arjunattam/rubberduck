@@ -173,8 +173,8 @@ export default class HoverElement extends React.Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
-    const { hoverResult: prevResult, isOnHoverBox: prevIsOnBox } = prevProps;
-    const { hoverResult, isOnHoverBox } = this.props;
+    const { hoverResult: prevResult } = prevProps;
+    const { hoverResult } = this.props;
     const didChangeLine = hoverResult.lineNumber !== prevResult.lineNumber;
     const didChangeChar = hoverResult.charNumber !== prevResult.charNumber;
     const didChangeElement = this.didChangeElement(hoverResult, prevResult);
