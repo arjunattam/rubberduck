@@ -91,6 +91,8 @@ export class BaseAPI {
   }
 
   cacheOrGet(uri) {
+    // The authorization header needs to be reset because axios.create
+    // is setting a default header. (Can clean this up)
     const headers = { Authorization: `` };
     const cached = this.getCached(uri);
     const { lastModified, data: cachedResponse } = cached;
