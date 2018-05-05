@@ -6,7 +6,7 @@
   "version": "0.2.9",
   "background": {
     "persistent": false,
-    "scripts": ["js/largeSync.js", "background.js"]
+    "scripts": ["background.js"]
   },
   "options_page": "options.html",
   "web_accessible_resources": ["fonts/*.woff2"],

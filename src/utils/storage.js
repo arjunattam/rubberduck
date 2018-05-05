@@ -1,9 +1,13 @@
-// Methods to use chrome local storage to maintain high level state
 import { sendMessage, constructMessage } from "./chrome";
 
-export const setAllInStore = (data, cb) => {
+export const setInSyncStore = (data, cb) => {
   // Send message to background page to set value in chrome.storage
-  const message = constructMessage("STORAGE_SET_ALL", data);
+  const message = constructMessage("STORAGE_SYNC_SET", data);
+  sendMessage(message, cb);
+};
+
+export const setInLocalStore = (data, cb) => {
+  const message = constructMessage("STORAGE_LOCAL_SET", data);
   sendMessage(message, cb);
 };
 

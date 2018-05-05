@@ -59,7 +59,6 @@ export class BaseAPI {
     let filteredObject = Object.keys(existingCache).reduce((res, key) => {
       const keyExpiry = existingCache[key].expiry;
       const isValid = Moment(keyExpiry).isAfter(now);
-      console.log(key, isValid, keyExpiry);
       if (isValid) res[key] = existingCache[key];
       return res;
     }, {});
@@ -72,7 +71,7 @@ export class BaseAPI {
     const { storage } = Store.getState();
     let apiResponses = storage.apiResponses;
     apiResponses[encoded] = { ...apiResponses[encoded], lastModified };
-    StorageUtils.setAllInStore({ apiResponses }, () => {});
+    StorageUtils.setInLocalStore({ apiResponses }, () => {});
   }
 
   setCached(uri, response) {
@@ -87,7 +86,7 @@ export class BaseAPI {
     if (lastModified && data) {
       let apiResponses = this.clearCache(storage.apiResponses);
       apiResponses[encoded] = { lastModified, data, expiry };
-      StorageUtils.setAllInStore({ apiResponses }, () => {});
+      StorageUtils.setInLocalStore({ apiResponses }, () => {});
     }
   }
 
@@ -106,7 +105,6 @@ export class BaseAPI {
         validateStatus: status => status < 400
       })
       .then(response => {
-        console.log(response.headers);
         if (response.status === 304) {
           const lastModified = response.headers["last-modified"];
           this.updateCache(uri, lastModified);

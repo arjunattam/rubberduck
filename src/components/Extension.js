@@ -73,7 +73,7 @@ class Extension extends React.Component {
       this.props.storage.clientId || Authorization.generateClientId();
     let existingToken = this.props.storage.token;
     Authorization.handleTokenState(clientId, existingToken).then(token => {
-      StorageUtils.setAllInStore({ token, clientId }, () => {});
+      StorageUtils.setInSyncStore({ token, clientId }, () => {});
       // Setup user context for sentry
       Raven.setUserContext(Authorization.decodeJWT(token));
     });

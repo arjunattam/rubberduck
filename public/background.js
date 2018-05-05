@@ -65,7 +65,8 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   // https://developer.chrome.com/apps/runtime#property-lastError
   const handlers = {
     AUTH_TRIGGER: triggerAuthFlow,
-    STORAGE_SET_ALL: saveToStorage,
+    STORAGE_SYNC_SET: saveToSyncStorage,
+    STORAGE_LOCAL_SET: saveToLocalStorage,
     STORAGE_GET_ALL: getAllFromStorage,
     HTTP_GET: getAjax,
     HTTP_POST: postAjax
@@ -122,11 +123,17 @@ const triggerAuthFlow = (data, callback) => {
 };
 
 // Handler for saving multiple keys to storage
-const saveToStorage = (data, callback) => {
+const saveToSyncStorage = (data, callback) => {
   // data must have key and value, callback will not have any args
   // Save it using the Chrome extension storage sync API
   // Docs: https://developer.chrome.com/apps/storage
-  largeSync.set(data, function() {
+  chrome.storage.sync.set(data, function() {
+    callback();
+  });
+};
+
+const saveToLocalStorage = (data, callback) => {
+  chrome.storage.local.set(data, function() {
     callback();
   });
 };
@@ -134,8 +141,10 @@ const saveToStorage = (data, callback) => {
 // Handler for getting from storage
 const getAllFromStorage = (data, callback) => {
   // data must have key, callback will be called with value
-  largeSync.get(null, function(storageData) {
-    callback(storageData);
+  chrome.storage.sync.get(null, function(syncData) {
+    chrome.storage.local.get(null, function(localData) {
+      callback({ ...syncData, ...localData });
+    });
   });
 };
 

@@ -68,7 +68,7 @@ class StatusBar extends React.Component {
         // Successful OAuth flow, save refreshed token
         this.setState({ isLoading: false });
         const refreshedToken = getParameterByName("token", response);
-        StorageUtils.setAllInStore({ token: refreshedToken });
+        StorageUtils.setInSyncStore({ token: refreshedToken });
       }
     });
   };
@@ -84,7 +84,7 @@ class StatusBar extends React.Component {
       } else {
         this.setState({ isLoading: false });
         const refreshedToken = getParameterByName("token", response);
-        StorageUtils.setAllInStore({ token: refreshedToken });
+        StorageUtils.setInSyncStore({ token: refreshedToken });
       }
     });
   };
