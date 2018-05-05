@@ -7,8 +7,6 @@
 
 export const SEND_MESSAGE_TYPES = [
   "AUTH_TRIGGER",
-  "STORAGE_SET",
-  "STORAGE_GET",
   "STORAGE_GET_ALL",
   "STORAGE_SET_ALL",
   "HTTP_POST",

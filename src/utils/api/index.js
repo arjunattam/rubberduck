@@ -1,3 +1,5 @@
+import axios from "axios";
+import Moment from "moment";
 import Store from "../../store";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
@@ -6,6 +8,10 @@ import BaseRequest from "./base";
 import { Authorization } from "../authorization";
 import { rootUrl, baseApiUrl } from "./url";
 import { GitRemoteAPI } from "./remote";
+import { hash } from "../data";
+import * as StorageUtils from "../storage";
+
+const CACHED_EXPIRY = 3; // hours
 
 export class BaseAPI {
   constructor() {
@@ -39,6 +45,77 @@ export class BaseAPI {
   refreshToken(token) {
     const uri = `${baseApiUrl}/token_refresh/`;
     return this.baseRequest.post(uri, { token: token });
+  }
+
+  getCached(uri) {
+    const encoded = hash(uri);
+    const { storage } = Store.getState();
+    return storage.apiResponses[encoded] || {};
+  }
+
+  clearCache(existingCache) {
+    const now = Moment.now();
+
+    let filteredObject = Object.keys(existingCache).reduce((res, key) => {
+      const keyExpiry = existingCache[key].expiry;
+      const isValid = Moment(keyExpiry).isAfter(now);
+      console.log(key, isValid, keyExpiry);
+      if (isValid) res[key] = existingCache[key];
+      return res;
+    }, {});
+
+    return filteredObject;
+  }
+
+  updateCache(uri, lastModified) {
+    const encoded = hash(uri);
+    const { storage } = Store.getState();
+    let apiResponses = storage.apiResponses;
+    apiResponses[encoded] = { ...apiResponses[encoded], lastModified };
+    StorageUtils.setAllInStore({ apiResponses }, () => {});
+  }
+
+  setCached(uri, response) {
+    const encoded = hash(uri);
+    const lastModified = response.headers["last-modified"];
+    const { data } = response;
+    const expiry = Moment()
+      .add(CACHED_EXPIRY, "hours")
+      .format();
+    const { storage } = Store.getState();
+
+    if (lastModified && data) {
+      let apiResponses = this.clearCache(storage.apiResponses);
+      apiResponses[encoded] = { lastModified, data, expiry };
+      StorageUtils.setAllInStore({ apiResponses }, () => {});
+    }
+  }
+
+  cacheOrGet(uri) {
+    const headers = { Authorization: `` };
+    const cached = this.getCached(uri);
+    const { lastModified, data: cachedResponse } = cached;
+
+    if (lastModified && cachedResponse) {
+      headers[`If-Modified-Since`] = lastModified;
+    }
+
+    return axios
+      .get(uri, {
+        headers,
+        validateStatus: status => status < 400
+      })
+      .then(response => {
+        console.log(response.headers);
+        if (response.status === 304) {
+          const lastModified = response.headers["last-modified"];
+          this.updateCache(uri, lastModified);
+          return cachedResponse;
+        } else {
+          this.setCached(uri, response);
+          return response.data;
+        }
+      });
   }
 }
 

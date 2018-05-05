@@ -7,7 +7,13 @@ const initialState = {
 
   // Sidebar props
   isSidebarVisible: true,
-  sidebarWidth: 235
+  sidebarWidth: 235,
+
+  // Hover debug
+  hasHoverDebug: false,
+
+  // API response caching: hash of url is the object key
+  apiResponses: {}
 };
 
 export default createReducer(initialState, {
@@ -28,16 +34,6 @@ export default createReducer(initialState, {
     return {
       ...state,
       ...sanitizedPayload
-    };
-  },
-  UPDATE_STORAGE: (state, action) => {
-    console.log("Updated storage data locally", {
-      ...state,
-      ...action.payload
-    });
-    return {
-      ...state,
-      ...action.payload
     };
   }
 });
