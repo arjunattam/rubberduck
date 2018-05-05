@@ -1,5 +1,5 @@
-import axios from "axios";
 import parse from "what-the-diff";
+import Raven from "raven-js";
 import { getGitService, treeAdapter } from "../../adapters";
 
 let BaseGitRemoteAPI = {
@@ -45,20 +45,21 @@ let BaseGitRemoteAPI = {
           if (error.response.status === 401) {
             // Remote has returned auth error
             this.dispatchAuthenticated(false);
+          } else {
+            Raven.captureException(error);
           }
         });
     } else {
       // Make call directly to github using client IP address
       // for efficient rate limit utilisation.
-      const caller = this.getAPICaller(uriPath);
-      return caller
-        .then(response => (response.data ? response.data : response))
-        .catch(error => {
-          if (error.response.status > 400 && error.response.status <= 404) {
-            // Remote has returned auth error
-            this.dispatchAuthenticated(false);
-          }
-        });
+      const fullUrl = this.buildUrl(uriPath);
+      return this.cacheOrGet(fullUrl).catch(error => {
+        const privateRepoErrorCodes = this.getPrivateErrorCodes();
+        const { status } = error.response;
+        if (privateRepoErrorCodes.indexOf(status) >= 0) {
+          this.dispatchAuthenticated(false);
+        }
+      });
     }
   },
 
@@ -95,9 +96,12 @@ let GithubAPI = {
     return `github_passthrough/`;
   },
 
-  getAPICaller(uriPath) {
-    const uri = `https://api.github.com/${uriPath}`;
-    return axios.get(uri, { headers: { Authorization: "" } });
+  buildUrl(path) {
+    return `https://api.github.com/${path}`;
+  },
+
+  getPrivateErrorCodes() {
+    return [401, 404];
   },
 
   getFilesTree(repoDetails) {
@@ -123,8 +127,6 @@ let GithubAPI = {
 
   getCompareFiles(repoDetails) {
     const { username, reponame, headSha, baseSha, isPrivate } = repoDetails;
-    // TODO(arjun): known issue: this does not work with 2 repositories
-    // eg, when branch in the fork is compared to base
     const uriPath = `repos/${username}/${reponame}/compare/${baseSha}...${headSha}`;
     return this.makeConditionalGet(uriPath, isPrivate).then(
       response => response.files
@@ -147,9 +149,12 @@ let BitbucketAPI = {
     return `bitbucket_passthrough/`;
   },
 
-  getAPICaller(uriPath) {
-    const uri = `https://api.bitbucket.org/2.0/${uriPath}`;
-    return axios.get(uri, { headers: { Authorization: "" } });
+  buildUrl(path) {
+    return `https://api.bitbucket.org/2.0/${path}`;
+  },
+
+  getPrivateErrorCodes() {
+    return [403];
   },
 
   getFilesTree(repoDetails) {
@@ -214,7 +219,7 @@ switch (getGitService()) {
     );
     break;
   default:
-    throw new Error("invalid git service");
+    throw new Error("Invalid git service");
 }
 
 export { GitRemoteAPI };

@@ -36,7 +36,7 @@ class Sidebar extends React.Component {
   };
 
   updateStorage = data => {
-    StorageUtils.setAllInStore(data);
+    StorageUtils.setInSyncStore(data);
   };
 
   componentDidMount() {

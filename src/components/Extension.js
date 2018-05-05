@@ -45,8 +45,8 @@ class Extension extends React.Component {
     );
     let hasTokenChanged = prevProps.storage.token !== newProps.storage.token;
     if (hasTokenChanged || !isSameSessionPath) {
-      this.handleSessionInitialization();
-      this.handleFileTreeUpdate();
+      this.initializeSession();
+      this.initializeFileTree();
     }
   }
 
@@ -73,7 +73,7 @@ class Extension extends React.Component {
       this.props.storage.clientId || Authorization.generateClientId();
     let existingToken = this.props.storage.token;
     Authorization.handleTokenState(clientId, existingToken).then(token => {
-      StorageUtils.setAllInStore({ token, clientId }, () => {});
+      StorageUtils.setInSyncStore({ token, clientId }, () => {});
       // Setup user context for sentry
       Raven.setUserContext(Authorization.decodeJWT(token));
     });
@@ -105,7 +105,7 @@ class Extension extends React.Component {
     return token && Authorization.isTokenValid(token);
   };
 
-  handleSessionInitialization() {
+  initializeSession() {
     const repoDetails = this.props.data.repoDetails;
     const hasSessionParams =
       repoDetails.prId || repoDetails.headSha || repoDetails.branch;
@@ -126,7 +126,7 @@ class Extension extends React.Component {
     }
   }
 
-  handleFileTreeUpdate() {
+  initializeFileTree() {
     let repoDetails = this.props.data.repoDetails;
 
     if (repoDetails.username && repoDetails.reponame) {

@@ -65,9 +65,8 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   // https://developer.chrome.com/apps/runtime#property-lastError
   const handlers = {
     AUTH_TRIGGER: triggerAuthFlow,
-    STORAGE_SET: saveKeyToStorage,
-    STORAGE_GET: getFromStorage,
-    STORAGE_SET_ALL: saveToStorage,
+    STORAGE_SYNC_SET: saveToSyncStorage,
+    STORAGE_LOCAL_SET: saveToLocalStorage,
     STORAGE_GET_ALL: getAllFromStorage,
     HTTP_GET: getAjax,
     HTTP_POST: postAjax
@@ -124,7 +123,7 @@ const triggerAuthFlow = (data, callback) => {
 };
 
 // Handler for saving multiple keys to storage
-const saveToStorage = (data, callback) => {
+const saveToSyncStorage = (data, callback) => {
   // data must have key and value, callback will not have any args
   // Save it using the Chrome extension storage sync API
   // Docs: https://developer.chrome.com/apps/storage
@@ -133,15 +132,8 @@ const saveToStorage = (data, callback) => {
   });
 };
 
-// Handler for saving to storage
-const saveKeyToStorage = (data, callback) => {
-  // data must have key and value, callback will not have any args
-  // Save it using the Chrome extension storage sync API
-  // Docs: https://developer.chrome.com/apps/storage
-  const { key, value } = data;
-  const dataToSave = {};
-  dataToSave[key] = value;
-  chrome.storage.sync.set(dataToSave, function() {
+const saveToLocalStorage = (data, callback) => {
+  chrome.storage.local.set(data, function() {
     callback();
   });
 };
@@ -149,17 +141,10 @@ const saveKeyToStorage = (data, callback) => {
 // Handler for getting from storage
 const getAllFromStorage = (data, callback) => {
   // data must have key, callback will be called with value
-  chrome.storage.sync.get(null, function(storageData) {
-    callback(storageData);
-  });
-};
-
-// Handler for getting from storage
-const getFromStorage = (data, callback) => {
-  // data must have key, callback will be called with value
-  const { key } = data;
-  chrome.storage.sync.get(key, function(value) {
-    callback(value[key]);
+  chrome.storage.sync.get(null, function(syncData) {
+    chrome.storage.local.get(null, function(localData) {
+      callback({ ...syncData, ...localData });
+    });
   });
 };
 

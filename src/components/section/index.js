@@ -2,6 +2,7 @@ import React from "react";
 import { bindActionCreators } from "redux";
 import SectionHeader from "./Section";
 import ExpandedCode from "../common/ExpandedCode";
+import { getGitService } from "../../adapters";
 import * as DataActions from "../../actions/dataActions";
 import "./Section.css";
 
@@ -59,6 +60,15 @@ export class BaseReaderSection extends BaseSection {
     <div className="section-zero-state">{`No results found`}</div>
   );
 
+  getServiceLink = (username, reponame, gitId, filePath, line) => {
+    switch (getGitService()) {
+      case "github":
+        return `/${username}/${reponame}/blob/${gitId}/${filePath}#L${line}`;
+      case "bitbucket":
+        return `/${username}/${reponame}/src/${gitId}/${filePath}#lines-${line}`;
+    }
+  };
+
   getFileLink = (fileSha, filePath, lineNumber) => {
     let shaId = "";
     const { base, head } = this.props.data.session.payload;
@@ -72,7 +82,7 @@ export class BaseReaderSection extends BaseSection {
     const { username, reponame, branch } = this.props.data.repoDetails;
     const gitId = shaId || branch;
     const offsetLine = lineNumber + 1;
-    return `/${username}/${reponame}/blob/${gitId}/${filePath}#L${offsetLine}`;
+    return this.getServiceLink(username, reponame, gitId, filePath, offsetLine);
   };
 }
 
