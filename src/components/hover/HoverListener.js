@@ -96,12 +96,17 @@ class HoverListener extends React.Component {
     );
   };
 
-  render() {
+  isDebugging = () => {
     const { hasHoverDebug } = this.props.storage;
+    // Can never debug in production
+    return hasHoverDebug && process.env.REACT_APP_BACKEND_ENV === "local";
+  };
+
+  render() {
     return (
       <div>
         <HoverElement {...this.props} {...this.state} />
-        {hasHoverDebug ? this.renderDebugger() : null}
+        {this.isDebugging() ? this.renderDebugger() : null}
       </div>
     );
   }
