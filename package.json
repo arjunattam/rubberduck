@@ -41,10 +41,11 @@
     "build": "react-app-rewired build && node scripts/helpers.js",
     "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",
     "pack": "npm run build && npm run gen-crx",
-    "test": "react-app-rewired test --env=jsdom",
+    "test": "TEST=true react-app-rewired test --env=jsdom",
     "sentry-upload": "sh scripts/sentry.sh",
     "gen-zip": "rm -f bundle.zip && zip -r9 bundle.zip build/* -x *.map",
-    "chrome-build": "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip && npm run sentry-upload",
+    "chrome-build":
+      "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip && npm run sentry-upload",
     "eject": "react-app-rewired eject"
   },
   "devDependencies": {

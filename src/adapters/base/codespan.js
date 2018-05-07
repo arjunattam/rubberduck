@@ -4,7 +4,7 @@ const POST_FILL_CLASS = "mercury-span-filled";
 
 const delimiterChars = "'.:\\\"$+<=>^` \\t,\\(\\)\\{\\}\\[\\]";
 
-const delimiterSplit = string => {
+export const delimiterSplit = string => {
   // This method splits the string with the delimiters
   // but also returns the delimiters as array elements in the output
 
@@ -14,7 +14,7 @@ const delimiterSplit = string => {
   // Now: ["from", " django", ".conf", " import", " settings"]
   let finalSplit = [];
   lookaheadSplit.forEach(element => {
-    const matcher = new RegExp(`([${delimiterChars}])+(.*)`);
+    const matcher = new RegExp(`([${delimiterChars}])+(.+)`);
     const match = element.match(matcher);
     if (match) {
       finalSplit.push(match[1], match[2]);
@@ -29,7 +29,6 @@ const delimiterSplit = string => {
 };
 
 const constructNodeHTML = childText => {
-  // const childText = node.nodeValue;
   const splitText = delimiterSplit(childText);
   const spannedChild = splitText.map(text => {
     const delimiterMatcher = new RegExp(`[${delimiterChars}]`);

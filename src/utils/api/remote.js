@@ -203,23 +203,15 @@ let BitbucketAPI = {
   getPRInfo(repoDetails) {}
 };
 
-let GitRemoteAPI = {};
+const getRemote = () => {
+  return process.env.TEST === "true" || getGitService() === "github"
+    ? GithubAPI
+    : BitbucketAPI;
+};
 
-switch (getGitService()) {
-  case "github":
-    GitRemoteAPI = Object.assign(
-      {},
-      Object.assign({}, BaseGitRemoteAPI, GithubAPI)
-    );
-    break;
-  case "bitbucket":
-    GitRemoteAPI = Object.assign(
-      {},
-      Object.assign({}, BaseGitRemoteAPI, BitbucketAPI)
-    );
-    break;
-  default:
-    throw new Error("Invalid git service");
-}
+const RemoteAPI = Object.assign(
+  {},
+  Object.assign({}, BaseGitRemoteAPI, getRemote())
+);
 
-export { GitRemoteAPI };
+export default RemoteAPI;
