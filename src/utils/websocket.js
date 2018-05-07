@@ -1,8 +1,5 @@
 import Store from "../store";
 import { bindActionCreators } from "redux";
-import io from "socket.io-client";
-import parser from "socket.io-json-parser";
-
 import WebSocketAsPromised from "websocket-as-promised";
 import Raven from "raven-js";
 import * as DataActions from "../actions/dataActions";
@@ -11,25 +8,6 @@ import { getGitService } from "../adapters";
 
 function exponentialBackoff(attempt, delay) {
   return Math.floor(Math.random() * Math.pow(2, attempt) * delay);
-}
-
-class BaseWebSocketIO {
-  constructor() {
-    this.socket = null;
-  }
-
-  createWebsocket = (token, onClose) => {
-    if (this.socket === null) {
-      const baseWsUrl = rootUrl.replace("http", "ws");
-      const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
-      this.socket = io(wsUrl, {
-        query: { token },
-        parser
-      });
-    }
-  };
-
-  tearDown = () => {};
 }
 
 /**

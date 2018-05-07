@@ -26,8 +26,6 @@
     "redux-promise-middleware": "^5.0.0",
     "redux-thunk": "^2.2.0",
     "shelljs": "^0.8.1",
-    "socket.io-client": "^2.1.0",
-    "socket.io-json-parser": "^2.1.0",
     "status-indicator": "^1.0.9",
     "websocket-as-promised": "^0.6.0",
     "what-the-diff": "^0.4.0"
@@ -46,8 +44,7 @@
     "test": "TEST=true react-app-rewired test --env=jsdom",
     "sentry-upload": "sh scripts/sentry.sh",
     "gen-zip": "rm -f bundle.zip && zip -r9 bundle.zip build/* -x *.map",
-    "chrome-build":
-      "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip && npm run sentry-upload",
+    "chrome-build": "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip && npm run sentry-upload",
     "eject": "react-app-rewired eject"
   },
   "devDependencies": {
