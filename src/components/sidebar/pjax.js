@@ -44,6 +44,10 @@ const setupPjaxHelper = () => {
   }
 };
 
+/**
+ * TODO(arjun): add callback to the loadUrl method, so that we can
+ * use it for highlighted the line on `Open file`
+ */
 export const loadUrl = path => GlobalPjax.loadUrl(path);
 
 export const setupPjax = () => {

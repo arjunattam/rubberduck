@@ -128,11 +128,43 @@ export default class ExpandedCode extends React.Component {
       : false;
   };
 
+  isFileAlreadyOpen = () =>
+    window.location.pathname.indexOf(this.props.filePath) >= 0;
+
+  scrollToDOMSelector = elementSelector => {
+    const element = document.querySelector(elementSelector);
+    const yOffset = window.scrollY + element.getBoundingClientRect().y - 75;
+    window.scrollTo(0, yOffset);
+  };
+
   scrollTo = () => {
     const elementSelector = this.getFileboxSelector(this.props.filePath);
-    const fileBox = document.querySelector(elementSelector);
-    const yOffset = window.scrollY + fileBox.getBoundingClientRect().y - 75;
-    window.scrollTo(0, yOffset);
+    return this.scrollToDOMSelector(elementSelector);
+  };
+
+  removeExistingHighlights = () => {
+    const highlightedElements = document.querySelectorAll(
+      "td.blob-code.highlighted"
+    );
+
+    for (let i = 0; i < highlightedElements.length; ++i) {
+      highlightedElements[i].classList.remove("highlighted");
+    }
+  };
+
+  highlightLine = lineId => {
+    // lineId is L35
+    this.removeExistingHighlights();
+    const siblingId = `LC${lineId.substr(1)}`;
+    const tdElement = document.querySelector(`td#${siblingId}`);
+    tdElement.classList.add("highlighted");
+  };
+
+  scrollToLine = () => {
+    // fileLink looks like /vitalets/websocket-as-promised/blob/master/src/index.js#L39
+    const lineId = this.props.fileLink.match(/.*#(L[0-9]+)/)[1];
+    this.highlightLine(lineId);
+    return this.scrollToDOMSelector(`td#${lineId}`);
   };
 
   clickHandler = event => {
@@ -143,6 +175,9 @@ export default class ExpandedCode extends React.Component {
       case "github":
         if (isGithubCompareView()) {
           return this.scrollTo();
+        } else if (this.isFileAlreadyOpen()) {
+          // File is open, scroll to line
+          return this.scrollToLine();
         } else {
           return loadUrl(this.props.fileLink);
         }
@@ -158,7 +193,7 @@ export default class ExpandedCode extends React.Component {
 
     switch (service) {
       case "github":
-        if (isGithubCompareView()) {
+        if (isGithubCompareView() || this.isFileAlreadyOpen()) {
           return "Scroll to";
         } else {
           return "Open file";
