@@ -14,7 +14,7 @@ export const delimiterSplit = string => {
   // Now: ["from", " django", ".conf", " import", " settings"]
   let finalSplit = [];
   lookaheadSplit.forEach(element => {
-    const matcher = new RegExp(`([${delimiterChars}])+(.*)`);
+    const matcher = new RegExp(`([${delimiterChars}])+(.+)`);
     const match = element.match(matcher);
     if (match) {
       finalSplit.push(match[1], match[2]);

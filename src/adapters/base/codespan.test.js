@@ -1,18 +1,8 @@
 import { delimiterSplit } from "./codespan";
 
 test("token split works", () => {
-  const TEST_STRING = "from django.conf import settings";
-  const EXPECTED = [
-    "from",
-    " ",
-    "django",
-    ".",
-    "conf",
-    " ",
-    "import",
-    " ",
-    "settings"
-  ];
+  const TEST_STRING = "from django.conf import";
+  const EXPECTED = ["from", " ", "django", ".", "conf", " ", "import"];
   expect(delimiterSplit(TEST_STRING)).toEqual(EXPECTED);
 
   const TEST_STRING_2 = "(TEST)";

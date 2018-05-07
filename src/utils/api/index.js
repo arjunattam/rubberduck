@@ -7,7 +7,7 @@ import * as DataActions from "../../actions/dataActions";
 import BaseRequest from "./base";
 import { Authorization } from "../authorization";
 import { rootUrl, baseApiUrl } from "./url";
-import { GitRemoteAPI } from "./remote";
+import GitRemoteAPI from "./remote";
 import { hash } from "../data";
 import * as StorageUtils from "../storage";
 
