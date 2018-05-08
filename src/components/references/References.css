@@ -9,29 +9,31 @@
 }
 
 .reference-container {
-  background: #fff;
   padding-bottom: 10px;
   transition: max-height 200ms ease-in;
 }
 
 .reference-files {
-  margin: 20px 0;
+  margin: 10px 0;
+}
+
+.reference-title-container {
+  padding: 7px 7px 0 12px;
 }
 
 .reference-title {
-  height: 30px;
-  padding: 10px 7px 5px 7px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .reference-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.reference-count {
-  margin-top: 3px;
-  color: #666;
+  font-size: 13px;
+  font-weight: bold;
 }
 
 .reference-items {

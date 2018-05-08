@@ -4,6 +4,7 @@ import SectionHeader from "./Section";
 import ExpandedCode from "../common/ExpandedCode";
 import { getGitService } from "../../adapters";
 import * as DataActions from "../../actions/dataActions";
+import SmallCodeSnippet from "../common/SmallCodeSnippet";
 import "./Section.css";
 
 export class BaseSection extends React.Component {
@@ -66,6 +67,8 @@ export class BaseReaderSection extends BaseSection {
         return `/${username}/${reponame}/blob/${gitId}/${filePath}#L${line}`;
       case "bitbucket":
         return `/${username}/${reponame}/src/${gitId}/${filePath}#lines-${line}`;
+      default:
+        return "";
     }
   };
 
@@ -123,4 +126,22 @@ export class BaseSectionItem extends React.Component {
     this.state.isHovering ? (
       <ExpandedCode {...this.props} style={this.getSnippetStyle()} />
     ) : null;
+
+  render() {
+    return (
+      <div
+        className="reference-item"
+        onMouseEnter={this.handleMouseEnter}
+        onMouseLeave={this.handleMouseLeave}
+        ref={"container"}
+      >
+        <SmallCodeSnippet
+          contents={this.props.codeSnippet}
+          contentLine={this.props.lineNumber - this.props.startLineNumber}
+          lineNumber={this.props.lineNumber}
+        />
+        {this.renderExpandedCode()}
+      </div>
+    );
+  }
 }

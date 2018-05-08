@@ -1,14 +1,16 @@
 import React from "react";
 import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
-import FileSection from "./FileSection";
+import { ReferenceFileSection } from "../section/FileSection";
+import InlineButton from "../common/InlineButton";
 import "./References.css";
 
 class References extends BaseReaderSection {
   sectionName = "usages";
 
   state = {
-    references: {}
+    references: {},
+    hasCollapsedFiles: false
   };
 
   getReferenceObject = (reference, hoverResult) => {
@@ -92,26 +94,55 @@ class References extends BaseReaderSection {
   getCountText = () =>
     this.state.count === 1 ? `1 usage` : `${this.state.count} usages`;
 
+  collapseFileSections = () =>
+    this.setState({ hasCollapsedFiles: !this.state.hasCollapsedFiles });
+
+  renderCollapseButton = () => {
+    const numFiles = Object.keys(this.state.references).length;
+
+    if (numFiles <= 1) {
+      // Don't show collapse button if there's just one file
+      return null;
+    }
+
+    const filesText = numFiles === 1 ? `1 file` : `${numFiles} files`;
+    const canCollapse = !this.state.hasCollapsedFiles;
+    const collapseText = canCollapse ? `Collapse` : `Expand`;
+
+    return (
+      <div style={{ textAlign: "center" }}>
+        <InlineButton
+          onClick={this.collapseFileSections}
+          text={`${collapseText} ${filesText}`}
+        />
+      </div>
+    );
+  };
+
   renderContainerTitle = () => (
-    <div className="reference-title">
-      <div className="reference-name monospace">{this.state.name}</div>
-      <div className="reference-count">{this.getCountText()}</div>
+    <div className="reference-title-container">
+      <div className="reference-title">
+        <div className="reference-name monospace">{this.state.name}</div>
+        <div className="reference-count tree-status">{this.getCountText()}</div>
+      </div>
+      {this.renderCollapseButton()}
     </div>
   );
 
   renderFileSections = () =>
     // TODO(arjun): sort by nearness to the current file
     Object.keys(this.state.references).map(key => (
-      <FileSection
+      <ReferenceFileSection
         name={key}
         items={this.state.references[key]}
         key={key}
         sidebarWidth={this.props.storage.sidebarWidth}
         fileContents={this.props.data.fileContents}
+        isCollapsed={this.state.hasCollapsedFiles}
       />
     ));
 
-  renderReferences = () =>
+  renderResult = () =>
     this.state.count > 0 ? (
       <div className="reference-container">
         {this.renderContainerTitle()}
@@ -122,7 +153,7 @@ class References extends BaseReaderSection {
     );
 
   renderContents = () =>
-    this.state.name ? this.renderReferences() : this.renderZeroState();
+    this.state.name ? this.renderResult() : this.renderZeroState();
 
   render() {
     let referencesClassName = this.isVisible()

@@ -1,39 +1,23 @@
-.code-node-container {
-  padding-bottom: 5px;
-  font-size: 12px;
-}
-
-.code-node-name {
-  padding-left: 20px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.code-node-file {
-  padding: 12px 5px 0px 5px;
-  color: #999;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.code-node-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .code-node-button {
   display: inline-block;
   vertical-align: middle;
   font-weight: bold;
-  background: #f1f1f1;
+  background: #f1f8ff;
+  border: 1px solid #c8e1ff;
   color: #444;
   text-align: center;
   border-radius: 10px;
   padding: 2px 6px 2px 6px;
-  margin: 0px 7px;
+  margin: 0px 1px;
   font-size: 10px;
   text-transform: uppercase;
+  cursor: pointer;
+}
+
+.code-node-button:hover {
+  background: #c8e1ff;
+}
+
+.code-node-button a:hover {
+  text-decoration: none;
 }

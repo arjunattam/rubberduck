@@ -3,27 +3,12 @@
 }
 
 .definitions-section {
-  background: rgb(250, 251, 252);
   max-height: calc(100vh - 207px);
   transition: max-height 200ms ease-in;
-}
-
-.definition-item {
-  background: #fff;
-  cursor: pointer;
-  border-top: 1px solid #f1f8ff;
-  border-bottom: 1px solid #f1f8ff;
-  margin: 10px 0px;
-}
-
-.definition-item:hover {
-  border-top: 1px solid #c8e1ff;
-  border-bottom: 1px solid #c8e1ff;
 }
 
 .definition-docstring {
   background: #f1f8ff;
   padding: 5px;
-  padding-left: 20px;
-  margin: 5px 0px 5px 0px;
+  padding-left: 12px;
 }

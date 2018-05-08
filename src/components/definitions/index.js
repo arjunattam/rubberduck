@@ -1,7 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
-import DefinitionItem from "./DefinitionItem";
+import { DefinitionFileSection } from "../section/FileSection";
+import Docstring from "../common/Docstring";
 import "./Definitions.css";
 
 /**
@@ -29,7 +30,6 @@ class Definitions extends BaseReaderSection {
       : null;
 
   getSelectionData = hoverResult => {
-    // const hoverResult = this.readPage();
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
@@ -37,14 +37,19 @@ class Definitions extends BaseReaderSection {
     if (isValidResult) {
       this.DataActions.callDefinitions(hoverResult).then(response => {
         const result = response.value.result;
+        const filePath = this.getFilePath(result);
+        const { fileSha } = hoverResult;
+        const lineNumber = this.getLine(result);
+        const fileLink = this.getFileLink(fileSha, filePath, lineNumber);
         const definition = {
           // Can use result.signature also for the name key
           // Verify on go: https://github.com/samuel/go-zookeeper/blob/master/zk/server_help.go#L176
           name: result.name || hoverResult.name,
-          filePath: this.getFilePath(result),
+          filePath,
           fileSha: hoverResult.fileSha,
+          fileLink,
           startLineNumber: this.getStartLine(result),
-          lineNumber: this.getLine(result),
+          lineNumber,
           docstring: result.docstring,
           codeSnippet: result.definition ? result.definition.contents : ""
         };
@@ -68,24 +73,40 @@ class Definitions extends BaseReaderSection {
     }
   };
 
-  fileContentProps = () => {
+  renderContainerTitle = () => (
+    <div className="reference-title-container">
+      <div className="reference-title">
+        <div className="reference-name monospace">
+          {this.state.definition.name}
+        </div>
+      </div>
+    </div>
+  );
+
+  renderItem = () => {
+    const items = [this.state.definition];
+    const { filePath: name } = this.state.definition;
     const { fileContents } = this.props.data;
-    const { fileSha, filePath } = this.state.definition;
-    const baseOrHead = fileSha === "base" ? fileSha : "head";
-    const contentsInStore = fileContents[baseOrHead][filePath];
-    return contentsInStore
-      ? { codeSnippet: contentsInStore, startLineNumber: 0 }
-      : {};
+    const { sidebarWidth } = this.props.storage;
+    return (
+      <DefinitionFileSection {...{ name, items, fileContents, sidebarWidth }} />
+    );
   };
+
+  renderDocstring = () =>
+    this.state.definition.docstring ? (
+      <div className="definition-docstring">
+        <Docstring docstring={this.state.definition.docstring} />
+      </div>
+    ) : null;
 
   renderResult = () =>
     this.state.definition.filePath ? (
-      <DefinitionItem
-        {...this.state.definition}
-        {...this.fileContentProps()}
-        fileLink={this.buildFileLink()}
-        sidebarWidth={this.props.storage.sidebarWidth}
-      />
+      <div className="reference-container">
+        {this.renderContainerTitle()}
+        {this.renderDocstring()}
+        <div className="reference-files">{this.renderItem()}</div>
+      </div>
     ) : (
       this.renderNoResults()
     );
