@@ -1,4 +1,5 @@
 import React from "react";
+import Octicon from "react-component-octicons";
 import FileIcon from "./fileIcon/FileIcon";
 
 const renderStatus = status => {
@@ -14,7 +15,7 @@ const renderStatus = status => {
   }
 };
 
-const TreeLabel = props => {
+const TreeLabelInner = props => {
   const additions = props.additions ? (
     <span className="tree-additions">{props.additions}</span>
   ) : null;
@@ -41,5 +42,25 @@ const TreeLabel = props => {
     </span>
   );
 };
+
+const LabelTriangle = props => (
+  <Octicon name={"triangle-down"} className="file-triangle" />
+);
+
+const getClassName = isSelected =>
+  `file-container ${isSelected ? "file-selected" : ""}`;
+
+const TreeLabel = props => (
+  <div className={getClassName(props.isSelected)}>
+    <a
+      href={props.href}
+      onClick={props.onClick}
+      style={{ paddingLeft: props.paddingLeft }}
+    >
+      {props.hasTriangle ? <LabelTriangle /> : null}
+      <TreeLabelInner {...props} />
+    </a>
+  </div>
+);
 
 export default TreeLabel;

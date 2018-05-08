@@ -61,11 +61,13 @@
   transform: rotate(-90deg);
 }
 
-.folder-structure-container .file-triangle {
+/* Same used by usages file sections and tree folder sections */
+div .file-triangle {
   transform: rotate(0);
 }
 
-.folder-structure-container.collapsed .file-triangle {
+/* Same used by usages file sections and tree folder sections */
+div.collapsed .file-triangle {
   transform: rotate(-90deg);
 }
 

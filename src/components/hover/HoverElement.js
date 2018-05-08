@@ -4,8 +4,8 @@ import * as DataActions from "../../actions/dataActions";
 import debounce from "debounce";
 import HoverBox from "./HoverBox";
 
-const API_DEBOUNCE_TIMEOUT = 200; // ms
-const VISIBILITY_DEBOUNCE_TIMEOUT = 1000; // ms
+const API_DEBOUNCE_TIMEOUT = 100; // ms
+const VISIBILITY_DEBOUNCE_TIMEOUT = 750; // ms
 const CURSOR_RADIUS = 20; // pixels
 
 /**

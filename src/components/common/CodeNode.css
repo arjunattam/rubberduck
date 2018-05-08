@@ -25,14 +25,15 @@
 }
 
 .code-node-button {
-  width: 54px;
+  display: inline-block;
+  vertical-align: middle;
   font-weight: bold;
   background: #f1f1f1;
-  color: #666;
+  color: #444;
   text-align: center;
   border-radius: 10px;
-  padding: 1px 4px 1px 4px;
-  margin: 10px 5px;
+  padding: 2px 6px 2px 6px;
+  margin: 0px 7px;
   font-size: 10px;
   text-transform: uppercase;
 }

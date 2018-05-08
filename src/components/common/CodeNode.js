@@ -19,8 +19,6 @@ export default class CodeNode extends React.Component {
               <span className="monospace">{this.props.name}</span>
             </div>
           </div>
-
-          <div className="code-node-button">EXPAND</div>
         </div>
 
         {this.props.children}

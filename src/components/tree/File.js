@@ -75,52 +75,40 @@ export default class File extends React.Component {
     }
   };
 
-  renderBasicFile = () => {
-    const padding = this.getPadding();
-    const { username, reponame, branch } = this.props.data.repoDetails;
-    const path = pathAdapter.constructPath(
-      this.props.path,
-      username,
-      reponame,
-      branch
-    );
+  renderFileLabel = (href, onClick, isSelected) => (
+    <TreeLabel
+      {...this.props}
+      icon="file"
+      iconColor="#999"
+      paddingLeft={this.getPadding()}
+      href={href}
+      onClick={onClick}
+      isSelected={isSelected}
+    />
+  );
 
-    return (
-      <a href={path} style={{ paddingLeft: padding }}>
-        <TreeLabel {...this.props} icon="file" iconColor="#999" />
-      </a>
-    );
+  renderBasicFile = isSelected => {
+    const { path } = this.props;
+    const { username, reponame, branch } = this.props.data.repoDetails;
+    const href = pathAdapter.constructPath(path, username, reponame, branch);
+    return this.renderFileLabel(href, null, isSelected);
   };
 
-  renderPRFile = () => {
+  renderPRFile = isSelected => {
     // This is a PR element, so we will scroll to file changed on the element
     // This might trigger pjax call to open the "files changed" view on Github
     // if that has not been opened already.
-    const pl = this.getPadding();
     const filesChangedUrl = this.getFilesChangedUrl();
-
-    return (
-      <a
-        href={filesChangedUrl}
-        onClick={e => this.clickHandler(e)}
-        style={{ paddingLeft: pl }}
-      >
-        <TreeLabel {...this.props} icon="file" iconColor="#999" />
-      </a>
-    );
+    const onClick = e => this.clickHandler(e);
+    return this.renderFileLabel(filesChangedUrl, onClick, isSelected);
   };
 
   render() {
-    const isPRElement =
-      this.props.additions || this.props.deletions || this.props.status;
+    const { additions, deletions, status } = this.props;
+    const isPR = additions || deletions || status;
     const isSelected = this.props.currentPath === this.props.path;
-    let className = "file-container";
-    className += isSelected ? " file-selected" : "";
-
-    return (
-      <div className={className}>
-        {isPRElement ? this.renderPRFile() : this.renderBasicFile()}
-      </div>
-    );
+    return isPR
+      ? this.renderPRFile(isSelected)
+      : this.renderBasicFile(isSelected);
   }
 }

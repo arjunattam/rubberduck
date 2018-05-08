@@ -1,7 +1,6 @@
 import React from "react";
 import File from "./File";
 import TreeLabel from "./TreeLabel";
-import Octicon from "react-component-octicons";
 
 const PADDING_CONST = 12; // in pixels
 
@@ -32,28 +31,19 @@ export const renderChildren = (children, depth, parentProps, currentPath) => {
   return (
     <div>
       {childrenToRender.map(element => {
+        const childProps = {
+          ...parentProps,
+          ...element,
+          depth: depth + 1,
+          key: element.path,
+          currentPath
+        };
         if (element.children.length > 0) {
           // Ordering of props is important since the element
           // needs to override the parentProps
-          return (
-            <Folder
-              {...parentProps}
-              {...element}
-              depth={depth + 1}
-              key={element.path}
-              currentPath={currentPath}
-            />
-          );
+          return <Folder {...childProps} />;
         } else {
-          return (
-            <File
-              {...parentProps}
-              {...element}
-              depth={depth + 1}
-              key={element.path}
-              currentPath={currentPath}
-            />
-          );
+          return <File {...childProps} />;
         }
       })}
     </div>
@@ -98,27 +88,26 @@ class Folder extends React.Component {
     });
   }
 
+  renderFolderLabel = () => (
+    <TreeLabel
+      {...this.props}
+      onClick={this.toggleCollapsed}
+      paddingLeft={this.getPadding()}
+      icon="file-directory"
+      iconColor="#8294ac"
+      hasTriangle={true}
+    />
+  );
+
   render() {
-    const pl = this.getPadding();
-    const triangle = (
-      <Octicon name={"triangle-down"} className="file-triangle" />
-    );
+    const { isCollapsed } = this.state;
     let containerClassName = "folder-structure-container";
-    containerClassName += this.state.isCollapsed ? " collapsed" : "";
+    containerClassName += isCollapsed ? " collapsed" : "";
 
     return (
       <div className={containerClassName}>
-        <div className={"file-container"}>
-          <a onClick={this.toggleCollapsed} style={{ paddingLeft: pl }}>
-            {triangle}{" "}
-            <TreeLabel
-              {...this.props}
-              icon="file-directory"
-              iconColor="#8294ac"
-            />
-          </a>
-        </div>
-        {this.state.isCollapsed ? null : this.renderFolderStructure()}
+        {this.renderFolderLabel()}
+        {isCollapsed ? null : this.renderFolderStructure()}
       </div>
     );
   }

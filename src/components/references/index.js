@@ -1,42 +1,53 @@
 import React from "react";
 import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
-import ReferenceItem from "./ReferenceItem";
+import FileSection from "./FileSection";
 import "./References.css";
 
 class References extends BaseReaderSection {
   sectionName = "usages";
 
   state = {
-    references: []
+    references: {}
   };
 
-  getReferenceItems = (apiResponse, hoverResult) => {
-    return apiResponse.references.map(reference => {
-      const parent = reference.parent;
-      let parentName = "";
+  getReferenceObject = (reference, hoverResult) => {
+    const parent = reference.parent;
+    let parentName = "";
 
-      if (parent !== null) {
-        parentName = parent.name;
+    if (parent !== null) {
+      parentName = parent.name;
+    } else {
+      parentName = reference.location.path.split("/").slice(-1)[0];
+    }
+
+    return {
+      name: parentName,
+      filePath: reference.location.path,
+      fileSha: hoverResult.fileSha,
+      fileLink: this.getFileLink(
+        hoverResult.fileSha,
+        reference.location.path,
+        reference.location.range.start.line
+      ),
+      lineNumber: reference.location.range.start.line,
+      codeSnippet: reference.contents,
+      startLineNumber: reference.contents_start_line
+    };
+  };
+
+  getReferenceItems = (references, hoverResult) =>
+    references.reduce((accumulator, reference) => {
+      const filePath = reference.location.path;
+      const obj = this.getReferenceObject(reference, hoverResult);
+
+      if (filePath in accumulator) {
+        accumulator[filePath].push(obj);
       } else {
-        parentName = reference.location.path.split("/").slice(-1)[0];
+        accumulator[filePath] = [obj];
       }
-
-      return {
-        name: parentName,
-        filePath: reference.location.path,
-        fileSha: hoverResult.fileSha,
-        fileLink: this.getFileLink(
-          hoverResult.fileSha,
-          reference.location.path,
-          reference.location.range.start.line
-        ),
-        lineNumber: reference.location.range.start.line,
-        codeSnippet: reference.contents,
-        startLineNumber: reference.contents_start_line
-      };
-    });
-  };
+      return accumulator;
+    }, []);
 
   getSelectionData = hoverResult => {
     const isValidResult =
@@ -50,7 +61,8 @@ class References extends BaseReaderSection {
           {
             name: hoverResult.name,
             count: result.count,
-            references: this.getReferenceItems(result, hoverResult)
+            // references is an object {filepath: array of reference items, ...}
+            references: this.getReferenceItems(result.references, hoverResult)
           },
           () => this.getFileContents()
         );
@@ -87,35 +99,23 @@ class References extends BaseReaderSection {
     </div>
   );
 
-  renderItems = () => {
-    const { sidebarWidth } = this.props.storage;
-    const { fileContents } = this.props.data;
-    const referenceItems = this.state.references.map((reference, index) => {
-      const { fileSha, filePath } = reference;
-      const baseOrHead = fileSha === "base" ? fileSha : "head";
-      const contentsInStore = fileContents[baseOrHead][filePath];
-      // Get contents from store if available, else use what we have
-      const fileProps = contentsInStore
-        ? { codeSnippet: contentsInStore, startLineNumber: 0 }
-        : {};
-
-      return (
-        <ReferenceItem
-          {...reference}
-          key={index}
-          sidebarWidth={sidebarWidth}
-          {...fileProps}
-        />
-      );
-    });
-    return <div className="reference-items">{referenceItems}</div>;
-  };
+  renderFileSections = () =>
+    // TODO(arjun): sort by nearness to the current file
+    Object.keys(this.state.references).map(key => (
+      <FileSection
+        name={key}
+        items={this.state.references[key]}
+        key={key}
+        sidebarWidth={this.props.storage.sidebarWidth}
+        fileContents={this.props.data.fileContents}
+      />
+    ));
 
   renderReferences = () =>
     this.state.count > 0 ? (
       <div className="reference-container">
         {this.renderContainerTitle()}
-        {this.renderItems()}
+        <div className="reference-files">{this.renderFileSections()}</div>
       </div>
     ) : (
       this.renderNoResults()

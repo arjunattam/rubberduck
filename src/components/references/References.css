@@ -9,9 +9,13 @@
 }
 
 .reference-container {
-  background: rgb(250, 251, 252);
+  background: #fff;
   padding-bottom: 10px;
   transition: max-height 200ms ease-in;
+}
+
+.reference-files {
+  margin: 20px 0;
 }
 
 .reference-title {
