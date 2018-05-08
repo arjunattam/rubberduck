@@ -19,6 +19,21 @@ const HelperText = props => (
   </div>
 );
 
+const HelperLoader = props => (
+  <div
+    style={{
+      width: 10,
+      height: 10,
+      margin: 0,
+      paddingRight: 10,
+      paddingBottom: 10,
+      textAlign: "right"
+    }}
+  >
+    <div className="status-loader" />
+  </div>
+);
+
 const ExpandHelper = props => (
   <div className="expand-helper">
     <HelperText
@@ -33,6 +48,7 @@ const ExpandHelper = props => (
         action={"expand"}
       />
     ) : null}
+    {props.isLoading ? <HelperLoader textAlign={"right"} /> : null}
   </div>
 );
 
@@ -139,6 +155,7 @@ export default class HoverBox extends React.Component {
     <ExpandHelper
       isExpandable={this.isDocstringExpandable()}
       isHighlighted={this.props.isHighlighted}
+      isLoading={this.props.isLoading}
     />
   );
 

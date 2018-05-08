@@ -4,11 +4,6 @@
 
 .tree-content {
   overflow: hidden;
-  transition: max-height 400ms linear;
-}
-
-.tree-content-visible {
-  max-height: 3000px;
 }
 
 .tree-content-hidden {

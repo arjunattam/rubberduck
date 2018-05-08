@@ -162,6 +162,10 @@ export default class HoverElement extends React.Component {
     if (this.visibilityDebFunc !== undefined) this.visibilityDebFunc.clear();
   };
 
+  clearApiResult = () => {
+    if (this.state.apiResult.name) this.setState({ apiResult: {} });
+  };
+
   setupDebounce = () => {
     this.apiDebFunc = debounce(() => this.callAPI(), API_DEBOUNCE_TIMEOUT);
     this.visibilityDebFunc = debounce(
@@ -171,6 +175,8 @@ export default class HoverElement extends React.Component {
     this.apiDebFunc();
     this.visibilityDebFunc();
   };
+
+  isLoading = () => this.props.data.section.isLoading.hover;
 
   componentDidUpdate(prevProps, prevState) {
     const { hoverResult: prevResult } = prevProps;
@@ -186,6 +192,7 @@ export default class HoverElement extends React.Component {
       // The component maintains two debounce functions: one for the API call
       // and the other for the hover box visibility.
       this.clearDebouce();
+      this.clearApiResult();
       const { hoverResult } = this.props;
       this.setState({ hoverResult, isVisible: false });
       this.setupDebounce();
@@ -206,6 +213,6 @@ export default class HoverElement extends React.Component {
   }
 
   render() {
-    return <HoverBox {...this.state} />;
+    return <HoverBox {...this.state} isLoading={this.isLoading()} />;
   }
 }
