@@ -1,5 +1,6 @@
-.small-code {
-  margin: 12px 0;
+.small-code pre {
+  padding: 3px 0;
+  background-color: #f0f1f3 !important;
 }
 
 .small-code code,
@@ -7,6 +8,10 @@
   margin: 0;
   padding: 0;
   overflow-x: hidden;
+}
+
+.small-code pre code {
+  font-size: 11px;
 }
 
 .small-code pre code span,

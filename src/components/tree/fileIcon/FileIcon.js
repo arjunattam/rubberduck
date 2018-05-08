@@ -26,7 +26,6 @@ export default class FileIcon extends React.Component {
       marginRight: "3px",
       paddingLeft: "5px",
       paddingRight: "5px",
-      height: 15,
       color: this.props.octColor
     };
     return <Octicon name={this.props.octicon} style={octIconStyle} />;

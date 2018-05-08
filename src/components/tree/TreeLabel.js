@@ -2,18 +2,8 @@ import React from "react";
 import Octicon from "react-component-octicons";
 import FileIcon from "./fileIcon/FileIcon";
 
-const renderStatus = status => {
-  switch (status) {
-    case "renamed":
-      return <span className="tree-status">renamed</span>;
-    case "added":
-      return <span className="tree-status">new</span>;
-    case "deleted":
-      return <span className="tree-status">deleted</span>;
-    default:
-      return null;
-  }
-};
+const renderStatus = text =>
+  text ? <span className="tree-status">{text}</span> : null;
 
 const TreeLabelInner = props => {
   const additions = props.additions ? (

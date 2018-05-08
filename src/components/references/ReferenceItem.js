@@ -1,7 +1,6 @@
 import React from "react";
 import { BaseSectionItem } from "../section";
 import SmallCodeSnippet from "../common/SmallCodeSnippet";
-import CodeNode from "../common/CodeNode";
 
 export default class ReferenceItem extends BaseSectionItem {
   render() {
@@ -12,12 +11,11 @@ export default class ReferenceItem extends BaseSectionItem {
         onMouseLeave={this.handleMouseLeave}
         ref={"container"}
       >
-        <CodeNode {...this.props}>
-          <SmallCodeSnippet
-            contents={this.props.codeSnippet}
-            lineNumber={this.props.lineNumber - this.props.startLineNumber}
-          />
-        </CodeNode>
+        <SmallCodeSnippet
+          contents={this.props.codeSnippet}
+          contentLine={this.props.lineNumber - this.props.startLineNumber}
+          lineNumber={this.props.lineNumber}
+        />
         {this.renderExpandedCode()}
       </div>
     );

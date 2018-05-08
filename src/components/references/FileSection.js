@@ -25,6 +25,7 @@ export default class FileSection extends React.Component {
         onClick={this.toggleCollapsed}
         hasTriangle={true}
         paddingLeft={12}
+        status={this.props.items.length}
       />
     );
   };
