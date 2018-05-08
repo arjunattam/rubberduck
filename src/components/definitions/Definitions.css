@@ -1,12 +1,3 @@
-.definitions-section.collapsed {
-  max-height: 25px;
-}
-
-.definitions-section {
-  max-height: calc(100vh - 207px);
-  transition: max-height 200ms ease-in;
-}
-
 .definition-docstring {
   background: #f1f8ff;
   padding: 5px;

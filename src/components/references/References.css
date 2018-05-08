@@ -1,9 +1,3 @@
-.references-section {
-  max-height: 5000px;
-  transition: max-height 250ms ease-in;
-  font-size: 12px;
-}
-
 .references-section.collapsed {
   max-height: 25px;
 }

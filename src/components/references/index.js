@@ -59,6 +59,7 @@ class References extends BaseReaderSection {
     if (isValidResult) {
       this.DataActions.callUsages(hoverResult).then(response => {
         const { result } = response.value;
+        const { fileSha } = hoverResult;
         this.setState(
           {
             name: hoverResult.name,
@@ -66,27 +67,18 @@ class References extends BaseReaderSection {
             // references is an object {filepath: array of reference items, ...}
             references: this.getReferenceItems(result.references, hoverResult)
           },
-          () => this.getFileContents()
+          () => this.getFileContents(fileSha)
         );
       });
     }
   };
 
-  getFileContents = () => {
-    const filesToQuery = this.state.references.map(reference => {
-      return {
-        filePath: reference.filePath,
-        baseOrHead: reference.fileSha === "base" ? reference.fileSha : "head"
-      };
-    });
-    // Remove duplicates
-    let filtered = filesToQuery.reduce((accumulator, current) => {
-      if (!accumulator.find(({ filePath }) => filePath === current.filePath)) {
-        accumulator.push(current);
-      }
-      return accumulator;
-    }, []);
-    filtered.forEach(fileSignature => {
+  getFileContents = fileSha => {
+    const filesToQuery = Object.keys(this.state.references).map(key => ({
+      filePath: key,
+      baseOrHead: fileSha === "base" ? fileSha : "head"
+    }));
+    filesToQuery.forEach(fileSignature => {
       this.DataActions.callFileContents(fileSignature);
     });
   };

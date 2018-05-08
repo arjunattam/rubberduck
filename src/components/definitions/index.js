@@ -116,8 +116,8 @@ class Definitions extends BaseReaderSection {
 
   render() {
     let definitonClassName = this.isVisible()
-      ? "definitions-section"
-      : "definitions-section collapsed";
+      ? "references-section"
+      : "references-section collapsed";
     return (
       <div className={definitonClassName}>
         {this.renderSectionHeader()}
