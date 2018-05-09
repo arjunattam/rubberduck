@@ -1,14 +1,5 @@
-.tree-container {
-  background: #fff;
-}
-
 .tree-content {
   overflow: hidden;
-  transition: max-height 400ms linear;
-}
-
-.tree-content-visible {
-  max-height: 3000px;
 }
 
 .tree-content-hidden {
@@ -25,13 +16,16 @@
 }
 
 .file-container a {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  width: -moz-available;
+  width: -webkit-fill-available;
+  width: fill-available;
   cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   height: 25px;
   line-height: 25px;
+  padding-right: 7px;
 }
 
 .file-container a:hover {
@@ -66,11 +60,13 @@
   transform: rotate(-90deg);
 }
 
-.folder-structure-container .file-triangle {
+/* Same used by usages file sections and tree folder sections */
+div .file-triangle {
   transform: rotate(0);
 }
 
-.folder-structure-container.collapsed .file-triangle {
+/* Same used by usages file sections and tree folder sections */
+div.collapsed .file-triangle {
   transform: rotate(-90deg);
 }
 
@@ -98,10 +94,12 @@
 
 .tree-status {
   text-transform: uppercase;
-  font-size: 9px;
+  font-size: 10px;
+  line-height: 10px;
   font-weight: bold;
   color: #333;
   background: #eee;
   padding: 3px;
-  vertical-align: middle;
+  white-space: nowrap;
+  display: inline-block;
 }

@@ -1,45 +1,47 @@
-.references-section {
-  max-height: 5000px;
-  transition: max-height 250ms ease-in;
-  font-size: 12px;
-}
-
 .references-section.collapsed {
   max-height: 25px;
 }
 
 .reference-container {
-  background: rgb(250, 251, 252);
   padding-bottom: 10px;
   transition: max-height 200ms ease-in;
 }
 
+.reference-files {
+  margin: 10px 0;
+}
+
+.reference-title-container {
+  padding: 7px 7px 0 12px;
+}
+
 .reference-title {
-  height: 30px;
-  padding: 10px 7px 5px 7px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .reference-name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 13px;
+  font-weight: bold;
 }
 
-.reference-count {
-  margin-top: 3px;
-  color: #666;
+.reference-items {
+  padding-bottom: 10px;
 }
 
 .reference-item {
-  margin: 10px 0px 0px 0px;
-  min-height: 50px;
   cursor: pointer;
-  background: #fff;
-  border-top: 1px solid #f1f8ff;
-  border-bottom: 1px solid #f1f8ff;
+  margin-bottom: 2px;
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #fff;
 }
 
 .reference-item:hover {
-  border-top: 1px solid #c8e1ff;
-  border-bottom: 1px solid #c8e1ff;
+  border-top: 1px solid #dadada;
+  border-bottom: 1px solid #dadada;
 }

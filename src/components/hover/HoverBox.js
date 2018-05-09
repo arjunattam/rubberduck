@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import Docstring from "../common/Docstring";
 import HoverSignature from "./HoverSignature";
+import { getMetaKey } from "../../adapters";
 import { decodeBase64 } from "../../utils/data";
 import "./Hover.css";
 
@@ -9,13 +10,24 @@ const MAX_HEIGHT = 240;
 const MAX_WIDTH = 300;
 const TOP_MARGIN = 2;
 
-const isMac = () => navigator.platform.indexOf("Mac") >= 0;
-
-const getMetaKey = () => (isMac() ? "⌘" : "ctrl");
-
 const HelperText = props => (
   <div style={{ textAlign: props.textAlign }}>
     {props.shortcut} <strong>{props.action}</strong>
+  </div>
+);
+
+const HelperLoader = props => (
+  <div
+    style={{
+      width: 10,
+      height: 10,
+      margin: 0,
+      paddingRight: 10,
+      paddingBottom: 10,
+      textAlign: "right"
+    }}
+  >
+    <div className="status-loader" />
   </div>
 );
 
@@ -33,6 +45,7 @@ const ExpandHelper = props => (
         action={"expand"}
       />
     ) : null}
+    {props.isLoading ? <HelperLoader textAlign={"right"} /> : null}
   </div>
 );
 
@@ -139,6 +152,7 @@ export default class HoverBox extends React.Component {
     <ExpandHelper
       isExpandable={this.isDocstringExpandable()}
       isHighlighted={this.props.isHighlighted}
+      isLoading={this.props.isLoading}
     />
   );
 

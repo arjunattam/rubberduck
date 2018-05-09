@@ -23,6 +23,17 @@ export const isGithubCompareView = () => {
   }
 };
 
+export const isCompareView = () => {
+  switch (getGitService()) {
+    case "bitbucket":
+      return true;
+    case "github":
+      return isGithubCompareView();
+    default:
+      return false;
+  }
+};
+
 const pathAdapterMap = {
   github: GithubPathAdapter,
   bitbucket: BitbucketPathAdapter
@@ -37,6 +48,10 @@ const pageListenerMap = {
   github: githubListener,
   bitbucket: bitbucketListener
 };
+
+export const isMac = () => navigator.platform.indexOf("Mac") >= 0;
+
+export const getMetaKey = () => (isMac() ? "⌘" : "ctrl");
 
 export const pathAdapter = pathAdapterMap[getGitService()];
 export const treeAdapter = treeAdapterMap[getGitService()];

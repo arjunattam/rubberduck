@@ -12,3 +12,20 @@ export const hash = string =>
         ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
       0
     );
+
+const commonSubArray = (x, y) => {
+  const xarray = x.split("/");
+  const yarray = y.split("/");
+  const minLength = Math.min(xarray.length, yarray.length);
+
+  for (let i = 0; i < minLength; i++) {
+    if (xarray[i] !== yarray[i]) {
+      return i;
+    }
+  }
+
+  return minLength;
+};
+
+export const pathNearnessSorter = (x, y, input) =>
+  commonSubArray(y, input) - commonSubArray(x, input);

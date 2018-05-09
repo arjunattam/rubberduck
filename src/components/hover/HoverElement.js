@@ -1,11 +1,12 @@
 import React from "react";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
+import { isMac } from "../../adapters";
 import debounce from "debounce";
 import HoverBox from "./HoverBox";
 
-const API_DEBOUNCE_TIMEOUT = 200; // ms
-const VISIBILITY_DEBOUNCE_TIMEOUT = 1000; // ms
+const API_DEBOUNCE_TIMEOUT = 100; // ms
+const VISIBILITY_DEBOUNCE_TIMEOUT = 750; // ms
 const CURSOR_RADIUS = 20; // pixels
 
 /**
@@ -53,6 +54,7 @@ export default class HoverElement extends React.Component {
   callAPI = () => {
     if (!this.isValidResult(this.props.hoverResult)) return;
 
+    this.clearApiResult();
     this.DataActions.callHover(this.props.hoverResult).then(response => {
       const { mouseX, mouseY } = this.props.hoverResult;
       const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
@@ -115,11 +117,9 @@ export default class HoverElement extends React.Component {
     });
   };
 
-  isMac = () => navigator.platform.indexOf("Mac") >= 0;
-
   isExpandKeyCode = event => {
     // Handles cmd key (left/right) on macOS and ctrl on other platforms
-    const allowedCodes = this.isMac() ? [91, 93] : [17];
+    const allowedCodes = isMac() ? [91, 93] : [17];
     return allowedCodes.indexOf(event.keyCode) >= 0;
   };
 
@@ -162,6 +162,10 @@ export default class HoverElement extends React.Component {
     if (this.visibilityDebFunc !== undefined) this.visibilityDebFunc.clear();
   };
 
+  clearApiResult = () => {
+    if (this.state.apiResult.name) this.setState({ apiResult: {} });
+  };
+
   setupDebounce = () => {
     this.apiDebFunc = debounce(() => this.callAPI(), API_DEBOUNCE_TIMEOUT);
     this.visibilityDebFunc = debounce(
@@ -171,6 +175,8 @@ export default class HoverElement extends React.Component {
     this.apiDebFunc();
     this.visibilityDebFunc();
   };
+
+  isLoading = () => this.props.data.section.isLoading.hover;
 
   componentDidUpdate(prevProps, prevState) {
     const { hoverResult: prevResult } = prevProps;
@@ -206,6 +212,6 @@ export default class HoverElement extends React.Component {
   }
 
   render() {
-    return <HoverBox {...this.state} />;
+    return <HoverBox {...this.state} isLoading={this.isLoading()} />;
   }
 }

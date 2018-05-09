@@ -1,8 +1,7 @@
 import React from "react";
 import { bindActionCreators } from "redux";
-import SectionHeader from "./Section";
-import ExpandedCode from "../common/ExpandedCode";
-import { getGitService } from "../../adapters";
+import SectionHeader from "./SectionHeader";
+import { getGitService, getMetaKey } from "../../adapters";
 import * as DataActions from "../../actions/dataActions";
 import "./Section.css";
 
@@ -18,8 +17,7 @@ export class BaseSection extends React.Component {
     this.DataActions.setOpenSection(openSection);
   };
 
-  getSectionTitle = () =>
-    this.sectionName === "tree" ? "files tree" : this.sectionName;
+  getSectionTitle = () => this.sectionName;
 
   renderSectionHeader = () => (
     <SectionHeader
@@ -51,25 +49,23 @@ export class BaseReaderSection extends BaseSection {
 
   renderZeroState = () => (
     <div className="section-zero-state">
-      <strong>{"⌘ + click"}</strong>
+      <strong>{`${getMetaKey()} + click`}</strong>
       {` on symbol to trigger ${this.sectionName}`}
     </div>
   );
 
-  renderNoResults = () => (
-    <div className="section-zero-state">{`No results found`}</div>
-  );
-
-  getServiceLink = (username, reponame, gitId, filePath, line) => {
+  getServiceLink = (username, reponame, gitId, filePath) => {
     switch (getGitService()) {
       case "github":
-        return `/${username}/${reponame}/blob/${gitId}/${filePath}#L${line}`;
+        return `/${username}/${reponame}/blob/${gitId}/${filePath}`;
       case "bitbucket":
-        return `/${username}/${reponame}/src/${gitId}/${filePath}#lines-${line}`;
+        return `/${username}/${reponame}/src/${gitId}/${filePath}`;
+      default:
+        return "";
     }
   };
 
-  getFileLink = (fileSha, filePath, lineNumber) => {
+  getFileLink = (fileSha, filePath) => {
     let shaId = "";
     const { base, head } = this.props.data.session.payload;
 
@@ -81,46 +77,74 @@ export class BaseReaderSection extends BaseSection {
 
     const { username, reponame, branch } = this.props.data.repoDetails;
     const gitId = shaId || branch;
-    const offsetLine = lineNumber + 1;
-    return this.getServiceLink(username, reponame, gitId, filePath, offsetLine);
-  };
-}
-
-export class BaseSectionItem extends React.Component {
-  state = {
-    isHovering: false
+    return this.getServiceLink(username, reponame, gitId, filePath);
   };
 
-  handleMouseEnter = event => {
-    this.setState({
-      isHovering: true
-    });
-  };
-
-  handleMouseLeave = event => {
-    const rect = this.refs.container.getBoundingClientRect();
-    const { clientX: x, clientY: y } = event;
-    const { top, bottom, right } = rect;
-    const PADDING = 20;
-    const isOnCodeSnippet = y < bottom && y > top && x <= right + PADDING;
-    const isOutsideWindow = x <= 0;
-
-    if (!isOnCodeSnippet || isOutsideWindow) {
-      this.setState({
-        isHovering: false
-      });
+  getStatusText = () => {
+    if (this.isLoading()) {
+      return "Loading";
+    } else if (!this.hasResults()) {
+      return "No result";
+    } else {
+      return this.getCountText();
     }
   };
 
-  getSnippetStyle = () => ({
-    left: this.props.sidebarWidth + 2,
-    top: this.refs.container
-      ? this.refs.container.getBoundingClientRect().top
-      : 0
-  });
+  getDefaultContents = fileObject => {
+    const referenceItem = fileObject.items ? fileObject.items[0] : {};
+    const { codeSnippet: contents, startLineNumber } = referenceItem;
+    return { contents, startLineNumber };
+  };
 
-  renderExpandedCode = () =>
-    this.state.isHovering ? (
-      <ExpandedCode {...this.props} style={this.getSnippetStyle()} />
-    ) : null;
+  fetchContents = fileObject => {
+    const { filePath, fileSha } = fileObject;
+    const baseOrHead = fileSha === "base" ? fileSha : "head";
+    return this.DataActions.callFileContents({ baseOrHead, filePath });
+  };
+
+  getFileContents = fileObject => {
+    const { fileSha, filePath } = fileObject;
+    const baseOrHead = fileSha === "base" ? fileSha : "head";
+    const { fileContents: contentStore } = this.props.data;
+    const contentsInStore = contentStore[baseOrHead][filePath];
+    return contentsInStore
+      ? { contents: contentsInStore, startLineNumber: 0 }
+      : this.getDefaultContents(fileObject);
+  };
+
+  renderContainerTitle = () => (
+    <div className="reference-title-container">
+      <div className="reference-title">
+        <div className="reference-name monospace">{this.getName()}</div>
+        {this.getStatusText() ? (
+          <div className="reference-count tree-status">
+            {this.getStatusText()}
+          </div>
+        ) : null}
+      </div>
+      {this.renderCollapseButton()}
+    </div>
+  );
+
+  renderResult = () => (
+    <div className="reference-container">
+      {this.renderContainerTitle()}
+      {this.renderDocstring()}
+      <div className="reference-files">{this.renderItems()}</div>
+    </div>
+  );
+
+  renderContents = () =>
+    this.isTriggered() ? this.renderResult() : this.renderZeroState();
+
+  render() {
+    const isVisible = this.isVisible();
+    const className = `references-section ${isVisible ? "" : "collapsed"}`;
+    return (
+      <div className={className}>
+        {this.renderSectionHeader()}
+        {isVisible ? this.renderContents() : null}
+      </div>
+    );
+  }
 }

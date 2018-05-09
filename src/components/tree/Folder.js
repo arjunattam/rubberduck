@@ -1,27 +1,21 @@
 import React from "react";
 import File from "./File";
 import TreeLabel from "./TreeLabel";
-import Octicon from "react-component-octicons";
-
+import { isCompareView } from "../../adapters";
 const PADDING_CONST = 12; // in pixels
+const COMPARE_VIEW_OPEN_DEPTH = 3;
+
+const isFolder = element => element.children.length > 0;
+
+const alphabetSort = (a, b) => a.name.localeCompare(b.name);
 
 const sortChildren = children => {
   const parents = children
-    .filter(element => {
-      return element.children.length > 0;
-    })
-    .sort(function(a, b) {
-      return a.name.localeCompare(b.name);
-    });
+    .filter(element => isFolder(element))
+    .sort(alphabetSort);
   const onlyChildren = children
-    .filter(element => {
-      return element.children.length === 0;
-    })
-    .sort(function(a, b) {
-      return a.name.localeCompare(b.name);
-    });
-
-  // Expected ordering is first folders, then files, each alphabetical
+    .filter(element => !isFolder(element))
+    .sort(alphabetSort);
   return parents.concat(onlyChildren);
 };
 
@@ -32,29 +26,20 @@ export const renderChildren = (children, depth, parentProps, currentPath) => {
   return (
     <div>
       {childrenToRender.map(element => {
-        if (element.children.length > 0) {
-          // Ordering of props is important since the element
-          // needs to override the parentProps
-          return (
-            <Folder
-              {...parentProps}
-              {...element}
-              depth={depth + 1}
-              key={element.path}
-              currentPath={currentPath}
-            />
-          );
-        } else {
-          return (
-            <File
-              {...parentProps}
-              {...element}
-              depth={depth + 1}
-              key={element.path}
-              currentPath={currentPath}
-            />
-          );
-        }
+        // Ordering of props is important since the element
+        // needs to override the parentProps
+        const childProps = {
+          ...parentProps,
+          ...element,
+          depth: depth + 1,
+          key: element.path,
+          currentPath
+        };
+        return isFolder(element) ? (
+          <Folder {...childProps} />
+        ) : (
+          <File {...childProps} />
+        );
       })}
     </div>
   );
@@ -65,14 +50,10 @@ class Folder extends React.Component {
     isCollapsed: true
   };
 
-  getPadding = () => {
-    // padding is a function of depth
-    return this.props.depth * PADDING_CONST;
-  };
+  getPadding = () => this.props.depth * PADDING_CONST;
 
-  toggleCollapsed = () => {
+  toggleCollapsed = () =>
     this.setState({ isCollapsed: !this.state.isCollapsed });
-  };
 
   renderFolderStructure = () => {
     const children = this.props.children;
@@ -85,40 +66,44 @@ class Folder extends React.Component {
     return <div className="file-children">{renderedChildren}</div>;
   };
 
-  isCurrentlyOpen = () => {
-    return (
-      this.props.currentPath &&
-      this.props.currentPath.indexOf(this.props.path) >= 0
-    );
-  };
+  isCurrentlyOpen = () =>
+    this.props.currentPath &&
+    this.props.currentPath.indexOf(this.props.path) >= 0;
 
   componentDidMount() {
+    let isCollapsed = true;
+    if (isCompareView()) {
+      if (this.props.depth < COMPARE_VIEW_OPEN_DEPTH) {
+        isCollapsed = false;
+      }
+    } else {
+      isCollapsed = !this.isCurrentlyOpen();
+    }
     this.setState({
-      isCollapsed: !this.isCurrentlyOpen()
+      isCollapsed
     });
   }
 
+  renderFolderLabel = () => (
+    <TreeLabel
+      {...this.props}
+      onClick={this.toggleCollapsed}
+      paddingLeft={this.getPadding()}
+      icon="file-directory"
+      iconColor="#8294ac"
+      hasTriangle={true}
+    />
+  );
+
   render() {
-    const pl = this.getPadding();
-    const triangle = (
-      <Octicon name={"triangle-down"} className="file-triangle" />
-    );
+    const { isCollapsed } = this.state;
     let containerClassName = "folder-structure-container";
-    containerClassName += this.state.isCollapsed ? " collapsed" : "";
+    containerClassName += isCollapsed ? " collapsed" : "";
 
     return (
       <div className={containerClassName}>
-        <div className={"file-container"}>
-          <a onClick={this.toggleCollapsed} style={{ paddingLeft: pl }}>
-            {triangle}{" "}
-            <TreeLabel
-              {...this.props}
-              icon="file-directory"
-              iconColor="#8294ac"
-            />
-          </a>
-        </div>
-        {this.state.isCollapsed ? null : this.renderFolderStructure()}
+        {this.renderFolderLabel()}
+        {isCollapsed ? null : this.renderFolderStructure()}
       </div>
     );
   }
