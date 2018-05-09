@@ -19,7 +19,7 @@
     "react-markdown": "^3.3.0",
     "react-redux": "^5.0.6",
     "react-rnd": "^7.4.0",
-    "react-scripts": "1.1.0",
+    "react-scripts": "1.1.3",
     "react-syntax-highlighter": "^7.0.0",
     "redux": "^3.7.2",
     "redux-create-reducer": "^1.1.1",
@@ -42,9 +42,10 @@
     "gen-crx": "./node_modules/.bin/crx pack $npm_package_config_pack",
     "pack": "npm run build && npm run gen-crx",
     "test": "TEST=true react-app-rewired test --env=jsdom",
-    "sentry-upload": "sh scripts/sentry.sh",
+    "sentry": "sh scripts/sentry.sh",
     "gen-zip": "rm -f bundle.zip && zip -r9 bundle.zip build/* -x *.map",
-    "chrome-build": "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip && npm run sentry-upload",
+    "chrome-build":
+      "REACT_APP_CHROME_ZIP=true npm run build && npm run gen-zip && npm run sentry",
     "eject": "react-app-rewired eject"
   },
   "devDependencies": {
