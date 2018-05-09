@@ -11,6 +11,7 @@ class References extends BaseReaderSection {
 
   state = {
     references: {},
+    hoverResult: {},
     hasCollapsedFiles: false
   };
 
@@ -68,6 +69,7 @@ class References extends BaseReaderSection {
         this.setState(
           {
             name: hoverResult.name,
+            hoverResult,
             count: result.count,
             // references is an object {filepath: array of reference items, ...}
             references: this.getReferenceItems(result.references, hoverResult)
@@ -115,7 +117,7 @@ class References extends BaseReaderSection {
 
   renderItems = () => {
     const files = Object.keys(this.state.references);
-    const currentFilePath = this.props.data.repoDetails.path;
+    const currentFilePath = this.state.hoverResult.filePath || "";
     // files should be sorted by nearness to the current file path
     files.sort((x, y) => pathNearnessSorter(x, y, currentFilePath));
     return files.map(key => (
