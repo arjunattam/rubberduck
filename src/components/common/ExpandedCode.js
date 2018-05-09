@@ -1,6 +1,7 @@
 import React from "react";
 import Octicon from "react-component-octicons";
 import SyntaxHighlight from "./SyntaxHighlight";
+import InlineButton from "./InlineButton";
 import { decodeBase64 } from "../../utils/data";
 import { getGitService, isGithubCompareView } from "../../adapters";
 import { loadUrl } from "../../components/sidebar/pjax";
@@ -97,20 +98,16 @@ export default class ExpandedCode extends React.Component {
     </div>
   );
 
-  renderLink = (text, isBlank, onClick) => (
-    <div className="expanded-button">
-      <a
-        href={this.props.fileLink}
-        target={isBlank ? "_blank" : null}
-        title={isBlank ? "Open in new tab" : null}
-        onClick={onClick}
-      >
-        {text}
-      </a>
-    </div>
+  renderLink = (text, isBlank, onClick, icon) => (
+    <InlineButton
+      href={this.props.fileLink}
+      style={{ marginLeft: 5 }}
+      {...{ isBlank, onClick, text, icon }}
+    />
   );
 
-  renderNewTab = () => this.renderLink("Open file ↗", true);
+  renderNewTab = () =>
+    this.renderLink("Open file", true, null, "link-external");
 
   getFileboxSelector = path => {
     const service = getGitService();
@@ -160,9 +157,13 @@ export default class ExpandedCode extends React.Component {
     tdElement.classList.add("highlighted");
   };
 
+  getLineId = () => {
+    // Example fileLink: /vitalets/websocket-as-promised/blob/master/src/index.js#L39
+    return this.props.fileLink.match(/.*#(L[0-9]+)/)[1];
+  };
+
   scrollToLine = () => {
-    // fileLink looks like /vitalets/websocket-as-promised/blob/master/src/index.js#L39
-    const lineId = this.props.fileLink.match(/.*#(L[0-9]+)/)[1];
+    const lineId = this.getLineId();
     this.highlightLine(lineId);
     return this.scrollToDOMSelector(`td#${lineId}`);
   };
@@ -179,6 +180,9 @@ export default class ExpandedCode extends React.Component {
           // File is open, scroll to line
           return this.scrollToLine();
         } else {
+          // Assume file will load in 1.5s, and then highlight the line
+          // For more accuracy, set a callback on loadUrl method
+          setTimeout(() => this.highlightLine(this.getLineId()), 1500);
           return loadUrl(this.props.fileLink);
         }
       case "bitbucket":

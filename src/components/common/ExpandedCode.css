@@ -47,14 +47,3 @@
   display: inline-block;
   vertical-align: middle;
 }
-
-.expanded-button {
-  background: #c8e1ff46;
-  text-align: center;
-  border-radius: 5px;
-  margin-left: 15px;
-  padding: 2px 6px 2px 6px;
-  cursor: pointer;
-  display: inline-block;
-  vertical-align: middle;
-}

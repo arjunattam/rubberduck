@@ -1,7 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
-import DefinitionItem from "./DefinitionItem";
+import { DefinitionFileSection } from "../section/FileSection";
+import Docstring from "../common/Docstring";
 import "./Definitions.css";
 
 /**
@@ -14,6 +15,8 @@ class Definitions extends BaseReaderSection {
   state = {
     definition: {}
   };
+
+  clearState = name => this.setState({ definition: { name } });
 
   getFilePath = result =>
     result.definition && result.definition.location
@@ -29,22 +32,27 @@ class Definitions extends BaseReaderSection {
       : null;
 
   getSelectionData = hoverResult => {
-    // const hoverResult = this.readPage();
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
+      this.clearState(hoverResult.name);
       this.DataActions.callDefinitions(hoverResult).then(response => {
         const result = response.value.result;
+        const filePath = this.getFilePath(result);
+        const { fileSha } = hoverResult;
+        const lineNumber = this.getLine(result);
+        const fileLink = this.getFileLink(fileSha, filePath, lineNumber);
         const definition = {
           // Can use result.signature also for the name key
           // Verify on go: https://github.com/samuel/go-zookeeper/blob/master/zk/server_help.go#L176
           name: result.name || hoverResult.name,
-          filePath: this.getFilePath(result),
+          filePath,
           fileSha: hoverResult.fileSha,
+          fileLink,
           startLineNumber: this.getStartLine(result),
-          lineNumber: this.getLine(result),
+          lineNumber,
           docstring: result.docstring,
           codeSnippet: result.definition ? result.definition.contents : ""
         };
@@ -68,42 +76,32 @@ class Definitions extends BaseReaderSection {
     }
   };
 
-  fileContentProps = () => {
+  renderItems = () => {
+    const items = [this.state.definition];
+    const { filePath: name } = this.state.definition;
     const { fileContents } = this.props.data;
-    const { fileSha, filePath } = this.state.definition;
-    const baseOrHead = fileSha === "base" ? fileSha : "head";
-    const contentsInStore = fileContents[baseOrHead][filePath];
-    return contentsInStore
-      ? { codeSnippet: contentsInStore, startLineNumber: 0 }
-      : {};
+    const { sidebarWidth } = this.props.storage;
+    return this.hasResults() ? (
+      <DefinitionFileSection {...{ name, items, fileContents, sidebarWidth }} />
+    ) : null;
   };
 
-  renderResult = () =>
-    this.state.definition.filePath ? (
-      <DefinitionItem
-        {...this.state.definition}
-        {...this.fileContentProps()}
-        fileLink={this.buildFileLink()}
-        sidebarWidth={this.props.storage.sidebarWidth}
-      />
-    ) : (
-      this.renderNoResults()
-    );
-
-  renderContents = () =>
-    this.state.definition.name ? this.renderResult() : this.renderZeroState();
-
-  render() {
-    let definitonClassName = this.isVisible()
-      ? "definitions-section"
-      : "definitions-section collapsed";
-    return (
-      <div className={definitonClassName}>
-        {this.renderSectionHeader()}
-        {this.isVisible() ? this.renderContents() : null}
+  renderDocstring = () =>
+    this.state.definition.docstring ? (
+      <div className="definition-docstring">
+        <Docstring docstring={this.state.definition.docstring} />
       </div>
-    );
-  }
+    ) : null;
+
+  getCountText = () => null;
+
+  renderCollapseButton = () => null;
+
+  hasResults = () => (this.state.definition.filePath ? true : false);
+
+  getName = () => this.state.definition.name;
+
+  isTriggered = () => (this.state.definition.name ? true : false);
 }
 
 function mapStateToProps(state) {

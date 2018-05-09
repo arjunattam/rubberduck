@@ -1,42 +1,59 @@
 import React from "react";
 import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
-import ReferenceItem from "./ReferenceItem";
+import { ReferenceFileSection } from "../section/FileSection";
+import InlineButton from "../common/InlineButton";
+import { pathNearnessSorter } from "../../utils/data";
 import "./References.css";
 
 class References extends BaseReaderSection {
   sectionName = "usages";
 
   state = {
-    references: []
+    references: {},
+    hasCollapsedFiles: false
   };
 
-  getReferenceItems = (apiResponse, hoverResult) => {
-    return apiResponse.references.map(reference => {
-      const parent = reference.parent;
-      let parentName = "";
+  clearState = name =>
+    this.setState({ references: {}, name, count: undefined });
 
-      if (parent !== null) {
-        parentName = parent.name;
+  getReferenceObject = (reference, hoverResult) => {
+    const parent = reference.parent;
+    let parentName = "";
+
+    if (parent !== null) {
+      parentName = parent.name;
+    } else {
+      parentName = reference.location.path.split("/").slice(-1)[0];
+    }
+
+    return {
+      name: parentName,
+      filePath: reference.location.path,
+      fileSha: hoverResult.fileSha,
+      fileLink: this.getFileLink(
+        hoverResult.fileSha,
+        reference.location.path,
+        reference.location.range.start.line
+      ),
+      lineNumber: reference.location.range.start.line,
+      codeSnippet: reference.contents,
+      startLineNumber: reference.contents_start_line
+    };
+  };
+
+  getReferenceItems = (references, hoverResult) =>
+    references.reduce((accumulator, reference) => {
+      const filePath = reference.location.path;
+      const obj = this.getReferenceObject(reference, hoverResult);
+
+      if (filePath in accumulator) {
+        accumulator[filePath].push(obj);
       } else {
-        parentName = reference.location.path.split("/").slice(-1)[0];
+        accumulator[filePath] = [obj];
       }
-
-      return {
-        name: parentName,
-        filePath: reference.location.path,
-        fileSha: hoverResult.fileSha,
-        fileLink: this.getFileLink(
-          hoverResult.fileSha,
-          reference.location.path,
-          reference.location.range.start.line
-        ),
-        lineNumber: reference.location.range.start.line,
-        codeSnippet: reference.contents,
-        startLineNumber: reference.contents_start_line
-      };
-    });
-  };
+      return accumulator;
+    }, []);
 
   getSelectionData = hoverResult => {
     const isValidResult =
@@ -44,98 +61,85 @@ class References extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
+      this.clearState(hoverResult.name);
       this.DataActions.callUsages(hoverResult).then(response => {
         const { result } = response.value;
+        const { fileSha } = hoverResult;
         this.setState(
           {
             name: hoverResult.name,
             count: result.count,
-            references: this.getReferenceItems(result, hoverResult)
+            // references is an object {filepath: array of reference items, ...}
+            references: this.getReferenceItems(result.references, hoverResult)
           },
-          () => this.getFileContents()
+          () => this.getFileContents(fileSha)
         );
       });
     }
   };
 
-  getFileContents = () => {
-    const filesToQuery = this.state.references.map(reference => {
-      return {
-        filePath: reference.filePath,
-        baseOrHead: reference.fileSha === "base" ? reference.fileSha : "head"
-      };
-    });
-    // Remove duplicates
-    let filtered = filesToQuery.reduce((accumulator, current) => {
-      if (!accumulator.find(({ filePath }) => filePath === current.filePath)) {
-        accumulator.push(current);
-      }
-      return accumulator;
-    }, []);
-    filtered.forEach(fileSignature => {
+  getFileContents = fileSha => {
+    const filesToQuery = Object.keys(this.state.references).map(key => ({
+      filePath: key,
+      baseOrHead: fileSha === "base" ? fileSha : "head"
+    }));
+    filesToQuery.forEach(fileSignature => {
       this.DataActions.callFileContents(fileSignature);
     });
+  };
+
+  collapseFileSections = () =>
+    this.setState({ hasCollapsedFiles: !this.state.hasCollapsedFiles });
+
+  renderCollapseButton = () => {
+    const numFiles = Object.keys(this.state.references).length;
+
+    if (numFiles <= 1) {
+      // Don't show collapse button if there's just one file
+      return null;
+    }
+
+    const filesText = numFiles === 1 ? `1 file` : `${numFiles} files`;
+    const canCollapse = !this.state.hasCollapsedFiles;
+    const collapseText = canCollapse ? `Collapse` : `Expand`;
+
+    return (
+      <div style={{ textAlign: "center" }}>
+        <InlineButton
+          onClick={this.collapseFileSections}
+          text={`${collapseText} ${filesText}`}
+        />
+      </div>
+    );
+  };
+
+  renderItems = () => {
+    const files = Object.keys(this.state.references);
+    const currentFilePath = this.props.data.repoDetails.path;
+    // files should be sorted by nearness to the current file path
+    files.sort((x, y) => pathNearnessSorter(x, y, currentFilePath));
+    return files.map(key => (
+      <ReferenceFileSection
+        name={key}
+        items={this.state.references[key]}
+        key={key}
+        sidebarWidth={this.props.storage.sidebarWidth}
+        fileContents={this.props.data.fileContents}
+        isCollapsed={this.state.hasCollapsedFiles}
+      />
+    ));
   };
 
   getCountText = () =>
     this.state.count === 1 ? `1 usage` : `${this.state.count} usages`;
 
-  renderContainerTitle = () => (
-    <div className="reference-title">
-      <div className="reference-name monospace">{this.state.name}</div>
-      <div className="reference-count">{this.getCountText()}</div>
-    </div>
-  );
+  renderDocstring = () => null;
 
-  renderItems = () => {
-    const { sidebarWidth } = this.props.storage;
-    const { fileContents } = this.props.data;
-    const referenceItems = this.state.references.map((reference, index) => {
-      const { fileSha, filePath } = reference;
-      const baseOrHead = fileSha === "base" ? fileSha : "head";
-      const contentsInStore = fileContents[baseOrHead][filePath];
-      // Get contents from store if available, else use what we have
-      const fileProps = contentsInStore
-        ? { codeSnippet: contentsInStore, startLineNumber: 0 }
-        : {};
+  hasResults = () => this.state.count > 0;
 
-      return (
-        <ReferenceItem
-          {...reference}
-          key={index}
-          sidebarWidth={sidebarWidth}
-          {...fileProps}
-        />
-      );
-    });
-    return <div className="reference-items">{referenceItems}</div>;
-  };
+  getName = () => this.state.name;
 
-  renderReferences = () =>
-    this.state.count > 0 ? (
-      <div className="reference-container">
-        {this.renderContainerTitle()}
-        {this.renderItems()}
-      </div>
-    ) : (
-      this.renderNoResults()
-    );
-
-  renderContents = () =>
-    this.state.name ? this.renderReferences() : this.renderZeroState();
-
-  render() {
-    let referencesClassName = this.isVisible()
-      ? "references-section"
-      : "references-section collapsed";
-
-    return (
-      <div className={referencesClassName}>
-        {this.renderSectionHeader()}
-        {this.isVisible() ? this.renderContents() : null}
-      </div>
-    );
-  }
+  isTriggered = () => (this.state.name ? true : false);
 }
 
 function mapStateToProps(state) {
