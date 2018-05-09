@@ -1,10 +1,8 @@
 import React from "react";
 import { bindActionCreators } from "redux";
-import SectionHeader from "./Section";
-import ExpandedCode from "../common/ExpandedCode";
+import SectionHeader from "./SectionHeader";
 import { getGitService, getMetaKey } from "../../adapters";
 import * as DataActions from "../../actions/dataActions";
-import SmallCodeSnippet from "../common/SmallCodeSnippet";
 import "./Section.css";
 
 export class BaseSection extends React.Component {
@@ -56,18 +54,18 @@ export class BaseReaderSection extends BaseSection {
     </div>
   );
 
-  getServiceLink = (username, reponame, gitId, filePath, line) => {
+  getServiceLink = (username, reponame, gitId, filePath) => {
     switch (getGitService()) {
       case "github":
-        return `/${username}/${reponame}/blob/${gitId}/${filePath}#L${line}`;
+        return `/${username}/${reponame}/blob/${gitId}/${filePath}`;
       case "bitbucket":
-        return `/${username}/${reponame}/src/${gitId}/${filePath}#lines-${line}`;
+        return `/${username}/${reponame}/src/${gitId}/${filePath}`;
       default:
         return "";
     }
   };
 
-  getFileLink = (fileSha, filePath, lineNumber) => {
+  getFileLink = (fileSha, filePath) => {
     let shaId = "";
     const { base, head } = this.props.data.session.payload;
 
@@ -79,8 +77,7 @@ export class BaseReaderSection extends BaseSection {
 
     const { username, reponame, branch } = this.props.data.repoDetails;
     const gitId = shaId || branch;
-    const offsetLine = lineNumber + 1;
-    return this.getServiceLink(username, reponame, gitId, filePath, offsetLine);
+    return this.getServiceLink(username, reponame, gitId, filePath);
   };
 
   getStatusText = () => {
@@ -91,6 +88,28 @@ export class BaseReaderSection extends BaseSection {
     } else {
       return this.getCountText();
     }
+  };
+
+  getDefaultContents = fileObject => {
+    const referenceItem = fileObject.items ? fileObject.items[0] : {};
+    const { codeSnippet: contents, startLineNumber } = referenceItem;
+    return { contents, startLineNumber };
+  };
+
+  fetchContents = fileObject => {
+    const { filePath, fileSha } = fileObject;
+    const baseOrHead = fileSha === "base" ? fileSha : "head";
+    return this.DataActions.callFileContents({ baseOrHead, filePath });
+  };
+
+  getFileContents = fileObject => {
+    const { fileSha, filePath } = fileObject;
+    const baseOrHead = fileSha === "base" ? fileSha : "head";
+    const { fileContents: contentStore } = this.props.data;
+    const contentsInStore = contentStore[baseOrHead][filePath];
+    return contentsInStore
+      ? { contents: contentsInStore, startLineNumber: 0 }
+      : this.getDefaultContents(fileObject);
   };
 
   renderContainerTitle = () => (
@@ -125,63 +144,6 @@ export class BaseReaderSection extends BaseSection {
       <div className={className}>
         {this.renderSectionHeader()}
         {isVisible ? this.renderContents() : null}
-      </div>
-    );
-  }
-}
-
-export class BaseSectionItem extends React.Component {
-  state = {
-    isHovering: false
-  };
-
-  handleMouseEnter = event => {
-    this.setState({
-      isHovering: true
-    });
-  };
-
-  handleMouseLeave = event => {
-    const rect = this.refs.container.getBoundingClientRect();
-    const { clientX: x, clientY: y } = event;
-    const { top, bottom, right } = rect;
-    const PADDING = 20;
-    const isOnCodeSnippet = y < bottom && y > top && x <= right + PADDING;
-    const isOutsideWindow = x <= 0;
-
-    if (!isOnCodeSnippet || isOutsideWindow) {
-      this.setState({
-        isHovering: false
-      });
-    }
-  };
-
-  getSnippetStyle = () => ({
-    left: this.props.sidebarWidth + 2,
-    top: this.refs.container
-      ? this.refs.container.getBoundingClientRect().top
-      : 0
-  });
-
-  renderExpandedCode = () =>
-    this.state.isHovering ? (
-      <ExpandedCode {...this.props} style={this.getSnippetStyle()} />
-    ) : null;
-
-  render() {
-    return (
-      <div
-        className="reference-item"
-        onMouseEnter={this.handleMouseEnter}
-        onMouseLeave={this.handleMouseLeave}
-        ref={"container"}
-      >
-        <SmallCodeSnippet
-          contents={this.props.codeSnippet}
-          contentLine={this.props.lineNumber - this.props.startLineNumber}
-          lineNumber={this.props.lineNumber}
-        />
-        {this.renderExpandedCode()}
       </div>
     );
   }
