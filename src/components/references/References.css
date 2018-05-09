@@ -36,11 +36,12 @@
 
 .reference-item {
   cursor: pointer;
+  margin-bottom: 2px;
   border-top: 1px solid #fff;
   border-bottom: 1px solid #fff;
 }
 
 .reference-item:hover {
-  border-top: 1px solid #b5b5b5;
-  border-bottom: 1px solid #b5b5b5;
+  border-top: 1px solid #dadada;
+  border-bottom: 1px solid #dadada;
 }

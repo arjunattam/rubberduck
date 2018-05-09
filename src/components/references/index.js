@@ -10,51 +10,55 @@ class References extends BaseReaderSection {
   sectionName = "usages";
 
   state = {
-    references: {},
-    hoverResult: {},
+    references: [],
     hasCollapsedFiles: false
   };
 
   clearState = name =>
-    this.setState({ references: {}, name, count: undefined });
+    this.setState({ references: [], name, count: undefined });
 
-  getReferenceObject = (reference, hoverResult) => {
-    const parent = reference.parent;
-    let parentName = "";
-
-    if (parent !== null) {
-      parentName = parent.name;
-    } else {
-      parentName = reference.location.path.split("/").slice(-1)[0];
-    }
-
+  getReferenceObject = reference => {
     return {
-      name: parentName,
-      filePath: reference.location.path,
-      fileSha: hoverResult.fileSha,
-      fileLink: this.getFileLink(
-        hoverResult.fileSha,
-        reference.location.path,
-        reference.location.range.start.line
-      ),
       lineNumber: reference.location.range.start.line,
       codeSnippet: reference.contents,
       startLineNumber: reference.contents_start_line
     };
   };
 
-  getReferenceItems = (references, hoverResult) =>
-    references.reduce((accumulator, reference) => {
-      const filePath = reference.location.path;
-      const obj = this.getReferenceObject(reference, hoverResult);
-
-      if (filePath in accumulator) {
-        accumulator[filePath].push(obj);
-      } else {
-        accumulator[filePath] = [obj];
-      }
+  getReferenceItems = (apiResult, hoverResult) => {
+    // Sort references by line number
+    let itemsObjects = apiResult.reduce((accumulator, reference) => {
+      const { path } = reference.location;
+      const obj = this.getReferenceObject(reference);
+      accumulator[path] =
+        path in accumulator ? [obj, ...accumulator[path]] : [obj];
       return accumulator;
-    }, []);
+    }, {});
+
+    Object.keys(itemsObjects).forEach(key => {
+      itemsObjects[key].sort((x, y) => x.lineNumber - y.lineNumber);
+    });
+
+    const metadataObjects = apiResult.reduce((accumulator, reference) => {
+      const { path } = reference.location;
+      const { fileSha } = hoverResult;
+      const link = this.getFileLink(fileSha, path);
+      const obj = { path, fileSha, link };
+      accumulator[path] = obj;
+      return accumulator;
+    }, {});
+
+    const files = Object.keys(itemsObjects);
+    const currentFilePath = hoverResult.filePath || "";
+    files.sort((x, y) => pathNearnessSorter(x, y, currentFilePath));
+    const items = files.map(file => {
+      return {
+        items: itemsObjects[file],
+        ...metadataObjects[file]
+      };
+    });
+    return items;
+  };
 
   getSelectionData = hoverResult => {
     const isValidResult =
@@ -65,29 +69,40 @@ class References extends BaseReaderSection {
       this.clearState(hoverResult.name);
       this.DataActions.callUsages(hoverResult).then(response => {
         const { result } = response.value;
-        const { fileSha } = hoverResult;
         this.setState(
           {
             name: hoverResult.name,
-            hoverResult,
             count: result.count,
-            // references is an object {filepath: array of reference items, ...}
             references: this.getReferenceItems(result.references, hoverResult)
           },
-          () => this.getFileContents(fileSha)
+          () => this.fetchFileContents()
         );
       });
     }
   };
 
-  getFileContents = fileSha => {
-    const filesToQuery = Object.keys(this.state.references).map(key => ({
-      filePath: key,
-      baseOrHead: fileSha === "base" ? fileSha : "head"
+  fetchFileContents = () => {
+    const filesToQuery = this.state.references.map(fileObject => ({
+      filePath: fileObject.path,
+      baseOrHead: fileObject.fileSha === "base" ? fileObject.fileSha : "head"
     }));
     filesToQuery.forEach(fileSignature => {
       this.DataActions.callFileContents(fileSignature);
     });
+  };
+
+  renderItems = () => {
+    return this.state.references.map(fileObject => (
+      <ReferenceFileSection
+        key={fileObject.path}
+        path={fileObject.path}
+        link={fileObject.link}
+        {...this.getFileContents(fileObject)}
+        items={fileObject.items}
+        sidebarWidth={this.props.storage.sidebarWidth}
+        isCollapsed={this.state.hasCollapsedFiles}
+      />
+    ));
   };
 
   collapseFileSections = () =>
@@ -113,23 +128,6 @@ class References extends BaseReaderSection {
         />
       </div>
     );
-  };
-
-  renderItems = () => {
-    const files = Object.keys(this.state.references);
-    const currentFilePath = this.state.hoverResult.filePath || "";
-    // files should be sorted by nearness to the current file path
-    files.sort((x, y) => pathNearnessSorter(x, y, currentFilePath));
-    return files.map(key => (
-      <ReferenceFileSection
-        name={key}
-        items={this.state.references[key]}
-        key={key}
-        sidebarWidth={this.props.storage.sidebarWidth}
-        fileContents={this.props.data.fileContents}
-        isCollapsed={this.state.hasCollapsedFiles}
-      />
-    ));
   };
 
   getCountText = () =>
