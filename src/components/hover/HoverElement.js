@@ -212,6 +212,13 @@ export default class HoverElement extends React.Component {
   }
 
   render() {
-    return <HoverBox {...this.state} isLoading={this.isLoading()} />;
+    const isNotReady = this.props.data.session.status !== "ready";
+    return (
+      <HoverBox
+        {...this.state}
+        isLoading={this.isLoading()}
+        isNotReady={isNotReady}
+      />
+    );
   }
 }
