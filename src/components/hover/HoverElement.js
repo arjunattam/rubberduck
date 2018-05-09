@@ -1,6 +1,7 @@
 import React from "react";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
+import { isMac } from "../../adapters";
 import debounce from "debounce";
 import HoverBox from "./HoverBox";
 
@@ -53,6 +54,7 @@ export default class HoverElement extends React.Component {
   callAPI = () => {
     if (!this.isValidResult(this.props.hoverResult)) return;
 
+    this.clearApiResult();
     this.DataActions.callHover(this.props.hoverResult).then(response => {
       const { mouseX, mouseY } = this.props.hoverResult;
       const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
@@ -115,11 +117,9 @@ export default class HoverElement extends React.Component {
     });
   };
 
-  isMac = () => navigator.platform.indexOf("Mac") >= 0;
-
   isExpandKeyCode = event => {
     // Handles cmd key (left/right) on macOS and ctrl on other platforms
-    const allowedCodes = this.isMac() ? [91, 93] : [17];
+    const allowedCodes = isMac() ? [91, 93] : [17];
     return allowedCodes.indexOf(event.keyCode) >= 0;
   };
 
@@ -192,7 +192,6 @@ export default class HoverElement extends React.Component {
       // The component maintains two debounce functions: one for the API call
       // and the other for the hover box visibility.
       this.clearDebouce();
-      this.clearApiResult();
       const { hoverResult } = this.props;
       this.setState({ hoverResult, isVisible: false });
       this.setupDebounce();

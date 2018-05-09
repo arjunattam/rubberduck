@@ -2,7 +2,7 @@ import React from "react";
 import { bindActionCreators } from "redux";
 import SectionHeader from "./Section";
 import ExpandedCode from "../common/ExpandedCode";
-import { getGitService } from "../../adapters";
+import { getGitService, getMetaKey } from "../../adapters";
 import * as DataActions from "../../actions/dataActions";
 import SmallCodeSnippet from "../common/SmallCodeSnippet";
 import "./Section.css";
@@ -52,13 +52,9 @@ export class BaseReaderSection extends BaseSection {
 
   renderZeroState = () => (
     <div className="section-zero-state">
-      <strong>{"⌘ + click"}</strong>
+      <strong>{`${getMetaKey()} + click`}</strong>
       {` on symbol to trigger ${this.sectionName}`}
     </div>
-  );
-
-  renderNoResults = () => (
-    <div className="section-zero-state">{`No results found`}</div>
   );
 
   getServiceLink = (username, reponame, gitId, filePath, line) => {
@@ -87,6 +83,52 @@ export class BaseReaderSection extends BaseSection {
     const offsetLine = lineNumber + 1;
     return this.getServiceLink(username, reponame, gitId, filePath, offsetLine);
   };
+
+  getStatusText = () => {
+    if (this.isLoading()) {
+      return "Loading";
+    } else if (!this.hasResults()) {
+      return "No result";
+    } else {
+      return this.getCountText();
+    }
+  };
+
+  renderContainerTitle = () => (
+    <div className="reference-title-container">
+      <div className="reference-title">
+        <div className="reference-name monospace">{this.getName()}</div>
+        {this.getStatusText() ? (
+          <div className="reference-count tree-status">
+            {this.getStatusText()}
+          </div>
+        ) : null}
+      </div>
+      {this.renderCollapseButton()}
+    </div>
+  );
+
+  renderResult = () => (
+    <div className="reference-container">
+      {this.renderContainerTitle()}
+      {this.renderDocstring()}
+      <div className="reference-files">{this.renderItems()}</div>
+    </div>
+  );
+
+  renderContents = () =>
+    this.isTriggered() ? this.renderResult() : this.renderZeroState();
+
+  render() {
+    const isVisible = this.isVisible();
+    const className = `references-section ${isVisible ? "" : "collapsed"}`;
+    return (
+      <div className={className}>
+        {this.renderSectionHeader()}
+        {isVisible ? this.renderContents() : null}
+      </div>
+    );
+  }
 }
 
 export class BaseSectionItem extends React.Component {

@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
 import { ReferenceFileSection } from "../section/FileSection";
 import InlineButton from "../common/InlineButton";
+import { pathNearnessSorter } from "../../utils/data";
 import "./References.css";
 
 class References extends BaseReaderSection {
@@ -12,6 +13,9 @@ class References extends BaseReaderSection {
     references: {},
     hasCollapsedFiles: false
   };
+
+  clearState = name =>
+    this.setState({ references: {}, name, count: undefined });
 
   getReferenceObject = (reference, hoverResult) => {
     const parent = reference.parent;
@@ -57,6 +61,7 @@ class References extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
+      this.clearState(hoverResult.name);
       this.DataActions.callUsages(hoverResult).then(response => {
         const { result } = response.value;
         const { fileSha } = hoverResult;
@@ -83,9 +88,6 @@ class References extends BaseReaderSection {
     });
   };
 
-  getCountText = () =>
-    this.state.count === 1 ? `1 usage` : `${this.state.count} usages`;
-
   collapseFileSections = () =>
     this.setState({ hasCollapsedFiles: !this.state.hasCollapsedFiles });
 
@@ -111,19 +113,12 @@ class References extends BaseReaderSection {
     );
   };
 
-  renderContainerTitle = () => (
-    <div className="reference-title-container">
-      <div className="reference-title">
-        <div className="reference-name monospace">{this.state.name}</div>
-        <div className="reference-count tree-status">{this.getCountText()}</div>
-      </div>
-      {this.renderCollapseButton()}
-    </div>
-  );
-
-  renderFileSections = () =>
-    // TODO(arjun): sort by nearness to the current file
-    Object.keys(this.state.references).map(key => (
+  renderItems = () => {
+    const files = Object.keys(this.state.references);
+    const currentFilePath = this.props.data.repoDetails.path;
+    // files should be sorted by nearness to the current file path
+    files.sort((x, y) => pathNearnessSorter(x, y, currentFilePath));
+    return files.map(key => (
       <ReferenceFileSection
         name={key}
         items={this.state.references[key]}
@@ -133,32 +128,18 @@ class References extends BaseReaderSection {
         isCollapsed={this.state.hasCollapsedFiles}
       />
     ));
+  };
 
-  renderResult = () =>
-    this.state.count > 0 ? (
-      <div className="reference-container">
-        {this.renderContainerTitle()}
-        <div className="reference-files">{this.renderFileSections()}</div>
-      </div>
-    ) : (
-      this.renderNoResults()
-    );
+  getCountText = () =>
+    this.state.count === 1 ? `1 usage` : `${this.state.count} usages`;
 
-  renderContents = () =>
-    this.state.name ? this.renderResult() : this.renderZeroState();
+  renderDocstring = () => null;
 
-  render() {
-    let referencesClassName = this.isVisible()
-      ? "references-section"
-      : "references-section collapsed";
+  hasResults = () => this.state.count > 0;
 
-    return (
-      <div className={referencesClassName}>
-        {this.renderSectionHeader()}
-        {this.isVisible() ? this.renderContents() : null}
-      </div>
-    );
-  }
+  getName = () => this.state.name;
+
+  isTriggered = () => (this.state.name ? true : false);
 }
 
 function mapStateToProps(state) {

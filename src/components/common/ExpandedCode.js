@@ -98,11 +98,16 @@ export default class ExpandedCode extends React.Component {
     </div>
   );
 
-  renderLink = (text, isBlank, onClick) => (
-    <InlineButton href={this.props.fileLink} {...{ isBlank, onClick, text }} />
+  renderLink = (text, isBlank, onClick, icon) => (
+    <InlineButton
+      href={this.props.fileLink}
+      style={{ marginLeft: 5 }}
+      {...{ isBlank, onClick, text, icon }}
+    />
   );
 
-  renderNewTab = () => this.renderLink("Open file ↗", true);
+  renderNewTab = () =>
+    this.renderLink("Open file", true, null, "link-external");
 
   getFileboxSelector = path => {
     const service = getGitService();

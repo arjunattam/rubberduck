@@ -38,6 +38,10 @@ const pageListenerMap = {
   bitbucket: bitbucketListener
 };
 
+export const isMac = () => navigator.platform.indexOf("Mac") >= 0;
+
+export const getMetaKey = () => (isMac() ? "⌘" : "ctrl");
+
 export const pathAdapter = pathAdapterMap[getGitService()];
 export const treeAdapter = treeAdapterMap[getGitService()];
 export const getPageListener = pageListenerMap[getGitService()];

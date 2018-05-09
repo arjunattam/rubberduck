@@ -16,6 +16,8 @@ class Definitions extends BaseReaderSection {
     definition: {}
   };
 
+  clearState = name => this.setState({ definition: { name } });
+
   getFilePath = result =>
     result.definition && result.definition.location
       ? result.definition.location.path
@@ -35,6 +37,7 @@ class Definitions extends BaseReaderSection {
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
+      this.clearState(hoverResult.name);
       this.DataActions.callDefinitions(hoverResult).then(response => {
         const result = response.value.result;
         const filePath = this.getFilePath(result);
@@ -73,24 +76,14 @@ class Definitions extends BaseReaderSection {
     }
   };
 
-  renderContainerTitle = () => (
-    <div className="reference-title-container">
-      <div className="reference-title">
-        <div className="reference-name monospace">
-          {this.state.definition.name}
-        </div>
-      </div>
-    </div>
-  );
-
-  renderItem = () => {
+  renderItems = () => {
     const items = [this.state.definition];
     const { filePath: name } = this.state.definition;
     const { fileContents } = this.props.data;
     const { sidebarWidth } = this.props.storage;
-    return (
+    return this.hasResults() ? (
       <DefinitionFileSection {...{ name, items, fileContents, sidebarWidth }} />
-    );
+    ) : null;
   };
 
   renderDocstring = () =>
@@ -100,31 +93,15 @@ class Definitions extends BaseReaderSection {
       </div>
     ) : null;
 
-  renderResult = () =>
-    this.state.definition.filePath ? (
-      <div className="reference-container">
-        {this.renderContainerTitle()}
-        {this.renderDocstring()}
-        <div className="reference-files">{this.renderItem()}</div>
-      </div>
-    ) : (
-      this.renderNoResults()
-    );
+  getCountText = () => null;
 
-  renderContents = () =>
-    this.state.definition.name ? this.renderResult() : this.renderZeroState();
+  renderCollapseButton = () => null;
 
-  render() {
-    let definitonClassName = this.isVisible()
-      ? "references-section"
-      : "references-section collapsed";
-    return (
-      <div className={definitonClassName}>
-        {this.renderSectionHeader()}
-        {this.isVisible() ? this.renderContents() : null}
-      </div>
-    );
-  }
+  hasResults = () => (this.state.definition.filePath ? true : false);
+
+  getName = () => this.state.definition.name;
+
+  isTriggered = () => (this.state.definition.name ? true : false);
 }
 
 function mapStateToProps(state) {

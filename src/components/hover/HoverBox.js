@@ -2,16 +2,13 @@ import React from "react";
 import PropTypes from "prop-types";
 import Docstring from "../common/Docstring";
 import HoverSignature from "./HoverSignature";
+import { getMetaKey } from "../../adapters";
 import { decodeBase64 } from "../../utils/data";
 import "./Hover.css";
 
 const MAX_HEIGHT = 240;
 const MAX_WIDTH = 300;
 const TOP_MARGIN = 2;
-
-const isMac = () => navigator.platform.indexOf("Mac") >= 0;
-
-const getMetaKey = () => (isMac() ? "⌘" : "ctrl");
 
 const HelperText = props => (
   <div style={{ textAlign: props.textAlign }}>
