@@ -99,7 +99,9 @@ export class BaseReaderSection extends BaseSection {
   fetchContents = fileObject => {
     const { filePath, fileSha } = fileObject;
     const baseOrHead = fileSha === "base" ? fileSha : "head";
-    return this.DataActions.callFileContents({ baseOrHead, filePath });
+    return filePath
+      ? this.DataActions.callFileContents({ baseOrHead, filePath })
+      : null;
   };
 
   getFileContents = fileObject => {

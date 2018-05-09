@@ -13,11 +13,14 @@ export const isGithubCompareView = () => {
 
   if (pathMatch) {
     const typeClass = pathMatch[3];
-    return (
-      typeClass.indexOf("pull") === 0 ||
-      typeClass.indexOf("commit") === 0 ||
-      typeClass.indexOf("compare") === 0
-    );
+    if (typeClass.indexOf("pull") === 0) {
+      // Could be pull/18 (is compare view) or pulls (is not)
+      return typeClass.indexOf("pulls") !== 0;
+    } else {
+      return (
+        typeClass.indexOf("commit") === 0 || typeClass.indexOf("compare") === 0
+      );
+    }
   } else {
     return false;
   }

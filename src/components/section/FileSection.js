@@ -72,6 +72,12 @@ class FileSubSection extends React.Component {
     }
   }
 
+  componentDidMount() {
+    if (this.props.isParentCollapsed !== this.state.isCollapsed) {
+      this.setState({ isCollapsed: this.props.isParentCollapsed });
+    }
+  }
+
   scrollToLine = lineNumber => this.setState({ currentLineNumber: lineNumber });
 
   renderSectionItem = (item, key) => (
