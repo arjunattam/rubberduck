@@ -60,19 +60,13 @@ class Definitions extends BaseReaderSection {
         const apiResult = response.value.result;
         const definition = this.getDefinitionObject(apiResult, hoverResult);
         this.setState({ definition: definition }, () =>
-          this.fetchFileContents()
+          this.fetchDefinitionContents()
         );
       });
     }
   };
 
-  fetchFileContents = () => {
-    const { fileSha, filePath } = this.state.definition;
-    const baseOrHead = fileSha === "base" ? fileSha : "head";
-    return filePath
-      ? this.DataActions.callFileContents({ baseOrHead, filePath })
-      : null;
-  };
+  fetchDefinitionContents = () => this.fetchContents(this.state.definition);
 
   renderItems = () => {
     const fileObject = this.state.definition;

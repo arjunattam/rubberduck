@@ -6,6 +6,8 @@ import InlineButton from "../common/InlineButton";
 import { pathNearnessSorter } from "../../utils/data";
 import "./References.css";
 
+const MAX_FILES_TO_PREFETCH = 3;
+
 class References extends BaseReaderSection {
   sectionName = "usages";
 
@@ -40,11 +42,11 @@ class References extends BaseReaderSection {
     });
 
     const metadataObjects = apiResult.reduce((accumulator, reference) => {
-      const { path } = reference.location;
+      const { path: filePath } = reference.location;
       const { fileSha } = hoverResult;
-      const link = this.getFileLink(fileSha, path);
-      const obj = { path, fileSha, link };
-      accumulator[path] = obj;
+      const link = this.getFileLink(fileSha, filePath);
+      const obj = { filePath, fileSha, link };
+      accumulator[filePath] = obj;
       return accumulator;
     }, {});
 
@@ -75,32 +77,29 @@ class References extends BaseReaderSection {
             count: result.count,
             references: this.getReferenceItems(result.references, hoverResult)
           },
-          () => this.fetchFileContents()
+          () => this.fetchReferencesContents()
         );
       });
     }
   };
 
-  fetchFileContents = () => {
-    const filesToQuery = this.state.references.map(fileObject => ({
-      filePath: fileObject.path,
-      baseOrHead: fileObject.fileSha === "base" ? fileObject.fileSha : "head"
-    }));
-    filesToQuery.forEach(fileSignature => {
-      this.DataActions.callFileContents(fileSignature);
-    });
+  fetchReferencesContents = () => {
+    const referencesCopy = [].concat(this.state.references);
+    const fetchable = referencesCopy.splice(0, MAX_FILES_TO_PREFETCH);
+    fetchable.forEach(fileObject => this.fetchContents(fileObject));
   };
 
   renderItems = () => {
     return this.state.references.map(fileObject => (
       <ReferenceFileSection
-        key={fileObject.path}
-        path={fileObject.path}
+        key={fileObject.filePath}
+        path={fileObject.filePath}
         link={fileObject.link}
         {...this.getFileContents(fileObject)}
         items={fileObject.items}
         sidebarWidth={this.props.storage.sidebarWidth}
-        isCollapsed={this.state.hasCollapsedFiles}
+        isParentCollapsed={this.state.hasCollapsedFiles}
+        onHover={() => this.fetchContents(fileObject)}
       />
     ));
   };

@@ -28,6 +28,7 @@ class FileSubSection extends React.Component {
     this.setState({
       isHovering: true
     });
+    return this.props.onHover ? this.props.onHover() : null;
   };
 
   handleMouseLeave = event => {
@@ -66,8 +67,8 @@ class FileSubSection extends React.Component {
   };
 
   componentWillReceiveProps(newProps) {
-    if (newProps.isCollapsed !== this.state.isCollapsed) {
-      this.setState({ isCollapsed: newProps.isCollapsed });
+    if (newProps.isParentCollapsed !== this.props.isParentCollapsed) {
+      this.setState({ isCollapsed: newProps.isParentCollapsed });
     }
   }
 
@@ -81,12 +82,24 @@ class FileSubSection extends React.Component {
     />
   );
 
-  getSnippetStyle = () => ({
-    left: this.props.sidebarWidth + 2,
-    top: this.refs.container
-      ? this.refs.container.getBoundingClientRect().top
-      : 0
-  });
+  handleMouseOver = event => {
+    const isMovingOnFileSection = event.clientX < this.props.sidebarWidth;
+    const isDeltaLarge =
+      !this.state.screenY ||
+      Math.abs(event.screenY - this.state.screenY) >= 100;
+
+    if (isMovingOnFileSection && isDeltaLarge)
+      this.setState({ screenY: event.screenY });
+  };
+
+  getSnippetStyle = () => {
+    const { screenY } = this.state;
+    const top = screenY ? Math.max(screenY - 200, 25) : 25;
+    return {
+      left: this.props.sidebarWidth + 2,
+      top
+    };
+  };
 
   renderExpandedCode = () => {
     const lineNumbers = this.props.items.map(item => item.lineNumber);
@@ -113,6 +126,7 @@ class FileSubSection extends React.Component {
         className={sectionClassName}
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
+        onMouseOver={this.handleMouseOver}
         ref={"container"}
       >
         {this.renderFileTitle()}

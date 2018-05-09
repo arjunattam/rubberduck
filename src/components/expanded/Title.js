@@ -165,7 +165,7 @@ export default class Title extends React.Component {
             style={{ verticalAlign: "text-bottom", color: "#999" }}
             name="file"
           />
-          <span>{this.props.filePath}</span>
+          <span style={{ marginLeft: 3 }}>{this.props.filePath}</span>
         </div>
         {this.renderSameTab()}
         {this.renderNewTab()}
