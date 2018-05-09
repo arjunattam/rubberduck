@@ -5,23 +5,17 @@ import { isCompareView } from "../../adapters";
 const PADDING_CONST = 12; // in pixels
 const COMPARE_VIEW_OPEN_DEPTH = 3;
 
+const isFolder = element => element.children.length > 0;
+
+const alphabetSort = (a, b) => a.name.localeCompare(b.name);
+
 const sortChildren = children => {
   const parents = children
-    .filter(element => {
-      return element.children.length > 0;
-    })
-    .sort(function(a, b) {
-      return a.name.localeCompare(b.name);
-    });
+    .filter(element => isFolder(element))
+    .sort(alphabetSort);
   const onlyChildren = children
-    .filter(element => {
-      return element.children.length === 0;
-    })
-    .sort(function(a, b) {
-      return a.name.localeCompare(b.name);
-    });
-
-  // Expected ordering is first folders, then files, each alphabetical
+    .filter(element => !isFolder(element))
+    .sort(alphabetSort);
   return parents.concat(onlyChildren);
 };
 
@@ -32,6 +26,8 @@ export const renderChildren = (children, depth, parentProps, currentPath) => {
   return (
     <div>
       {childrenToRender.map(element => {
+        // Ordering of props is important since the element
+        // needs to override the parentProps
         const childProps = {
           ...parentProps,
           ...element,
@@ -39,13 +35,11 @@ export const renderChildren = (children, depth, parentProps, currentPath) => {
           key: element.path,
           currentPath
         };
-        if (element.children.length > 0) {
-          // Ordering of props is important since the element
-          // needs to override the parentProps
-          return <Folder {...childProps} />;
-        } else {
-          return <File {...childProps} />;
-        }
+        return isFolder(element) ? (
+          <Folder {...childProps} />
+        ) : (
+          <File {...childProps} />
+        );
       })}
     </div>
   );
@@ -56,14 +50,10 @@ class Folder extends React.Component {
     isCollapsed: true
   };
 
-  getPadding = () => {
-    // padding is a function of depth
-    return this.props.depth * PADDING_CONST;
-  };
+  getPadding = () => this.props.depth * PADDING_CONST;
 
-  toggleCollapsed = () => {
+  toggleCollapsed = () =>
     this.setState({ isCollapsed: !this.state.isCollapsed });
-  };
 
   renderFolderStructure = () => {
     const children = this.props.children;
@@ -76,12 +66,9 @@ class Folder extends React.Component {
     return <div className="file-children">{renderedChildren}</div>;
   };
 
-  isCurrentlyOpen = () => {
-    return (
-      this.props.currentPath &&
-      this.props.currentPath.indexOf(this.props.path) >= 0
-    );
-  };
+  isCurrentlyOpen = () =>
+    this.props.currentPath &&
+    this.props.currentPath.indexOf(this.props.path) >= 0;
 
   componentDidMount() {
     let isCollapsed = true;
