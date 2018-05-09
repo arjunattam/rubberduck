@@ -1,8 +1,9 @@
 import React from "react";
 import File from "./File";
 import TreeLabel from "./TreeLabel";
-
+import { isCompareView } from "../../adapters";
 const PADDING_CONST = 12; // in pixels
+const COMPARE_VIEW_OPEN_DEPTH = 3;
 
 const sortChildren = children => {
   const parents = children
@@ -83,8 +84,16 @@ class Folder extends React.Component {
   };
 
   componentDidMount() {
+    let isCollapsed = true;
+    if (isCompareView()) {
+      if (this.props.depth < COMPARE_VIEW_OPEN_DEPTH) {
+        isCollapsed = false;
+      }
+    } else {
+      isCollapsed = !this.isCurrentlyOpen();
+    }
     this.setState({
-      isCollapsed: !this.isCurrentlyOpen()
+      isCollapsed
     });
   }
 

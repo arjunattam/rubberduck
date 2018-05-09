@@ -23,6 +23,17 @@ export const isGithubCompareView = () => {
   }
 };
 
+export const isCompareView = () => {
+  switch (getGitService()) {
+    case "bitbucket":
+      return true;
+    case "github":
+      return isGithubCompareView();
+    default:
+      return false;
+  }
+};
+
 const pathAdapterMap = {
   github: GithubPathAdapter,
   bitbucket: BitbucketPathAdapter

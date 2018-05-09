@@ -2,11 +2,13 @@ import React from "react";
 import { connect } from "react-redux";
 import { renderChildren } from "./Folder";
 import { BaseSection } from "../section";
-import { treeAdapter } from "../../adapters";
+import { treeAdapter, isCompareView } from "../../adapters";
 import "./Tree.css";
 
 class Tree extends BaseSection {
   sectionName = "tree";
+
+  getSectionTitle = () => (isCompareView() ? "files changed" : "files tree");
 
   flattenSingleDirectory = () => {
     // This method flattens the tree in the case when there is a chain

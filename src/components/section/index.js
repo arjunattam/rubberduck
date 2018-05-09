@@ -19,8 +19,7 @@ export class BaseSection extends React.Component {
     this.DataActions.setOpenSection(openSection);
   };
 
-  getSectionTitle = () =>
-    this.sectionName === "tree" ? "files tree" : this.sectionName;
+  getSectionTitle = () => this.sectionName;
 
   renderSectionHeader = () => (
     <SectionHeader
