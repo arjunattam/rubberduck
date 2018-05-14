@@ -11,28 +11,30 @@ class Tree extends BaseSection {
   getSectionTitle = () => (isCompareView() ? "files changed" : "files tree");
 
   flattenSingleDirectory = () => {
-    // This method flattens the tree in the case when there is a chain
-    // of single directories.
-    // For example, src/org/eclipse/ls/... (often found in Java)
+    // Flatten the tree when there is a chain of single directories (often found in Java)
+    // For example, src/org/eclipse/ls/...
     const tree = this.props.data.fileTree;
     if (tree.children) {
+      console.log(tree.children);
       return treeAdapter.flattenChildren(tree).children;
     }
     return tree.children;
   };
 
   componentDidMount() {
-    document.addEventListener("pjax:send", () =>
-      this.DataActions.setTreeLoading(true)
-    );
-    document.addEventListener("pjax:complete", () =>
-      this.DataActions.setTreeLoading(false)
-    );
+    document.addEventListener("pjax:send", () => this.onPjaxStart());
+    document.addEventListener("pjax:complete", () => this.onPjaxEnd());
   }
 
+  onPjaxStart = () => {
+    this.DataActions.setTreeLoading(true);
+  };
+
+  onPjaxEnd = () => {
+    this.DataActions.setTreeLoading(false);
+  };
+
   render() {
-    // data.fileTree is a recursive tree structure, where every element
-    // has children, that denote the subtree
     const children = this.flattenSingleDirectory();
     const renderedChildren = renderChildren(
       children,

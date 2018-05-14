@@ -3,6 +3,13 @@ import { getGitService } from "../../adapters";
 const Pjax = require("pjax");
 let GlobalPjax;
 
+const FILES_TREE_SELECTOR = "#mercury-sidebar .tree-container .tree-content";
+
+const LINK_SELECTOR = "#mercury-sidebar a";
+
+/**
+ * returns pjax selector for git remote service
+ */
 const getPjaxSelector = () => {
   const service = getGitService();
   if (service === "github") {
@@ -12,12 +19,12 @@ const getPjaxSelector = () => {
   }
 };
 
+/**
+ * sets up pjax, only on elements of the sidebar (this is important!)
+ */
 const createPjax = () => {
-  // The `elements` needs to be namespaced or it shows weird
-  // behaviour on Github. The PR buttons gets disabled on going from
-  // repo home page --> open new PR page.
   GlobalPjax = new Pjax({
-    elements: "#mercury-sidebar a", // default is "a[href], form[action]"
+    elements: LINK_SELECTOR,
     selectors: ["title", ...getPjaxSelector()],
     disablePjaxHeader: true,
     cacheBust: false,
@@ -25,22 +32,24 @@ const createPjax = () => {
   });
 };
 
+/**
+ * pjax needs to be reset whenever there is a mutation on the
+ * files tree DOM element.
+ */
 const setupPjaxHelper = () => {
-  // Trigger pjax setup whenever the files tree DOM changes
-  // Select the node that will be observed for mutations
-  var targetNode = document.querySelector(".tree-container");
-  // Options for the observer (which mutations to observe)
+  console.log("setup pjax helper");
+  var targetNode = document.querySelector(FILES_TREE_SELECTOR);
   var config = { childList: true, subtree: true };
-  // Callback function to execute when mutations are observed
   var callback = function(mutationsList) {
+    // TODO(arjun): remove console logs
+    console.log("mutations", mutationsList);
     createPjax();
   };
-  // Create an observer instance linked to the callback function
   var observer = new MutationObserver(callback);
-  // Start observing the target node for configured mutations
+
   if (targetNode) {
     observer.observe(targetNode, config);
-    createPjax();
+    createPjax(); // first time setup
   }
 };
 
@@ -50,8 +59,10 @@ const setupPjaxHelper = () => {
  */
 export const loadUrl = path => GlobalPjax.loadUrl(path);
 
+/**
+ * waits for a second so that the page loads, and then sets up pjax
+ */
 export const setupPjax = () => {
-  // Wait for 1 seconds, and then setup pjax
   setTimeout(() => {
     setupPjaxHelper();
   }, 1000);

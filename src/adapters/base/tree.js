@@ -61,9 +61,9 @@ const returnIfSame = (children, key) => {
     return children[0][key];
   }
 
-  return children.reduce(function(a, b) {
-    return a && b && a[key] === b[key] ? a[key] : null;
-  });
+  return children.reduce(function(result, child) {
+    return result && child && result === child[key] ? result : null;
+  }, children[0][key]);
 };
 
 export const appendDiffInfo = (tree, prResponse) => {
