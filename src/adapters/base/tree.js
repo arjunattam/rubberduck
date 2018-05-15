@@ -61,9 +61,19 @@ const returnIfSame = (children, key) => {
     return children[0][key];
   }
 
-  return children.reduce(function(result, child) {
+  const common = children.reduce(function(result, child) {
     return result && child && result === child[key] ? result : null;
   }, children[0][key]);
+
+  if (common !== null) {
+    // The children have the same status, so we can return it, and remove
+    // the label from the children
+    children.forEach(element => {
+      element[key] = null;
+    });
+  }
+
+  return common;
 };
 
 export const appendDiffInfo = (tree, prResponse) => {

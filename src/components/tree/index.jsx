@@ -15,7 +15,6 @@ class Tree extends BaseSection {
     // For example, src/org/eclipse/ls/...
     const tree = this.props.data.fileTree;
     if (tree.children) {
-      console.log(tree.children);
       return treeAdapter.flattenChildren(tree).children;
     }
     return tree.children;
