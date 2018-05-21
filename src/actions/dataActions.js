@@ -52,24 +52,38 @@ export function setTreeLoading(data) {
   };
 }
 
-export function callTree(repoDetails) {
+function getTreeResponseHandler(repoDetails) {
   const { reponame, type } = repoDetails;
-  let handler;
-
   switch (type) {
     case "pull":
     case "commit":
     case "compare":
-      handler = response => treeAdapter.getPRChildren(reponame, response);
-      break;
+      return response => treeAdapter.getPRChildren(reponame, response);
     default:
-      handler = response => treeAdapter.getTreeChildren(reponame, response);
+      return response => treeAdapter.getTreeChildren(reponame, response);
   }
+}
 
+export function callTree(repoDetails) {
+  const handler = getTreeResponseHandler(repoDetails);
   return {
     type: "CALL_TREE",
     payload: API.getTree(repoDetails).then(response => {
-      return handler(response);
+      return {
+        ...response,
+        data: handler(response.data),
+        raw: response.data
+      };
+    })
+  };
+}
+
+export function callTreePages(repoDetails, firstPageData, pageNumbers) {
+  const handler = getTreeResponseHandler(repoDetails);
+  return {
+    type: "CALL_TREE_PAGES",
+    payload: API.getTreePages(repoDetails, pageNumbers).then(response => {
+      return handler(response.concat(firstPageData));
     })
   };
 }

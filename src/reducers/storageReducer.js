@@ -26,10 +26,6 @@ export default createReducer(initialState, {
   },
   UPDATE_FROM_CHROME_STORAGE: (state, action) => {
     if (!action.payload) return { ...state };
-    console.log("Updated storage data from chrome", {
-      ...state,
-      ...action.payload
-    });
     let sanitizedPayload = action.payload;
     return {
       ...state,

@@ -14,6 +14,7 @@ import * as StorageUtils from "../storage";
 const linkParser = require("parse-link-header");
 
 const CACHED_EXPIRY = 3; // hours
+const IS_CACHING_ENABLED = true;
 
 export class BaseAPI {
   constructor() {
@@ -79,6 +80,7 @@ export class BaseAPI {
   setCached(uri, response) {
     const encoded = hash(uri);
     const lastModified = response.headers["last-modified"];
+    const link = response.headers["link"];
     const { data } = response;
     const expiry = Moment()
       .add(CACHED_EXPIRY, "hours")
@@ -87,28 +89,37 @@ export class BaseAPI {
 
     if (lastModified && data) {
       let apiResponses = this.clearCache(storage.apiResponses);
-      apiResponses[encoded] = { lastModified, data, expiry };
+      apiResponses[encoded] = { lastModified, data, expiry, link };
       StorageUtils.setInLocalStore({ apiResponses }, () => {});
     }
   }
 
-  handlePagination(response) {
-    const { Link: linkHeaders } = response.headers;
+  getNextPages(linkHeaders) {
+    let next, last;
     if (linkHeaders) {
-      console.log(linkParser(linkHeaders));
+      const parsed = linkParser(linkHeaders);
+      next = parsed.next ? +parsed.next.page : null;
+      last = parsed.last ? +parsed.last.page : null;
     }
-    return response;
+    let result = {};
+    if (next) {
+      result.nextPage = next;
+    }
+    if (last) {
+      result.lastPage = last;
+    }
+    return result;
   }
 
   cacheOrGet(uri) {
     const cached = this.getCached(uri);
-    const { lastModified, data: cachedResponse } = cached;
+    const { lastModified, link, data: cachedResponse } = cached;
     // The authorization header needs to be reset because axios.create
     // is setting a default header. (Can clean this up)
-    let headers = { Authorization: `` };
+    let headers = { Authorization: "" };
 
-    if (lastModified && cachedResponse) {
-      headers[`If-Modified-Since`] = lastModified;
+    if (lastModified && cachedResponse && IS_CACHING_ENABLED) {
+      headers["If-Modified-Since"] = lastModified;
     }
 
     const options = {
@@ -116,19 +127,19 @@ export class BaseAPI {
       validateStatus: status => status < 400
     };
 
-    return axios
-      .get(uri, options)
-      .then(this.handlePagination)
-      .then(response => {
-        if (response.status === 304) {
-          const lastModified = response.headers["last-modified"];
-          this.updateCache(uri, lastModified);
-          return cachedResponse;
-        } else {
-          this.setCached(uri, response);
-          return response.data;
-        }
-      });
+    return axios.get(uri, options).then(response => {
+      if (response.status === 304) {
+        const lastModified = response.headers["last-modified"];
+        this.updateCache(uri, lastModified);
+        const next = this.getNextPages(link);
+        return { data: cachedResponse, ...next };
+      } else {
+        this.setCached(uri, response);
+        const { link: linkHeaders } = response.headers;
+        const next = this.getNextPages(linkHeaders);
+        return { data: response.data, ...next };
+      }
+    });
   }
 }
 

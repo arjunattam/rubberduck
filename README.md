@@ -22,6 +22,12 @@ This repo is the chrome extension for the mercury project.
     npm run pack
     ```
 
+4.  Run tests with (defaults to watch mode).
+
+    ```
+    yarn test
+    ```
+
 ## Testing with localhost
 
 1.  Run the local server

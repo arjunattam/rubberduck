@@ -26,21 +26,22 @@ const EXAMPLE_PR_FILES_RESPONSE_2 = [
 ];
 
 const LINK_HEADERS =
-  '<https://api.github.com/repositories/50594260/pulls/824/files?page=2>; rel="next", <https://api.github.com/repositories/50594260/pulls/824/files?page=5>; rel="last"';
+  '<https://api.github.com/repositories/134233736/pulls/824/files?page=2>; rel="next", <https://api.github.com/repositories/134233736/pulls/824/files?page=5>; rel="last"';
+
+const REPO_DETAILS = {
+  type: "pull",
+  reponame: "test-repo",
+  username: "test-org",
+  prId: 824,
+  isPrivate: false
+};
 
 afterEach(() => {
   mockAxios.reset();
 });
 
 test("pr files api calls correct url", () => {
-  const repoDetails = {
-    type: "pull",
-    reponame: "test-repo",
-    username: "test-org",
-    prId: 824,
-    isPrivate: false
-  };
-  API.getTree(repoDetails);
+  API.getTree(REPO_DETAILS);
   const EXPECTED_URL =
     "https://api.github.com/repos/test-org/test-repo/pulls/824/files";
   expect(mockAxios.get).toHaveBeenCalled();
@@ -48,32 +49,23 @@ test("pr files api calls correct url", () => {
 });
 
 test("pr files api generates correct response", () => {
-  const repoDetails = {
-    type: "pull",
-    reponame: "test-repo",
-    username: "test-org",
-    prId: 824,
-    isPrivate: false
-  };
-  const promise = API.getTree(repoDetails);
+  const promise = API.getTree(REPO_DETAILS);
   mockAxios.mockResponse({
     data: EXAMPLE_PR_FILES_RESPONSE
   });
-  expect(promise).resolves.toEqual(EXAMPLE_PR_FILES_RESPONSE);
+  expect(promise).resolves.toEqual({ data: EXAMPLE_PR_FILES_RESPONSE });
 });
 
-test("pr files api works with pagination", () => {
-  const repoDetails = {
-    type: "pull",
-    reponame: "test-repo",
-    username: "test-org",
-    prId: 824,
-    isPrivate: false
-  };
-  const promise = API.getTree(repoDetails);
+test("pr files api works with link headers", () => {
+  const promise = API.getTree(REPO_DETAILS);
   mockAxios.mockResponse({
     data: EXAMPLE_PR_FILES_RESPONSE,
-    headers: { Link: LINK_HEADERS }
+    headers: { link: LINK_HEADERS }
   });
-  expect(promise).resolves.toEqual(EXAMPLE_PR_FILES_RESPONSE);
+  const response = {
+    data: EXAMPLE_PR_FILES_RESPONSE,
+    nextPage: 2,
+    lastPage: 5
+  };
+  expect(promise).resolves.toEqual(response);
 });

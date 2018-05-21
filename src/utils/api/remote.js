@@ -72,12 +72,12 @@ let BaseGitRemoteAPI = {
     }
   },
 
-  getTree(repoDetails) {
+  getTreeCaller(repoDetails, page) {
     const { type } = repoDetails;
 
     switch (type) {
       case "pull":
-        return this.getPRFiles(repoDetails);
+        return this.getPRFiles(repoDetails, page);
       case "commit":
         return this.getCommitFiles(repoDetails);
       case "compare":
@@ -85,6 +85,20 @@ let BaseGitRemoteAPI = {
       default:
         return this.getFilesTree(repoDetails);
     }
+  },
+
+  getTree(repoDetails) {
+    return this.getTreeCaller(repoDetails, null);
+  },
+
+  getTreePages(repoDetails, pages) {
+    const callers = pages.map(page => this.getTreeCaller(repoDetails, page));
+    return Promise.all(callers).then(function(responses) {
+      return responses.reduce(
+        (result, current) => result.concat(current.data),
+        []
+      );
+    });
   }
 };
 
@@ -105,38 +119,53 @@ let GithubAPI = {
     return [401, 404];
   },
 
+  getUrlBase(repoDetails) {
+    const { username, reponame } = repoDetails;
+    return `repos/${username}/${reponame}`;
+  },
+
   getFilesTree(repoDetails) {
-    const { username, reponame, branch, isPrivate } = repoDetails;
-    const nonNullBranch = branch || "master"; // TODO(arjun): check for default branch
-    const uriPath = `repos/${username}/${reponame}/git/trees/${nonNullBranch}?recursive=1`;
+    const urlBase = this.getUrlBase(repoDetails);
+    const { branch, isPrivate } = repoDetails;
+    // TODO(arjun): check for default branch
+    const nonNullBranch = branch || "master";
+    const uriPath = `${urlBase}/git/trees/${nonNullBranch}?recursive=1`;
     return this.makeConditionalGet(uriPath, isPrivate);
   },
 
-  getPRFiles(repoDetails) {
-    const { username, reponame, prId, isPrivate } = repoDetails;
-    const uriPath = `repos/${username}/${reponame}/pulls/${prId}/files`;
+  getPRFiles(repoDetails, page) {
+    const urlBase = this.getUrlBase(repoDetails);
+    const { prId, isPrivate } = repoDetails;
+    let pageParam = "";
+    if (page) {
+      pageParam = `?page=${page}`;
+    }
+    const uriPath = `${urlBase}/pulls/${prId}/files${pageParam}`;
     return this.makeConditionalGet(uriPath, isPrivate);
   },
 
   getCommitFiles(repoDetails) {
-    const { username, reponame, headSha, isPrivate } = repoDetails;
-    const uriPath = `repos/${username}/${reponame}/commits/${headSha}`;
-    return this.makeConditionalGet(uriPath, isPrivate).then(
-      response => response.files
-    );
+    const urlBase = this.getUrlBase(repoDetails);
+    const { headSha, isPrivate } = repoDetails;
+    const uriPath = `${urlBase}/commits/${headSha}`;
+    return this.makeConditionalGet(uriPath, isPrivate).then(response => ({
+      data: response.data.files
+    }));
   },
 
   getCompareFiles(repoDetails) {
-    const { username, reponame, headSha, baseSha, isPrivate } = repoDetails;
-    const uriPath = `repos/${username}/${reponame}/compare/${baseSha}...${headSha}`;
-    return this.makeConditionalGet(uriPath, isPrivate).then(
-      response => response.files
-    );
+    const urlBase = this.getUrlBase(repoDetails);
+    const { headSha, baseSha, isPrivate } = repoDetails;
+    const uriPath = `${urlBase}/compare/${baseSha}...${headSha}`;
+    return this.makeConditionalGet(uriPath, isPrivate).then(response => ({
+      data: response.data.files
+    }));
   },
 
   getPRInfo(repoDetails) {
-    const { username, reponame, isPrivate, prId } = repoDetails;
-    const uriPath = `repos/${username}/${reponame}/pulls/${prId}`;
+    const urlBase = this.getUrlBase(repoDetails);
+    const { isPrivate, prId } = repoDetails;
+    const uriPath = `${urlBase}/pulls/${prId}`;
     return this.makeConditionalGet(uriPath, isPrivate);
   }
 };
