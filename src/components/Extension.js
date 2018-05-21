@@ -131,10 +131,7 @@ class Extension extends React.Component {
 
     if (repoDetails.username && repoDetails.reponame) {
       if (this.hasValidToken()) {
-        this.DataActions.callTree(repoDetails).then(response => {
-          const fileTreeData = response.value;
-          this.DataActions.setFileTree(fileTreeData);
-        });
+        this.DataActions.callTree(repoDetails);
       }
     }
   }

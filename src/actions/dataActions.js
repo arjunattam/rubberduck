@@ -1,6 +1,7 @@
 import { WS } from "../utils/websocket";
 import { API } from "../utils/api";
 import Store from "../store";
+import { treeAdapter } from "../adapters";
 
 export function updateData(data) {
   return {
@@ -37,13 +38,6 @@ export function setRepoDetails(data) {
   };
 }
 
-export function setFileTree(data) {
-  return {
-    type: "SET_FILE_TREE",
-    payload: data
-  };
-}
-
 export function setHoverResult(data) {
   return {
     type: "SET_HOVER_RESULT",
@@ -58,10 +52,25 @@ export function setTreeLoading(data) {
   };
 }
 
-export function callTree(data) {
+export function callTree(repoDetails) {
+  const { reponame, type } = repoDetails;
+  let handler;
+
+  switch (type) {
+    case "pull":
+    case "commit":
+    case "compare":
+      handler = response => treeAdapter.getPRChildren(reponame, response);
+      break;
+    default:
+      handler = response => treeAdapter.getTreeChildren(reponame, response);
+  }
+
   return {
     type: "CALL_TREE",
-    payload: API.getTree(data)
+    payload: API.getTree(repoDetails).then(response => {
+      return handler(response);
+    })
   };
 }
 

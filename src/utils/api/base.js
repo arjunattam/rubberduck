@@ -10,10 +10,14 @@ export default class BaseRequest {
     this.baseRequest = axios.create({
       baseURL: baseURL
     });
-    axiosRetry(this.baseRequest, {
-      retryDelay: axiosRetry.exponentialDelay,
-      retries: RETRY_LIMIT
-    });
+
+    // Need to write this because it fails in tests (!?) due to mock axios
+    try {
+      axiosRetry(this.baseRequest, {
+        retryDelay: axiosRetry.exponentialDelay,
+        retries: RETRY_LIMIT
+      });
+    } catch (e) {}
   }
 
   updateDefaultHeader(token) {

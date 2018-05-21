@@ -11,6 +11,8 @@ import GitRemoteAPI from "./remote";
 import { hash } from "../data";
 import * as StorageUtils from "../storage";
 
+const linkParser = require("parse-link-header");
+
 const CACHED_EXPIRY = 3; // hours
 
 export class BaseAPI {
@@ -90,22 +92,33 @@ export class BaseAPI {
     }
   }
 
+  handlePagination(response) {
+    const { Link: linkHeaders } = response.headers;
+    if (linkHeaders) {
+      console.log(linkParser(linkHeaders));
+    }
+    return response;
+  }
+
   cacheOrGet(uri) {
-    // The authorization header needs to be reset because axios.create
-    // is setting a default header. (Can clean this up)
-    const headers = { Authorization: `` };
     const cached = this.getCached(uri);
     const { lastModified, data: cachedResponse } = cached;
+    // The authorization header needs to be reset because axios.create
+    // is setting a default header. (Can clean this up)
+    let headers = { Authorization: `` };
 
     if (lastModified && cachedResponse) {
       headers[`If-Modified-Since`] = lastModified;
     }
 
+    const options = {
+      headers,
+      validateStatus: status => status < 400
+    };
+
     return axios
-      .get(uri, {
-        headers,
-        validateStatus: status => status < 400
-      })
+      .get(uri, options)
+      .then(this.handlePagination)
       .then(response => {
         if (response.status === 304) {
           const lastModified = response.headers["last-modified"];

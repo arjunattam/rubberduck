@@ -1,6 +1,6 @@
 import parse from "what-the-diff";
 import Raven from "raven-js";
-import { getGitService, treeAdapter } from "../../adapters";
+import { getGitService } from "../../adapters";
 
 let BaseGitRemoteAPI = {
   isRemoteAuthorized(isPrivate) {
@@ -28,61 +28,62 @@ let BaseGitRemoteAPI = {
     return false;
   },
 
-  makeConditionalGet(uriPath, isPrivate) {
-    if (this.isRemoteAuthorized(isPrivate)) {
-      // If user is logged in with github, we will send
-      // this API call to pass through via backend.
-      const uri = `${this.getPassthroughPath()}${uriPath.replace("?", "%3F")}/`;
-      return this.baseRequest
-        .fetch(uri)
-        .then(
-          response =>
-            // This is required for non-json responses, as the passthrough api
-            // JSONifies them with the jsonified key
-            response.jsonified || response
-        )
-        .catch(error => {
-          if (error.response.status === 401) {
-            // Remote has returned auth error
-            this.dispatchAuthenticated(false);
-          } else {
-            Raven.captureException(error);
-          }
-        });
-    } else {
-      // Make call directly to github using client IP address
-      // for efficient rate limit utilisation.
-      const fullUrl = this.buildUrl(uriPath);
-      return this.cacheOrGet(fullUrl).catch(error => {
-        const privateRepoErrorCodes = this.getPrivateErrorCodes();
-        const { status } = error.response;
-        if (privateRepoErrorCodes.indexOf(status) >= 0) {
+  makePassthrough(uriPath) {
+    const fixedPath = uriPath.replace("?", "%3F");
+    const fullUri = `${this.getPassthroughPath()}${fixedPath}/`;
+    return this.baseRequest
+      .fetch(fullUri)
+      .then(
+        response =>
+          // This is required for non-json responses, as the passthrough api
+          // JSONifies them with the jsonified key
+          response.jsonified || response
+      )
+      .catch(error => {
+        if (error.response.status === 401) {
+          // Remote has returned auth error
           this.dispatchAuthenticated(false);
+        } else {
+          Raven.captureException(error);
         }
       });
+  },
+
+  makeRemoteCall(uriPath) {
+    const fullUri = this.buildUrl(uriPath);
+    return this.cacheOrGet(fullUri).catch(error => {
+      const privateRepoErrorCodes = this.getPrivateErrorCodes();
+      const { status } = error.response;
+      if (privateRepoErrorCodes.indexOf(status) >= 0) {
+        this.dispatchAuthenticated(false);
+      }
+    });
+  },
+
+  makeConditionalGet(uriPath, isPrivate) {
+    if (this.isRemoteAuthorized(isPrivate)) {
+      // If user is logged in with remote, we will send
+      // this API call to pass through via backend.
+      return this.makePassthrough(uriPath);
+    } else {
+      // Make call directly to remote using client IP address
+      // for efficient rate limit utilisation.
+      return this.makeRemoteCall(uriPath);
     }
   },
 
   getTree(repoDetails) {
-    const { reponame, type } = repoDetails;
+    const { type } = repoDetails;
 
     switch (type) {
       case "pull":
-        return this.getPRFiles(repoDetails).then(response =>
-          treeAdapter.getPRChildren(reponame, response)
-        );
+        return this.getPRFiles(repoDetails);
       case "commit":
-        return this.getCommitFiles(repoDetails).then(response =>
-          treeAdapter.getPRChildren(reponame, response)
-        );
+        return this.getCommitFiles(repoDetails);
       case "compare":
-        return this.getCompareFiles(repoDetails).then(response =>
-          treeAdapter.getPRChildren(reponame, response)
-        );
+        return this.getCompareFiles(repoDetails);
       default:
-        return this.getFilesTree(repoDetails).then(response =>
-          treeAdapter.getTreeChildren(reponame, response)
-        );
+        return this.getFilesTree(repoDetails);
     }
   }
 };
