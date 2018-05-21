@@ -67,7 +67,7 @@ export default class File extends React.Component {
 
     if (path.match(/\/[^/.]+\/[^/.]+\/pull\/\d+\/files.*/) !== null) {
       // The path matches the files changed url
-      return path;
+      return null;
     } else if (path.match(/\/[^/.]+\/[^/.]+\/pull\/\d+.*/) !== null) {
       // The path matches other PR urls
       let prBase = path.match(/\/[^/.]+\/[^/.]+\/pull\/\d+/)[0];

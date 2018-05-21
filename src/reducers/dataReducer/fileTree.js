@@ -7,8 +7,16 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  SET_FILE_TREE: (state, action) => ({
-    ...state,
-    ...action.payload
-  })
+  CALL_TREE_FULFILLED: (state, action) => {
+    return {
+      ...state,
+      ...action.payload.data
+    };
+  },
+  CALL_TREE_PAGES_FULFILLED: (state, action) => {
+    return {
+      ...state,
+      ...action.payload
+    };
+  }
 });

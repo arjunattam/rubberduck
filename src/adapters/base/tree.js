@@ -24,7 +24,6 @@ export const buildTree = fileList => {
   for (var levelName in hierarchy) {
     result.push({
       name: levelName,
-      path: "",
       children: buildTree(hierarchy[levelName])
     });
   }
@@ -61,9 +60,19 @@ const returnIfSame = (children, key) => {
     return children[0][key];
   }
 
-  return children.reduce(function(a, b) {
-    return a && b && a[key] === b[key] ? a[key] : null;
-  });
+  const common = children.reduce(function(result, child) {
+    return result && child && result === child[key] ? result : null;
+  }, children[0][key]);
+
+  if (common !== null) {
+    // The children have the same status, so we can return it, and remove
+    // the label from the children
+    children.forEach(element => {
+      element[key] = null;
+    });
+  }
+
+  return common;
 };
 
 export const appendDiffInfo = (tree, prResponse) => {
@@ -127,8 +136,7 @@ export const flattenChildren = tree => {
       flattened.children = child.children;
       return flattenChildren(flattened);
     } else {
-      // Child is a file
-      return tree;
+      return tree; // Child is a file
     }
   }
 };
