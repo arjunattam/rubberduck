@@ -33,30 +33,20 @@ export default class BaseRequest {
   }
 
   fetch(uri, params) {
-    return this.baseRequest
-      .get(uri, {
-        params
-      })
-      .then(response => {
-        return response.data ? response.data : response;
-      });
+    return this.baseRequest.get(uri, {
+      params
+    });
   }
 
   post(uri, body) {
-    return this.baseRequest.post(uri, body).then(response => {
-      return response.data ? response.data : response;
-    });
+    return this.baseRequest.post(uri, body);
   }
 
   patch(uri, body) {
-    return this.baseRequest.patch(uri, body).then(response => {
-      return response.data ? response.data : response;
-    });
+    return this.baseRequest.patch(uri, body);
   }
 
   remove(uri) {
-    return this.baseRequest.delete(uri).then(response => {
-      return response.data ? response.data : response;
-    });
+    return this.baseRequest.delete(uri);
   }
 }

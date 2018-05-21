@@ -42,12 +42,16 @@ export class BaseAPI {
 
   issueToken(clientId) {
     const uri = `${baseApiUrl}/token_issue/`;
-    return this.baseRequest.post(uri, { client_id: clientId });
+    return this.baseRequest
+      .post(uri, { client_id: clientId })
+      .then(response => response.data);
   }
 
   refreshToken(token) {
     const uri = `${baseApiUrl}/token_refresh/`;
-    return this.baseRequest.post(uri, { token: token });
+    return this.baseRequest
+      .post(uri, { token: token })
+      .then(response => response.data);
   }
 
   getCached(uri) {

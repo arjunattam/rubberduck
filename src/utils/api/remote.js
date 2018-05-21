@@ -33,12 +33,15 @@ let BaseGitRemoteAPI = {
     const fullUri = `${this.getPassthroughPath()}${fixedPath}/`;
     return this.baseRequest
       .fetch(fullUri)
-      .then(
-        response =>
-          // This is required for non-json responses, as the passthrough api
-          // JSONifies them with the jsonified key
-          response.jsonified || response
-      )
+      .then(response => {
+        // This is required for non-json responses, as the passthrough api
+        // JSONifies them with the jsonified key
+        const { data, headers } = response;
+        const actual = data.jsonified || data;
+        const { link: linkHeaders } = headers;
+        const next = this.getNextPages(linkHeaders);
+        return { data: actual, ...next };
+      })
       .catch(error => {
         if (error.response.status === 401) {
           // Remote has returned auth error
