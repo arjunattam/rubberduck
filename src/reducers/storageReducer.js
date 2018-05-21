@@ -9,8 +9,10 @@ const initialState = {
   isSidebarVisible: true,
   sidebarWidth: 235,
 
-  // Hover debug
+  // Settings --> TODO(arjun): move these to chrome.storage.local (not sync)
   hasHoverDebug: false,
+  hasMenuBarApp: false,
+  defaultPort: 8000,
 
   // API response caching: hash of url is the object key
   apiResponses: {}
@@ -26,10 +28,6 @@ export default createReducer(initialState, {
   },
   UPDATE_FROM_CHROME_STORAGE: (state, action) => {
     if (!action.payload) return { ...state };
-    console.log("Updated storage data from chrome", {
-      ...state,
-      ...action.payload
-    });
     let sanitizedPayload = action.payload;
     return {
       ...state,

@@ -1,6 +1,7 @@
 import { WS } from "../utils/websocket";
 import { API } from "../utils/api";
 import Store from "../store";
+import { treeAdapter } from "../adapters";
 
 export function updateData(data) {
   return {
@@ -37,13 +38,6 @@ export function setRepoDetails(data) {
   };
 }
 
-export function setFileTree(data) {
-  return {
-    type: "SET_FILE_TREE",
-    payload: data
-  };
-}
-
 export function setHoverResult(data) {
   return {
     type: "SET_HOVER_RESULT",
@@ -58,10 +52,39 @@ export function setTreeLoading(data) {
   };
 }
 
-export function callTree(data) {
+function getTreeResponseHandler(repoDetails) {
+  const { reponame, type } = repoDetails;
+  switch (type) {
+    case "pull":
+    case "commit":
+    case "compare":
+      return response => treeAdapter.getPRChildren(reponame, response);
+    default:
+      return response => treeAdapter.getTreeChildren(reponame, response);
+  }
+}
+
+export function callTree(repoDetails) {
+  const handler = getTreeResponseHandler(repoDetails);
   return {
     type: "CALL_TREE",
-    payload: API.getTree(data)
+    payload: API.getTree(repoDetails).then(response => {
+      return {
+        ...response,
+        data: handler(response.data),
+        raw: response.data
+      };
+    })
+  };
+}
+
+export function callTreePages(repoDetails, firstPageData, pageNumbers) {
+  const handler = getTreeResponseHandler(repoDetails);
+  return {
+    type: "CALL_TREE_PAGES",
+    payload: API.getTreePages(repoDetails, pageNumbers).then(response => {
+      return handler(response.concat(firstPageData));
+    })
   };
 }
 

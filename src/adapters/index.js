@@ -5,7 +5,16 @@ import * as BitbucketTreeAdapter from "./bitbucket/tree";
 import { getListener as githubListener } from "./github/views";
 import { getListener as bitbucketListener } from "./bitbucket/views";
 
-export const getGitService = () => window.location.host.split(".")[0];
+export const getGitService = () => {
+  const hostname = window.location.host.split(".")[0];
+
+  if (hostname === "localhost") {
+    // Temporary fix till we figure out how to mock
+    return "github";
+  } else {
+    return hostname;
+  }
+};
 
 export const isGithubCompareView = () => {
   const { pathname } = window.location;

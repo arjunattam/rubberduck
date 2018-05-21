@@ -40,6 +40,12 @@ export default createReducer(initialState, {
   CALL_TREE_FULFILLED: (state, action) =>
     updateIsLoading(state, { tree: false }),
 
+  CALL_TREE_PAGES_PENDING: (state, action) =>
+    updateIsLoading(state, { tree: true }),
+
+  CALL_TREE_PAGES_FULFILLED: (state, action) =>
+    updateIsLoading(state, { tree: false }),
+
   CALL_TREE_REJECTED: (state, action) =>
     updateIsLoading(state, { tree: false }),
 

@@ -80,7 +80,6 @@ class Extension extends React.Component {
   }
 
   handleStorageUpdate(data) {
-    console.log("Storage changes via listener", data);
     this.StorageActions.updateFromChromeStorage(data);
   }
 
@@ -132,8 +131,16 @@ class Extension extends React.Component {
     if (repoDetails.username && repoDetails.reponame) {
       if (this.hasValidToken()) {
         this.DataActions.callTree(repoDetails).then(response => {
-          const fileTreeData = response.value;
-          this.DataActions.setFileTree(fileTreeData);
+          const { payload } = response.action;
+          if (payload && payload.nextPage && payload.lastPage) {
+            // We were not able to load the entire tree because API is paginated
+            let pages = [];
+            for (let i = payload.nextPage; i <= payload.lastPage; i++) {
+              pages.push(i);
+            }
+            const firstPageRaw = payload.raw;
+            this.DataActions.callTreePages(repoDetails, firstPageRaw, pages);
+          }
         });
       }
     }

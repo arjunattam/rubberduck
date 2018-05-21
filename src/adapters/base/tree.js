@@ -24,7 +24,6 @@ export const buildTree = fileList => {
   for (var levelName in hierarchy) {
     result.push({
       name: levelName,
-      path: "",
       children: buildTree(hierarchy[levelName])
     });
   }
@@ -137,8 +136,7 @@ export const flattenChildren = tree => {
       flattened.children = child.children;
       return flattenChildren(flattened);
     } else {
-      // Child is a file
-      return tree;
+      return tree; // Child is a file
     }
   }
 };

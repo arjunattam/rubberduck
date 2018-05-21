@@ -10,10 +10,14 @@ export default class BaseRequest {
     this.baseRequest = axios.create({
       baseURL: baseURL
     });
-    axiosRetry(this.baseRequest, {
-      retryDelay: axiosRetry.exponentialDelay,
-      retries: RETRY_LIMIT
-    });
+
+    // Need to write this because it fails in tests (!?) due to mock axios
+    try {
+      axiosRetry(this.baseRequest, {
+        retryDelay: axiosRetry.exponentialDelay,
+        retries: RETRY_LIMIT
+      });
+    } catch (e) {}
   }
 
   updateDefaultHeader(token) {
@@ -29,30 +33,20 @@ export default class BaseRequest {
   }
 
   fetch(uri, params) {
-    return this.baseRequest
-      .get(uri, {
-        params
-      })
-      .then(response => {
-        return response.data ? response.data : response;
-      });
+    return this.baseRequest.get(uri, {
+      params
+    });
   }
 
   post(uri, body) {
-    return this.baseRequest.post(uri, body).then(response => {
-      return response.data ? response.data : response;
-    });
+    return this.baseRequest.post(uri, body);
   }
 
   patch(uri, body) {
-    return this.baseRequest.patch(uri, body).then(response => {
-      return response.data ? response.data : response;
-    });
+    return this.baseRequest.patch(uri, body);
   }
 
   remove(uri) {
-    return this.baseRequest.delete(uri).then(response => {
-      return response.data ? response.data : response;
-    });
+    return this.baseRequest.delete(uri);
   }
 }

@@ -11,6 +11,7 @@
     "js-base64": "^2.4.3",
     "jsonwebtoken": "^8.1.1",
     "moment": "^2.20.1",
+    "parse-link-header": "^1.0.1",
     "pjax": "https://github.com/karigari/pjax.git#karigari",
     "raven-js": "^3.23.3",
     "react": "^16.2.0",
@@ -50,7 +51,11 @@
   },
   "devDependencies": {
     "crx": "^3.2.1",
+    "jest-mock-axios": "^2.1.11",
     "react-app-rewired": "^1.4.1",
     "write-file-webpack-plugin": "^4.2.0"
+  },
+  "jest": {
+    "collectCoverage": true
   }
 }

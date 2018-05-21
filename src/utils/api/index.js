@@ -11,7 +11,10 @@ import GitRemoteAPI from "./remote";
 import { hash } from "../data";
 import * as StorageUtils from "../storage";
 
+const linkParser = require("parse-link-header");
+
 const CACHED_EXPIRY = 3; // hours
+const IS_CACHING_ENABLED = true;
 
 export class BaseAPI {
   constructor() {
@@ -39,12 +42,16 @@ export class BaseAPI {
 
   issueToken(clientId) {
     const uri = `${baseApiUrl}/token_issue/`;
-    return this.baseRequest.post(uri, { client_id: clientId });
+    return this.baseRequest
+      .post(uri, { client_id: clientId })
+      .then(response => response.data);
   }
 
   refreshToken(token) {
     const uri = `${baseApiUrl}/token_refresh/`;
-    return this.baseRequest.post(uri, { token: token });
+    return this.baseRequest
+      .post(uri, { token: token })
+      .then(response => response.data);
   }
 
   getCached(uri) {
@@ -77,6 +84,7 @@ export class BaseAPI {
   setCached(uri, response) {
     const encoded = hash(uri);
     const lastModified = response.headers["last-modified"];
+    const link = response.headers["link"];
     const { data } = response;
     const expiry = Moment()
       .add(CACHED_EXPIRY, "hours")
@@ -85,37 +93,57 @@ export class BaseAPI {
 
     if (lastModified && data) {
       let apiResponses = this.clearCache(storage.apiResponses);
-      apiResponses[encoded] = { lastModified, data, expiry };
+      apiResponses[encoded] = { lastModified, data, expiry, link };
       StorageUtils.setInLocalStore({ apiResponses }, () => {});
     }
   }
 
+  getNextPages(linkHeaders) {
+    let next, last;
+    if (linkHeaders) {
+      const parsed = linkParser(linkHeaders);
+      next = parsed.next ? +parsed.next.page : null;
+      last = parsed.last ? +parsed.last.page : null;
+    }
+    let result = {};
+    if (next) {
+      result.nextPage = next;
+    }
+    if (last) {
+      result.lastPage = last;
+    }
+    return result;
+  }
+
   cacheOrGet(uri) {
+    const cached = this.getCached(uri);
+    const { lastModified, link, data: cachedResponse } = cached;
     // The authorization header needs to be reset because axios.create
     // is setting a default header. (Can clean this up)
-    const headers = { Authorization: `` };
-    const cached = this.getCached(uri);
-    const { lastModified, data: cachedResponse } = cached;
+    let headers = { Authorization: "" };
 
-    if (lastModified && cachedResponse) {
-      headers[`If-Modified-Since`] = lastModified;
+    if (lastModified && cachedResponse && IS_CACHING_ENABLED) {
+      headers["If-Modified-Since"] = lastModified;
     }
 
-    return axios
-      .get(uri, {
-        headers,
-        validateStatus: status => status < 400
-      })
-      .then(response => {
-        if (response.status === 304) {
-          const lastModified = response.headers["last-modified"];
-          this.updateCache(uri, lastModified);
-          return cachedResponse;
-        } else {
-          this.setCached(uri, response);
-          return response.data;
-        }
-      });
+    const options = {
+      headers,
+      validateStatus: status => status < 400
+    };
+
+    return axios.get(uri, options).then(response => {
+      if (response.status === 304) {
+        const lastModified = response.headers["last-modified"];
+        this.updateCache(uri, lastModified);
+        const next = this.getNextPages(link);
+        return { data: cachedResponse, ...next };
+      } else {
+        this.setCached(uri, response);
+        const { link: linkHeaders } = response.headers;
+        const next = this.getNextPages(linkHeaders);
+        return { data: response.data, ...next };
+      }
+    });
   }
 }
 

@@ -37,12 +37,9 @@ const createPjax = () => {
  * files tree DOM element.
  */
 const setupPjaxHelper = () => {
-  console.log("setup pjax helper");
   var targetNode = document.querySelector(FILES_TREE_SELECTOR);
   var config = { childList: true, subtree: true };
   var callback = function(mutationsList) {
-    // TODO(arjun): remove console logs
-    console.log("mutations", mutationsList);
     createPjax();
   };
   var observer = new MutationObserver(callback);

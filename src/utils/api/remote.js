@@ -1,6 +1,6 @@
 import parse from "what-the-diff";
 import Raven from "raven-js";
-import { getGitService, treeAdapter } from "../../adapters";
+import { getGitService } from "../../adapters";
 
 let BaseGitRemoteAPI = {
   isRemoteAuthorized(isPrivate) {
@@ -28,62 +28,80 @@ let BaseGitRemoteAPI = {
     return false;
   },
 
-  makeConditionalGet(uriPath, isPrivate) {
-    if (this.isRemoteAuthorized(isPrivate)) {
-      // If user is logged in with github, we will send
-      // this API call to pass through via backend.
-      const uri = `${this.getPassthroughPath()}${uriPath.replace("?", "%3F")}/`;
-      return this.baseRequest
-        .fetch(uri)
-        .then(
-          response =>
-            // This is required for non-json responses, as the passthrough api
-            // JSONifies them with the jsonified key
-            response.jsonified || response
-        )
-        .catch(error => {
-          if (error.response.status === 401) {
-            // Remote has returned auth error
-            this.dispatchAuthenticated(false);
-          } else {
-            Raven.captureException(error);
-          }
-        });
-    } else {
-      // Make call directly to github using client IP address
-      // for efficient rate limit utilisation.
-      const fullUrl = this.buildUrl(uriPath);
-      return this.cacheOrGet(fullUrl).catch(error => {
-        const privateRepoErrorCodes = this.getPrivateErrorCodes();
-        const { status } = error.response;
-        if (privateRepoErrorCodes.indexOf(status) >= 0) {
+  makePassthrough(uriPath) {
+    const fixedPath = uriPath.replace("?", "%3F");
+    const fullUri = `${this.getPassthroughPath()}${fixedPath}/`;
+    return this.baseRequest
+      .fetch(fullUri)
+      .then(response => {
+        // This is required for non-json responses, as the passthrough api
+        // JSONifies them with the jsonified key
+        const { data, headers } = response;
+        const actual = data.jsonified || data;
+        const { link: linkHeaders } = headers;
+        const next = this.getNextPages(linkHeaders);
+        return { data: actual, ...next };
+      })
+      .catch(error => {
+        if (error.response.status === 401) {
+          // Remote has returned auth error
           this.dispatchAuthenticated(false);
+        } else {
+          Raven.captureException(error);
         }
       });
+  },
+
+  makeRemoteCall(uriPath) {
+    const fullUri = this.buildUrl(uriPath);
+    return this.cacheOrGet(fullUri).catch(error => {
+      const privateRepoErrorCodes = this.getPrivateErrorCodes();
+      const { status } = error.response;
+      if (privateRepoErrorCodes.indexOf(status) >= 0) {
+        this.dispatchAuthenticated(false);
+      }
+    });
+  },
+
+  makeConditionalGet(uriPath, isPrivate) {
+    if (this.isRemoteAuthorized(isPrivate)) {
+      // If user is logged in with remote, we will send
+      // this API call to pass through via backend.
+      return this.makePassthrough(uriPath);
+    } else {
+      // Make call directly to remote using client IP address
+      // for efficient rate limit utilisation.
+      return this.makeRemoteCall(uriPath);
+    }
+  },
+
+  getTreeCaller(repoDetails, page) {
+    const { type } = repoDetails;
+
+    switch (type) {
+      case "pull":
+        return this.getPRFiles(repoDetails, page);
+      case "commit":
+        return this.getCommitFiles(repoDetails);
+      case "compare":
+        return this.getCompareFiles(repoDetails);
+      default:
+        return this.getFilesTree(repoDetails);
     }
   },
 
   getTree(repoDetails) {
-    const { reponame, type } = repoDetails;
+    return this.getTreeCaller(repoDetails, null);
+  },
 
-    switch (type) {
-      case "pull":
-        return this.getPRFiles(repoDetails).then(response =>
-          treeAdapter.getPRChildren(reponame, response)
-        );
-      case "commit":
-        return this.getCommitFiles(repoDetails).then(response =>
-          treeAdapter.getPRChildren(reponame, response)
-        );
-      case "compare":
-        return this.getCompareFiles(repoDetails).then(response =>
-          treeAdapter.getPRChildren(reponame, response)
-        );
-      default:
-        return this.getFilesTree(repoDetails).then(response =>
-          treeAdapter.getTreeChildren(reponame, response)
-        );
-    }
+  getTreePages(repoDetails, pages) {
+    const callers = pages.map(page => this.getTreeCaller(repoDetails, page));
+    return Promise.all(callers).then(function(responses) {
+      return responses.reduce(
+        (result, current) => result.concat(current.data),
+        []
+      );
+    });
   }
 };
 
@@ -104,38 +122,53 @@ let GithubAPI = {
     return [401, 404];
   },
 
+  getUrlBase(repoDetails) {
+    const { username, reponame } = repoDetails;
+    return `repos/${username}/${reponame}`;
+  },
+
   getFilesTree(repoDetails) {
-    const { username, reponame, branch, isPrivate } = repoDetails;
-    const nonNullBranch = branch || "master"; // TODO(arjun): check for default branch
-    const uriPath = `repos/${username}/${reponame}/git/trees/${nonNullBranch}?recursive=1`;
+    const urlBase = this.getUrlBase(repoDetails);
+    const { branch, isPrivate } = repoDetails;
+    // TODO(arjun): check for default branch
+    const nonNullBranch = branch || "master";
+    const uriPath = `${urlBase}/git/trees/${nonNullBranch}?recursive=1`;
     return this.makeConditionalGet(uriPath, isPrivate);
   },
 
-  getPRFiles(repoDetails) {
-    const { username, reponame, prId, isPrivate } = repoDetails;
-    const uriPath = `repos/${username}/${reponame}/pulls/${prId}/files`;
+  getPRFiles(repoDetails, page) {
+    const urlBase = this.getUrlBase(repoDetails);
+    const { prId, isPrivate } = repoDetails;
+    let pageParam = "";
+    if (page) {
+      pageParam = `?page=${page}`;
+    }
+    const uriPath = `${urlBase}/pulls/${prId}/files${pageParam}`;
     return this.makeConditionalGet(uriPath, isPrivate);
   },
 
   getCommitFiles(repoDetails) {
-    const { username, reponame, headSha, isPrivate } = repoDetails;
-    const uriPath = `repos/${username}/${reponame}/commits/${headSha}`;
-    return this.makeConditionalGet(uriPath, isPrivate).then(
-      response => response.files
-    );
+    const urlBase = this.getUrlBase(repoDetails);
+    const { headSha, isPrivate } = repoDetails;
+    const uriPath = `${urlBase}/commits/${headSha}`;
+    return this.makeConditionalGet(uriPath, isPrivate).then(response => ({
+      data: response.data.files
+    }));
   },
 
   getCompareFiles(repoDetails) {
-    const { username, reponame, headSha, baseSha, isPrivate } = repoDetails;
-    const uriPath = `repos/${username}/${reponame}/compare/${baseSha}...${headSha}`;
-    return this.makeConditionalGet(uriPath, isPrivate).then(
-      response => response.files
-    );
+    const urlBase = this.getUrlBase(repoDetails);
+    const { headSha, baseSha, isPrivate } = repoDetails;
+    const uriPath = `${urlBase}/compare/${baseSha}...${headSha}`;
+    return this.makeConditionalGet(uriPath, isPrivate).then(response => ({
+      data: response.data.files
+    }));
   },
 
   getPRInfo(repoDetails) {
-    const { username, reponame, isPrivate, prId } = repoDetails;
-    const uriPath = `repos/${username}/${reponame}/pulls/${prId}`;
+    const urlBase = this.getUrlBase(repoDetails);
+    const { isPrivate, prId } = repoDetails;
+    const uriPath = `${urlBase}/pulls/${prId}`;
     return this.makeConditionalGet(uriPath, isPrivate);
   }
 };
