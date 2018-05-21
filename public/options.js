@@ -1,9 +1,10 @@
 // Saves options to chrome.storage
 function save_options() {
-  var debugMode = document.getElementById("debug").checked;
   chrome.storage.sync.set(
     {
-      hasHoverDebug: debugMode
+      hasHoverDebug: document.getElementById("debug").checked,
+      hasMenuBarApp: document.getElementById("menu").checked,
+      defaultPort: document.getElementById("port").value
     },
     function() {
       // Update status to let user know options were saved.
@@ -19,13 +20,17 @@ function save_options() {
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 function restore_options() {
-  // Use default value color = 'red' and likesColor = true.
   chrome.storage.sync.get(
     {
-      hasHoverDebug: false
+      // Default values
+      hasHoverDebug: false,
+      hasMenuBarApp: false,
+      defaultPort: 8000
     },
     function(items) {
       document.getElementById("debug").checked = items.hasHoverDebug;
+      document.getElementById("menu").checked = items.hasMenuBarApp;
+      document.getElementById("port").value = items.defaultPort;
     }
   );
 }

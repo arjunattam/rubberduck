@@ -9,8 +9,10 @@ const initialState = {
   isSidebarVisible: true,
   sidebarWidth: 235,
 
-  // Hover debug
+  // Settings --> TODO(arjun): move these to chrome.storage.local (not sync)
   hasHoverDebug: false,
+  hasMenuBarApp: false,
+  defaultPort: 8000,
 
   // API response caching: hash of url is the object key
   apiResponses: {}
