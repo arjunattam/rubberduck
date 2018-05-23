@@ -3,7 +3,7 @@ const GH_CONTAINERS = ["container", "container-responsive"]; // class names for 
 
 const SPACING = 10;
 
-export const updateLayout = (isSidebarVisible, width) => {
+export const updateLayout = (isExpanded, width) => {
   // This method updates the layout of the page to fit the sidebar
   const documentWidth = document.body.offsetWidth;
 
@@ -30,7 +30,7 @@ export const updateLayout = (isSidebarVisible, width) => {
 
   const autoMarginLeft = (documentWidth - containerWidth) / 2;
   const spacing = containerWidth < 1000 ? SPACING : 0;
-  const shouldPushLeft = isSidebarVisible && autoMarginLeft < width + spacing;
+  const shouldPushLeft = isExpanded && autoMarginLeft < width + spacing;
 
   // Modifying page styles
   document.body.style.marginLeft = shouldPushLeft ? width + "px" : "";
