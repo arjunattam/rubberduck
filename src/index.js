@@ -59,8 +59,11 @@ const loadSentry = () => {
   }).install();
 };
 
+const loadDoorbell = () => {};
+
 // Content script setup -- on injection
 // registerServiceWorker();
 loadSentry();
+loadDoorbell();
 createExtensionContainer();
 renderExtension();
