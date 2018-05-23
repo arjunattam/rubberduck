@@ -80,7 +80,8 @@ class BaseWebSocket {
     });
   };
 
-  createPRSession = (organisation, name, pull_request_id) => {
+  createPRSession = params => {
+    const { organisation, name, pull_request_id } = params;
     return this.sendRequest({
       type: "session.create",
       payload: {
@@ -92,7 +93,8 @@ class BaseWebSocket {
     });
   };
 
-  createCompareSession = (organisation, name, head_sha, base_sha) => {
+  createCompareSession = params => {
+    const { organisation, name, head_sha, base_sha } = params;
     return this.sendRequest({
       type: "session.create",
       payload: {
@@ -103,6 +105,14 @@ class BaseWebSocket {
         base_sha
       }
     });
+  };
+
+  createSession = params => {
+    if (params.type === "pull") {
+      return this.createPRSession(params);
+    } else {
+      return this.createCompareSession(params);
+    }
   };
 
   getHover = (baseOrHead, filePath, lineNumber, charNumber) => {
@@ -249,23 +259,28 @@ class WebSocketManager {
     error.indexOf("Branch not found") >= 0 ||
     error.indexOf("Pull Request not found") >= 0;
 
+  isLanguageUnsupported = error => error.indexOf("Language not supported") >= 0;
+
   createNewSession = params => {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
     return this.createSession().catch(error => {
-      if (error.error && error.error.indexOf("Language not supported") >= 0) {
+      if (error.error && this.isLanguageUnsupported(error.error)) {
         this.dispatchStatus("unsupported_language");
-      } else if (error === "No session to be created") {
-        this.dispatchStatus("no_session");
       } else if (error.error && this.isNoAccessError(error.error)) {
         this.dispatchStatus("no_access");
+      } else if (error === "No session to be created") {
+        this.dispatchStatus("no_session");
       } else {
-        // Unknown error, sent to Sentry
         this.dispatchStatus("error");
-        Raven.captureException(error);
+        const excp = new Error(JSON.stringify(error));
+        Raven.captureException(excp);
       }
     });
   };
+
+  isValidType = type =>
+    ["pull", "file", "commit", "compare"].indexOf(type) >= 0;
 
   createSession = () => {
     // This method is called with params, and internally
@@ -274,28 +289,9 @@ class WebSocketManager {
     return this.tearDownIfRequired()
       .then(this.createConnection)
       .then(() => {
-        if (params.type === "pull") {
+        if (this.isValidType(params.type)) {
           this.dispatchStatus("creating");
-          return this.ws.createPRSession(
-            params.organisation,
-            params.name,
-            params.pull_request_id
-          );
-        } else if (params.type === "file") {
-          this.dispatchStatus("creating");
-          return this.ws.createCompareSession(
-            params.organisation,
-            params.name,
-            params.head_sha
-          );
-        } else if (params.type === "commit" || params.type === "compare") {
-          this.dispatchStatus("creating");
-          return this.ws.createCompareSession(
-            params.organisation,
-            params.name,
-            params.head_sha,
-            params.base_sha
-          );
+          return this.ws.createSession(params);
         } else {
           return Promise.reject("No session to be created");
         }
