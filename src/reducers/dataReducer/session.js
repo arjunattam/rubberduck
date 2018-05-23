@@ -3,6 +3,7 @@ import { createReducer } from "redux-create-reducer";
 const initialState = {
   payload: {},
   status: "",
+  progress: null,
   showNotReady: null
 };
 
@@ -33,7 +34,8 @@ export default createReducer(initialState, {
   },
   UPDATE_SESSION_STATUS: (state, action) => ({
     ...state,
-    status: action.payload.status
+    status: action.payload.status,
+    progress: action.payload.progress
   }),
 
   // We are not updating for usages, since usages and definitions happen together

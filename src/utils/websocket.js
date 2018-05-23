@@ -163,17 +163,18 @@ class WebSocketManager {
     this.DataActions = bindActionCreators(DataActions, Store.dispatch);
   }
 
-  dispatchStatus = status => {
-    this.DataActions.updateSessionStatus({ status });
+  dispatchStatus = (status, progress) => {
+    this.DataActions.updateSessionStatus({ status, progress });
   };
 
   statusUpdatesListener = message => {
     // This will trigger the UI states for session status
-    this.dispatchStatus(message.status_update);
+    const { status_update: status, progress } = message;
+    this.dispatchStatus(status, progress);
 
-    if (message.status_update === "ready") {
+    if (status === "ready") {
       this.isReady = true;
-    } else if (message.status_update === "error") {
+    } else if (status === "error") {
       console.log("Error in creating session", message);
     }
   };
