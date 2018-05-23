@@ -11,7 +11,7 @@ const initialState = {
 
   // Settings --> TODO(arjun): move these to chrome.storage.local (not sync)
   hasHoverDebug: false,
-  hasMenuBarApp: false,
+  hasMenuApp: false,
   defaultPort: 8000,
 
   // API response caching: hash of url is the object key

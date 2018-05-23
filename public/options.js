@@ -3,7 +3,7 @@ function save_options() {
   chrome.storage.sync.set(
     {
       hasHoverDebug: document.getElementById("debug").checked,
-      hasMenuBarApp: document.getElementById("menu").checked,
+      hasMenuApp: document.getElementById("menu").checked,
       defaultPort: document.getElementById("port").value
     },
     function() {
@@ -24,12 +24,12 @@ function restore_options() {
     {
       // Default values
       hasHoverDebug: false,
-      hasMenuBarApp: false,
+      hasMenuApp: false,
       defaultPort: 8000
     },
     function(items) {
       document.getElementById("debug").checked = items.hasHoverDebug;
-      document.getElementById("menu").checked = items.hasMenuBarApp;
+      document.getElementById("menu").checked = items.hasMenuApp;
       document.getElementById("port").value = items.defaultPort;
     }
   );
