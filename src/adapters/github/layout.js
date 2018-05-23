@@ -1,37 +1,44 @@
-// Github layout manipulation
-const GH_CONTAINERS = ["container", "container-responsive"]; // class names for layout
+const GH_CONTAINER_CLASS = "container";
 
 const SPACING = 10;
 
-export const updateLayout = (isExpanded, width) => {
-  // This method updates the layout of the page to fit the sidebar
+/**
+ * Get elements and then merge-flatten them
+ */
+const getContainerElements = () => [
+  ...document.getElementsByClassName(GH_CONTAINER_CLASS)
+];
+
+const getContainerWidth = () => {
+  const containerElements = getContainerElements();
+  return containerElements.reduce((max, b) => {
+    return b.offsetWidth ? Math.max(max, b.offsetWidth) : max;
+  }, 0);
+};
+
+const updateContainerWidths = width => {
+  const containerElements = getContainerElements();
+  containerElements.forEach(element => (element.style.width = `${width}px`));
+};
+
+/**
+ * This method updates the layout of the page to fit the sidebar
+ */
+export const updateLayout = (isExpanded, sidebarWidth) => {
   const documentWidth = document.body.offsetWidth;
-
-  // Get elements and then merge-flatten them
-  const containerElements = [].concat.apply(
-    [],
-    GH_CONTAINERS.map(name => {
-      return [...document.getElementsByClassName(name)];
-    })
-  );
-  let defaultWidth = 0;
-
-  if (containerElements.length > 0) {
-    defaultWidth = containerElements[0].offsetWidth;
-  }
-
-  const containerWidth = containerElements.reduce((max, b) => {
-    if (b.offsetWidth !== undefined) {
-      return Math.max(max, b.offsetWidth);
-    } else {
-      return defaultWidth;
-    }
-  }, defaultWidth);
+  const windowWidth = window.innerWidth;
+  const containerWidth = getContainerWidth();
 
   const autoMarginLeft = (documentWidth - containerWidth) / 2;
   const spacing = containerWidth < 1000 ? SPACING : 0;
-  const shouldPushLeft = isExpanded && autoMarginLeft < width + spacing;
+  const shouldPushLeft = isExpanded && autoMarginLeft < sidebarWidth + spacing;
+  const shouldResizeContainer =
+    isExpanded && windowWidth < containerWidth + sidebarWidth;
 
-  // Modifying page styles
-  document.body.style.marginLeft = shouldPushLeft ? width + "px" : "";
+  document.body.style.marginLeft = shouldPushLeft ? sidebarWidth + "px" : "";
+
+  if (shouldResizeContainer) {
+    // TODO(arjun): the goal is to not have horizontal scrolling in this case
+    // calculate the max container width and call updateContainerWidths()
+  }
 };
