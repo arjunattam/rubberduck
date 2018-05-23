@@ -3,6 +3,9 @@ const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location
 
 const INJECTABLE_URLS = ["github.com", "bitbucket.org"];
 
+const UNINSTALLATION_FORM_LINK =
+  "https://docs.google.com/forms/d/1fK-NaaxlPR2ImacKyTRVilN87NBAWkCgn8lXVbSROEQ";
+
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
@@ -51,7 +54,7 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
     let storageChange = changes[key];
     storageChanges = {
       ...storageChanges,
-      [key]: storageChange.newValue || null
+      [key]: storageChange.newValue
     };
   }
   sendMessageToAllTabs("STORAGE_UPDATED", storageChanges);
@@ -75,6 +78,10 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
   // Return true to inform that we will send response async
   return true;
 });
+
+if (chrome.runtime.setUninstallURL) {
+  chrome.runtime.setUninstallURL(UNINSTALLATION_FORM_LINK);
+}
 
 // Helper method to send message to specific tab(by id) in content script.
 const sendMessageToTab = (tabId, action, data) => {

@@ -87,6 +87,8 @@ class Extension extends React.Component {
     // Due to pjax, there are cases when the url has been updated but
     // the DOM elements have not loaded up, so repoDetails cannot be calculated
     // Hence we keep a timeout of 1 sec.
+
+    // TODO(arjun): need to listen to pjax end event here
     setTimeout(() => {
       this.updateRepoDetailsFromPath();
     }, 1000);
@@ -148,7 +150,9 @@ class Extension extends React.Component {
 
   render() {
     const { reponame } = this.props.data.repoDetails;
-    const willRenderSidebar = reponame !== null && reponame !== undefined;
+    const { initialized } = this.props.storage;
+    const isNameValid = reponame !== null && reponame !== undefined;
+    const willRenderSidebar = initialized && isNameValid;
     return willRenderSidebar ? <Sidebar /> : null;
   }
 }

@@ -66,7 +66,13 @@ const getBranch = () => {
   let prPageBranch = null;
 
   if (prPageSelector !== null) {
-    prPageBranch = prPageSelector.getAttribute("title");
+    const prPageTitle = prPageSelector.getAttribute("title");
+    // title looks like org-name/repo-name:branch-name
+    const match = prPageTitle.match(/(.+)\/(.+):(.+)/);
+
+    if (match.length >= 3) {
+      prPageBranch = match[3];
+    }
   }
 
   const branchMenuDiv = document.querySelector(".branch-select-menu");

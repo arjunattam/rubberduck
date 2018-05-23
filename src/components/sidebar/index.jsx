@@ -35,9 +35,7 @@ class Sidebar extends React.Component {
     element.classList.add("will-slide-left");
   };
 
-  updateStorage = data => {
-    StorageUtils.setInSyncStore(data);
-  };
+  updateStorage = data => StorageUtils.setInSyncStore(data);
 
   componentDidMount() {
     setupPjax();

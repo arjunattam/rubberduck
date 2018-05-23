@@ -190,13 +190,6 @@ let BitbucketAPI = {
     return [403];
   },
 
-  getFilesTree(repoDetails) {
-    const { username, reponame, branch } = repoDetails;
-    const nonNullBranch = branch || "master"; // TODO(arjun): check for default branch
-    const uriPath = `repositories/${username}/${reponame}/src/${nonNullBranch}/`;
-    return this.makeConditionalGet(uriPath);
-  },
-
   parseLines(element, charToCheck) {
     const hunkValues = element.hunks.map(hunk => {
       const lines = hunk.lines;
@@ -228,10 +221,12 @@ let BitbucketAPI = {
     const { username, reponame, prId } = repoDetails;
     const uriPath = `repositories/${username}/${reponame}/pullrequests/${prId}/diff/`;
     return this.makeConditionalGet(uriPath).then(response => {
-      const parsedDiff = parse.parse(response);
-      return this.getDiffData(parsedDiff);
+      const parsedDiff = parse.parse(response.data);
+      return { data: this.getDiffData(parsedDiff) };
     });
   },
+
+  getFilesTree(repoDetails) {},
 
   getPRInfo(repoDetails) {}
 };

@@ -23,11 +23,21 @@ Possible values
 - no_access
 */
 
+const ProgressBar = ({ value }) => {
+  const width = `${value}%`;
+  return (
+    <div>
+      <div className="progress-bar" style={{ width }} />
+    </div>
+  );
+};
+
 class SessionStatus extends React.Component {
   state = { showNotReady: null };
 
   renderIndicator = () => {
-    switch (this.props.data.session.status) {
+    const { status } = this.props.data.session;
+    switch (status) {
       case "ready":
         return <status-indicator positive />;
       case "disconnected":
@@ -43,7 +53,8 @@ class SessionStatus extends React.Component {
   };
 
   getText = () => {
-    switch (this.props.data.session.status) {
+    const { status } = this.props.data.session;
+    switch (status) {
       case "creating":
         return "initializing";
       case "created":
@@ -61,7 +72,25 @@ class SessionStatus extends React.Component {
       case "no_access":
         return "not authorised";
       default:
-        return this.props.data.session.status;
+        return status;
+    }
+  };
+
+  getProgress = () => {
+    const { status, progress } = this.props.data.session;
+    const filteredStatus = this.getText(status);
+    const startAt = {
+      connecting: 0,
+      initializing: 10,
+      indexing: 90,
+      ready: 100
+    };
+    if (filteredStatus === "preparing") {
+      const baseProgress = status === "fetched_details" ? 20 : 90;
+      const proratedProgress = progress ? progress / 100.0 : 0;
+      return baseProgress + proratedProgress * 70;
+    } else {
+      return startAt[filteredStatus];
     }
   };
 
@@ -81,15 +110,29 @@ class SessionStatus extends React.Component {
     }
   }
 
+  renderProgressBar = () => <ProgressBar value={this.getProgress()} />;
+
+  renderStatus = () => {
+    const statusText = this.getText();
+    return (
+      <div className="session-status">
+        {this.renderIndicator()}
+        <span className="session-status-text">{statusText}</span>
+      </div>
+    );
+  };
+
+  renderNotReady = () => {
+    return <div className="session-status-not-ready">Waiting to be ready</div>;
+  };
+
   render() {
     return (
       <div className="session-status-container">
+        {this.renderProgressBar()}
         <div className="session-status-inner">
-          <div className="session-status">
-            {this.renderIndicator()}
-            <span className="session-status-text">{this.getText()}</span>
-          </div>
-          <div className="session-status-not-ready">Waiting to be ready</div>
+          {this.renderStatus()}
+          {this.renderNotReady()}
         </div>
       </div>
     );
