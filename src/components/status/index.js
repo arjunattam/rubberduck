@@ -3,8 +3,7 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
 import { getGitService } from "../../adapters";
-import { getParameterByName } from "../../utils/api";
-import { Authorization } from "../../utils/authorization";
+import Authorization from "../../utils/authorization";
 import * as StorageUtils from "../../utils/storage";
 import StatusComponent from "./StatusComponent";
 import "./StatusBar.css";
@@ -17,7 +16,7 @@ class StatusBar extends React.Component {
 
   state = {
     showAuthPrompt: false,
-    showSettings: true,
+    showSettings: false,
     isLoading: false
   };
 
@@ -32,36 +31,16 @@ class StatusBar extends React.Component {
     });
   };
 
+  stopLoading = () => this.setState({ isLoading: false });
+
   launchOAuthFlow = () => {
     this.setLoadingState();
-    const { token } = this.props.storage;
-    Authorization.triggerOAuthFlow(token, response => {
-      // response is the redirected url. It is possible that it is null,
-      // when the background page throws an error. In that case we should
-      // refresh the JWT, and not store this value in the store.
-      if (response === null) {
-        console.log("Could not login with github.");
-      } else {
-        this.setState({ isLoading: false });
-        const refreshedToken = getParameterByName("token", response);
-        StorageUtils.setInSyncStore({ token: refreshedToken });
-      }
-    });
+    Authorization.launchOAuthFlow().then(response => this.stopLoading());
   };
 
   launchLogoutFlow = () => {
-    let token = this.props.storage.token;
     this.setLoadingState();
-
-    Authorization.triggerLogoutFlow(token, response => {
-      if (response === null) {
-        console.log("Could not log out.");
-      } else {
-        this.setState({ isLoading: false });
-        const refreshedToken = getParameterByName("token", response);
-        StorageUtils.setInSyncStore({ token: refreshedToken });
-      }
-    });
+    Authorization.launchLogoutFlow().then(response => this.stopLoading());
   };
 
   toggleSettings = () => {
@@ -70,13 +49,13 @@ class StatusBar extends React.Component {
     });
   };
 
-  getServiceUsername = decodedJWT => {
+  getServiceUsername = () => {
     const service = getGitService();
 
     if (service === "github") {
-      return decodedJWT.github_username;
+      return Authorization.getGithubUsername();
     } else if (service === "bitbucket") {
-      return decodedJWT.bitbucket_username;
+      return Authorization.getBitbucketUsername();
     }
   };
 
@@ -91,33 +70,25 @@ class StatusBar extends React.Component {
   };
 
   getAuthState = () => {
-    // Three possible situations: 1. token unavailable, 2. token available but
-    // no github login, and 3. token and github login both available
-    const { token } = this.props.storage;
-    const decodedJWT = token ? Authorization.decodeJWT(token) : {};
-    const serviceUser = this.getServiceUsername(decodedJWT);
-    const hasToken = token !== null;
-    const hasBoth = serviceUser !== undefined && serviceUser !== "";
-    let authState = "No token found";
-
-    if (hasBoth) {
-      authState = "Logged in " + serviceUser;
-    } else if (hasToken) {
-      authState = (
-        <a className="pointer" onClick={() => this.launchOAuthFlow()}>
-          {this.getLoginPrompt()}
-        </a>
-      );
+    switch (Authorization.getAuthState()) {
+      case "no_token":
+        return <span>No token found</span>;
+      case "has_authenticated":
+        return <span>{`Logged in ${this.getServiceUsername()}`}</span>;
+      case "has_token":
+        return (
+          <a className="pointer" onClick={() => this.launchOAuthFlow()}>
+            {this.getLoginPrompt()}
+          </a>
+        );
     }
-
-    return authState;
   };
 
   onPortChange = event =>
-    StorageUtils.setInSyncStore({ defaultPort: event.target.value });
+    StorageUtils.setInLocalStore({ defaultPort: event.target.value });
 
   onMenuChange = event =>
-    StorageUtils.setInSyncStore({ hasMenuApp: event.target.checked });
+    StorageUtils.setInLocalStore({ hasMenuApp: event.target.checked });
 
   componentWillReceiveProps(newProps) {
     const { isUnauthenticated } = newProps.data.data;

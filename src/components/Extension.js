@@ -7,7 +7,7 @@ import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
 import * as ChromeUtils from "./../utils/chrome";
 import * as StorageUtils from "./../utils/storage";
-import { Authorization } from "./../utils/authorization";
+import Authorization from "./../utils/authorization";
 import { pathAdapter } from "../adapters";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 
@@ -31,28 +31,33 @@ class Extension extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (!prevProps.storage.initialized && this.props.storage.initialized) {
+    const { initialized: prevInitialized } = prevProps.storage;
+    const { initialized: newInitialized } = this.props.storage;
+    const hasLoadedStorage = !prevInitialized && newInitialized;
+
+    if (hasLoadedStorage) {
       // Checking to trigger this only after chrome storage is loaded
       this.setupAuthorization();
     }
+
     this.updateSessionAndTree(prevProps, this.props);
   }
 
   updateSessionAndTree(prevProps, newProps) {
-    let isSameSessionPath = pathAdapter.isSameSessionPath(
-      prevProps.data.repoDetails,
-      newProps.data.repoDetails
+    const { repoDetails: prev } = prevProps.data;
+    const { repoDetails: now } = newProps.data;
+    let hasSessionChanged = !pathAdapter.isSameSessionPath(prev, now);
+    const hasAuthChanged = Authorization.hasChanged(
+      prevProps.storage,
+      newProps.storage
     );
-    let hasTokenChanged = prevProps.storage.token !== newProps.storage.token;
-    if (hasTokenChanged || !isSameSessionPath) {
+    if (hasAuthChanged || hasSessionChanged) {
       this.initializeSession();
       this.initializeFileTree();
     }
   }
 
   setupChromeListener() {
-    // Setup the chrome message passing listener for
-    // messages from the background.
     ChromeUtils.addChromeListener((action, data) => {
       if (action === "URL_UPDATE") {
         this.handleUrlUpdate(data);
@@ -69,14 +74,7 @@ class Extension extends React.Component {
   }
 
   setupAuthorization() {
-    let clientId =
-      this.props.storage.clientId || Authorization.generateClientId();
-    let existingToken = this.props.storage.token;
-    Authorization.handleTokenState(clientId, existingToken).then(token => {
-      StorageUtils.setInSyncStore({ token, clientId }, () => {});
-      // Setup user context for sentry
-      Raven.setUserContext(Authorization.decodeJWT(token));
-    });
+    Authorization.setup().then(userInfo => Raven.setUserContext(userInfo));
   }
 
   handleStorageUpdate(data) {
@@ -101,10 +99,7 @@ class Extension extends React.Component {
     });
   }
 
-  hasValidToken = () => {
-    const { token } = this.props.storage;
-    return token && Authorization.isTokenValid(token);
-  };
+  hasValidToken = () => Authorization.hasValidToken();
 
   initializeSession() {
     const repoDetails = this.props.data.repoDetails;

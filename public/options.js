@@ -1,6 +1,6 @@
 // Saves options to chrome.storage
 function save_options() {
-  chrome.storage.sync.set(
+  chrome.storage.local.set(
     {
       hasHoverDebug: document.getElementById("debug").checked,
       hasMenuApp: document.getElementById("menu").checked,
@@ -20,7 +20,7 @@ function save_options() {
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 function restore_options() {
-  chrome.storage.sync.get(
+  chrome.storage.local.get(
     {
       // Default values
       hasHoverDebug: false,
