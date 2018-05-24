@@ -31,8 +31,7 @@ let BaseGitRemoteAPI = {
   makePassthrough(uriPath) {
     const fixedPath = uriPath.replace("?", "%3F");
     const fullUri = `${this.getPassthroughPath()}${fixedPath}/`;
-    return this.baseRequest
-      .fetch(fullUri)
+    return this.makeGetRequest(fullUri)
       .then(response => {
         // This is required for non-json responses, as the passthrough api
         // JSONifies them with the jsonified key
