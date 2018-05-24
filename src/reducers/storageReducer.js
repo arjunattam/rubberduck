@@ -9,12 +9,15 @@ const initialState = {
   isSidebarVisible: true,
   sidebarWidth: 235,
 
-  // Settings --> TODO(arjun): move these to chrome.storage.local (not sync)
+  // Settings
+  // (chrome.storage.local)
   hasHoverDebug: false,
-  hasMenuBarApp: false,
-  defaultPort: 8000,
+  hasMenuApp: false,
+  defaultPort: 9898,
+  menuAppTokens: {},
 
   // API response caching: hash of url is the object key
+  // (chrome.storage.local)
   apiResponses: {}
 };
 
@@ -26,12 +29,30 @@ export default createReducer(initialState, {
       initialized: true
     };
   },
+
   UPDATE_FROM_CHROME_STORAGE: (state, action) => {
     if (!action.payload) return { ...state };
-    let sanitizedPayload = action.payload;
+    let modifier = {};
+    let hasChangeEnv = false;
+    const { hasMenuApp: newEnv } = action.payload;
+
+    if (newEnv !== undefined) {
+      hasChangeEnv = state.hasMenuApp !== newEnv;
+    }
+
+    if (hasChangeEnv) {
+      modifier.menuAppTokens = {};
+    } else if (action.payload.menuAppTokens) {
+      modifier.menuAppTokens = {
+        ...state.menuAppTokens,
+        ...action.payload.menuAppTokens
+      };
+    }
+
     return {
       ...state,
-      ...sanitizedPayload
+      ...action.payload,
+      ...modifier
     };
   }
 });

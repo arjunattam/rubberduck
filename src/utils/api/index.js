@@ -1,36 +1,34 @@
 import axios from "axios";
 import Moment from "moment";
-import Store from "../../store";
 import { bindActionCreators } from "redux";
+import Store from "../../store";
 import * as DataActions from "../../actions/dataActions";
-
-import BaseRequest from "./base";
-import { Authorization } from "../authorization";
-import { rootUrl, baseApiUrl } from "./url";
-import GitRemoteAPI from "./remote";
+import Authorization from "../authorization";
 import { hash } from "../data";
 import * as StorageUtils from "../storage";
+import BaseRequest from "./base";
+import GitRemoteAPI from "./remote";
 
 const linkParser = require("parse-link-header");
 
 const CACHED_EXPIRY = 3; // hours
 const IS_CACHING_ENABLED = true;
+const BASE_API_PREFIX = "api/v1";
 
 export class BaseAPI {
   constructor() {
-    this.baseRequest = new BaseRequest(rootUrl);
-    this.baseURI = this.baseRequest.getAPIUrl();
     Store.subscribe(() => this.updateBaseRequest());
     this.DataActions = bindActionCreators(DataActions, Store.dispatch);
   }
 
   getDecodedToken() {
-    const token = Store.getState().storage.token;
-    return Authorization.decodeJWT(token);
+    return Authorization.getDecodedToken();
   }
 
   updateBaseRequest() {
-    let token = Store.getState().storage.token;
+    const rootUrl = Authorization.getBaseUrl();
+    const token = Authorization.getToken();
+    this.baseRequest = new BaseRequest(rootUrl);
     this.baseRequest.updateDefaultHeader(token);
   }
 
@@ -41,14 +39,14 @@ export class BaseAPI {
   }
 
   issueToken(clientId) {
-    const uri = `${baseApiUrl}/token_issue/`;
+    const uri = `${BASE_API_PREFIX}/token_issue/`;
     return this.baseRequest
       .post(uri, { client_id: clientId })
       .then(response => response.data);
   }
 
   refreshToken(token) {
-    const uri = `${baseApiUrl}/token_refresh/`;
+    const uri = `${BASE_API_PREFIX}/token_refresh/`;
     return this.baseRequest
       .post(uri, { token: token })
       .then(response => response.data);
@@ -151,4 +149,3 @@ Object.assign(BaseAPI.prototype, GitRemoteAPI);
 
 export const API = new BaseAPI();
 export { getParameterByName } from "./utils";
-export { rootUrl };
