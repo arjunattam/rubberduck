@@ -63,7 +63,7 @@ const ConfigSection = ({
         </div>
       </div>
       <div className="row">
-        <div>TCP port</div>
+        <div>Menu app TCP port</div>
         <div>
           <input type="text" value={defaultPort} onChange={onPortChange} />
         </div>
