@@ -35,12 +35,16 @@ class StatusBar extends React.Component {
 
   launchOAuthFlow = () => {
     this.setLoadingState();
-    Authorization.launchOAuthFlow().then(response => this.stopLoading());
+    Authorization.launchOAuthFlow()
+      .then(response => this.stopLoading())
+      .catch(error => this.stopLoading());
   };
 
   launchLogoutFlow = () => {
     this.setLoadingState();
-    Authorization.launchLogoutFlow().then(response => this.stopLoading());
+    Authorization.launchLogoutFlow()
+      .then(response => this.stopLoading())
+      .catch(error => this.stopLoading());
   };
 
   toggleSettings = () => {

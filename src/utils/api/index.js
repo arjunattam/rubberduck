@@ -17,19 +17,11 @@ const BASE_API_PREFIX = "api/v1";
 
 export class BaseAPI {
   constructor() {
-    Store.subscribe(() => this.updateBaseRequest());
     this.DataActions = bindActionCreators(DataActions, Store.dispatch);
   }
 
   getDecodedToken() {
     return Authorization.getDecodedToken();
-  }
-
-  updateBaseRequest() {
-    const rootUrl = Authorization.getBaseUrl();
-    const token = Authorization.getToken();
-    this.baseRequest = new BaseRequest(rootUrl);
-    this.baseRequest.updateDefaultHeader(token);
   }
 
   dispatchAuthenticated(isAuthenticated) {
@@ -38,18 +30,32 @@ export class BaseAPI {
     });
   }
 
+  makePostRequest = (uri, body) => {
+    const rootUrl = Authorization.getBaseUrl();
+    const token = Authorization.getToken();
+    const baseRequest = new BaseRequest(rootUrl, token);
+    return baseRequest.post(uri, body);
+  };
+
+  makeGetRequest = uri => {
+    const rootUrl = Authorization.getBaseUrl();
+    const token = Authorization.getToken();
+    const baseRequest = new BaseRequest(rootUrl, token);
+    return baseRequest.fetch(uri);
+  };
+
   issueToken(clientId) {
     const uri = `${BASE_API_PREFIX}/token_issue/`;
-    return this.baseRequest
-      .post(uri, { client_id: clientId })
-      .then(response => response.data);
+    return this.makePostRequest(uri, { client_id: clientId }).then(
+      response => response.data
+    );
   }
 
   refreshToken(token) {
     const uri = `${BASE_API_PREFIX}/token_refresh/`;
-    return this.baseRequest
-      .post(uri, { token: token })
-      .then(response => response.data);
+    return this.makePostRequest(uri, { token: token }).then(
+      response => response.data
+    );
   }
 
   getCached(uri) {
