@@ -3,20 +3,20 @@ import Octicon from "react-component-octicons";
 import "./CodeNode.css";
 
 const InlineIcon = props => (
-  <Octicon name={props.name} style={{ marginLeft: 3 }} />
+  <Octicon name={props.name} style={{ height: 12, width: 12, marginLeft: 3 }} />
 );
 
 const InlineButton = props => (
-  <div className="code-node-button" style={props.style}>
-    <a
-      href={props.href}
-      onClick={props.onClick}
-      target={props.isBlank ? "_blank" : null}
-    >
-      {props.text}
-      {props.icon ? <InlineIcon name={props.icon} /> : null}
-    </a>
-  </div>
+  <a
+    className="code-node-button"
+    href={props.href}
+    style={props.style}
+    onClick={props.onClick}
+    target={props.isBlank ? "_blank" : null}
+  >
+    {props.text}
+    {props.icon ? <InlineIcon name={props.icon} /> : null}
+  </a>
 );
 
 export default InlineButton;

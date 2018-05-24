@@ -1,9 +1,9 @@
+import _ from "lodash";
 import ReduxStore from "../../store";
 import * as AuthUtils from "./utils";
 import * as StorageUtils from "../storage";
 import { getGitService } from "../../adapters";
 import { getParameterByName } from "../api";
-import _ from "lodash";
 
 /**
  * The AuthStore manages auth and environment (menu app vs hosted)
