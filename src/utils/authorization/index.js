@@ -1,4 +1,4 @@
-import Store from "../../store";
+import ReduxStore from "../../store";
 import * as AuthUtils from "./utils";
 import * as StorageUtils from "../storage";
 import { getGitService } from "../../adapters";
@@ -13,8 +13,8 @@ export class AuthStore {
    * Constructing with the store so that we can inject during testing
    */
   constructor(store) {
-    this.onMenuAppEnv = null;
     this.store = store;
+    this.isOnMenuAppEnv = null;
     this.store.subscribe(() => this.updateEnvironment());
   }
 
@@ -22,10 +22,9 @@ export class AuthStore {
     const hasInit = this.store.getState().storage.initialized;
     const newMenuApp = this.store.getState().storage.hasMenuApp;
 
-    if (hasInit && newMenuApp != this.onMenuAppEnv) {
-      this.onMenuAppEnv = newMenuApp;
+    if (hasInit && newMenuApp != this.isOnMenuAppEnv) {
+      this.isOnMenuAppEnv = newMenuApp;
     }
-    console.log("on menu app", this.onMenuAppEnv);
   }
 
   getToken() {
@@ -33,8 +32,7 @@ export class AuthStore {
   }
 
   getClientId() {
-    const { clientId } = this.store.getState().storage;
-    return clientId;
+    return this.getClientIdFromStorage(this.store.getState().storage);
   }
 
   getBaseUrl = () => {
@@ -44,18 +42,44 @@ export class AuthStore {
       envRootUrl = "http://localhost:8000/";
     }
 
+    if (this.isOnMenuAppEnv) {
+      const { defaultPort } = this.store.getState().storage;
+      envRootUrl = `http://localhost:${defaultPort}/`;
+    }
+
     return envRootUrl;
   };
 
   getTokenFromStorage = storage => {
-    const { token } = storage;
+    let container = storage;
+
+    if (this.isOnMenuAppEnv) {
+      container = storage.menuAppTokens;
+    }
+
+    const { token } = container;
     return token;
   };
 
+  getClientIdFromStorage = storage => {
+    let container = storage;
+
+    if (this.isOnMenuAppEnv) {
+      container = storage.menuAppTokens;
+    }
+
+    const { clientId } = container;
+    return clientId;
+  };
+
   updateTokenInStorage = ({ token, clientId }) => {
-    // TODO(arjun): cant save in sync if on menu
     const nonNull = _.pickBy({ token, clientId }, _.identity);
-    StorageUtils.setInSyncStore(nonNull, () => {});
+
+    if (this.isOnMenuAppEnv) {
+      StorageUtils.setInLocalStore({ menuAppTokens: nonNull }, () => {});
+    } else {
+      StorageUtils.setInSyncStore(nonNull, () => {});
+    }
   };
 
   hasValidToken() {
@@ -106,10 +130,11 @@ export class AuthStore {
    * Returns true if token or environment changed
    */
   hasChanged(prevStorage, newStorage) {
-    // TODO(arjun): can also be because the menu app setting has changed
     const prevToken = this.getTokenFromStorage(prevStorage);
     const newToken = this.getTokenFromStorage(newStorage);
-    return prevToken !== newToken;
+    const hasTokenChanged = prevToken !== newToken;
+    const hasEnvChanged = prevStorage.hasMenuApp !== newStorage.hasMenuApp;
+    return hasEnvChanged || hasTokenChanged;
   }
 
   /**
@@ -169,4 +194,4 @@ export class AuthStore {
   };
 }
 
-export default new AuthStore(Store);
+export default new AuthStore(ReduxStore);
