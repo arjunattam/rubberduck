@@ -1,6 +1,7 @@
 import { sendMessage, constructMessage } from "./chrome";
 
 export const setInSyncStore = (data, cb) => {
+  console.log("setting in store", data);
   // Send message to background page to set value in chrome.storage
   const message = constructMessage("STORAGE_SYNC_SET", data);
   sendMessage(message, cb);

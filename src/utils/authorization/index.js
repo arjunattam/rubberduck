@@ -3,15 +3,60 @@ import * as AuthUtils from "./utils";
 import * as StorageUtils from "../storage";
 import { getGitService } from "../../adapters";
 import { getParameterByName } from "../api";
+import _ from "lodash";
 
 /**
- * The AuthStore manages everything with auth and environment (menu app vs hosted)
+ * The AuthStore manages auth and environment (menu app vs hosted)
  */
-class AuthStore {
-  getToken() {
-    const { token } = Store.getState().storage;
-    return token;
+export class AuthStore {
+  /**
+   * Constructing with the store so that we can inject during testing
+   */
+  constructor(store) {
+    this.onMenuAppEnv = null;
+    this.store = store;
+    this.store.subscribe(() => this.updateEnvironment());
   }
+
+  updateEnvironment() {
+    const hasInit = this.store.getState().storage.initialized;
+    const newMenuApp = this.store.getState().storage.hasMenuApp;
+
+    if (hasInit && newMenuApp != this.onMenuAppEnv) {
+      this.onMenuAppEnv = newMenuApp;
+    }
+    console.log("on menu app", this.onMenuAppEnv);
+  }
+
+  getToken() {
+    return this.getTokenFromStorage(this.store.getState().storage);
+  }
+
+  getClientId() {
+    const { clientId } = this.store.getState().storage;
+    return clientId;
+  }
+
+  getBaseUrl = () => {
+    let envRootUrl = "https://www.codeview.io/";
+
+    if (process.env.REACT_APP_BACKEND_ENV === "local") {
+      envRootUrl = "http://localhost:8000/";
+    }
+
+    return envRootUrl;
+  };
+
+  getTokenFromStorage = storage => {
+    const { token } = storage;
+    return token;
+  };
+
+  updateTokenInStorage = ({ token, clientId }) => {
+    // TODO(arjun): cant save in sync if on menu
+    const nonNull = _.pickBy({ token, clientId }, _.identity);
+    StorageUtils.setInSyncStore(nonNull, () => {});
+  };
 
   hasValidToken() {
     const token = this.getToken();
@@ -61,22 +106,22 @@ class AuthStore {
    * Returns true if token or environment changed
    */
   hasChanged(prevStorage, newStorage) {
-    let hasTokenChanged = prevStorage.token !== newStorage.token;
-    return hasTokenChanged;
+    // TODO(arjun): can also be because the menu app setting has changed
+    const prevToken = this.getTokenFromStorage(prevStorage);
+    const newToken = this.getTokenFromStorage(newStorage);
+    return prevToken !== newToken;
   }
 
   /**
    * Returns a promise after setting up authorization
    */
   setup() {
-    const {
-      clientId: storedId,
-      token: existingToken
-    } = Store.getState().storage;
+    const storedId = this.getClientId();
+    const existingToken = this.getToken();
     let clientId = storedId || AuthUtils.generateClientId();
     return new Promise((resolve, reject) => {
       AuthUtils.handleTokenState(clientId, existingToken).then(token => {
-        StorageUtils.setInSyncStore({ token, clientId }, () => {});
+        this.updateTokenInStorage({ token, clientId });
         const decoded = AuthUtils.decodeJWT(token);
         resolve(decoded);
       });
@@ -87,7 +132,7 @@ class AuthStore {
    * Returns a promise after OAuth flow
    */
   launchOAuthFlow = () => {
-    const { token } = Store.getState().storage;
+    const token = this.getToken();
     const baseUrl = this.getBaseUrl();
     return new Promise((resolve, reject) => {
       AuthUtils.triggerOAuthFlow(baseUrl, token, response => {
@@ -96,7 +141,7 @@ class AuthStore {
           reject();
         } else {
           const refreshedToken = getParameterByName("token", response);
-          StorageUtils.setInSyncStore({ token: refreshedToken });
+          this.updateTokenInStorage({ token: refreshedToken });
           resolve();
         }
       });
@@ -107,7 +152,7 @@ class AuthStore {
    * Returns a promise after logging out
    */
   launchLogoutFlow = () => {
-    const { token } = Store.getState().storage;
+    const token = this.getToken();
     const baseUrl = this.getBaseUrl();
     return new Promise((resolve, reject) => {
       AuthUtils.triggerLogoutFlow(baseUrl, token, response => {
@@ -116,22 +161,12 @@ class AuthStore {
           reject();
         } else {
           const refreshedToken = getParameterByName("token", response);
-          StorageUtils.setInSyncStore({ token: refreshedToken });
+          this.updateTokenInStorage({ token: refreshedToken });
           resolve();
         }
       });
     });
   };
-
-  getBaseUrl = () => {
-    let envRootUrl = "https://www.codeview.io/";
-
-    if (process.env.REACT_APP_BACKEND_ENV === "local") {
-      envRootUrl = "http://localhost:8000/";
-    }
-
-    return envRootUrl;
-  };
 }
 
-export default new AuthStore();
+export default new AuthStore(Store);
