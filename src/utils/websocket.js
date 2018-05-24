@@ -3,7 +3,7 @@ import { bindActionCreators } from "redux";
 import WebSocketAsPromised from "websocket-as-promised";
 import Raven from "raven-js";
 import * as DataActions from "../actions/dataActions";
-import { rootUrl } from "./api";
+import Authorization from "./authorization";
 import { getGitService } from "../adapters";
 
 function exponentialBackoff(attempt, delay) {
@@ -26,8 +26,10 @@ class BaseWebSocket {
     return this.wsp && this.wsp.isOpening;
   };
 
-  createWebsocket = (token, onClose) => {
+  createWebsocket = onClose => {
+    const token = Authorization.getToken();
     if (this.wsp === null) {
+      const rootUrl = Authorization.getBaseUrl();
       const baseWsUrl = rootUrl.replace("http", "ws");
       const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
       this.wsp = new WebSocketAsPromised(wsUrl, {
@@ -41,8 +43,8 @@ class BaseWebSocket {
     }
   };
 
-  connectSocket = (token, onClose) => {
-    this.createWebsocket(token, onClose);
+  connectSocket = onClose => {
+    this.createWebsocket(onClose);
     return this.wsp.open();
   };
 
@@ -226,11 +228,10 @@ class WebSocketManager {
   };
 
   createConnection = () => {
-    const token = Store.getState().storage.token;
     return new Promise((resolve, reject) => {
       this.dispatchStatus("connecting");
       this.ws
-        .connectSocket(token, this.onSocketClose)
+        .connectSocket(this.onSocketClose)
         .then(() => {
           this.isReady = false;
           this.setupListener();

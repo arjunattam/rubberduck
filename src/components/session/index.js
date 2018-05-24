@@ -27,7 +27,7 @@ const ProgressBar = ({ value }) => {
   const width = `${value}%`;
   return (
     <div>
-      <div className="progress-bar" style={{ width }} />
+      <div className="session-progress-bar" style={{ width }} />
     </div>
   );
 };

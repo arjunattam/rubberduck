@@ -8,7 +8,7 @@
   overflow: hidden;
 }
 
-.progress-bar {
+.session-progress-bar {
   height: 4px;
   background-color: #c8e1ff;
   transition: width 0.3s;

@@ -2,8 +2,8 @@
   "manifest_version": 2,
   "name": "Rubberduck",
   "short_name": "Rubberduck",
-  "description": "Code review assistant for GitHub",
-  "version": "0.2.16",
+  "description": "Code review assistant for GitHub and Bitbucket",
+  "version": "0.2.17",
   "background": {
     "persistent": false,
     "scripts": ["background.js"]
