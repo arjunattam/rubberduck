@@ -106,6 +106,7 @@ const refreshToken = existingToken => {
 };
 
 export const handleTokenState = (clientId, existingToken) => {
+  console.log("handle token state", clientId, existingToken);
   if (isTokenRefreshExpiringSoon(existingToken)) {
     // Refreshing will not help, let's just issue a new token
     return issueToken(clientId);

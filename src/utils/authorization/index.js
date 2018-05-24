@@ -24,6 +24,10 @@ export class AuthStore {
 
     if (hasInit && newMenuApp != this.isOnMenuAppEnv) {
       this.isOnMenuAppEnv = newMenuApp;
+
+      if (this.isOnMenuAppEnv) {
+        this.setup();
+      }
     }
   }
 
@@ -72,7 +76,7 @@ export class AuthStore {
     return clientId;
   };
 
-  updateTokenInStorage = ({ token, clientId }) => {
+  updateTokenStorage = ({ token, clientId }) => {
     const nonNull = _.pickBy({ token, clientId }, _.identity);
 
     if (this.isOnMenuAppEnv) {
@@ -146,7 +150,7 @@ export class AuthStore {
     let clientId = storedId || AuthUtils.generateClientId();
     return new Promise((resolve, reject) => {
       AuthUtils.handleTokenState(clientId, existingToken).then(token => {
-        this.updateTokenInStorage({ token, clientId });
+        this.updateTokenStorage({ token, clientId });
         const decoded = AuthUtils.decodeJWT(token);
         resolve(decoded);
       });
@@ -166,7 +170,7 @@ export class AuthStore {
           reject();
         } else {
           const refreshedToken = getParameterByName("token", response);
-          this.updateTokenInStorage({ token: refreshedToken });
+          this.updateTokenStorage({ token: refreshedToken });
           resolve();
         }
       });
@@ -186,7 +190,7 @@ export class AuthStore {
           reject();
         } else {
           const refreshedToken = getParameterByName("token", response);
-          this.updateTokenInStorage({ token: refreshedToken });
+          this.updateTokenStorage({ token: refreshedToken });
           resolve();
         }
       });

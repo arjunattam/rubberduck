@@ -87,8 +87,20 @@ class StatusBar extends React.Component {
   onPortChange = event =>
     StorageUtils.setInLocalStore({ defaultPort: event.target.value });
 
-  onMenuChange = event =>
-    StorageUtils.setInLocalStore({ hasMenuApp: event.target.checked });
+  /**
+   * Whenever our hasMenuApp setting changes, we want to clear the
+   * menu app tokens, because our "menu app server" might have changed.
+   * Right after this, auth store will issue new tokens and update the store.
+   */
+  onMenuChange = event => {
+    if (this.props.data.data.isUnauthenticated) {
+      this.DataActions.updateData({ isUnauthenticated: false });
+    }
+    return StorageUtils.setInLocalStore({
+      hasMenuApp: event.target.checked,
+      menuAppTokens: {}
+    });
+  };
 
   componentWillReceiveProps(newProps) {
     const { isUnauthenticated } = newProps.data.data;

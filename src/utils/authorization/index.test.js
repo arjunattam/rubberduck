@@ -54,7 +54,7 @@ test("get base url for menu app works", () => {
 test("test token saved in sync store", () => {
   let store = mockStore({});
   const Authorization = new AuthStore(store);
-  Authorization.updateTokenInStorage({ token: "token", clientId: "id" });
+  Authorization.updateTokenStorage({ token: "token", clientId: "id" });
   expect(setInSyncStore.mock.calls.length).toEqual(1);
   expect(setInSyncStore).lastCalledWith(
     { token: "token", clientId: "id" },
@@ -66,7 +66,7 @@ test("test token saved in local store", () => {
   let store = mockStore({});
   const Authorization = new AuthStore(store);
   Authorization.isOnMenuAppEnv = true;
-  Authorization.updateTokenInStorage({ token: "new-token" });
+  Authorization.updateTokenStorage({ token: "new-token" });
   expect(setInLocalStore.mock.calls.length).toEqual(1);
   expect(setInLocalStore).lastCalledWith(
     {

@@ -29,16 +29,20 @@ export default createReducer(initialState, {
       initialized: true
     };
   },
+
   UPDATE_FROM_CHROME_STORAGE: (state, action) => {
     if (!action.payload) return { ...state };
     let modifier = {};
+    let hasChangeEnv = false;
+    const { hasMenuApp: newEnv } = action.payload;
 
-    if (state.hasMenuApp !== action.payload.hasMenuApp) {
-      // Refresh the menu app tokens
-      modifier.menuAppTokens = {};
+    if (newEnv !== undefined) {
+      hasChangeEnv = state.hasMenuApp !== newEnv;
     }
 
-    if (action.payload.menuAppTokens) {
+    if (hasChangeEnv) {
+      modifier.menuAppTokens = {};
+    } else if (action.payload.menuAppTokens) {
       modifier.menuAppTokens = {
         ...state.menuAppTokens,
         ...action.payload.menuAppTokens
