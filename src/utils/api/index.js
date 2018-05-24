@@ -40,7 +40,6 @@ export class BaseAPI {
 
   issueToken(clientId) {
     const uri = `${BASE_API_PREFIX}/token_issue/`;
-    console.log("issue token called", uri);
     return this.baseRequest
       .post(uri, { client_id: clientId })
       .then(response => response.data);
