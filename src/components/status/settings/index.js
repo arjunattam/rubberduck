@@ -15,9 +15,12 @@ const email = "team@rubberduck.io";
 
 const mailto = `mailto:${email}`;
 
-export const GearButton = props => (
-  <div className="button-div" onClick={props.onClick}>
-    <Octicon name="gear" style={{ height: 20, width: 20 }} />
+export const GearButton = ({ onClick, isVisible: isExpanded }) => (
+  <div className="button-div" onClick={onClick}>
+    <Octicon
+      name={isExpanded ? "chevron-down" : "gear"}
+      style={{ height: 20, width: 20 }}
+    />
   </div>
 );
 

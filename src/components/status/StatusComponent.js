@@ -32,7 +32,7 @@ const StatusComponent = props => (
     <StatusContainer {...props}>
       <div className="status">
         <MiniSettings {...props} />
-        <GearButton onClick={props.onClick} />
+        <GearButton onClick={props.onClick} isVisible={props.showSettings} />
       </div>
       <Settings {...props} isVisible={props.showSettings} />
     </StatusContainer>
