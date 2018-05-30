@@ -75,8 +75,6 @@ class StatusBar extends React.Component {
 
   getAuthState = () => {
     switch (Authorization.getAuthState()) {
-      case "no_token":
-        return <span>No token found</span>;
       case "has_authenticated":
         return <span>{`Logged in ${this.getServiceUsername()}`}</span>;
       case "has_token":
@@ -85,6 +83,9 @@ class StatusBar extends React.Component {
             {this.getLoginPrompt()}
           </a>
         );
+      case "no_token":
+      default:
+        return <span>No token found</span>;
     }
   };
 
@@ -93,17 +94,29 @@ class StatusBar extends React.Component {
 
   /**
    * Whenever our hasMenuApp setting changes, we want to clear the
-   * menu app tokens, because our "menu app server" might have changed.
+   * menu app tokens, because our menu app server instance might have changed.
    * Right after this, auth store will issue new tokens and update the store.
+   *
+   * At this point, we also check whether chrome permissions to communicate
+   * with the menu app server. This requires "user interaction" and therefore
+   * needs to be done here.
    */
   onMenuChange = event => {
     if (this.props.data.data.isUnauthenticated) {
       this.DataActions.updateData({ isUnauthenticated: false });
     }
-    return StorageUtils.setInLocalStore({
-      hasMenuApp: event.target.checked,
+    const { checked: hasMenuApp } = event.target;
+    const values = {
+      hasMenuApp,
       menuAppTokens: {}
-    });
+    };
+    if (hasMenuApp) {
+      Authorization.updateChromePermissions().then(response => {
+        StorageUtils.setInLocalStore(values);
+      });
+    } else {
+      StorageUtils.setInLocalStore(values);
+    }
   };
 
   componentWillReceiveProps(newProps) {

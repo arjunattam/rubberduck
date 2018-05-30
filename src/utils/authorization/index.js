@@ -22,7 +22,7 @@ export class AuthStore {
     const hasInit = this.store.getState().storage.initialized;
     const newMenuApp = this.store.getState().storage.hasMenuApp;
 
-    if (hasInit && newMenuApp != this.isOnMenuAppEnv) {
+    if (hasInit && newMenuApp !== this.isOnMenuAppEnv) {
       this.isOnMenuAppEnv = newMenuApp;
 
       if (this.isOnMenuAppEnv) {
@@ -195,6 +195,11 @@ export class AuthStore {
         }
       });
     });
+  };
+
+  updateChromePermissions = () => {
+    const url = "http://localhost/*"; // ports don't matter
+    return AuthUtils.updateChromePermissions(url);
   };
 }
 
