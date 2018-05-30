@@ -123,3 +123,5 @@ export const handleTokenState = (clientId, existingToken) => {
     return issueToken(clientId);
   }
 };
+
+export const updateChromePermissions = urls => {};

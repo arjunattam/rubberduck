@@ -72,7 +72,8 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
     STORAGE_LOCAL_SET: saveToLocalStorage,
     STORAGE_GET_ALL: getAllFromStorage,
     HTTP_GET: getAjax,
-    HTTP_POST: postAjax
+    HTTP_POST: postAjax,
+    PERMISSIONS_UPDATE: updatePermissions
   };
   handlers[req.message](req.data, sendRes);
   // Return true to inform that we will send response async
@@ -93,13 +94,6 @@ const sendMessageToTab = (tabId, action, data) => {
     },
     res => {}
   );
-};
-
-// Helper method to send message to the current tab in content script.
-const sendMessageToCurrentTab = (action, data) => {
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    sendMessageToTab(tabs[0].id, action, data);
-  });
 };
 
 const sendMessageToAllTabs = (action, data) => {
@@ -154,6 +148,12 @@ const getAllFromStorage = (data, callback) => {
     });
   });
 };
+
+/**
+ * This method updates chrome.permissions to make sure we can
+ * communicate to all the urls (like localhost)
+ */
+const updatePermissions = (data, callback) => {};
 
 // Plain js network calls
 function postAjax(fulldata, success) {

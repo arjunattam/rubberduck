@@ -16,7 +16,7 @@ This repo is the chrome extension for the mercury project.
     npm run start-local
     ```
 
-3.  To distribute binary file, we pack the extension into a crx file, located at `dist/mercury.crx`. Generate new crx using the command. Packing needs keys (see below).
+3.  To distribute binary file, we can pack the extension into a crx file. Generate new crx using the command. Packing needs keys (see below).
 
     ```
     npm run pack
