@@ -2,7 +2,7 @@ import React from "react";
 import Octicon from "react-component-octicons";
 import RubberduckIcon from "./icon";
 
-export const VERSION = "0.2.18";
+export const VERSION = "0.2.19";
 
 const slack =
   "https://join.slack.com/t/karigarihq/shared_invite/enQtMzM5NzQxNjQxNTA1LTM0ZDFhNWQ3YmEyYmExZTY1ODJmM2U3NzExM2E0YmQxODcxYTgwYzczOTVkOGY5ODk2MWE0MzE2ODliNGU1ZDc";
