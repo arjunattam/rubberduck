@@ -124,4 +124,19 @@ export const handleTokenState = (clientId, existingToken) => {
   }
 };
 
-export const updateChromePermissions = urls => {};
+/**
+ * Return promise after ensuring that we have CORS permissions
+ * for a url. See https://developer.chrome.com/extensions/xhr
+ */
+export const updateChromePermissions = url => {
+  const message = constructMessage("PERMISSIONS_UPDATE", { url });
+  return new Promise((resolve, reject) => {
+    sendMessage(message, result => {
+      if (result) {
+        resolve(result);
+      } else {
+        reject(result);
+      }
+    });
+  });
+};
