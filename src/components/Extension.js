@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import Raven from "raven-js";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
@@ -40,6 +39,7 @@ class Extension extends React.Component {
       this.setupAuthorization();
     }
 
+    // TODO(arjun): should this happen only after auth has been setup?
     this.updateSessionAndTree(prevProps, this.props);
   }
 
@@ -74,7 +74,7 @@ class Extension extends React.Component {
   }
 
   setupAuthorization() {
-    Authorization.setup().then(userInfo => Raven.setUserContext(userInfo));
+    return Authorization.setup();
   }
 
   handleStorageUpdate(data) {
