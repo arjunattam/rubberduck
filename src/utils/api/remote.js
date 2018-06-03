@@ -1,6 +1,6 @@
 import parse from "what-the-diff";
-import Raven from "raven-js";
 import { getGitService } from "../../adapters";
+import * as CrashReporting from "../crashes";
 
 let BaseGitRemoteAPI = {
   isRemoteAuthorized(isPrivate) {
@@ -46,7 +46,7 @@ let BaseGitRemoteAPI = {
           // Remote has returned auth error
           this.dispatchAuthenticated(false);
         } else {
-          Raven.captureException(error);
+          CrashReporting.catchException(error);
         }
       });
   },
