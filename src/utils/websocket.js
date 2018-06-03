@@ -265,7 +265,10 @@ class WebSocketManager {
 
   recordEvent = type => {
     const repoDetails = Store.getState().data.repoDetails;
-    AnalyticsUtils.logSessionEvent(type, repoDetails);
+    AnalyticsUtils.logSessionEvent(type, {
+      ...repoDetails,
+      service: getGitService()
+    });
   };
 
   createNewSession = params => {
