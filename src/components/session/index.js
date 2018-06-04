@@ -30,6 +30,7 @@ const SUPPORT_LINKS_BASIC = {
 
 const SUPPORT_LINKS_SELF_HOSTED = {
   disconnected: "https://support.rubberduck.io/articles/26924",
+  unsupported_language: "https://support.rubberduck.io/articles/26922",
   no_access: "https://support.rubberduck.io/articles/26916"
 };
 
@@ -81,6 +82,8 @@ class SessionStatus extends React.Component {
         return "inactive";
       case "no_access":
         return "not authorised";
+      case "disconnected":
+        return "unable to connect";
       default:
         return status;
     }
@@ -102,9 +105,18 @@ class SessionStatus extends React.Component {
       href = SUPPORT_LINKS_BASIC[status];
     }
 
+    let text = "Support →";
+
+    if (hasMenuApp) {
+      const configurableStatuses = ["no_access", "disconnected"];
+      if (configurableStatuses.indexOf(status) >= 0) {
+        text = "Configure →";
+      }
+    }
+
     return href ? (
       <a href={href} target="_blank">
-        Support
+        {text}
       </a>
     ) : null;
   };

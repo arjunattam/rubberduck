@@ -203,7 +203,7 @@ class WebSocketManager {
   reconnectIfRequired = () => {
     // We should reconnect if the socket connection was `ready`
     // and the server disconnected.
-    if (!this.ws.isConnected()) {
+    if (!this.ws.isConnected() && this.isReady) {
       this.reconnectAttempts += 1;
       this.createSession().then(response => {
         this.reconnectAttempts = 0;
@@ -220,7 +220,6 @@ class WebSocketManager {
 
   onSocketClose = closeResponse => {
     this.dispatchStatus("disconnected");
-    this.isReady = false;
 
     if (!closeResponse.wasClean) {
       // This means we did not explicitly close the connection ourself
@@ -246,14 +245,8 @@ class WebSocketManager {
   };
 
   tearDownIfRequired = () => {
-    if (this.ws.isConnected() || this.ws.isConnecting()) {
-      this.isReady = false;
-      return this.ws.tearDown();
-    } else {
-      return new Promise((resolve, reject) => {
-        resolve();
-      });
-    }
+    this.isReady = false;
+    return this.ws.tearDown();
   };
 
   isNoAccessError = error =>

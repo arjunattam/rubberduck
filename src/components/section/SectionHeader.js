@@ -24,15 +24,17 @@ const SectionLoader = props => (
 );
 
 const ReportIssue = props => (
-  <div className="section-loader">
-    <a
-      href="https://github.com/karigari/rubberduck-issues/issues/new/choose"
-      target="_blank"
-      style={{ color: "#999" }}
-      title="Report issue"
-    >
-      <Octicon name="report" />
-    </a>
+  <div
+    className="section-loader section-report"
+    onClick={e => {
+      window.open(
+        "https://github.com/karigari/rubberduck-issues/issues/new/choose",
+        "_blank"
+      );
+      e.stopPropagation();
+    }}
+  >
+    <Octicon name="report" />
   </div>
 );
 

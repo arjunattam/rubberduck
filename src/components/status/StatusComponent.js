@@ -5,7 +5,7 @@ import "./StatusBar.css";
 
 const SettingsStatus = ({ authState, hasMenuApp, defaultPort }) =>
   hasMenuApp ? (
-    <div className="settings-status-text settings-success">{`menu app (${defaultPort})`}</div>
+    <div className="tree-status">{`menu app (${defaultPort})`}</div>
   ) : (
     <div>{authState}</div>
   );
