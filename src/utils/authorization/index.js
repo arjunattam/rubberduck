@@ -2,6 +2,8 @@ import _ from "lodash";
 import ReduxStore from "../../store";
 import * as AuthUtils from "./utils";
 import * as StorageUtils from "../storage";
+import * as CrashReporting from "../crashes";
+import * as AnalyticsUtils from "../analytics";
 import { getGitService } from "../../adapters";
 import { getParameterByName } from "../api";
 
@@ -24,10 +26,7 @@ export class AuthStore {
 
     if (hasInit && newMenuApp !== this.isOnMenuAppEnv) {
       this.isOnMenuAppEnv = newMenuApp;
-
-      if (this.isOnMenuAppEnv) {
-        this.setup();
-      }
+      this.setup();
     }
   }
 
@@ -154,6 +153,11 @@ export class AuthStore {
         const decoded = AuthUtils.decodeJWT(token);
         resolve(decoded);
       });
+    }).then(decodedInfo => {
+      const userInfo = { ...decodedInfo, isOnMenuAppEnv: this.isOnMenuAppEnv };
+      CrashReporting.setupUser(userInfo);
+      AnalyticsUtils.setupUser(userInfo);
+      return userInfo;
     });
   }
 

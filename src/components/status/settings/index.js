@@ -9,15 +9,18 @@ const slack =
 
 const twitter = "https://twitter.com/getrubberduck";
 
-const website = "https://www.rubberduck.io";
+const changelog = "https://www.rubberduck.io/blog";
 
 const email = "team@rubberduck.io";
 
 const mailto = `mailto:${email}`;
 
-export const GearButton = props => (
-  <div className="button-div" onClick={props.onClick}>
-    <Octicon name="gear" style={{ height: 20, width: 20 }} />
+export const GearButton = ({ onClick, isVisible: isExpanded }) => (
+  <div className="button-div" onClick={onClick}>
+    <Octicon
+      name={isExpanded ? "chevron-down" : "gear"}
+      style={{ height: 20, width: 20 }}
+    />
   </div>
 );
 
@@ -26,8 +29,10 @@ const IconSection = props => (
     <div className="row">
       <div>
         <h5>Rubberduck</h5>
-        v{VERSION} · <a href={twitter}>Changelog</a> ·{" "}
-        <a href={website}>Website</a>
+        v{VERSION} ·{" "}
+        <a href={changelog} target="_blank">
+          Changelog
+        </a>
       </div>
       <div>
         <RubberduckIcon size="24" />
@@ -82,8 +87,8 @@ const LogoutSection = ({ onLogout }) => (
 
 const SettingsInternal = props => (
   <div className="settings-section">
-    <IconSection />
     <ConfigSection {...props} />
+    <IconSection />
     <SupportSection />
     <LogoutSection {...props} />
   </div>

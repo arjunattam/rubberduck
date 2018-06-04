@@ -1,10 +1,11 @@
 import Store from "../store";
 import { bindActionCreators } from "redux";
 import WebSocketAsPromised from "websocket-as-promised";
-import Raven from "raven-js";
-import * as DataActions from "../actions/dataActions";
 import Authorization from "./authorization";
 import { getGitService } from "../adapters";
+import * as DataActions from "../actions/dataActions";
+import * as CrashReporting from "./crashes";
+import * as AnalyticsUtils from ".//analytics";
 
 function exponentialBackoff(attempt, delay) {
   return Math.floor(Math.random() * Math.pow(2, attempt) * delay);
@@ -202,7 +203,7 @@ class WebSocketManager {
   reconnectIfRequired = () => {
     // We should reconnect if the socket connection was `ready`
     // and the server disconnected.
-    if (!this.ws.isConnected()) {
+    if (!this.ws.isConnected() && this.isReady) {
       this.reconnectAttempts += 1;
       this.createSession().then(response => {
         this.reconnectAttempts = 0;
@@ -219,7 +220,6 @@ class WebSocketManager {
 
   onSocketClose = closeResponse => {
     this.dispatchStatus("disconnected");
-    this.isReady = false;
 
     if (!closeResponse.wasClean) {
       // This means we did not explicitly close the connection ourself
@@ -245,14 +245,8 @@ class WebSocketManager {
   };
 
   tearDownIfRequired = () => {
-    if (this.ws.isConnected() || this.ws.isConnecting()) {
-      this.isReady = false;
-      return this.ws.tearDown();
-    } else {
-      return new Promise((resolve, reject) => {
-        resolve();
-      });
-    }
+    this.isReady = false;
+    return this.ws.tearDown();
   };
 
   isNoAccessError = error =>
@@ -262,22 +256,41 @@ class WebSocketManager {
 
   isLanguageUnsupported = error => error.indexOf("Language not supported") >= 0;
 
+  recordEvent = type => {
+    const repoDetails = Store.getState().data.repoDetails;
+    AnalyticsUtils.logSessionEvent(type, {
+      ...repoDetails,
+      service: getGitService()
+    });
+  };
+
   createNewSession = params => {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
-    return this.createSession().catch(error => {
-      if (error.error && this.isLanguageUnsupported(error.error)) {
-        this.dispatchStatus("unsupported_language");
-      } else if (error.error && this.isNoAccessError(error.error)) {
-        this.dispatchStatus("no_access");
-      } else if (error === "No session to be created") {
-        this.dispatchStatus("no_session");
-      } else {
-        this.dispatchStatus("error");
-        const excp = new Error(JSON.stringify(error));
-        Raven.captureException(excp);
-      }
-    });
+    this.recordEvent("creating");
+
+    return this.createSession()
+      .then(response => {
+        this.recordEvent("created");
+        return response;
+      })
+      .catch(error => {
+        if (error.error && this.isLanguageUnsupported(error.error)) {
+          this.dispatchStatus("unsupported_language");
+          this.recordEvent("unsupported_language");
+        } else if (error.error && this.isNoAccessError(error.error)) {
+          this.dispatchStatus("no_access");
+          this.recordEvent("no_access");
+        } else if (error === "No session to be created") {
+          this.dispatchStatus("no_session");
+          this.recordEvent("no_session");
+        } else {
+          this.dispatchStatus("error");
+          const excp = new Error(JSON.stringify(error));
+          CrashReporting.catchException(excp);
+          this.recordEvent("error");
+        }
+      });
   };
 
   isValidType = type =>
