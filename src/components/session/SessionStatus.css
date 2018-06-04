@@ -1,15 +1,21 @@
+:root {
+  --status-indicator-size: 10px;
+  --status-indicator-animation-duration: 1.5s;
+}
+
 .session-status-container {
   text-transform: uppercase;
   font-size: 11px;
-  height: 29px;
+  height: 30px;
   width: 100%;
   font-weight: bold;
   color: #333;
   overflow: hidden;
+  border-bottom: 1px #e4e4e4 solid;
 }
 
 .session-progress-bar {
-  height: 4px;
+  height: 5px;
   background-color: #c8e1ff;
   transition: width 0.3s;
   border-radius: 0;
@@ -20,9 +26,14 @@
 }
 
 .session-status {
-  height: 15px;
   width: 100%;
   padding: 5px 0px 5px 11px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.session-status-link {
+  margin-right: 20px;
 }
 
 .session-status-not-ready {

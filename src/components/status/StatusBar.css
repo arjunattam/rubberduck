@@ -48,3 +48,21 @@
   text-align: right;
   width: 48px;
 }
+
+.settings-status-text {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #333;
+  background: #eee;
+  padding: 3px;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.settings-alert {
+  background: rgba(255, 135, 0, 0.2);
+}
+
+.settings-success {
+  background: rgba(75, 210, 143, 0.2);
+}

@@ -90,8 +90,8 @@ class Sidebar extends React.Component {
     >
       <Title />
       {this.renderCollapseButton(width)}
+      <SessionStatus />
       <div className="repo-info-sections">
-        <SessionStatus />
         <Tree />
         <Definitions />
         <References />
