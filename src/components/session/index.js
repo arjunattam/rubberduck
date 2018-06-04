@@ -4,7 +4,7 @@ import "status-indicator/styles.css";
 import "./SessionStatus.css";
 
 /*
-Possible values
+Possible values for status
 - connecting
 - disconnected
 
@@ -22,6 +22,17 @@ Possible values
 - no_session
 - no_access
 */
+
+const SUPPORT_LINKS_BASIC = {
+  unsupported_language: "https://support.rubberduck.io/articles/26922",
+  no_access: "https://support.rubberduck.io/articles/26923"
+};
+
+const SUPPORT_LINKS_SELF_HOSTED = {
+  disconnected: "https://support.rubberduck.io/articles/26924",
+  unsupported_language: "https://support.rubberduck.io/articles/26922",
+  no_access: "https://support.rubberduck.io/articles/26916"
+};
 
 const ProgressBar = ({ value }) => {
   const width = `${value}%`;
@@ -62,7 +73,7 @@ class SessionStatus extends React.Component {
       case "cloned_base_repo":
       case "setup_base_repo":
       case "cloned_head_repo":
-        return "preparing";
+        return "one-time preparation";
       case "initiated":
         return "indexing";
       case "unsupported_language":
@@ -71,27 +82,43 @@ class SessionStatus extends React.Component {
         return "inactive";
       case "no_access":
         return "not authorised";
+      case "disconnected":
+        return "unable to connect";
       default:
         return status;
     }
   };
 
   getProgress = () => {
-    const { status, progress } = this.props.data.session;
-    const filteredStatus = this.getText(status);
-    const startAt = {
-      connecting: 0,
-      initializing: 10,
-      indexing: 90,
-      ready: 100
-    };
-    if (filteredStatus === "preparing") {
-      const baseProgress = status === "fetched_details" ? 20 : 90;
-      const proratedProgress = progress ? progress / 100.0 : 0;
-      return baseProgress + proratedProgress * 70;
+    const { progress } = this.props.data.session;
+    return progress;
+  };
+
+  renderSupportLink = () => {
+    const { status } = this.props.data.session;
+    const { hasMenuApp } = this.props.storage;
+    let href = "";
+
+    if (hasMenuApp) {
+      href = SUPPORT_LINKS_SELF_HOSTED[status];
     } else {
-      return startAt[filteredStatus];
+      href = SUPPORT_LINKS_BASIC[status];
     }
+
+    let text = "Support →";
+
+    if (hasMenuApp) {
+      const configurableStatuses = ["no_access", "disconnected"];
+      if (configurableStatuses.indexOf(status) >= 0) {
+        text = "Configure →";
+      }
+    }
+
+    return href ? (
+      <a href={href} target="_blank">
+        {text}
+      </a>
+    ) : null;
   };
 
   showNotReady = () => {
@@ -112,15 +139,15 @@ class SessionStatus extends React.Component {
 
   renderProgressBar = () => <ProgressBar value={this.getProgress()} />;
 
-  renderStatus = () => {
-    const statusText = this.getText();
-    return (
-      <div className="session-status">
+  renderStatus = () => (
+    <div className="session-status">
+      <div>
         {this.renderIndicator()}
-        <span className="session-status-text">{statusText}</span>
+        <span className="session-status-text">{this.getText()}</span>
       </div>
-    );
-  };
+      <div className="session-status-link">{this.renderSupportLink()}</div>
+    </div>
+  );
 
   renderNotReady = () => {
     return <div className="session-status-not-ready">Waiting to be ready</div>;

@@ -2,8 +2,9 @@ import React from "react";
 import Octicon from "react-component-octicons";
 import "./Section.css";
 
+const iconStyle = { height: 12, marginRight: "5px", width: 12 };
+
 const SectionHeaderIcon = props => {
-  const iconStyle = { height: 12, marginRight: "5px", width: 12 };
   let traingleCLassName = props.isOpen
     ? "section-triangle"
     : "section-triangle collapsed";
@@ -22,11 +23,27 @@ const SectionLoader = props => (
   </div>
 );
 
+const ReportIssue = props => (
+  <div
+    className="section-loader section-report"
+    onClick={e => {
+      window.open(
+        "https://github.com/karigari/rubberduck-issues/issues/new/choose",
+        "_blank"
+      );
+      e.stopPropagation();
+    }}
+  >
+    <Octicon name="report" />
+  </div>
+);
+
 const SectionHeader = props => (
   <div className="section-header" onClick={props.onClick}>
     <SectionHeaderIcon isOpen={props.isVisible} />
     {props.name}
     {props.isLoading ? <SectionLoader /> : null}
+    {props.isVisible && !props.isLoading ? <ReportIssue /> : null}
   </div>
 );
 
