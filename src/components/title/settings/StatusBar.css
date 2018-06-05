@@ -1,3 +1,13 @@
+.settings-section-hidden {
+  max-height: 0 !important;
+}
+
+.settings-section {
+  max-height: 500px;
+  overflow: hidden;
+  transition: max-height 0.5s, opacity 0.2s;
+}
+
 .settings-sub-section {
   padding: 15px;
   background-color: #fff;

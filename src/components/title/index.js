@@ -13,6 +13,10 @@ class Header extends React.Component {
     this.setState({ isSettingsExpanded: !this.state.isSettingsExpanded });
   };
 
+  renderSettings = () => (
+    <Settings isVisible={this.state.isSettingsExpanded} {...this.props} />
+  );
+
   render() {
     return (
       <div>
@@ -20,8 +24,8 @@ class Header extends React.Component {
           settingsOnClick={this.toggleSettings}
           repoDetails={this.props.data.repoDetails}
         />
-        <SessionStatus />
-        {this.state.isSettingsExpanded ? <Settings {...this.props} /> : null}
+        {this.renderSettings()}
+        <SessionStatus {...this.props} />
       </div>
     );
   }

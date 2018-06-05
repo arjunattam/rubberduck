@@ -96,9 +96,8 @@ export class Settings extends React.Component {
     const { hasMenuApp, defaultPort } = this.props.storage;
     return (
       <SettingsInternal
-        {...this.state}
+        isVisible={this.props.isVisible}
         authState={this.getAuthState()}
-        onClick={() => this.toggleSettings()}
         onLogout={() => this.launchLogoutFlow()}
         hasMenuApp={hasMenuApp}
         defaultPort={defaultPort}

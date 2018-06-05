@@ -92,8 +92,13 @@ const SettingsPreview = props =>
     </div>
   );
 
+const getClassName = ({ isVisible }) => {
+  const nameModifier = isVisible ? "" : "settings-section-hidden";
+  return `${nameModifier} settings-section`;
+};
+
 const SettingsInternal = props => (
-  <div className="settings-section">
+  <div className={getClassName(props)}>
     <SettingsPreview {...props} />
     <ConfigSection {...props} />
     <IconSection />
