@@ -1,9 +1,9 @@
 import React from "react";
 import { bindActionCreators } from "redux";
-import { getGitService } from "../../../adapters";
 import * as DataActions from "../../../actions/dataActions";
 import * as StorageUtils from "../../../utils/storage";
 import Authorization from "../../../utils/authorization";
+import { getGitService } from "../../../adapters";
 import SettingsInternal from "./SettingsComponent";
 
 export class Settings extends React.Component {
@@ -36,34 +36,10 @@ export class Settings extends React.Component {
     }
   };
 
-  getLoginPrompt = () => {
-    const service = getGitService();
+  getAuthState = () => Authorization.getAuthState();
 
-    if (service === "github") {
-      return "Login with GitHub";
-    } else if (service === "bitbucket") {
-      return "Login with Bitbucket";
-    }
-  };
-
-  getAuthState = () => {
-    switch (Authorization.getAuthState()) {
-      case "has_authenticated":
-        return <span>{`Logged in ${this.getServiceUsername()}`}</span>;
-      case "has_token":
-        return (
-          <a className="pointer" onClick={() => this.launchOAuthFlow()}>
-            {this.getLoginPrompt()}
-          </a>
-        );
-      case "no_token":
-      default:
-        return <span>No token found</span>;
-    }
-  };
-
-  onPortChange = event =>
-    StorageUtils.setInLocalStore({ defaultPort: event.target.value });
+  onPortChange = newValue =>
+    StorageUtils.setInLocalStore({ defaultPort: newValue });
 
   /**
    * Whenever our hasMenuApp setting changes, we want to clear the
@@ -97,7 +73,9 @@ export class Settings extends React.Component {
       <SettingsInternal
         isVisible={this.props.isVisible}
         authState={this.getAuthState()}
-        onLogout={() => this.launchLogoutFlow()}
+        serviceUsername={this.getServiceUsername()}
+        onLogout={this.launchLogoutFlow}
+        onLogin={this.launchOAuthFlow}
         hasMenuApp={hasMenuApp}
         defaultPort={defaultPort}
         onPortChange={this.onPortChange}

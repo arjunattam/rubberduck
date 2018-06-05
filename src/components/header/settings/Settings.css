@@ -27,9 +27,16 @@
   border-bottom: 1px #e8e8e8 solid;
 }
 
+.settings-sub-section .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
 .settings-sub-section h5 {
   text-transform: uppercase;
   margin-bottom: 3px;
+  color: #333;
 }
 
 .settings-sub-section input[type="text"] {

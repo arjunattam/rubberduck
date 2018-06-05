@@ -13,7 +13,7 @@ const initialState = {
   // (chrome.storage.local)
   hasHoverDebug: false,
   hasMenuApp: false,
-  defaultPort: 9898,
+  defaultPort: "9898",
   menuAppTokens: {},
 
   // API response caching: hash of url is the object key

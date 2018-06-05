@@ -9,21 +9,14 @@ const changelog = "https://www.rubberduck.io/blog";
 const email = "team@rubberduck.io";
 const mailto = `mailto:${email}`;
 
-export const IconSection = props => (
-  <div className="settings-sub-section">
-    <div className="row">
-      <div>
-        <h5>Rubberduck</h5>
-        v{VERSION} ·{" "}
-        <a href={changelog} target="_blank">
-          Changelog
-        </a>
-      </div>
-      <div>
-        <RubberduckIcon size="24" />
-      </div>
+const IconSection = () => (
+  <div className="row">
+    <div>
+      <h5>Rubberduck</h5>
     </div>
-    <div />
+    <div>
+      <RubberduckIcon size="24" />
+    </div>
   </div>
 );
 
@@ -32,9 +25,15 @@ const openLink = event => {
   window.open(github, "_blank");
 };
 
-export const SupportSection = props => (
+const SupportSection = () => (
   <div className="settings-sub-section">
-    <h5>Support</h5>
+    <IconSection />
+    <div>
+      v{VERSION} ·{" "}
+      <a href={changelog} target="_blank">
+        Changelog
+      </a>
+    </div>
     <div>
       <a href={github} onClick={openLink}>
         Report issue
@@ -47,3 +46,5 @@ export const SupportSection = props => (
     </div>
   </div>
 );
+
+export default SupportSection;
