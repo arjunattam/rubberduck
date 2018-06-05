@@ -6,7 +6,7 @@ import SessionStatus from "./session";
 
 class Header extends React.Component {
   state = {
-    isSettingsExpanded: false
+    isSettingsExpanded: true
   };
 
   toggleSettings = () => {

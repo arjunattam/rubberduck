@@ -5,24 +5,31 @@
 .settings-section {
   max-height: 500px;
   overflow: hidden;
-  transition: max-height 0.5s, opacity 0.2s;
+  transition: max-height 0.3s ease;
+}
+
+.settings-sub-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.settings-sub-list li {
+  display: block;
+  padding: 7px 0;
+  border-bottom: 1px solid #efefef;
+  display: flex;
+  justify-content: space-between;
 }
 
 .settings-sub-section {
   padding: 15px;
-  background-color: #fff;
   border-bottom: 1px #e8e8e8 solid;
 }
 
 .settings-sub-section h5 {
   text-transform: uppercase;
   margin-bottom: 3px;
-}
-
-.settings-sub-section .row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 5px;
 }
 
 .settings-sub-section input[type="text"] {

@@ -4,8 +4,7 @@ import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
 import * as StorageActions from "../../actions/storageActions";
 import * as StorageUtils from "../../utils/storage";
-import Title from "title";
-// import StatusBar from "status";
+import Header from "header";
 import CollapseButton from "collapse/CollapseButton";
 import Tree from "tree";
 import References from "references";
@@ -87,7 +86,7 @@ class Sidebar extends React.Component {
       onResize={this.onResize}
       onResizeStop={this.onResizeStop}
     >
-      <Title />
+      <Header />
       {this.renderCollapseButton(width)}
       <div className="repo-info-sections">
         <Tree />

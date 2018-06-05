@@ -74,16 +74,15 @@ export class Settings extends React.Component {
    * with the menu app server. This requires "user interaction" and therefore
    * needs to be done here.
    */
-  onMenuChange = event => {
-    if (this.props.data.data.isUnauthenticated) {
-      this.DataActions.updateData({ isUnauthenticated: false });
-    }
-    const { checked: hasMenuApp } = event.target;
+  onMenuChange = newMenuApp => {
+    // if (this.props.data.data.isUnauthenticated) {
+    //   this.DataActions.updateData({ isUnauthenticated: false });
+    // }
     const values = {
-      hasMenuApp,
+      hasMenuApp: newMenuApp,
       menuAppTokens: {}
     };
-    if (hasMenuApp) {
+    if (newMenuApp) {
       Authorization.updateChromePermissions().then(response => {
         StorageUtils.setInLocalStore(values);
       });
