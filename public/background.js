@@ -3,22 +3,32 @@ const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location
 
 const INJECTABLE_URLS = ["github.com", "bitbucket.org"];
 
+const DONT_INJECT_PATHS = ["/settings/tokens/new"];
+
 const UNINSTALLATION_FORM_LINK =
   "https://docs.google.com/forms/d/1fK-NaaxlPR2ImacKyTRVilN87NBAWkCgn8lXVbSROEQ";
 
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
+
   // Send message on every URL change to content script
   if (changeInfo.url) {
     sendMessageToTab(tabId, "URL_UPDATE", changeInfo.url);
   }
+
   // To ensure we don't inject the extension twice
   const injectFlagCode =
     "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;";
 
   if (!tab.url || INJECTABLE_URLS.indexOf(extractHostname(tab.url)) < 0) {
     // Tab hostname is not in the INJECTABLE_URLS
+    return;
+  }
+
+  if (DONT_INJECT_PATHS.indexOf(extractPath(tab.url)) >= 0) {
+    // We don't inject anything in the github "confirm password" screen
+    // This might not be an exhaustive set of path names
     return;
   }
 
@@ -211,19 +221,11 @@ function getAjax(data, success) {
 
 // Helper method to extract hostname from url
 const extractHostname = url => {
-  var hostname;
-  //find & remove protocol (http, ftp, etc.) and get hostname
+  const parsed = new URL(url);
+  return parsed.hostname;
+};
 
-  if (url.indexOf("://") > -1) {
-    hostname = url.split("/")[2];
-  } else {
-    hostname = url.split("/")[0];
-  }
-
-  //find & remove port number
-  hostname = hostname.split(":")[0];
-  //find & remove "?"
-  hostname = hostname.split("?")[0];
-
-  return hostname;
+const extractPath = url => {
+  const parsed = new URL(url);
+  return parsed.pathname;
 };
