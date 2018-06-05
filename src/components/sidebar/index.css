@@ -45,7 +45,7 @@
 
 .repo-info-sections {
   flex-grow: 1;
-  max-height: calc(100vh - 136px);
+  max-height: 100vh;
   overflow: auto;
   background: #fff;
 }

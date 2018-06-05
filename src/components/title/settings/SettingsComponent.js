@@ -1,8 +1,8 @@
 import React from "react";
-import Octicon from "react-component-octicons";
-import RubberduckIcon from "./icon";
+import RubberduckIcon from "../../icon";
+import "./StatusBar.css";
 
-export const VERSION = "0.2.21";
+const VERSION = "0.2.21";
 
 const slack =
   "https://join.slack.com/t/karigarihq/shared_invite/enQtMzM5NzQxNjQxNTA1LTM0ZDFhNWQ3YmEyYmExZTY1ODJmM2U3NzExM2E0YmQxODcxYTgwYzczOTVkOGY5ODk2MWE0MzE2ODliNGU1ZDc";
@@ -14,15 +14,6 @@ const changelog = "https://www.rubberduck.io/blog";
 const email = "team@rubberduck.io";
 
 const mailto = `mailto:${email}`;
-
-export const GearButton = ({ onClick, isVisible: isExpanded }) => (
-  <div className="button-div" onClick={onClick}>
-    <Octicon
-      name={isExpanded ? "chevron-down" : "gear"}
-      style={{ height: 20, width: 20 }}
-    />
-  </div>
-);
 
 const IconSection = props => (
   <div className="settings-sub-section">
@@ -85,8 +76,25 @@ const LogoutSection = ({ onLogout }) => (
   </div>
 );
 
+const SettingsStatus = ({ authState, hasMenuApp, defaultPort }) =>
+  hasMenuApp ? (
+    <div className="tree-status">{`menu app (${defaultPort})`}</div>
+  ) : (
+    <div>{authState}</div>
+  );
+
+const SettingsPreview = props =>
+  props.isLoading ? (
+    <div className="status-loader" style={{ width: 15, height: 15 }} />
+  ) : (
+    <div className="settings-sub-section">
+      <SettingsStatus {...props} />
+    </div>
+  );
+
 const SettingsInternal = props => (
   <div className="settings-section">
+    <SettingsPreview {...props} />
     <ConfigSection {...props} />
     <IconSection />
     <SupportSection />
@@ -94,5 +102,4 @@ const SettingsInternal = props => (
   </div>
 );
 
-export const Settings = props =>
-  props.isVisible ? <SettingsInternal {...props} /> : null;
+export default SettingsInternal;

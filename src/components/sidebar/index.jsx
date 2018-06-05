@@ -4,18 +4,17 @@ import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
 import * as StorageActions from "../../actions/storageActions";
 import * as StorageUtils from "../../utils/storage";
-import Title from "title/Title";
-import StatusBar from "status";
+import Title from "title";
+// import StatusBar from "status";
 import CollapseButton from "collapse/CollapseButton";
 import Tree from "tree";
 import References from "references";
 import Definitions from "definitions";
 import HoverListener from "hover/HoverListener";
-import SessionStatus from "session";
 import * as GithubLayout from "../../adapters/github/layout";
 import { setupPjax } from "./pjax";
 import Resizable from "./Resizable";
-import "../../index.css";
+import "./index.css";
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -90,14 +89,13 @@ class Sidebar extends React.Component {
     >
       <Title />
       {this.renderCollapseButton(width)}
-      <SessionStatus />
       <div className="repo-info-sections">
         <Tree />
         <Definitions />
         <References />
       </div>
       <HoverListener />
-      <StatusBar />
+      {/* <StatusBar /> */}
     </Resizable>
   );
 

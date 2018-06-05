@@ -1,0 +1,21 @@
+.settings-sub-section {
+  padding: 15px;
+  background-color: #fff;
+  border-bottom: 1px #e8e8e8 solid;
+}
+
+.settings-sub-section h5 {
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.settings-sub-section .row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.settings-sub-section input[type="text"] {
+  text-align: right;
+  width: 48px;
+}

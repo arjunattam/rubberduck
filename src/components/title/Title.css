@@ -1,5 +1,4 @@
 .header {
-  height: 48px; /* same as github title */
   padding: 4px;
   padding-left: 10px;
   font-size: 15px;
@@ -22,4 +21,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.title-settings-button {
+  position: fixed;
+  top: 10px;
+  left: 200px;
+  cursor: pointer;
 }

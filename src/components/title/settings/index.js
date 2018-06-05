@@ -1,56 +1,29 @@
 import React from "react";
-import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import * as DataActions from "../../actions/dataActions";
-import { getGitService } from "../../adapters";
-import Authorization from "../../utils/authorization";
-import * as StorageUtils from "../../utils/storage";
-import StatusComponent from "./StatusComponent";
-import "./StatusBar.css";
+import { getGitService } from "../../../adapters";
+import * as DataActions from "../../../actions/dataActions";
+import * as StorageUtils from "../../../utils/storage";
+import Authorization from "../../../utils/authorization";
+import SettingsInternal from "./SettingsComponent";
 
-class StatusBar extends React.Component {
+export class Settings extends React.Component {
   constructor(props) {
     super(props);
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
   }
 
-  state = {
-    showAuthPrompt: false,
-    showSettings: false,
-    isLoading: false
-  };
-
-  setLoadingState = () => {
-    this.setState({
-      showAuthPrompt: false,
-      showSettings: false,
-      isLoading: true
-    });
-    this.DataActions.updateData({
-      isUnauthenticated: false
-    });
-  };
-
-  stopLoading = () => this.setState({ isLoading: false });
-
   launchOAuthFlow = () => {
-    this.setLoadingState();
+    // this.setLoadingState();
     Authorization.launchOAuthFlow()
       .then(response => this.stopLoading())
       .catch(error => this.stopLoading());
   };
 
   launchLogoutFlow = () => {
-    this.setLoadingState();
+    // this.setLoadingState();
     Authorization.launchLogoutFlow()
       .then(response => this.stopLoading())
       .catch(error => this.stopLoading());
-  };
-
-  toggleSettings = () => {
-    this.setState({
-      showSettings: !this.state.showSettings
-    });
   };
 
   getServiceUsername = () => {
@@ -119,19 +92,10 @@ class StatusBar extends React.Component {
     }
   };
 
-  componentWillReceiveProps(newProps) {
-    const { isUnauthenticated } = newProps.data.data;
-    if (isUnauthenticated !== this.state.showAuthPrompt) {
-      this.setState({
-        showAuthPrompt: isUnauthenticated
-      });
-    }
-  }
-
   render() {
     const { hasMenuApp, defaultPort } = this.props.storage;
     return (
-      <StatusComponent
+      <SettingsInternal
         {...this.state}
         authState={this.getAuthState()}
         onClick={() => this.toggleSettings()}
@@ -144,12 +108,3 @@ class StatusBar extends React.Component {
     );
   }
 }
-
-function mapStateToProps(state) {
-  const { data, storage } = state;
-  return {
-    data,
-    storage
-  };
-}
-export default connect(mapStateToProps)(StatusBar);
