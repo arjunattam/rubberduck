@@ -19,6 +19,7 @@ const GH_RESERVED_REPO_NAMES = ["followers", "following", "repositories"];
 const GH_RESERVED_SUB_PAGES = [
   "notifications",
   "graphs",
+  "network",
   "settings",
   "pulse",
   "wiki",

@@ -106,13 +106,31 @@ class Sidebar extends React.Component {
       ? this.props.data.data.sidebarWidth
       : this.props.storage.sidebarWidth;
 
+  hasSidebarRendered = () => {
+    const { reponame } = this.props.data.repoDetails;
+    const { initialized } = this.props.storage;
+    const isNameValid = reponame !== null && reponame !== undefined;
+    return initialized && isNameValid;
+  };
+
   render() {
+    // The sidebar can have 3 states
+    //    1. nothing at all (on eg, https://github.com/django/daphne/pulse)
+    //    2. rendered, but collapsed (only shows collapse button)
+    //    3. rendered, and expanded (shows full sidebar)
+    const shouldRenderSidebar = this.hasSidebarRendered();
+    const { isSidebarVisible: isExpanded } = this.props.storage;
     const width = this.getWidth();
-    const { isSidebarVisible: isVisible } = this.props.storage;
-    this.updatePageLayout(isVisible, width);
-    return isVisible
-      ? this.renderSidebar(width)
-      : this.renderCollapseButton(width);
+    let renderOutput = null;
+
+    if (shouldRenderSidebar) {
+      renderOutput = isExpanded
+        ? this.renderSidebar(width)
+        : this.renderCollapseButton(width);
+    }
+
+    this.updatePageLayout(shouldRenderSidebar && isExpanded, width);
+    return renderOutput;
   }
 }
 
