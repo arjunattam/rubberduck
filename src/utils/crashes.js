@@ -1,5 +1,4 @@
 import Raven from "raven-js";
-// import { VERSION } from "../components/status/settings";
 
 const VERSION = "0.2.21";
 

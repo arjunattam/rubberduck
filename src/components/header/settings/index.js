@@ -4,7 +4,7 @@ import * as DataActions from "../../../actions/dataActions";
 import * as StorageUtils from "../../../utils/storage";
 import Authorization from "../../../utils/authorization";
 import { getGitService } from "../../../adapters";
-import SettingsInternal from "./SettingsComponent";
+import SettingsInternal from "./Settings";
 
 export class Settings extends React.Component {
   constructor(props) {

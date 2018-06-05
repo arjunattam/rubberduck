@@ -94,7 +94,6 @@ class Sidebar extends React.Component {
         <References />
       </div>
       <HoverListener />
-      {/* <StatusBar /> */}
     </Resizable>
   );
 
