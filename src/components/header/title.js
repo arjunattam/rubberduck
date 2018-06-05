@@ -1,10 +1,13 @@
 import React from "react";
-import { connect } from "react-redux";
 import Octicon from "react-component-octicons";
 import { getGitService } from "../../adapters";
 import "./Title.css";
 
-const iconStyle = { height: 12, color: "#999" };
+export const SettingsButton = ({ onClick }) => (
+  <div className="title-settings-button" onClick={onClick}>
+    <Octicon name="gear" style={{ height: 15, width: 15 }} />
+  </div>
+);
 
 const getPRTitle = () => {
   let selector = null;
@@ -39,8 +42,9 @@ const getCompareTitle = () => {
   return element ? element.getAttribute("title") : "";
 };
 
-class Title extends React.Component {
-  renderSubtitle = repoDetails => {
+export default class Title extends React.Component {
+  renderSubtitle = () => {
+    const { repoDetails } = this.props;
     let inner = null;
     let iconName = "git-branch";
 
@@ -60,6 +64,7 @@ class Title extends React.Component {
       default:
         inner = repoDetails.branch;
     }
+    const iconStyle = { height: 12, color: "#999" };
 
     return (
       <div className="branch">
@@ -68,7 +73,8 @@ class Title extends React.Component {
     );
   };
 
-  renderTitle = repoDetails => {
+  renderTitle = () => {
+    const { repoDetails } = this.props;
     const reponameHref =
       "/" + repoDetails.username + "/" + repoDetails.reponame;
 
@@ -82,22 +88,17 @@ class Title extends React.Component {
     );
   };
 
+  renderSettingsButton = () => {
+    return <SettingsButton onClick={this.props.settingsOnClick} />;
+  };
+
   render() {
-    const repoDetails = this.props.data.repoDetails;
     return (
       <div className="header">
-        {this.renderTitle(repoDetails)}
-        {this.renderSubtitle(repoDetails)}
+        {this.renderTitle()}
+        {this.renderSubtitle()}
+        {this.renderSettingsButton()}
       </div>
     );
   }
 }
-
-function mapStateToProps(state) {
-  const { storage, data } = state;
-  return {
-    storage,
-    data
-  };
-}
-export default connect(mapStateToProps)(Title);

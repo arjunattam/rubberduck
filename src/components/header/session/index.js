@@ -1,5 +1,4 @@
 import React from "react";
-import { connect } from "react-redux";
 import "status-indicator/styles.css";
 import "./SessionStatus.css";
 
@@ -43,7 +42,7 @@ const ProgressBar = ({ value }) => {
   );
 };
 
-class SessionStatus extends React.Component {
+export default class SessionStatus extends React.Component {
   state = { showNotReady: null };
 
   renderIndicator = () => {
@@ -165,12 +164,3 @@ class SessionStatus extends React.Component {
     );
   }
 }
-
-function mapStateToProps(state) {
-  const { storage, data } = state;
-  return {
-    storage,
-    data
-  };
-}
-export default connect(mapStateToProps)(SessionStatus);
