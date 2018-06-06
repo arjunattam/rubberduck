@@ -101,11 +101,28 @@ const SettingsLink = ({ text, onClick }) => {
   );
 };
 
-const StatusBar = props => {
-  const { session, onClick, isExpanded } = props;
-  const linkText = isExpanded ? "collapse" : "settings";
-  return (
-    <div className="session-status-container">
+export default class StatusBar extends React.Component {
+  state = {
+    showNotReady: null,
+    isShowingWarning: false
+  };
+
+  componentWillReceiveProps(newProps) {
+    if (newProps.session.showNotReady !== this.state.showNotReady) {
+      this.setState({
+        showNotReady: newProps.session.showNotReady,
+        isShowingWarning: true
+      });
+      setTimeout(() => {
+        this.setState({ isShowingWarning: false });
+      }, 1500);
+    }
+  }
+
+  renderNormal = () => {
+    const { session, onClick, isExpanded } = this.props;
+    const linkText = isExpanded ? "collapse" : "settings";
+    return (
       <div className="session-status">
         <div>
           <Indicator session={session} />
@@ -113,76 +130,28 @@ const StatusBar = props => {
         </div>
         <SettingsLink text={linkText} onClick={onClick} />
       </div>
-      <ProgressBar session={session} />
-    </div>
-  );
-};
-
-export default StatusBar;
-
-class SessionStatus extends React.Component {
-  state = { showNotReady: null };
-
-  // renderSupportLink = () => {
-  //   const { status } = this.props.data.session;
-  //   const { hasMenuApp } = this.props.storage;
-  //   let href = "";
-
-  //   if (hasMenuApp) {
-  //     href = SUPPORT_LINKS_SELF_HOSTED[status];
-  //   } else {
-  //     href = SUPPORT_LINKS_BASIC[status];
-  //   }
-
-  //   let text = "Support →";
-
-  //   if (hasMenuApp) {
-  //     const configurableStatuses = ["no_access", "disconnected"];
-  //     if (configurableStatuses.indexOf(status) >= 0) {
-  //       text = "Configure →";
-  //     }
-  //   }
-
-  //   return href ? (
-  //     <a href={href} target="_blank">
-  //       {text}
-  //     </a>
-  //   ) : null;
-  // };
-
-  showNotReady = () => {
-    const element = document.querySelector(".session-status-inner");
-    element.classList.remove("status-animation");
-    void element.offsetWidth;
-    element.classList.add("status-animation");
+    );
   };
 
-  componentWillReceiveProps(newProps) {
-    if (newProps.data.session.showNotReady !== this.state.showNotReady) {
-      this.showNotReady();
-      this.setState({
-        showNotReady: newProps.data.session.showNotReady
-      });
-    }
-  }
+  renderWarning = () => {
+    return (
+      <div className="session-status not-ready">
+        <div>Waiting for ready</div>
+      </div>
+    );
+  };
 
-  // renderNotReady = () => {
-  //   return <div className="session-status-not-ready">Waiting to be ready</div>;
-  // };
+  renderStatus = () => {
+    return this.state.isShowingWarning
+      ? this.renderWarning()
+      : this.renderNormal();
+  };
 
   render() {
-    const { session } = this.props.data;
+    const { session } = this.props;
     return (
       <div className="session-status-container">
-        <div className="session-status-inner">
-          <div className="session-status">
-            <Indicator session={session} />
-            <span className="session-status-text">
-              <StatusText session={session} />
-            </span>
-          </div>
-          {/* {this.renderNotReady()} */}
-        </div>
+        {this.renderStatus()}
         <ProgressBar session={session} />
       </div>
     );

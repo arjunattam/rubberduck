@@ -12,6 +12,10 @@
   overflow: hidden;
 }
 
+.not-ready {
+  background-color: #ffeea991;
+}
+
 .session-progress-bar {
   height: 5px;
   background-color: #c8e1ff;
@@ -25,7 +29,7 @@
 
 .session-status {
   width: 100%;
-  padding: 0px 0px 5px 11px;
+  padding: 3px 0px 2px 11px;
   display: flex;
   justify-content: space-between;
 }
