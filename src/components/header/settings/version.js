@@ -1,7 +1,7 @@
 import React from "react";
 import RubberduckIcon from "../../icon";
 
-const VERSION = "0.2.21";
+const VERSION = "0.3.0";
 const changelog = "https://www.rubberduck.io/blog";
 const support = "https://www.rubberduck.io/support";
 
