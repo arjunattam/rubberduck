@@ -24,12 +24,6 @@ export class BaseAPI {
     return Authorization.getDecodedToken();
   }
 
-  dispatchAuthenticated(isAuthenticated) {
-    this.DataActions.updateData({
-      isUnauthenticated: !isAuthenticated
-    });
-  }
-
   makePostRequest = (uri, body) => {
     const rootUrl = Authorization.getBaseUrl();
     const token = Authorization.getToken();

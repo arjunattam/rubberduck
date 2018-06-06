@@ -4,7 +4,6 @@ import TitleBar from "./title";
 import Settings from "./settings";
 import StatusBar from "./status";
 import BranchInfo from "./branch";
-import "./index.css";
 
 class Header extends React.Component {
   state = {

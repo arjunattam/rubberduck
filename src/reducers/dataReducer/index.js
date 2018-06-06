@@ -7,9 +7,7 @@ import hoverResult from "./hoverResult";
 import session from "./session";
 import fileContents from "./fileContents";
 
-const initialState = {
-  isUnauthenticated: false // Triggers the 401 pop-up
-};
+const initialState = {};
 
 const data = createReducer(initialState, {
   UPDATE_DATA: (state, action) => ({

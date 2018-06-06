@@ -18,7 +18,7 @@ const Title = ({ repoDetails, hasMenuApp }) => {
 
 const TitleBar = props => {
   return (
-    <div class="title-bar-container">
+    <div className="title-bar-container">
       <Title {...props} />
     </div>
   );

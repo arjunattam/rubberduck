@@ -8,6 +8,7 @@ export default class CloudSettings extends React.Component {
     onLogin: PropTypes.func.isRequired,
     onLogout: PropTypes.func.isRequired,
     authState: PropTypes.string.isRequired,
+    isAuthLoading: PropTypes.bool.isRequired,
     serviceUsername: PropTypes.string.isRequired
   };
 
@@ -50,6 +51,14 @@ export default class CloudSettings extends React.Component {
     return this.props.authState === "has_authenticated";
   };
 
+  renderAuthLoader = () => {
+    return this.props.isAuthLoading ? (
+      <div className="section-loader">
+        <div className="status-loader" />
+      </div>
+    ) : null;
+  };
+
   render() {
     const { onLogout } = this.props;
     return (
@@ -60,7 +69,10 @@ export default class CloudSettings extends React.Component {
             label="Using on private repos"
           />
         </li>
-        <li>{this.getAuth()}</li>
+        <li>
+          <div>{this.getAuth()}</div>
+          <div>{this.renderAuthLoader()}</div>
+        </li>
         {this.isLoggedIn() ? (
           <li>
             <a className="pointer" onClick={onLogout}>

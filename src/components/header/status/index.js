@@ -93,9 +93,10 @@ const StatusText = ({ session }) => {
 };
 
 const SettingsLink = ({ text, onClick }) => {
+  const icon = text === "collapse" ? "x" : "gear";
   return (
     <div className="session-status-link" onClick={onClick}>
-      {text} <Octicon name="gear" style={{ height: 14 }} />
+      {text} <Octicon name={icon} style={{ height: 14 }} />
     </div>
   );
 };

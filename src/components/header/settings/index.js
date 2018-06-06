@@ -7,20 +7,32 @@ import { getGitService } from "../../../adapters";
 import SettingsInternal from "./Settings";
 
 export default class Settings extends React.Component {
+  state = {
+    isAuthLoading: false
+  };
+
   constructor(props) {
     super(props);
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
   }
 
+  setLoadingState = () => {
+    this.setState({ isAuthLoading: true });
+  };
+
+  stopLoading = () => {
+    this.setState({ isAuthLoading: false });
+  };
+
   launchOAuthFlow = () => {
-    // this.setLoadingState();
+    this.setLoadingState();
     Authorization.launchOAuthFlow()
       .then(response => this.stopLoading())
       .catch(error => this.stopLoading());
   };
 
   launchLogoutFlow = () => {
-    // this.setLoadingState();
+    this.setLoadingState();
     Authorization.launchLogoutFlow()
       .then(response => this.stopLoading())
       .catch(error => this.stopLoading());
@@ -51,9 +63,6 @@ export default class Settings extends React.Component {
    * needs to be done here.
    */
   onMenuChange = newMenuApp => {
-    // if (this.props.data.data.isUnauthenticated) {
-    //   this.DataActions.updateData({ isUnauthenticated: false });
-    // }
     const values = {
       hasMenuApp: newMenuApp,
       menuAppTokens: {}
@@ -72,6 +81,7 @@ export default class Settings extends React.Component {
     return (
       <SettingsInternal
         isVisible={this.props.isVisible}
+        isAuthLoading={this.state.isAuthLoading}
         authState={this.getAuthState()}
         serviceUsername={this.getServiceUsername()}
         onLogout={this.launchLogoutFlow}
