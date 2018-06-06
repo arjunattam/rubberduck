@@ -37,7 +37,7 @@ export default class MenuAppSettings extends React.Component {
         <li>
           <NewTabLink
             link="https://support.rubberduck.io/articles/26915"
-            label="Get started"
+            label="Get started with self-hosted"
           />
         </li>
         <li>

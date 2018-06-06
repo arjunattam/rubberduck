@@ -1,0 +1,13 @@
+.title-settings-button {
+  position: fixed;
+  top: 10px;
+  left: 200px;
+  cursor: pointer;
+}
+
+.title-env-button {
+  position: fixed;
+  top: 10px;
+  left: 180px;
+  cursor: pointer;
+}

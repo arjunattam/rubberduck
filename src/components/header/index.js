@@ -1,31 +1,36 @@
 import React from "react";
 import { connect } from "react-redux";
-import Title from "./title";
-import { Settings } from "./settings";
-import SessionStatus from "./session";
+import TitleBar from "./title";
+import Settings from "./settings";
+import StatusBar from "./status";
+import BranchInfo from "./branch";
+import "./index.css";
 
 class Header extends React.Component {
   state = {
-    isSettingsExpanded: true
+    isSettingsExpanded: false
   };
 
   toggleSettings = () => {
     this.setState({ isSettingsExpanded: !this.state.isSettingsExpanded });
   };
 
-  renderSettings = () => (
-    <Settings isVisible={this.state.isSettingsExpanded} {...this.props} />
-  );
-
   render() {
+    const { repoDetails, session } = this.props.data;
+    const { hasMenuApp } = this.props.storage;
+    const { isSettingsExpanded } = this.state;
     return (
       <div>
-        <Title
-          settingsOnClick={this.toggleSettings}
-          repoDetails={this.props.data.repoDetails}
-        />
-        {this.renderSettings()}
-        <SessionStatus {...this.props} />
+        <div className="header-upper">
+          <TitleBar repoDetails={repoDetails} hasMenuApp={hasMenuApp} />
+          <StatusBar
+            session={session}
+            onClick={this.toggleSettings}
+            isExpanded={isSettingsExpanded}
+          />
+          <Settings isVisible={isSettingsExpanded} {...this.props} />
+        </div>
+        <BranchInfo repoDetails={repoDetails} />
       </div>
     );
   }

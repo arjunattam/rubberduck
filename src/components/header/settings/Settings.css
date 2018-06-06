@@ -22,9 +22,13 @@
   justify-content: space-between;
 }
 
+.settings-sub-list li:last-child {
+  border: none;
+}
+
 .settings-sub-section {
   padding: 15px;
-  border-bottom: 1px #e8e8e8 solid;
+  border-top: 1px #e8e8e8 solid;
 }
 
 .settings-sub-section .row {

@@ -6,7 +6,7 @@ import Authorization from "../../../utils/authorization";
 import { getGitService } from "../../../adapters";
 import SettingsInternal from "./Settings";
 
-export class Settings extends React.Component {
+export default class Settings extends React.Component {
   constructor(props) {
     super(props);
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
