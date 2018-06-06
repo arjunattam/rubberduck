@@ -9,3 +9,4 @@ June 6, 2018
 - Improvements to websocket lifecycle
 - bugfix: Working on github insights pages
 - bugfix: No script injection onn github's confirm password screen
+- bugfix: Fixed Bitbucket API auth issues with self-hosted environment

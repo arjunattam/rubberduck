@@ -54,7 +54,7 @@ let BaseGitRemoteAPI = {
   },
 
   makeConditionalGet(uriPath, isPrivate) {
-    if (this.isRemoteAuthorized(isPrivate)) {
+    if (this.isOnMenuApp() || this.isRemoteAuthorized(isPrivate)) {
       // If user is logged in with remote, we will send
       // this API call to pass through via backend.
       return this.makePassthrough(uriPath);
