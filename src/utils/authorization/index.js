@@ -30,8 +30,9 @@ export class AuthStore {
 
     if (hasInit && newMenuApp !== this.isOnMenuAppEnv) {
       this.isOnMenuAppEnv = newMenuApp;
-      WS.tearDown();
-      this.setup();
+      if (newMenuApp) {
+        WS.tearDown().then(() => this.setup());
+      }
     }
   }
 
@@ -102,12 +103,12 @@ export class AuthStore {
 
   getGithubUsername() {
     const decoded = this.getDecodedToken();
-    return decoded.github_username;
+    return decoded.github_username || "";
   }
 
   getBitbucketUsername() {
     const decoded = this.getDecodedToken();
-    return decoded.bitbucket_username;
+    return decoded.bitbucket_username || "";
   }
 
   hasServiceUsername() {
