@@ -6,7 +6,6 @@
 .session-status-container {
   text-transform: uppercase;
   font-size: 11px;
-  height: 30px;
   width: 100%;
   font-weight: bold;
   color: #333;
@@ -26,13 +25,20 @@
 
 .session-status {
   width: 100%;
-  padding: 5px 0px 5px 11px;
+  padding: 0px 0px 5px 11px;
   display: flex;
   justify-content: space-between;
 }
 
 .session-status-link {
+  font-weight: 500;
+  cursor: pointer;
   margin-right: 20px;
+  color: #666;
+}
+
+.session-status-link:hover {
+  color: #333;
 }
 
 /* .session-status-not-ready {

@@ -2,17 +2,13 @@ import React from "react";
 import Octicon from "react-component-octicons";
 import "./Title.css";
 
-const EnvironmentIcon = ({ hasMenuApp }) => {
-  const icon = hasMenuApp ? "shield" : "server";
-  return <Octicon name={icon} />;
-};
-
-const Title = ({ repoDetails }) => {
+const Title = ({ repoDetails, hasMenuApp }) => {
   const { username, reponame } = repoDetails;
   const href = `/${username}/${reponame}`;
+  const icon = hasMenuApp ? "shield" : "server";
   return (
     <div className="reponame">
-      <Octicon name="repo" style={{ height: 21 }} />{" "}
+      <Octicon name={icon} style={{ height: 18 }} />{" "}
       <a href={href}>
         <strong>{reponame}</strong>
       </a>
@@ -20,11 +16,10 @@ const Title = ({ repoDetails }) => {
   );
 };
 
-const TitleBar = ({ repoDetails, hasMenuApp }) => {
+const TitleBar = props => {
   return (
     <div class="title-bar-container">
-      <Title repoDetails={repoDetails} />
-      <EnvironmentIcon hasMenuApp={hasMenuApp} />
+      <Title {...props} />
     </div>
   );
 };

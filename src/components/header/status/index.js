@@ -92,16 +92,17 @@ const StatusText = ({ session }) => {
   return <span className="session-status-text">{text}</span>;
 };
 
-const SettingsLink = ({ onClick }) => {
+const SettingsLink = ({ text, onClick }) => {
   return (
     <div className="session-status-link" onClick={onClick}>
-      settings <Octicon name="gear" />
+      {text} <Octicon name="gear" style={{ height: 14 }} />
     </div>
   );
 };
 
 const StatusBar = props => {
-  const { session, onClick } = props;
+  const { session, onClick, isExpanded } = props;
+  const linkText = isExpanded ? "collapse" : "settings";
   return (
     <div className="session-status-container">
       <div className="session-status">
@@ -109,7 +110,7 @@ const StatusBar = props => {
           <Indicator session={session} />
           <StatusText session={session} />
         </div>
-        <SettingsLink onClick={onClick} />
+        <SettingsLink text={linkText} onClick={onClick} />
       </div>
       <ProgressBar session={session} />
     </div>
