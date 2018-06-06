@@ -9,9 +9,15 @@ const CollapseIcon = props => (
   />
 );
 
+const getExpandedStyle = width => ({
+  left: width,
+  boxShadow: "3px 0 9px -6px inset",
+  borderRadius: 0
+});
+
 // button width is 34px => 44 when the sidebar is visible
-const getCollapseStyle = props =>
-  props.isVisible ? { left: props.sidebarWidth - 44 } : { left: 10 };
+const getCollapseStyle = ({ isVisible, sidebarWidth }) =>
+  isVisible ? getExpandedStyle(sidebarWidth) : { left: 10 };
 
 const CollapseButton = props => (
   <div

@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { NewTabLink } from "./common";
 import { getGitService } from "../../../../adapters";
 
 export default class CloudSettings extends React.Component {
@@ -8,6 +7,7 @@ export default class CloudSettings extends React.Component {
     onLogin: PropTypes.func.isRequired,
     onLogout: PropTypes.func.isRequired,
     authState: PropTypes.string.isRequired,
+    isAuthLoading: PropTypes.bool.isRequired,
     serviceUsername: PropTypes.string.isRequired
   };
 
@@ -50,17 +50,22 @@ export default class CloudSettings extends React.Component {
     return this.props.authState === "has_authenticated";
   };
 
+  renderAuthLoader = () => {
+    return this.props.isAuthLoading ? (
+      <div className="section-loader">
+        <div className="status-loader" />
+      </div>
+    ) : null;
+  };
+
   render() {
     const { onLogout } = this.props;
     return (
       <ul className="settings-sub-list">
         <li>
-          <NewTabLink
-            link="https://support.rubberduck.io/articles/26923"
-            label="Using on private repos"
-          />
+          <div>{this.getAuth()}</div>
+          <div>{this.renderAuthLoader()}</div>
         </li>
-        <li>{this.getAuth()}</li>
         {this.isLoggedIn() ? (
           <li>
             <a className="pointer" onClick={onLogout}>

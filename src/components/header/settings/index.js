@@ -6,21 +6,33 @@ import Authorization from "../../../utils/authorization";
 import { getGitService } from "../../../adapters";
 import SettingsInternal from "./Settings";
 
-export class Settings extends React.Component {
+export default class Settings extends React.Component {
+  state = {
+    isAuthLoading: false
+  };
+
   constructor(props) {
     super(props);
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
   }
 
+  setLoadingState = () => {
+    this.setState({ isAuthLoading: true });
+  };
+
+  stopLoading = () => {
+    this.setState({ isAuthLoading: false });
+  };
+
   launchOAuthFlow = () => {
-    // this.setLoadingState();
+    this.setLoadingState();
     Authorization.launchOAuthFlow()
       .then(response => this.stopLoading())
       .catch(error => this.stopLoading());
   };
 
   launchLogoutFlow = () => {
-    // this.setLoadingState();
+    this.setLoadingState();
     Authorization.launchLogoutFlow()
       .then(response => this.stopLoading())
       .catch(error => this.stopLoading());
@@ -51,9 +63,6 @@ export class Settings extends React.Component {
    * needs to be done here.
    */
   onMenuChange = newMenuApp => {
-    // if (this.props.data.data.isUnauthenticated) {
-    //   this.DataActions.updateData({ isUnauthenticated: false });
-    // }
     const values = {
       hasMenuApp: newMenuApp,
       menuAppTokens: {}
@@ -71,7 +80,9 @@ export class Settings extends React.Component {
     const { hasMenuApp, defaultPort } = this.props.storage;
     return (
       <SettingsInternal
+        supportLink={this.props.supportLink}
         isVisible={this.props.isVisible}
+        isAuthLoading={this.state.isAuthLoading}
         authState={this.getAuthState()}
         serviceUsername={this.getServiceUsername()}
         onLogout={this.launchLogoutFlow}

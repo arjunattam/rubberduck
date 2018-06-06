@@ -1,5 +1,6 @@
 import React from "react";
 import EnvironmentSettings from "./environment";
+import VersionSection from "./version";
 import SupportSection from "./support";
 import "./Settings.css";
 
@@ -10,8 +11,9 @@ const getClassName = ({ isVisible }) => {
 
 const SettingsInternal = props => (
   <div className={getClassName(props)}>
+    <SupportSection {...props} />
     <EnvironmentSettings {...props} />
-    <SupportSection />
+    <VersionSection />
   </div>
 );
 

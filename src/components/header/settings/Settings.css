@@ -6,37 +6,39 @@
   max-height: 500px;
   overflow: hidden;
   transition: max-height 0.3s ease;
+  background-color: #fff;
+}
+
+.support-section {
+  background-color: #c7daff5e;
 }
 
 .settings-sub-list {
   list-style-type: none;
   padding: 0;
-  margin: 10px 0;
+  margin: 10px 0 0;
 }
 
 .settings-sub-list li {
   display: block;
   padding: 7px 0;
-  border-bottom: 1px solid #efefef;
+  border-bottom: 1px solid #b2c4da52;
   display: flex;
   justify-content: space-between;
 }
 
+.settings-sub-list li:last-child {
+  border: none;
+}
+
 .settings-sub-section {
-  padding: 15px;
-  border-bottom: 1px #e8e8e8 solid;
+  padding: 10px;
+  border-bottom: 3px #b2c4da52 solid;
 }
 
 .settings-sub-section .row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.settings-sub-section h5 {
-  text-transform: uppercase;
-  margin-bottom: 3px;
-  color: #333;
 }
 
 .settings-sub-section input[type="text"] {

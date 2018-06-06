@@ -1,0 +1,7 @@
+.title-bar-container {
+  padding: 4px 10px;
+  font-size: 15px;
+  display: flex;
+  color: #666;
+  justify-content: space-between;
+}

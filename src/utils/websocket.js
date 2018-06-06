@@ -257,9 +257,11 @@ class WebSocketManager {
   isLanguageUnsupported = error => error.indexOf("Language not supported") >= 0;
 
   recordEvent = type => {
-    const repoDetails = Store.getState().data.repoDetails;
+    const { repoDetails } = Store.getState().data;
+    const { isSidebarVisible } = Store.getState().storage;
     AnalyticsUtils.logSessionEvent(type, {
       ...repoDetails,
+      isSidebarVisible,
       service: getGitService()
     });
   };

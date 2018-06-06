@@ -1,0 +1,8 @@
+.branch-info-container {
+  padding: 3px 13px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-top: 1px #e4e4e4 solid;
+}
