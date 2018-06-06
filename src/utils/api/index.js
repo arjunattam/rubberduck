@@ -24,10 +24,8 @@ export class BaseAPI {
     return Authorization.getDecodedToken();
   }
 
-  dispatchAuthenticated(isAuthenticated) {
-    this.DataActions.updateData({
-      isUnauthenticated: !isAuthenticated
-    });
+  isOnMenuApp() {
+    return Authorization.isOnMenuAppEnv;
   }
 
   makePostRequest = (uri, body) => {

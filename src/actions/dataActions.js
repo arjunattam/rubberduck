@@ -97,7 +97,7 @@ export function callHover(data) {
 }
 
 const isTreeTooBig = () => {
-  const ACCEPTABLE_TREE_COVERAGE = 0.55;
+  const ACCEPTABLE_TREE_COVERAGE = 0.35;
   const treeElement = document.querySelector("div.tree-content");
   const sidebarElement = document.querySelector("div.sidebar-container");
   if (treeElement && sidebarElement) {

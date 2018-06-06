@@ -244,7 +244,7 @@ class WebSocketManager {
     });
   };
 
-  tearDownIfRequired = () => {
+  tearDown = () => {
     this.isReady = false;
     return this.ws.tearDown();
   };
@@ -257,9 +257,11 @@ class WebSocketManager {
   isLanguageUnsupported = error => error.indexOf("Language not supported") >= 0;
 
   recordEvent = type => {
-    const repoDetails = Store.getState().data.repoDetails;
+    const { repoDetails } = Store.getState().data;
+    const { isSidebarVisible } = Store.getState().storage;
     AnalyticsUtils.logSessionEvent(type, {
       ...repoDetails,
+      isSidebarVisible,
       service: getGitService()
     });
   };
@@ -300,7 +302,7 @@ class WebSocketManager {
     // This method is called with params, and internally
     // we need to figure out which type of session this is
     const params = this.sessionParams;
-    return this.tearDownIfRequired()
+    return this.tearDown()
       .then(this.createConnection)
       .then(() => {
         if (this.isValidType(params.type)) {

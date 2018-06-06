@@ -42,28 +42,19 @@ let BaseGitRemoteAPI = {
         return { data: actual, ...next };
       })
       .catch(error => {
-        if (error.response.status === 401) {
-          // Remote has returned auth error
-          this.dispatchAuthenticated(false);
-        } else {
-          CrashReporting.catchException(error);
-        }
+        CrashReporting.catchException(error);
       });
   },
 
   makeRemoteCall(uriPath) {
     const fullUri = this.buildUrl(uriPath);
     return this.cacheOrGet(fullUri).catch(error => {
-      const privateRepoErrorCodes = this.getPrivateErrorCodes();
-      const { status } = error.response;
-      if (privateRepoErrorCodes.indexOf(status) >= 0) {
-        this.dispatchAuthenticated(false);
-      }
+      CrashReporting.catchException(error);
     });
   },
 
   makeConditionalGet(uriPath, isPrivate) {
-    if (this.isRemoteAuthorized(isPrivate)) {
+    if (this.isOnMenuApp() || this.isRemoteAuthorized(isPrivate)) {
       // If user is logged in with remote, we will send
       // this API call to pass through via backend.
       return this.makePassthrough(uriPath);

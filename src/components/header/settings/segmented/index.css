@@ -1,0 +1,49 @@
+.segmented-control {
+  display: table;
+  width: 100%;
+  padding: 0;
+  font-size: 12px;
+}
+
+.segmented-control__item {
+  display: table-cell;
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  width: 50%;
+  color: #0377dd;
+}
+
+.segmented-control__input {
+  position: absolute;
+  visibility: hidden;
+}
+
+.segmented-control__label {
+  display: block;
+  margin: 0 -1px -1px 0; /* -1px margin removes double-thickness borders between items */
+  padding: 5px;
+  border: 1px solid #0377dd;
+  text-align: center;
+  cursor: pointer;
+  font-weight: normal;
+}
+
+.segmented-control__item:first-child .segmented-control__label {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.segmented-control__item:last-child .segmented-control__label {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.segmented-control__label:hover {
+  background: #fafafa;
+}
+
+.segmented-control__input:checked + .segmented-control__label {
+  background: #0377dd;
+  color: #fff;
+}

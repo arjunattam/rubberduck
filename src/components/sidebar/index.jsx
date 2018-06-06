@@ -4,18 +4,16 @@ import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
 import * as StorageActions from "../../actions/storageActions";
 import * as StorageUtils from "../../utils/storage";
-import Title from "title/Title";
-import StatusBar from "status";
+import Header from "header";
 import CollapseButton from "collapse/CollapseButton";
 import Tree from "tree";
 import References from "references";
 import Definitions from "definitions";
 import HoverListener from "hover/HoverListener";
-import SessionStatus from "session";
 import * as GithubLayout from "../../adapters/github/layout";
 import { setupPjax } from "./pjax";
 import Resizable from "./Resizable";
-import "../../index.css";
+import "./index.css";
 
 class Sidebar extends React.Component {
   constructor(props) {
@@ -88,16 +86,14 @@ class Sidebar extends React.Component {
       onResize={this.onResize}
       onResizeStop={this.onResizeStop}
     >
-      <Title />
+      <Header />
       {this.renderCollapseButton(width)}
-      <SessionStatus />
       <div className="repo-info-sections">
         <Tree />
         <Definitions />
         <References />
       </div>
       <HoverListener />
-      <StatusBar />
     </Resizable>
   );
 
@@ -106,13 +102,31 @@ class Sidebar extends React.Component {
       ? this.props.data.data.sidebarWidth
       : this.props.storage.sidebarWidth;
 
+  hasSidebarRendered = () => {
+    const { reponame } = this.props.data.repoDetails;
+    const { initialized } = this.props.storage;
+    const isNameValid = reponame !== null && reponame !== undefined;
+    return initialized && isNameValid;
+  };
+
   render() {
+    // The sidebar can have 3 states
+    //    1. nothing at all (on eg, https://github.com/django/daphne/pulse)
+    //    2. rendered, but collapsed (only shows collapse button)
+    //    3. rendered, and expanded (shows full sidebar)
+    const shouldRenderSidebar = this.hasSidebarRendered();
+    const { isSidebarVisible: isExpanded } = this.props.storage;
     const width = this.getWidth();
-    const { isSidebarVisible: isVisible } = this.props.storage;
-    this.updatePageLayout(isVisible, width);
-    return isVisible
-      ? this.renderSidebar(width)
-      : this.renderCollapseButton(width);
+    let renderOutput = null;
+
+    if (shouldRenderSidebar) {
+      renderOutput = isExpanded
+        ? this.renderSidebar(width)
+        : this.renderCollapseButton(width);
+    }
+
+    this.updatePageLayout(shouldRenderSidebar && isExpanded, width);
+    return renderOutput;
   }
 }
 
