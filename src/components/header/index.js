@@ -4,6 +4,7 @@ import TitleBar from "./title";
 import Settings from "./settings";
 import StatusBar from "./status";
 import BranchInfo from "./branch";
+import { getSupportLink } from "./support";
 
 class Header extends React.Component {
   state = {
@@ -18,16 +19,22 @@ class Header extends React.Component {
     const { repoDetails, session } = this.props.data;
     const { hasMenuApp } = this.props.storage;
     const { isSettingsExpanded } = this.state;
+    const supportLink = getSupportLink(session, hasMenuApp);
     return (
       <div>
         <div className="header-upper">
           <TitleBar repoDetails={repoDetails} hasMenuApp={hasMenuApp} />
           <StatusBar
             session={session}
+            supportLink={supportLink}
             onClick={this.toggleSettings}
             isExpanded={isSettingsExpanded}
           />
-          <Settings isVisible={isSettingsExpanded} {...this.props} />
+          <Settings
+            supportLink={supportLink}
+            isVisible={isSettingsExpanded}
+            {...this.props}
+          />
         </div>
         <BranchInfo repoDetails={repoDetails} />
       </div>

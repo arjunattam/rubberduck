@@ -23,17 +23,6 @@ Possible values for status
 - no_access
 */
 
-const SUPPORT_LINKS_BASIC = {
-  unsupported_language: "https://support.rubberduck.io/articles/26922",
-  no_access: "https://support.rubberduck.io/articles/26923"
-};
-
-const SUPPORT_LINKS_SELF_HOSTED = {
-  disconnected: "https://support.rubberduck.io/articles/26924",
-  unsupported_language: "https://support.rubberduck.io/articles/26922",
-  no_access: "https://support.rubberduck.io/articles/26916"
-};
-
 const ProgressBar = ({ session }) => {
   const { progress } = session;
   const width = `${progress}%`;
@@ -93,7 +82,17 @@ const StatusText = ({ session }) => {
 };
 
 const SettingsLink = ({ text, onClick }) => {
-  const icon = text === "collapse" ? "x" : "gear";
+  let icon = "gear";
+  switch (text) {
+    case "collapse":
+      icon = "x";
+      break;
+    case "help":
+      icon = "question";
+      break;
+    default:
+      icon = "gear";
+  }
   return (
     <div className="session-status-link" onClick={onClick}>
       {text} <Octicon name={icon} style={{ height: 14 }} />
@@ -120,11 +119,12 @@ export default class StatusBar extends React.Component {
   }
 
   renderNormal = () => {
-    const { session, onClick, isExpanded } = this.props;
-    const linkText = isExpanded ? "collapse" : "settings";
+    const { supportLink, session, onClick, isExpanded } = this.props;
+    let linkText = supportLink ? "help" : "settings";
+    linkText = isExpanded ? "collapse" : linkText;
     return (
       <div className="session-status">
-        <div>
+        <div className="session-status-name">
           <Indicator session={session} />
           <StatusText session={session} />
         </div>

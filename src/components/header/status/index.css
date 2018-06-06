@@ -23,6 +23,12 @@
   border-radius: 0;
 }
 
+.session-status-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .session-status-text {
   margin-left: 6px;
 }
@@ -35,6 +41,8 @@
 }
 
 .session-status-link {
+  min-width: 75px; /* this can be a function of the link text */
+  text-align: right;
   font-weight: 500;
   cursor: pointer;
   margin-right: 20px;

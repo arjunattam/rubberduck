@@ -80,6 +80,7 @@ export default class Settings extends React.Component {
     const { hasMenuApp, defaultPort } = this.props.storage;
     return (
       <SettingsInternal
+        supportLink={this.props.supportLink}
         isVisible={this.props.isVisible}
         isAuthLoading={this.state.isAuthLoading}
         authState={this.getAuthState()}

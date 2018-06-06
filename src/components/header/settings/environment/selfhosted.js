@@ -41,12 +41,6 @@ export default class MenuAppSettings extends React.Component {
           />
         </li>
         <li>
-          <NewTabLink
-            link="https://support.rubberduck.io/articles/26916"
-            label="Setup authorization"
-          />
-        </li>
-        <li>
           <div>Use default configuration</div>
           <div>
             <input

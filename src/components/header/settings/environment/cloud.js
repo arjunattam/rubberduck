@@ -1,6 +1,5 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { NewTabLink } from "./common";
 import { getGitService } from "../../../../adapters";
 
 export default class CloudSettings extends React.Component {
@@ -63,12 +62,6 @@ export default class CloudSettings extends React.Component {
     const { onLogout } = this.props;
     return (
       <ul className="settings-sub-list">
-        <li>
-          <NewTabLink
-            link="https://support.rubberduck.io/articles/26923"
-            label="Using on private repos"
-          />
-        </li>
         <li>
           <div>{this.getAuth()}</div>
           <div>{this.renderAuthLoader()}</div>
