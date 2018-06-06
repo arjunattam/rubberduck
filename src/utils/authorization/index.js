@@ -1,11 +1,14 @@
 import _ from "lodash";
 import ReduxStore from "../../store";
+import { bindActionCreators } from "redux";
+import * as DataActions from "../../actions/dataActions";
 import * as AuthUtils from "./utils";
 import * as StorageUtils from "../storage";
 import * as CrashReporting from "../crashes";
 import * as AnalyticsUtils from "../analytics";
 import { getGitService } from "../../adapters";
 import { getParameterByName } from "../api";
+import { WS } from "../websocket";
 
 /**
  * The AuthStore manages auth and environment (menu app vs hosted)
@@ -17,6 +20,7 @@ export class AuthStore {
   constructor(store) {
     this.store = store;
     this.isOnMenuAppEnv = null;
+    this.DataActions = bindActionCreators(DataActions, store.dispatch);
     this.store.subscribe(() => this.updateEnvironment());
   }
 
@@ -26,6 +30,7 @@ export class AuthStore {
 
     if (hasInit && newMenuApp !== this.isOnMenuAppEnv) {
       this.isOnMenuAppEnv = newMenuApp;
+      WS.tearDown();
       this.setup();
     }
   }
@@ -148,13 +153,23 @@ export class AuthStore {
     const existingToken = this.getToken();
     let clientId = storedId || AuthUtils.generateClientId();
     return new Promise((resolve, reject) => {
-      AuthUtils.handleTokenState(clientId, existingToken).then(token => {
-        this.updateTokenStorage({ token, clientId });
-        const decoded = AuthUtils.decodeJWT(token);
-        resolve(decoded);
-      });
+      AuthUtils.handleTokenState(clientId, existingToken)
+        .then(token => {
+          this.updateTokenStorage({ token, clientId });
+          const decoded = AuthUtils.decodeJWT(token);
+          resolve(decoded);
+        })
+        .catch(error => {
+          // This probably means that the server is down,
+          // and so we set status to "disconnected".
+          this.DataActions.updateSessionStatus({ status: "disconnected" });
+          CrashReporting.catchException(error);
+        });
     }).then(decodedInfo => {
-      const userInfo = { ...decodedInfo, isOnMenuAppEnv: this.isOnMenuAppEnv };
+      const userInfo = {
+        ...decodedInfo,
+        isOnMenuAppEnv: this.isOnMenuAppEnv
+      };
       CrashReporting.setupUser(userInfo);
       AnalyticsUtils.setupUser(userInfo);
       return userInfo;
