@@ -256,41 +256,32 @@ class WebSocketManager {
 
   isLanguageUnsupported = error => error.indexOf("Language not supported") >= 0;
 
-  recordEvent = type => {
-    const { repoDetails } = Store.getState().data;
-    const { isSidebarVisible } = Store.getState().storage;
-    AnalyticsUtils.logSessionEvent(type, {
-      ...repoDetails,
-      isSidebarVisible,
-      service: getGitService()
-    });
+  dispatchAndLog = type => {
+    this.dispatchStatus(type);
+    AnalyticsUtils.logSessionEvent(type);
   };
 
   createNewSession = params => {
     this.sessionParams = params;
     this.reconnectAttempts = 0;
-    this.recordEvent("creating");
+    AnalyticsUtils.logSessionEvent("creating");
 
     return this.createSession()
       .then(response => {
-        this.recordEvent("created");
+        AnalyticsUtils.logSessionEvent("created");
         return response;
       })
       .catch(error => {
         if (error.error && this.isLanguageUnsupported(error.error)) {
-          this.dispatchStatus("unsupported_language");
-          this.recordEvent("unsupported_language");
+          return this.dispatchAndLog("unsupported_language");
         } else if (error.error && this.isNoAccessError(error.error)) {
-          this.dispatchStatus("no_access");
-          this.recordEvent("no_access");
+          return this.dispatchAndLog("no_access");
         } else if (error === "No session to be created") {
-          this.dispatchStatus("no_session");
-          this.recordEvent("no_session");
+          return this.dispatchAndLog("no_session");
         } else {
-          this.dispatchStatus("error");
           const excp = new Error(JSON.stringify(error));
           CrashReporting.catchException(excp);
-          this.recordEvent("error");
+          return this.dispatchAndLog("error");
         }
       });
   };

@@ -1,4 +1,7 @@
 import amplitude from "amplitude-js";
+import Store from "../store";
+import { getGitService } from "../adapters";
+import { VERSION } from "./version";
 
 const hasAnalytics = () => {
   const { REACT_APP_BACKEND_ENV } = process.env;
@@ -25,7 +28,33 @@ export const setupUser = userInfo => {
   amplitude.getInstance().identify(userIdentity);
 };
 
-export const logSessionEvent = (type, properties) => {
+const getEventProps = () => {
+  const { repoDetails } = Store.getState().data;
+  const { isSidebarVisible, hasMenuApp } = Store.getState().storage;
+  return {
+    ...repoDetails,
+    isSidebarVisible,
+    hasMenuApp,
+    version: VERSION,
+    service: getGitService()
+  };
+};
+
+export const logSessionEvent = type => {
   const name = `extension.session.${type}`;
-  amplitude.getInstance().logEvent(name, properties);
+  const props = getEventProps();
+  amplitude.getInstance().logEvent(name, props);
+};
+
+export const logSidebarEvent = isOpen => {
+  const type = isOpen ? "open" : "close";
+  const name = `extension.sidebar.${type}`;
+  const props = getEventProps();
+  amplitude.getInstance().logEvent(name, props);
+};
+
+export const logTreeClick = () => {
+  const name = `extension.tree.click`;
+  const props = getEventProps();
+  amplitude.getInstance().logEvent(name, props);
 };

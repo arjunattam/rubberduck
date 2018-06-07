@@ -25,7 +25,9 @@ export default class File extends React.Component {
           if (pathname.indexOf("files") >= 0) {
             return this.scrollTo();
           } else {
-            // This is the conversation page
+            // This is the conversation page, and we want to move to the
+            // files changed view.
+            // TODO(arjun): this also needs the pjax callback
             document.addEventListener("pjax:success", this.scrollTo);
           }
         }
