@@ -1,12 +1,20 @@
 import React from "react";
+import { bindActionCreators } from "redux";
+import Store from "../../store";
 import Codebox from "./Codebox";
 import Title from "./Title";
+import * as DataActions from "../../actions/dataActions";
 import "./ExpandedCode.css";
 
 const MAX_HEIGHT = 400; // pixels
 const PADDING = 75;
 
 export default class ExpandedCode extends React.Component {
+  constructor(props) {
+    super(props);
+    this.DataActions = bindActionCreators(DataActions, Store.dispatch);
+  }
+
   getStyle = () => {
     let { top } = this.props.style;
 
@@ -21,7 +29,7 @@ export default class ExpandedCode extends React.Component {
   render() {
     return (
       <div className="expanded-code" style={this.getStyle()}>
-        <Title {...this.props} />
+        <Title {...this.props} urlLoader={this.DataActions.loadUrl} />
         <Codebox {...this.props} />
       </div>
     );

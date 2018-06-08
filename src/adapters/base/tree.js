@@ -85,6 +85,7 @@ export const appendDiffInfo = (tree, prResponse) => {
       tree[index].additions = prFile.additions;
       tree[index].deletions = prFile.deletions;
       tree[index].status = prFile.status;
+      tree[index].isPRFile = true;
     } else {
       // Need to sum up from children
       tree[index].children = appendDiffInfo(tree[index].children, prResponse);

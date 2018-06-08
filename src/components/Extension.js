@@ -27,6 +27,10 @@ class Extension extends React.Component {
     this.initializeStorage();
     this.updateRepoDetailsFromPath();
     setupSpanObserver();
+
+    // We can't use our own redux handler for pjax because that
+    // is restricted to pjax calls from the sidebar.
+    document.addEventListener("pjax:complete", this.onPjaxEnd);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -42,6 +46,11 @@ class Extension extends React.Component {
     // TODO(arjun): should this happen only after auth has been setup?
     this.updateSessionAndTree(prevProps, this.props);
   }
+
+  onPjaxEnd = () => {
+    this.updateRepoDetailsFromPath();
+    setupSpanObserver();
+  };
 
   updateSessionAndTree(prevProps, newProps) {
     const { repoDetails: prev } = prevProps.data;
@@ -60,7 +69,8 @@ class Extension extends React.Component {
   setupChromeListener() {
     ChromeUtils.addChromeListener((action, data) => {
       if (action === "URL_UPDATE") {
-        this.handleUrlUpdate(data);
+        // This has been replaced by pjax:complete event listener
+        // Keeping this event just in case we need it
       } else if (action === "STORAGE_UPDATED") {
         this.handleStorageUpdate(data);
       }
@@ -79,18 +89,6 @@ class Extension extends React.Component {
 
   handleStorageUpdate(data) {
     this.StorageActions.updateFromChromeStorage(data);
-  }
-
-  handleUrlUpdate() {
-    // Due to pjax, there are cases when the url has been updated but
-    // the DOM elements have not loaded up, so repoDetails cannot be calculated
-    // Hence we keep a timeout of 1 sec.
-
-    // TODO(arjun): need to listen to pjax end event here, instead of random constant
-    setTimeout(() => {
-      this.updateRepoDetailsFromPath();
-    }, 1000);
-    setupSpanObserver();
   }
 
   updateRepoDetailsFromPath() {

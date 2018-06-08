@@ -3,3 +3,43 @@
   z-index: 10001;
   top: 10px;
 }
+
+.collapse-container-expanded {
+  box-shadow: 3px 0 9px -6px inset;
+  border-radius: 0 !important;
+  opacity: 0.4;
+  transition: opacity 0.1s, margin-left 0.1s;
+  margin-left: -12px;
+}
+
+.collapse-container-expanded:hover {
+  opacity: 1;
+  margin-left: 0px;
+}
+
+.button-div {
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  color: #24292e;
+  background-color: #eff3f6;
+  background-image: linear-gradient(-180deg, #fafbfc 0%, #eff3f6 90%);
+  display: inline-block;
+  padding: 6px;
+  height: 20px;
+  width: 20px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  vertical-align: middle;
+  border: 1px solid rgba(27, 31, 35, 0.2);
+  border-radius: 0.25em;
+}
+
+.button-div:hover {
+  background-color: #e6ebf1;
+  background-image: linear-gradient(-180deg, #f0f3f6 0%, #e6ebf1 90%);
+  background-position: -0.5em;
+  text-decoration: none;
+}

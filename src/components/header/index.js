@@ -6,6 +6,12 @@ import StatusBar from "./status";
 import BranchInfo from "./branch";
 import { getSupportLink } from "./support";
 
+const HEADER_UPPER_STYLE = {
+  backgroundColor: "rgb(250, 251, 252)",
+  zIndex: 10050,
+  position: "relative"
+};
+
 class Header extends React.Component {
   state = {
     isSettingsExpanded: false
@@ -22,7 +28,7 @@ class Header extends React.Component {
     const supportLink = getSupportLink(session, hasMenuApp);
     return (
       <div>
-        <div className="header-upper">
+        <div className="header-upper" style={HEADER_UPPER_STYLE}>
           <TitleBar repoDetails={repoDetails} hasMenuApp={hasMenuApp} />
           <StatusBar
             session={session}

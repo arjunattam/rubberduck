@@ -2,44 +2,28 @@ import React from "react";
 import PropTypes from "prop-types";
 import Octicon from "react-component-octicons";
 import InlineButton from "../common/InlineButton";
-import { getGitService, isGithubCompareView } from "../../adapters";
-import { loadUrl } from "../sidebar/pjax";
-
-const appendLineNumber = (baseLink, lineNumber) => {
-  switch (getGitService()) {
-    case "github":
-      return `${baseLink}#L${lineNumber + 1}`;
-    case "bitbucket":
-      return `${baseLink}#lines-${lineNumber + 1}`;
-    default:
-      return baseLink;
-  }
-};
+import {
+  getGitService,
+  isGithubCompareView,
+  getFileboxSelector,
+  appendLineNumber
+} from "../../adapters";
 
 export default class Title extends React.Component {
   static propTypes = {
     filePath: PropTypes.string.isRequired,
     baseLink: PropTypes.string.isRequired,
-    currentLineNumber: PropTypes.number.isRequired
+    currentLineNumber: PropTypes.number.isRequired,
+    urlLoader: PropTypes.func.isRequired
   };
 
   getFileLink = () =>
     appendLineNumber(this.props.baseLink, this.props.currentLineNumber);
 
   hasFileinCompareView = () => {
-    return document.querySelector(this.getFileboxSelector(this.props.filePath))
+    return document.querySelector(getFileboxSelector(this.props.filePath))
       ? true
       : false;
-  };
-
-  getFileboxSelector = path => {
-    const service = getGitService();
-
-    if (service === "github") {
-      return `div.file-header[data-path="${path}"]`;
-    } else if (service === "bitbucket") {
-      return `section.iterable-item[data-path="${path}"]`;
-    }
   };
 
   scrollToDOMSelector = elementSelector => {
@@ -49,7 +33,7 @@ export default class Title extends React.Component {
   };
 
   scrollTo = () => {
-    const elementSelector = this.getFileboxSelector(this.props.filePath);
+    const elementSelector = getFileboxSelector(this.props.filePath);
     return this.scrollToDOMSelector(elementSelector);
   };
 
@@ -90,10 +74,11 @@ export default class Title extends React.Component {
           // File is open, scroll to line
           return this.scrollToLine();
         } else {
-          // Assume file will load in 1.5s, and then highlight the line
-          // For more accuracy, set a callback on loadUrl method
-          setTimeout(() => this.highlightLine(this.getLineId()), 1500);
-          return loadUrl(this.getFileLink());
+          // Load the url, callback to highlight line
+          const { urlLoader } = this.props;
+          return urlLoader({ urlPath: this.getFileLink() }).then(response => {
+            this.highlightLine(this.getLineId());
+          });
         }
       case "bitbucket":
         return this.scrollTo();
