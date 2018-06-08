@@ -2,7 +2,11 @@ import React from "react";
 import PropTypes from "prop-types";
 import Octicon from "react-component-octicons";
 import InlineButton from "../common/InlineButton";
-import { getGitService, isGithubCompareView } from "../../adapters";
+import {
+  getGitService,
+  isGithubCompareView,
+  getFileboxSelector
+} from "../../adapters";
 import { loadUrl } from "../sidebar/pjax";
 
 const appendLineNumber = (baseLink, lineNumber) => {
@@ -27,19 +31,9 @@ export default class Title extends React.Component {
     appendLineNumber(this.props.baseLink, this.props.currentLineNumber);
 
   hasFileinCompareView = () => {
-    return document.querySelector(this.getFileboxSelector(this.props.filePath))
+    return document.querySelector(getFileboxSelector(this.props.filePath))
       ? true
       : false;
-  };
-
-  getFileboxSelector = path => {
-    const service = getGitService();
-
-    if (service === "github") {
-      return `div.file-header[data-path="${path}"]`;
-    } else if (service === "bitbucket") {
-      return `section.iterable-item[data-path="${path}"]`;
-    }
   };
 
   scrollToDOMSelector = elementSelector => {
@@ -49,7 +43,7 @@ export default class Title extends React.Component {
   };
 
   scrollTo = () => {
-    const elementSelector = this.getFileboxSelector(this.props.filePath);
+    const elementSelector = getFileboxSelector(this.props.filePath);
     return this.scrollToDOMSelector(elementSelector);
   };
 

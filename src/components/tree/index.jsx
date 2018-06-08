@@ -13,7 +13,7 @@ class Tree extends BaseSection {
   flattenSingleDirectory = () => {
     // Flatten the tree when there is a chain of single directories (often found in Java)
     // For example, src/org/eclipse/ls/...
-    const tree = this.props.data.fileTree;
+    const { fileTree: tree } = this.props.data;
     if (tree.children) {
       return treeAdapter.flattenChildren(tree).children;
     }
@@ -35,14 +35,8 @@ class Tree extends BaseSection {
 
   render() {
     const children = this.flattenSingleDirectory();
-    const { path: currentPath } = this.props.data.repoDetails;
     const initialDepth = 0;
-    const renderedChildren = renderChildren(
-      children,
-      initialDepth,
-      this.props,
-      currentPath
-    );
+    const renderedChildren = renderChildren(children, initialDepth, this.props);
     const styleClass = this.isVisible()
       ? "tree-content-visible"
       : "tree-content-hidden";

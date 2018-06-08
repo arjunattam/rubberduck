@@ -35,6 +35,20 @@ export const isGithubCompareView = () => {
   }
 };
 
+export const isSplitDiffGithubView = () =>
+  getGitService() === "github" &&
+  document.querySelector("table.file-diff-split");
+
+export const getFileboxSelector = path => {
+  const service = getGitService();
+
+  if (service === "github") {
+    return `div.file-header[data-path="${path}"]`;
+  } else if (service === "bitbucket") {
+    return `section.iterable-item[data-path="${path}"]`;
+  }
+};
+
 export const isCompareView = () => {
   switch (getGitService()) {
     case "bitbucket":

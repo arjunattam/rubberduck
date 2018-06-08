@@ -2,14 +2,67 @@ import React from "react";
 import { pathAdapter } from "../../adapters";
 import TreeLabel from "./TreeLabel";
 import { loadUrl } from "../sidebar/pjax";
-import { getGitService } from "../../adapters";
+import {
+  getGitService,
+  getFileboxSelector,
+  isSplitDiffGithubView
+} from "../../adapters";
 
 const PADDING_CONST = 12; // in pixels -- same as folder
 
 export default class File extends React.Component {
   getPadding = () => (this.props.depth + 1) * PADDING_CONST + 2;
 
-  clickHandler = event => {
+  clickHandler = (href, event) => {
+    const { isPRFile } = this.props;
+
+    if (isPRFile) {
+      return this.prClickHandler(href, event);
+    } else {
+      return this.pjaxClickHandler(href, event, () => {});
+    }
+  };
+
+  /**
+   * This might seem hacky. Because it is. The intention is that when the files changed view
+   * is opened by clicking on a link in the diff tree, the view should take up the whole width.
+   * Like it does if you click on the "Files changed" tab on GitHub
+   */
+  setDiffToFullWidth = () => {
+    if (!isSplitDiffGithubView()) return;
+
+    const MAX_OBSERVER_TIMEOUT = 10000;
+    const GH_FULL_WIDTH_CLASS = "full-width";
+
+    setTimeout(() => {
+      document.body.classList.add(GH_FULL_WIDTH_CLASS);
+    }, 100);
+
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type == "attributes") {
+          if (!document.body.classList.contains(GH_FULL_WIDTH_CLASS)) {
+            document.body.classList.add(GH_FULL_WIDTH_CLASS);
+            observer.disconnect();
+          }
+        }
+      });
+    });
+    observer.observe(document.body, { attributes: true });
+
+    setTimeout(() => {
+      observer.disconnect();
+    }, MAX_OBSERVER_TIMEOUT);
+  };
+
+  pjaxClickHandler = (href, event, callback) => {
+    if (!(event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      loadUrl(href, callback);
+    }
+  };
+
+  prClickHandler = (href, event) => {
     const service = getGitService();
 
     switch (service) {
@@ -27,7 +80,10 @@ export default class File extends React.Component {
             return this.scrollTo();
           } else {
             // This is the conversation page
-            document.addEventListener("pjax:success", this.scrollTo);
+            return this.pjaxClickHandler(href, event, () => {
+              this.setDiffToFullWidth();
+              return this.scrollTo();
+            });
           }
         }
         break;
@@ -38,27 +94,15 @@ export default class File extends React.Component {
     }
   };
 
-  getFileboxSelector = path => {
-    const service = getGitService();
-
-    if (service === "github") {
-      return `div.file-header[data-path="${path}"]`;
-    } else if (service === "bitbucket") {
-      return `section.iterable-item[data-path="${path}"]`;
-    }
-  };
-
   scrollTo = () => {
-    // Can check for event.triggerElement -- in pjax:success call
-    // Remove the event listener that we added
-    document.removeEventListener("pjax:success", this.scrollTo);
-    const elementSelector = this.getFileboxSelector(this.props.path);
+    const elementSelector = getFileboxSelector(this.props.path);
     const fileBox = document.querySelector(elementSelector);
     const yOffset = window.scrollY + fileBox.getBoundingClientRect().y - 75;
 
     setTimeout(function() {
       // Without the timeout, the scrollTo does not work for pjax
-      // Need a mutation observer?
+      // My guess is this is because the page is incrementally loaded, and not
+      // contents are available. TODO(arjun): need to check
       window.scrollTo(0, yOffset);
     }, 1.5);
   };
@@ -76,7 +120,14 @@ export default class File extends React.Component {
     }
   };
 
-  renderFileLabel = (href, onClick, isSelected) => (
+  isSelected = () => {
+    const { path: filePath } = this.props;
+    const { repoDetails } = this.props.data;
+    const { path: currentPath } = repoDetails;
+    return currentPath === filePath;
+  };
+
+  renderFileLabel = (href, onClick) => (
     <TreeLabel
       {...this.props}
       icon="file"
@@ -84,70 +135,18 @@ export default class File extends React.Component {
       paddingLeft={this.getPadding()}
       href={href}
       onClick={onClick}
-      isSelected={isSelected}
+      isSelected={this.isSelected()}
     />
   );
 
-  renderBasicFile = isSelected => {
-    const { path } = this.props;
-    const { username, reponame, branch } = this.props.data.repoDetails;
-    const href = pathAdapter.constructPath(path, username, reponame, branch);
-    // return this.renderFileLabel(href, null, isSelected);
-    return this.renderFileLabel(
-      href,
-      event => {
-        console.log("click event called");
-        console.log("ctrl key", event.ctrlKey);
-        console.log("meta key", event.metaKey);
-        event.preventDefault();
-        loadUrl(href, () => {});
-      },
-      isSelected
-    );
-  };
-
-  renderPRFile = isSelected => {
-    // This is a PR element, so we will scroll to file changed on the element
-    // This might trigger pjax call to open the "files changed" view on Github
-    // if that has not been opened already.
-    const filesChangedUrl = this.getFilesChangedUrl();
-    const onClick = e => this.clickHandler(e);
-    // return this.renderFileLabel(filesChangedUrl, onClick, isSelected);
-    return this.renderFileLabel(
-      filesChangedUrl,
-      event => {
-        event.preventDefault();
-        loadUrl(filesChangedUrl, () => {
-          // console.log("calling full-wdith", document.body.classList);
-          // setTimeout(() => {
-          //   document.body.classList.add("full-width");
-          // }, 100);
-          // // document.body.classList.add("full-width");
-          // var observer = new MutationObserver(function(mutations) {
-          //   mutations.forEach(function(mutation) {
-          //     if (mutation.type == "attributes") {
-          //       console.log("attributes changed", document.body.classList);
-          //       if (!document.body.classList.contains("full-width")) {
-          //         document.body.classList.add("full-width");
-          //         observer.disconnect();
-          //       }
-          //     }
-          //   });
-          // });
-          // observer.observe(document.body, { attributes: true });
-        });
-        // --> call this method on pjax callback
-      },
-      isSelected
-    );
-  };
-
   render() {
-    const { additions, deletions, status } = this.props;
-    const isPR = additions || deletions || status;
-    const isSelected = this.props.currentPath === this.props.path;
-    return isPR
-      ? this.renderPRFile(isSelected)
-      : this.renderBasicFile(isSelected);
+    const { isPRFile, path } = this.props;
+    const { repoDetails } = this.props.data;
+    const { username, reponame, branch } = repoDetails;
+    const href = isPRFile
+      ? this.getFilesChangedUrl()
+      : pathAdapter.constructPath(path, username, reponame, branch);
+
+    return this.renderFileLabel(href, event => this.clickHandler(href, event));
   }
 }
