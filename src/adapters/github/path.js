@@ -255,6 +255,12 @@ export default class GithubPathAdapter {
     }
 
     const isTypeSame = oldRepoDetails.type === newRepoDetails.type;
+
+    if (isTypeSame && oldRepoDetails.type === "pull") {
+      const isPRSame = oldRepoDetails.prId === newRepoDetails.prId;
+      return isPRSame;
+    }
+
     const isHeadSame = oldRepoDetails.headSha === newRepoDetails.headSha;
     const isBaseSame = oldRepoDetails.baseSha === newRepoDetails.baseSha;
     const isBranchSame = oldRepoDetails.branch === newRepoDetails.branch;

@@ -66,8 +66,10 @@ export class BaseReaderSection extends BaseSection {
   };
 
   getFileLink = (fileSha, filePath) => {
+    const { session, repoDetails } = this.props.data;
+    const { base, head } = session.payload;
+    const { headSha, baseSha, prId, branch } = repoDetails;
     let shaId = "";
-    const { base, head } = this.props.data.session.payload;
 
     if (fileSha === "base") {
       shaId = base ? base.sha_id : "";
@@ -75,8 +77,17 @@ export class BaseReaderSection extends BaseSection {
       shaId = head ? head.sha_id : "";
     }
 
-    const { username, reponame, branch } = this.props.data.repoDetails;
+    // Special handling for a common case
+    // Suppose you are browsing the repo on the master branch and want the
+    // link. In this case, we don't want the head sha value. Instead we will
+    // use the branch name only
+    const isBasicCase = !headSha && !baseSha && !prId && branch;
+    if (fileSha !== "base" && isBasicCase) {
+      shaId = branch;
+    }
+
     const gitId = shaId || branch;
+    const { username, reponame } = repoDetails;
     return this.getServiceLink(username, reponame, gitId, filePath);
   };
 

@@ -12,7 +12,6 @@ import References from "references";
 import Definitions from "definitions";
 import HoverListener from "hover/HoverListener";
 import * as GithubLayout from "../../adapters/github/layout";
-import { setupPjax } from "./pjax";
 import Resizable from "./Resizable";
 import "./index.css";
 
@@ -36,10 +35,6 @@ class Sidebar extends React.Component {
 
   updateStorage = data => StorageUtils.setInSyncStore(data);
 
-  componentDidMount() {
-    setupPjax();
-  }
-
   toggleCollapse() {
     const { isSidebarVisible } = this.props.storage;
     if (isSidebarVisible) {
@@ -53,7 +48,6 @@ class Sidebar extends React.Component {
     } else {
       this.updateStorage({ isSidebarVisible: true });
       AnalyticsUtils.logSidebarEvent(true);
-      setupPjax();
     }
   }
 

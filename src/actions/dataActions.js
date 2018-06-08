@@ -1,5 +1,6 @@
 import { WS } from "../utils/websocket";
 import { API } from "../utils/api";
+import { loadUrl as pjaxLoadUrl } from "../utils/pjax";
 import Store from "../store";
 import { treeAdapter } from "../adapters";
 
@@ -143,5 +144,16 @@ export function callFileContents(data) {
     payload: fileContents
       ? noOpPromise
       : WS.getFileContents(baseOrHead, filePath)
+  };
+}
+
+export function loadUrl({ urlPath }) {
+  return {
+    type: "LOAD_PJAX_URL",
+    payload: new Promise((resolve, reject) => {
+      pjaxLoadUrl(urlPath, () => {
+        resolve();
+      });
+    })
   };
 }

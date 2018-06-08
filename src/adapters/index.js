@@ -35,6 +35,31 @@ export const isGithubCompareView = () => {
   }
 };
 
+export const isSplitDiffGithubView = () =>
+  getGitService() === "github" &&
+  document.querySelector("table.file-diff-split");
+
+export const getFileboxSelector = path => {
+  const service = getGitService();
+
+  if (service === "github") {
+    return `div.file-header[data-path="${path}"]`;
+  } else if (service === "bitbucket") {
+    return `section.iterable-item[data-path="${path}"]`;
+  }
+};
+
+export const appendLineNumber = (baseLink, lineNumber) => {
+  switch (getGitService()) {
+    case "github":
+      return `${baseLink}#L${lineNumber + 1}`;
+    case "bitbucket":
+      return `${baseLink}#lines-${lineNumber + 1}`;
+    default:
+      return baseLink;
+  }
+};
+
 export const isCompareView = () => {
   switch (getGitService()) {
     case "bitbucket":

@@ -5512,7 +5512,7 @@ pinkie@^2.0.0:
 
 "pjax@https://github.com/karigari/pjax.git#karigari":
   version "0.2.5"
-  resolved "https://github.com/karigari/pjax.git#f59651652789d972e02dbbd09badcd86ccea4d94"
+  resolved "https://github.com/karigari/pjax.git#4e8eaaeba626efd9928b0ccdd3ac8a924bc3d492"
 
 pkg-dir@^1.0.0:
   version "1.0.0"
