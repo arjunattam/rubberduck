@@ -32,20 +32,27 @@ const constructState = (path, startTimestamp) => {
 };
 
 /**
+ * Pjax has an odd behaviour where it attaches to the links on the
+ * GitHub pages, even outside the definition scope. Hence we feed it
+ * with a weird random selector that matches nothing (hopefully!)
+ */
+const getRandomSelector = () => {
+  return ".db18458e2782b2b77e36769c569e263a53885a9944dd0a861e5064eac16f1a a";
+};
+
+/**
  * Only supports GitHub
  *
  * See docs/PJAX.md for manual test-cases.
  */
 export const loadUrl = (path, callback) => {
   const containerSelector = getPjaxSelector();
-  console.log("calling load url", path);
   const startTimestamp = +new Date();
 
   // Add a once only event listener
   document.addEventListener(
     "pjax:complete",
     () => {
-      console.log("pjax completed for ", path);
       const { state, title, url } = constructState(path, startTimestamp);
       window.history.pushState(state, title, url);
       callback();
@@ -55,6 +62,7 @@ export const loadUrl = (path, callback) => {
 
   const newPjax = new Pjax({
     selectors: ["title", containerSelector],
+    elements: getRandomSelector(),
     disablePjaxHeader: true,
     cacheBust: false,
     history: false

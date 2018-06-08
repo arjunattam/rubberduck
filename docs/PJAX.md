@@ -16,8 +16,14 @@
 
 4.  PR view: click on tree link in conversations tab should open the files changed view and scroll to the correct file. Files changed view should be `full-width`. Going back from here should open conversation without `full-width`.
 
-5.  PR view: go from pulls list --> open a PR --> go to files changed view (via tree link) --> go back (should open conversation) --> go back (should open pulls list)
+5.  Also try the scrolling to file changed in long-ish PRs, since they are loaded incrementally after the page load.
 
-6.  Expanded code box: open file should trigger pjax, and after file loads, it should highlight the correct line number. Going back should go back to the previous page.
+6.  PR view: go from pulls list --> open a PR --> go to files changed view (via tree link) --> go back (should open conversation) --> go back (should open pulls list)
 
-7.  Expanded code box: cmd-click on open file?
+7.  Expanded code box: open file should trigger pjax, and after file loads, it should highlight the correct line number. Going back should go back to the previous page.
+
+8.  Expanded code box: cmd-click on open file?
+
+## Possible improvements
+
+1.  GitHub prefetches the files changed page in PRs, when the PR is loaded. This makes the transition to files changed a lot faster. Perhaps we could implement the same.
