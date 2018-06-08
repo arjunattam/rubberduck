@@ -1,4 +1,4 @@
-import { getGitService } from "../../adapters";
+import { getGitService } from "../adapters";
 const Pjax = require("pjax");
 
 /**

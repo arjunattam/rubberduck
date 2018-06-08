@@ -6,6 +6,7 @@ import fileTree from "./fileTree";
 import hoverResult from "./hoverResult";
 import session from "./session";
 import fileContents from "./fileContents";
+import pjax from "./pjax";
 
 const initialState = {};
 
@@ -23,7 +24,8 @@ const dataReducer = combineReducers({
   section,
   hoverResult,
   session,
-  fileContents
+  fileContents,
+  pjax
 });
 
 export default dataReducer;

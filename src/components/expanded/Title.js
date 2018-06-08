@@ -5,26 +5,16 @@ import InlineButton from "../common/InlineButton";
 import {
   getGitService,
   isGithubCompareView,
-  getFileboxSelector
+  getFileboxSelector,
+  appendLineNumber
 } from "../../adapters";
-import { loadUrl } from "../sidebar/pjax";
-
-const appendLineNumber = (baseLink, lineNumber) => {
-  switch (getGitService()) {
-    case "github":
-      return `${baseLink}#L${lineNumber + 1}`;
-    case "bitbucket":
-      return `${baseLink}#lines-${lineNumber + 1}`;
-    default:
-      return baseLink;
-  }
-};
 
 export default class Title extends React.Component {
   static propTypes = {
     filePath: PropTypes.string.isRequired,
     baseLink: PropTypes.string.isRequired,
-    currentLineNumber: PropTypes.number.isRequired
+    currentLineNumber: PropTypes.number.isRequired,
+    urlLoader: PropTypes.func.isRequired
   };
 
   getFileLink = () =>
@@ -85,9 +75,10 @@ export default class Title extends React.Component {
           return this.scrollToLine();
         } else {
           // Load the url, callback to highlight line
-          return loadUrl(this.getFileLink(), () =>
-            this.highlightLine(this.getLineId())
-          );
+          const { urlLoader } = this.props;
+          return urlLoader({ urlPath: this.getFileLink() }).then(response => {
+            this.highlightLine(this.getLineId());
+          });
         }
       case "bitbucket":
         return this.scrollTo();

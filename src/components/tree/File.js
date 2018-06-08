@@ -1,7 +1,6 @@
 import React from "react";
 import { pathAdapter } from "../../adapters";
 import TreeLabel from "./TreeLabel";
-import { loadUrl } from "../sidebar/pjax";
 import {
   getGitService,
   getFileboxSelector,
@@ -55,7 +54,10 @@ export default class File extends React.Component {
   pjaxClickHandler = (href, event, callback) => {
     if (!(event.ctrlKey || event.metaKey)) {
       event.preventDefault();
-      loadUrl(href, callback);
+      const { urlLoader } = this.props;
+      urlLoader({ urlPath: href }).then(response => {
+        callback();
+      });
     }
   };
 

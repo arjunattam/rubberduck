@@ -49,6 +49,17 @@ export const getFileboxSelector = path => {
   }
 };
 
+export const appendLineNumber = (baseLink, lineNumber) => {
+  switch (getGitService()) {
+    case "github":
+      return `${baseLink}#L${lineNumber + 1}`;
+    case "bitbucket":
+      return `${baseLink}#lines-${lineNumber + 1}`;
+    default:
+      return baseLink;
+  }
+};
+
 export const isCompareView = () => {
   switch (getGitService()) {
     case "bitbucket":

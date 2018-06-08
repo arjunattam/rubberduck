@@ -20,23 +20,19 @@ class Tree extends BaseSection {
     return tree.children;
   };
 
-  componentDidMount() {
-    document.addEventListener("pjax:send", () => this.onPjaxStart());
-    document.addEventListener("pjax:complete", () => this.onPjaxEnd());
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    const { isLoading: prevLoading } = prevProps.data.pjax;
+    const { isLoading: newLoading } = this.props.data.pjax;
+    if (newLoading !== prevLoading) {
+      this.DataActions.setTreeLoading(newLoading);
+    }
   }
-
-  onPjaxStart = () => {
-    this.DataActions.setTreeLoading(true);
-  };
-
-  onPjaxEnd = () => {
-    this.DataActions.setTreeLoading(false);
-  };
 
   render() {
     const children = this.flattenSingleDirectory();
     const initialDepth = 0;
-    const renderedChildren = renderChildren(children, initialDepth, this.props);
+    const props = { ...this.props, urlLoader: this.DataActions.loadUrl };
+    const renderedChildren = renderChildren(children, initialDepth, props);
     const styleClass = this.isVisible()
       ? "tree-content-visible"
       : "tree-content-hidden";
