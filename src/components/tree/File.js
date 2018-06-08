@@ -15,12 +15,9 @@ export default class File extends React.Component {
 
   clickHandler = (href, event) => {
     const { isPRFile } = this.props;
-
-    if (isPRFile) {
-      return this.prClickHandler(href, event);
-    } else {
-      return this.pjaxClickHandler(href, event, () => {});
-    }
+    return isPRFile
+      ? this.prClickHandler(href, event)
+      : this.pjaxClickHandler(href, event, () => {});
   };
 
   /**
@@ -40,7 +37,7 @@ export default class File extends React.Component {
 
     var observer = new MutationObserver(function(mutations) {
       mutations.forEach(function(mutation) {
-        if (mutation.type == "attributes") {
+        if (mutation.type === "attributes") {
           if (!document.body.classList.contains(GH_FULL_WIDTH_CLASS)) {
             document.body.classList.add(GH_FULL_WIDTH_CLASS);
             observer.disconnect();
