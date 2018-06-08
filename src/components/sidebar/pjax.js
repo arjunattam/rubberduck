@@ -1,11 +1,5 @@
 import { getGitService } from "../../adapters";
-
 const Pjax = require("pjax");
-let GlobalPjax;
-
-const FILES_TREE_SELECTOR = "#mercury-sidebar .tree-container .tree-content";
-
-const LINK_SELECTOR = "#mercury-sidebar a";
 
 /**
  * returns pjax selector for git remote service
@@ -13,54 +7,57 @@ const LINK_SELECTOR = "#mercury-sidebar a";
 const getPjaxSelector = () => {
   const service = getGitService();
   if (service === "github") {
-    return ["#js-repo-pjax-container"];
+    return "#js-repo-pjax-container";
   } else if (service === "bitbucket") {
-    return ["#source-container"];
+    return "#source-container";
   }
 };
 
 /**
- * sets up pjax, only on elements of the sidebar (this is important!)
+ * Construct the same state that GitHub uses. To see GitHub's state
+ * run `window.history.state` in browser console.
  */
-const createPjax = () => {
-  GlobalPjax = new Pjax({
-    elements: LINK_SELECTOR,
-    selectors: ["title", ...getPjaxSelector()],
+const constructState = (path, startTimestamp) => {
+  const title = document.title;
+  const url = `https://github.com${path}`;
+  const state = {
+    container: getPjaxSelector(),
+    id: +new Date(),
+    timeout: 650,
+    title,
+    url,
+    _id: startTimestamp
+  };
+  return { state, title, url };
+};
+
+/**
+ * Only supports GitHub
+ *
+ * See docs/PJAX.md for manual test-cases.
+ */
+export const loadUrl = (path, callback) => {
+  const containerSelector = getPjaxSelector();
+  console.log("calling load url", path);
+  const startTimestamp = +new Date();
+
+  // Add a once only event listener
+  document.addEventListener(
+    "pjax:complete",
+    () => {
+      console.log("pjax completed for ", path);
+      const { state, title, url } = constructState(path, startTimestamp);
+      window.history.pushState(state, title, url);
+      callback();
+    },
+    { once: true }
+  );
+
+  const newPjax = new Pjax({
+    selectors: ["title", containerSelector],
     disablePjaxHeader: true,
     cacheBust: false,
-    currentUrlFullReload: false
+    history: false
   });
-};
-
-/**
- * pjax needs to be reset whenever there is a mutation on the
- * files tree DOM element.
- */
-const setupPjaxHelper = () => {
-  var targetNode = document.querySelector(FILES_TREE_SELECTOR);
-  var config = { childList: true, subtree: true };
-  var callback = function(mutationsList) {
-    createPjax();
-  };
-  var observer = new MutationObserver(callback);
-
-  if (targetNode) {
-    observer.observe(targetNode, config);
-    createPjax(); // first time setup
-  }
-};
-
-/**
- * TODO(arjun): add callback to the loadUrl method, so that we can
- * use it for highlighted the line on `Open file`
- */
-export const loadUrl = path => GlobalPjax.loadUrl(path);
-
-/**
- * waits for a second so that the page loads, and then sets up pjax
- */
-export const setupPjax = () => {
-  setTimeout(() => {
-    setupPjaxHelper();
-  }, 1000);
+  newPjax.loadUrl(path);
 };

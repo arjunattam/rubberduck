@@ -90,10 +90,10 @@ export default class Title extends React.Component {
           // File is open, scroll to line
           return this.scrollToLine();
         } else {
-          // Assume file will load in 1.5s, and then highlight the line
-          // For more accuracy, set a callback on loadUrl method
-          setTimeout(() => this.highlightLine(this.getLineId()), 1500);
-          return loadUrl(this.getFileLink());
+          // Load the url, callback to highlight line
+          return loadUrl(this.getFileLink(), () =>
+            this.highlightLine(this.getLineId())
+          );
         }
       case "bitbucket":
         return this.scrollTo();

@@ -1,6 +1,7 @@
 import React from "react";
 import { pathAdapter } from "../../adapters";
 import TreeLabel from "./TreeLabel";
+import { loadUrl } from "../sidebar/pjax";
 import { getGitService } from "../../adapters";
 
 const PADDING_CONST = 12; // in pixels -- same as folder
@@ -91,7 +92,18 @@ export default class File extends React.Component {
     const { path } = this.props;
     const { username, reponame, branch } = this.props.data.repoDetails;
     const href = pathAdapter.constructPath(path, username, reponame, branch);
-    return this.renderFileLabel(href, null, isSelected);
+    // return this.renderFileLabel(href, null, isSelected);
+    return this.renderFileLabel(
+      href,
+      event => {
+        console.log("click event called");
+        console.log("ctrl key", event.ctrlKey);
+        console.log("meta key", event.metaKey);
+        event.preventDefault();
+        loadUrl(href, () => {});
+      },
+      isSelected
+    );
   };
 
   renderPRFile = isSelected => {
@@ -100,7 +112,34 @@ export default class File extends React.Component {
     // if that has not been opened already.
     const filesChangedUrl = this.getFilesChangedUrl();
     const onClick = e => this.clickHandler(e);
-    return this.renderFileLabel(filesChangedUrl, onClick, isSelected);
+    // return this.renderFileLabel(filesChangedUrl, onClick, isSelected);
+    return this.renderFileLabel(
+      filesChangedUrl,
+      event => {
+        event.preventDefault();
+        loadUrl(filesChangedUrl, () => {
+          // console.log("calling full-wdith", document.body.classList);
+          // setTimeout(() => {
+          //   document.body.classList.add("full-width");
+          // }, 100);
+          // // document.body.classList.add("full-width");
+          // var observer = new MutationObserver(function(mutations) {
+          //   mutations.forEach(function(mutation) {
+          //     if (mutation.type == "attributes") {
+          //       console.log("attributes changed", document.body.classList);
+          //       if (!document.body.classList.contains("full-width")) {
+          //         document.body.classList.add("full-width");
+          //         observer.disconnect();
+          //       }
+          //     }
+          //   });
+          // });
+          // observer.observe(document.body, { attributes: true });
+        });
+        // --> call this method on pjax callback
+      },
+      isSelected
+    );
   };
 
   render() {

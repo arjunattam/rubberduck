@@ -35,11 +35,13 @@ class Tree extends BaseSection {
 
   render() {
     const children = this.flattenSingleDirectory();
+    const { path: currentPath } = this.props.data.repoDetails;
+    const initialDepth = 0;
     const renderedChildren = renderChildren(
       children,
-      0,
+      initialDepth,
       this.props,
-      this.props.data.repoDetails.path
+      currentPath
     );
     const styleClass = this.isVisible()
       ? "tree-content-visible"
