@@ -73,9 +73,18 @@ class Definitions extends BaseReaderSection {
     const { filePath: path, fileLink: link, items } = fileObject;
     const { contents, startLineNumber } = this.getFileContents(fileObject);
     const { sidebarWidth } = this.props.storage;
+    const onHover = () => {};
     return this.hasResults() ? (
       <DefinitionFileSection
-        {...{ path, link, items, contents, startLineNumber, sidebarWidth }}
+        {...{
+          path,
+          link,
+          items,
+          contents,
+          startLineNumber,
+          sidebarWidth,
+          onHover
+        }}
       />
     ) : null;
   };

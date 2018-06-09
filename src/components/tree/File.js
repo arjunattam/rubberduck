@@ -1,11 +1,12 @@
 import React from "react";
-import { pathAdapter } from "../../adapters";
 import TreeLabel from "./TreeLabel";
 import {
   getGitService,
   getFileboxSelector,
-  isSplitDiffGithubView
+  isSplitDiffGithubView,
+  pathAdapter
 } from "../../adapters";
+import * as AnalyticsUtils from "../../utils/analytics";
 
 const PADDING_CONST = 12; // in pixels -- same as folder
 
@@ -13,6 +14,7 @@ export default class File extends React.Component {
   getPadding = () => (this.props.depth + 1) * PADDING_CONST + 2;
 
   clickHandler = (href, event) => {
+    AnalyticsUtils.logTreeClick(true);
     const { isPRFile } = this.props;
     return isPRFile
       ? this.prClickHandler(href, event)

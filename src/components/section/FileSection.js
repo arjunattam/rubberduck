@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import BaseSectionItem from "./SectionItem";
 import TreeLabel from "../tree/TreeLabel";
 import ExpandedCode from "../expanded";
+import * as AnalyticsUtils from "../../utils/analytics";
 
 /**
  * Collapsible section titled with file path, and contains usages in that file
@@ -15,6 +16,7 @@ class FileSubSection extends React.Component {
     startLineNumber: PropTypes.number.isRequired,
     items: PropTypes.array.isRequired,
     sidebarWidth: PropTypes.number.isRequired,
+    onHover: PropTypes.func.isRequired,
     isCollapsed: PropTypes.bool
   };
 
@@ -28,7 +30,8 @@ class FileSubSection extends React.Component {
     this.setState({
       isHovering: true
     });
-    return this.props.onHover ? this.props.onHover() : null;
+    AnalyticsUtils.logExpandedCodeShow();
+    return this.props.onHover();
   };
 
   handleMouseLeave = event => {
@@ -89,18 +92,22 @@ class FileSubSection extends React.Component {
   );
 
   handleMouseOver = event => {
-    const isMovingOnFileSection = event.clientX < this.props.sidebarWidth;
-    const isDeltaLarge =
-      !this.state.screenY ||
-      Math.abs(event.screenY - this.state.screenY) >= 100;
+    const { clientY: mouseY, clientX: mouseX } = event;
+    const { sidebarWidth } = this.props;
+    const isMovingOnFileSection = mouseX < sidebarWidth;
+    const hasNoValue = !this.state.mouseY;
+    const isDeltaLarge = Math.abs(mouseY - this.state.mouseY) >= 100;
 
-    if (isMovingOnFileSection && isDeltaLarge)
-      this.setState({ screenY: event.screenY });
+    if (isMovingOnFileSection) {
+      if (hasNoValue || isDeltaLarge) {
+        this.setState({ mouseY });
+      }
+    }
   };
 
   getSnippetStyle = () => {
-    const { screenY } = this.state;
-    const top = screenY ? Math.max(screenY - 200, 25) : 25;
+    const { mouseY } = this.state;
+    const top = mouseY ? Math.max(mouseY - 200, 25) : 25;
     return {
       left: this.props.sidebarWidth + 2,
       top

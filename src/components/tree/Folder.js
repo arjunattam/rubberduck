@@ -2,6 +2,8 @@ import React from "react";
 import File from "./File";
 import TreeLabel from "./TreeLabel";
 import { isCompareView } from "../../adapters";
+import * as AnalyticsUtils from "../../utils/analytics";
+
 const PADDING_CONST = 12; // in pixels
 const COMPARE_VIEW_OPEN_DEPTH = 3;
 
@@ -51,8 +53,10 @@ class Folder extends React.Component {
 
   getPadding = () => this.props.depth * PADDING_CONST;
 
-  toggleCollapsed = () =>
-    this.setState({ isCollapsed: !this.state.isCollapsed });
+  toggleCollapsed = () => {
+    AnalyticsUtils.logTreeClick(false);
+    return this.setState({ isCollapsed: !this.state.isCollapsed });
+  };
 
   renderFolderStructure = () => {
     const children = this.props.children;

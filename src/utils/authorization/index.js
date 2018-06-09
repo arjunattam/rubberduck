@@ -166,11 +166,7 @@ export class AuthStore {
           this.DataActions.updateSessionStatus({ status: "disconnected" });
           CrashReporting.catchException(error);
         });
-    }).then(decodedInfo => {
-      const userInfo = {
-        ...decodedInfo,
-        isOnMenuAppEnv: this.isOnMenuAppEnv
-      };
+    }).then(userInfo => {
       CrashReporting.setupUser(userInfo);
       AnalyticsUtils.setupUser(userInfo);
       return userInfo;
