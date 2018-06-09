@@ -20,3 +20,5 @@ June 6, 2018
 - Improvements to session creation for browsing basic files
 - Improvements to styling of the header and collapse button
 - Reliability and speed improvements to understanding page state on URL transitions
+- Update analytics telemetry to cover most user actions
+- Fix position of expanded code snippet
