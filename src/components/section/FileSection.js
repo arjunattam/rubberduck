@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import BaseSectionItem from "./SectionItem";
 import TreeLabel from "../tree/TreeLabel";
 import ExpandedCode from "../expanded";
+import * as AnalyticsUtils from "../../utils/analytics";
 
 /**
  * Collapsible section titled with file path, and contains usages in that file
@@ -15,6 +16,7 @@ class FileSubSection extends React.Component {
     startLineNumber: PropTypes.number.isRequired,
     items: PropTypes.array.isRequired,
     sidebarWidth: PropTypes.number.isRequired,
+    onHover: PropTypes.func.isRequired,
     isCollapsed: PropTypes.bool
   };
 
@@ -28,7 +30,8 @@ class FileSubSection extends React.Component {
     this.setState({
       isHovering: true
     });
-    return this.props.onHover ? this.props.onHover() : null;
+    AnalyticsUtils.logExpandedCodeShow();
+    return this.props.onHover();
   };
 
   handleMouseLeave = event => {

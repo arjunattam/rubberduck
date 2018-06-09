@@ -29,10 +29,14 @@ export const setupUser = userInfo => {
 };
 
 const getEventProps = () => {
-  const { repoDetails } = Store.getState().data;
+  const { repoDetails, session, hoverResult } = Store.getState().data;
   const { isSidebarVisible, hasMenuApp } = Store.getState().storage;
+  const { status: sessionStatus, progress: sessionProgress } = session;
   return {
     ...repoDetails,
+    ...hoverResult,
+    sessionStatus,
+    sessionProgress,
     isSidebarVisible,
     hasMenuApp,
     version: VERSION,
@@ -40,21 +44,43 @@ const getEventProps = () => {
   };
 };
 
-export const logSessionEvent = type => {
-  const name = `extension.session.${type}`;
+export const logAction = (actionName, eventType) => {
+  let name = `extension.${actionName}`;
+
+  if (eventType) {
+    name = `${name}.${eventType}`;
+  }
+
   const props = getEventProps();
   amplitude.getInstance().logEvent(name, props);
+};
+
+export const logCall = actionName => {
+  return logAction(actionName, "call");
+};
+
+export const logResponse = actionName => {
+  return logAction(actionName, "response");
+};
+
+export const logPageView = () => {
+  return logAction("injected");
+};
+
+export const logSessionEvent = type => {
+  return logAction("session", type);
 };
 
 export const logSidebarEvent = isOpen => {
   const type = isOpen ? "open" : "close";
-  const name = `extension.sidebar.${type}`;
-  const props = getEventProps();
-  amplitude.getInstance().logEvent(name, props);
+  return logAction("sidebar", type);
 };
 
-export const logTreeClick = () => {
-  const name = `extension.tree.click`;
-  const props = getEventProps();
-  amplitude.getInstance().logEvent(name, props);
+export const logTreeClick = isFile => {
+  const type = isFile ? "file.click" : "folder.click";
+  return logAction("tree", type);
+};
+
+export const logExpandedCodeShow = () => {
+  return logAction("expanded_code", "show");
 };

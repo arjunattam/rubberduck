@@ -54,7 +54,7 @@ class Folder extends React.Component {
   getPadding = () => this.props.depth * PADDING_CONST;
 
   toggleCollapsed = () => {
-    AnalyticsUtils.logTreeClick();
+    AnalyticsUtils.logTreeClick(false);
     return this.setState({ isCollapsed: !this.state.isCollapsed });
   };
 
