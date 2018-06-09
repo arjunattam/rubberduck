@@ -2,6 +2,13 @@
   padding: 4px 10px;
   font-size: 15px;
   display: flex;
-  color: #666;
+  color: #999;
   justify-content: space-between;
 }
+
+.title-bar-container .reponame {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+

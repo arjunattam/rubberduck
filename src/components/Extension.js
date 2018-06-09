@@ -4,8 +4,9 @@ import { bindActionCreators } from "redux";
 import * as DataActions from "../actions/dataActions";
 import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
-import * as ChromeUtils from "./../utils/chrome";
-import * as StorageUtils from "./../utils/storage";
+import * as ChromeUtils from "../utils/chrome";
+import * as StorageUtils from "../utils/storage";
+import * as AnalyticsUtils from "../utils/analytics";
 import Authorization from "./../utils/authorization";
 import { pathAdapter } from "../adapters";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
@@ -25,8 +26,12 @@ class Extension extends React.Component {
   componentDidMount() {
     this.setupChromeListener();
     this.initializeStorage();
-    this.updateRepoDetailsFromPath();
+    this.initializeRepoDetails();
     setupSpanObserver();
+
+    // We can't use our own redux handler for pjax because that
+    // is restricted to pjax calls from the sidebar.
+    document.addEventListener("pjax:complete", this.onPjaxEnd);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -41,6 +46,28 @@ class Extension extends React.Component {
 
     // TODO(arjun): should this happen only after auth has been setup?
     this.updateSessionAndTree(prevProps, this.props);
+  }
+
+  onPjaxEnd = () => {
+    this.updateRepoDetails();
+    setupSpanObserver();
+  };
+
+  /**
+   * First time call for repo details. After this, we fire the extension.injected
+   * analytics event.
+   */
+  initializeRepoDetails() {
+    this.updateRepoDetails().then(response => {
+      AnalyticsUtils.logPageView();
+    });
+  }
+
+  updateRepoDetails() {
+    return pathAdapter.fetchRepoDetails().then(repoDetails => {
+      this.DataActions.setRepoDetails(repoDetails);
+      return repoDetails;
+    });
   }
 
   updateSessionAndTree(prevProps, newProps) {
@@ -60,7 +87,8 @@ class Extension extends React.Component {
   setupChromeListener() {
     ChromeUtils.addChromeListener((action, data) => {
       if (action === "URL_UPDATE") {
-        this.handleUrlUpdate(data);
+        // This has been replaced by pjax:complete event listener
+        // Keeping this event just in case we need it
       } else if (action === "STORAGE_UPDATED") {
         this.handleStorageUpdate(data);
       }
@@ -79,24 +107,6 @@ class Extension extends React.Component {
 
   handleStorageUpdate(data) {
     this.StorageActions.updateFromChromeStorage(data);
-  }
-
-  handleUrlUpdate() {
-    // Due to pjax, there are cases when the url has been updated but
-    // the DOM elements have not loaded up, so repoDetails cannot be calculated
-    // Hence we keep a timeout of 1 sec.
-
-    // TODO(arjun): need to listen to pjax end event here, instead of random constant
-    setTimeout(() => {
-      this.updateRepoDetailsFromPath();
-    }, 1000);
-    setupSpanObserver();
-  }
-
-  updateRepoDetailsFromPath() {
-    pathAdapter.fetchRepoDetails().then(repoDetails => {
-      this.DataActions.setRepoDetails(repoDetails);
-    });
   }
 
   hasValidToken = () => Authorization.hasValidToken();

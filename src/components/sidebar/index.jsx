@@ -4,6 +4,7 @@ import { bindActionCreators } from "redux";
 import * as DataActions from "../../actions/dataActions";
 import * as StorageActions from "../../actions/storageActions";
 import * as StorageUtils from "../../utils/storage";
+import * as AnalyticsUtils from "../../utils/analytics";
 import Header from "header";
 import CollapseButton from "collapse/CollapseButton";
 import Tree from "tree";
@@ -11,7 +12,6 @@ import References from "references";
 import Definitions from "definitions";
 import HoverListener from "hover/HoverListener";
 import * as GithubLayout from "../../adapters/github/layout";
-import { setupPjax } from "./pjax";
 import Resizable from "./Resizable";
 import "./index.css";
 
@@ -35,21 +35,19 @@ class Sidebar extends React.Component {
 
   updateStorage = data => StorageUtils.setInSyncStore(data);
 
-  componentDidMount() {
-    setupPjax();
-  }
-
   toggleCollapse() {
-    if (this.props.storage.isSidebarVisible) {
+    const { isSidebarVisible } = this.props.storage;
+    if (isSidebarVisible) {
       // To trigger the left slide animation, we follow this:
       // https://css-tricks.com/restart-css-animation/#article-header-id-0
       this.triggerReflow();
       setTimeout(() => {
         this.updateStorage({ isSidebarVisible: false });
       }, 150);
+      AnalyticsUtils.logSidebarEvent(false);
     } else {
       this.updateStorage({ isSidebarVisible: true });
-      setupPjax();
+      AnalyticsUtils.logSidebarEvent(true);
     }
   }
 

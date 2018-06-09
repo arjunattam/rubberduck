@@ -2,6 +2,8 @@ import React from "react";
 import File from "./File";
 import TreeLabel from "./TreeLabel";
 import { isCompareView } from "../../adapters";
+import * as AnalyticsUtils from "../../utils/analytics";
+
 const PADDING_CONST = 12; // in pixels
 const COMPARE_VIEW_OPEN_DEPTH = 3;
 
@@ -19,7 +21,7 @@ const sortChildren = children => {
   return parents.concat(onlyChildren);
 };
 
-export const renderChildren = (children, depth, parentProps, currentPath) => {
+export const renderChildren = (children, depth, parentProps) => {
   // The parentProps are required to pass org/repo information down
   // the component chain, so that we can construct the link href. Can this be avoided?
   const childrenToRender = children ? sortChildren(children) : [];
@@ -32,8 +34,7 @@ export const renderChildren = (children, depth, parentProps, currentPath) => {
           ...parentProps,
           ...element,
           depth: depth + 1,
-          key: element.path,
-          currentPath
+          key: element.path
         };
         return isFolder(element) ? (
           <Folder {...childProps} />
@@ -52,23 +53,22 @@ class Folder extends React.Component {
 
   getPadding = () => this.props.depth * PADDING_CONST;
 
-  toggleCollapsed = () =>
-    this.setState({ isCollapsed: !this.state.isCollapsed });
+  toggleCollapsed = () => {
+    AnalyticsUtils.logTreeClick(false);
+    return this.setState({ isCollapsed: !this.state.isCollapsed });
+  };
 
   renderFolderStructure = () => {
     const children = this.props.children;
-    const renderedChildren = renderChildren(
-      children,
-      this.props.depth,
-      this.props,
-      this.props.currentPath
-    );
+    const { depth } = this.props;
+    const renderedChildren = renderChildren(children, depth, this.props);
     return <div className="file-children">{renderedChildren}</div>;
   };
 
-  isCurrentlyOpen = () =>
-    this.props.currentPath &&
-    this.props.currentPath.indexOf(this.props.path) >= 0;
+  isCurrentlyOpen = () => {
+    const { path: currentPath } = this.props.data.repoDetails;
+    return currentPath && currentPath.indexOf(this.props.path) >= 0;
+  };
 
   componentDidMount() {
     let isCollapsed = true;

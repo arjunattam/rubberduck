@@ -1,6 +1,5 @@
 import Raven from "raven-js";
-
-const VERSION = "0.3.0";
+import { VERSION } from "./version";
 
 function normalizeSentryUrl(url) {
   return `chrome-extension://mercury/${url.replace(/^.*[\\\/]/, "")}`;
