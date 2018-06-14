@@ -75,6 +75,13 @@ export default class Codebox extends React.Component {
             return "java";
           case "go":
             return "go";
+          case "scala":
+            return "scala";
+          case "kt":
+            return "kotlin";
+          case "cc":
+          case "cpp":
+            return "cpp";
           default:
             return null;
         }
