@@ -186,10 +186,15 @@ class WebSocketManager {
     this.dispatchStatus(status, progress);
 
     if (status === "ready") {
-      this.isReady = true;
+      this.markAsReady();
     } else if (status === "error") {
       console.log("Error in creating session", message);
     }
+  };
+
+  markAsReady = () => {
+    this.isReady = true;
+    AnalyticsUtils.logSessionEvent("ready");
   };
 
   setupListener = () => {
