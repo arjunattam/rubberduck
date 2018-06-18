@@ -180,10 +180,15 @@ class WebSocketManager {
     this.DataActions.updateSessionStatus({ status, progress });
   };
 
+  dispatchAndLog = (type, progress) => {
+    this.dispatchStatus(type, progress);
+    AnalyticsUtils.logSessionEvent(type);
+  };
+
   statusUpdatesListener = message => {
     // This will trigger the UI states for session status
     const { status_update: status, progress } = message;
-    this.dispatchStatus(status, progress);
+    this.dispatchAndLog(status, progress);
 
     if (status === "ready") {
       this.isReady = true;
@@ -255,11 +260,6 @@ class WebSocketManager {
     error.indexOf("Pull Request not found") >= 0;
 
   isLanguageUnsupported = error => error.indexOf("Language not supported") >= 0;
-
-  dispatchAndLog = type => {
-    this.dispatchStatus(type);
-    AnalyticsUtils.logSessionEvent(type);
-  };
 
   createNewSession = params => {
     this.sessionParams = params;

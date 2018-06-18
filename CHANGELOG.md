@@ -1,15 +1,11 @@
 # Changelog
 
-## 0.3.0
+## 0.3.2
 
-June 6, 2018
+June 18, 2018
 
-- Self-hosted readiness
-- Improved settings, with environment selection and configuration, embedded documentation and support links
-- Improvements to websocket lifecycle
-- bugfix: Working on github insights pages
-- bugfix: No script injection onn github's confirm password screen
-- bugfix: Fixed Bitbucket API auth issues with self-hosted environment
+- Syntax highlighting for new languages (C++, Kotlin, Scala)
+- Analytics events for session status
 
 ## 0.3.1
 
@@ -22,3 +18,14 @@ June 6, 2018
 - Reliability and speed improvements to understanding page state on URL transitions
 - Update analytics telemetry to cover most user actions
 - Fix position of expanded code snippet
+
+## 0.3.0
+
+June 6, 2018
+
+- Self-hosted readiness
+- Improved settings, with environment selection and configuration, embedded documentation and support links
+- Improvements to websocket lifecycle
+- bugfix: Working on github insights pages
+- bugfix: No script injection onn github's confirm password screen
+- bugfix: Fixed Bitbucket API auth issues with self-hosted environment
