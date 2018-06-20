@@ -147,7 +147,7 @@ export function callUsages(data) {
   AnalyticsUtils.logCall(ANALYTICS_NAME);
   return {
     type: "CALL_USAGES",
-    payload: WS.getReferences(fileSha, filePath, lineNumber, charNumber).then(
+    payload: WS.getUsages(fileSha, filePath, lineNumber, charNumber).then(
       response => {
         AnalyticsUtils.logResponse(ANALYTICS_NAME);
         return response;

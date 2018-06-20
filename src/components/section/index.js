@@ -152,7 +152,7 @@ export class BaseReaderSection extends BaseSection {
 
   render() {
     const isVisible = this.isVisible();
-    const className = `references-section ${isVisible ? "" : "collapsed"}`;
+    const className = `usages-section ${isVisible ? "" : "collapsed"}`;
     return (
       <div className={className}>
         {this.renderSectionHeader()}

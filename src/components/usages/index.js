@@ -1,37 +1,36 @@
 import React from "react";
 import { connect } from "react-redux";
 import { BaseReaderSection } from "../section";
-import { ReferenceFileSection } from "../section/FileSection";
+import { UsageFileSection } from "../section/FileSection";
 import InlineButton from "../common/InlineButton";
 import { pathNearnessSorter } from "../../utils/data";
-import "./References.css";
+import "./index.css";
 
 const MAX_FILES_TO_PREFETCH = 3;
 
-class References extends BaseReaderSection {
+class Usages extends BaseReaderSection {
   sectionName = "usages";
 
   state = {
-    references: [],
+    usages: [],
     hasCollapsedFiles: false
   };
 
-  clearState = name =>
-    this.setState({ references: [], name, count: undefined });
+  clearState = name => this.setState({ usages: [], name, count: undefined });
 
-  getReferenceObject = reference => {
+  getUsageObject = usage => {
     return {
-      lineNumber: reference.location.range.start.line,
-      codeSnippet: reference.contents,
-      startLineNumber: reference.contents_start_line
+      lineNumber: usage.location.range.start.line,
+      codeSnippet: usage.contents,
+      startLineNumber: usage.contents_start_line
     };
   };
 
-  getReferenceItems = (apiResult, hoverResult) => {
-    // Sort references by line number
-    let itemsObjects = apiResult.reduce((accumulator, reference) => {
-      const { path } = reference.location;
-      const obj = this.getReferenceObject(reference);
+  getUsageItems = (apiResult, hoverResult) => {
+    // Sort usages by line number
+    let itemsObjects = apiResult.reduce((accumulator, usage) => {
+      const { path } = usage.location;
+      const obj = this.getUsageObject(usage);
       accumulator[path] =
         path in accumulator ? [obj, ...accumulator[path]] : [obj];
       return accumulator;
@@ -41,8 +40,8 @@ class References extends BaseReaderSection {
       itemsObjects[key].sort((x, y) => x.lineNumber - y.lineNumber);
     });
 
-    const metadataObjects = apiResult.reduce((accumulator, reference) => {
-      const { path: filePath } = reference.location;
+    const metadataObjects = apiResult.reduce((accumulator, usage) => {
+      const { path: filePath } = usage.location;
       const { fileSha } = hoverResult;
       const link = this.getFileLink(fileSha, filePath);
       const obj = { filePath, fileSha, link };
@@ -75,23 +74,23 @@ class References extends BaseReaderSection {
           {
             name: hoverResult.name,
             count: result.count,
-            references: this.getReferenceItems(result.references, hoverResult)
+            usages: this.getUsageItems(result.references, hoverResult)
           },
-          () => this.fetchReferencesContents()
+          () => this.fetchUsagesContents()
         );
       });
     }
   };
 
-  fetchReferencesContents = () => {
-    const referencesCopy = [].concat(this.state.references);
-    const fetchable = referencesCopy.splice(0, MAX_FILES_TO_PREFETCH);
+  fetchUsagesContents = () => {
+    const usagesCopy = [].concat(this.state.usages);
+    const fetchable = usagesCopy.splice(0, MAX_FILES_TO_PREFETCH);
     fetchable.forEach(fileObject => this.fetchContents(fileObject));
   };
 
   renderItems = () => {
-    return this.state.references.map(fileObject => (
-      <ReferenceFileSection
+    return this.state.usages.map(fileObject => (
+      <UsageFileSection
         key={fileObject.filePath}
         path={fileObject.filePath}
         link={fileObject.link}
@@ -108,7 +107,7 @@ class References extends BaseReaderSection {
     this.setState({ hasCollapsedFiles: !this.state.hasCollapsedFiles });
 
   renderCollapseButton = () => {
-    const numFiles = Object.keys(this.state.references).length;
+    const numFiles = Object.keys(this.state.usages).length;
 
     if (numFiles <= 1) {
       // Don't show collapse button if there's just one file
@@ -148,4 +147,4 @@ function mapStateToProps(state) {
     data
   };
 }
-export default connect(mapStateToProps)(References);
+export default connect(mapStateToProps)(Usages);
