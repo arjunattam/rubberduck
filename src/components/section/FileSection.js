@@ -131,7 +131,7 @@ class FileSubSection extends React.Component {
 
   render() {
     const { isCollapsed } = this.state;
-    let sectionClassName = "references-file-section";
+    let sectionClassName = "usages-file-section";
     sectionClassName += isCollapsed ? " collapsed" : "";
 
     return (
@@ -150,7 +150,7 @@ class FileSubSection extends React.Component {
   }
 }
 
-export class ReferenceFileSection extends FileSubSection {
+export class UsageFileSection extends FileSubSection {
   getLabelStatus = () => {
     const count = this.props.items.length;
     return count === 1 ? "1 usage" : `${count} usages`;

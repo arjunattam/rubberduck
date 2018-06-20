@@ -129,7 +129,7 @@ class BaseWebSocket {
     });
   };
 
-  getReferences = (baseOrHead, filePath, lineNumber, charNumber) => {
+  getUsages = (baseOrHead, filePath, lineNumber, charNumber) => {
     const queryParams = {
       is_base_repo: baseOrHead === "base" ? "true" : "false",
       location_id: `${filePath}#L${lineNumber}#C${charNumber}`
@@ -323,8 +323,8 @@ class WebSocketManager {
     return this.getLSCallHelper(this.ws.getHover, ...params);
   };
 
-  getReferences = (...params) => {
-    return this.getLSCallHelper(this.ws.getReferences, ...params);
+  getUsages = (...params) => {
+    return this.getLSCallHelper(this.ws.getUsages, ...params);
   };
 
   getDefinition = (...params) => {

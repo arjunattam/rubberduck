@@ -17,13 +17,13 @@ const SectionHeaderIcon = props => {
   );
 };
 
-const SectionLoader = props => (
+const SectionLoader = () => (
   <div className="section-loader">
     <div className="status-loader" />
   </div>
 );
 
-const ReportIssue = props => (
+const ReportIssue = () => (
   <div
     className="section-loader section-report"
     onClick={e => {

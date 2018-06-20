@@ -1,4 +1,4 @@
-import parse from "what-the-diff";
+import parse from "diffparser";
 import { getGitService } from "../../adapters";
 import * as CrashReporting from "../crashes";
 
@@ -180,29 +180,26 @@ let BitbucketAPI = {
     return [403];
   },
 
-  parseLines(element, charToCheck) {
-    const hunkValues = element.hunks.map(hunk => {
-      const lines = hunk.lines;
-      return lines.reduce((total, line) => {
-        const num = line[0] === charToCheck ? 1 : 0;
-        return total + num;
-      }, 0);
-    });
-    return hunkValues.reduce((total, num) => total + num, 0);
-  },
-
-  getDiffData(parsedDiff) {
-    // Return file path, additions and deletions by parsing the diff
-    // Also uses git diff statuses: `added`, `renamed`, `modified`, `deleted`
+  getParsedDiff(rawDiff) {
+    const parsedDiff = parse(rawDiff);
     return parsedDiff.map(element => {
-      const additions = this.parseLines(element, "+");
-      const deletions = this.parseLines(element, "-");
-      const filePath = element.newPath || element.oldPath;
+      let status = "modified";
+      let filename = element.to;
+
+      if (element.to === "/dev/null") {
+        status = "deleted";
+        filename = element.from;
+      } else if (element.from === "/dev/null") {
+        status = "added";
+      } else if (element.to !== element.from) {
+        status = "renamed";
+      }
+
       return {
-        filename: filePath.replace("b/", ""),
-        additions: additions,
-        deletions: deletions,
-        status: element.status
+        filename,
+        status,
+        additions: element.additions,
+        deletions: element.deletions
       };
     });
   },
@@ -211,8 +208,7 @@ let BitbucketAPI = {
     const { username, reponame, prId } = repoDetails;
     const uriPath = `repositories/${username}/${reponame}/pullrequests/${prId}/diff/`;
     return this.makeConditionalGet(uriPath).then(response => {
-      const parsedDiff = parse.parse(response.data);
-      return { data: this.getDiffData(parsedDiff) };
+      return { data: this.getParsedDiff(response.data) };
     });
   },
 

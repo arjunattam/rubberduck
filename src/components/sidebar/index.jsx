@@ -8,7 +8,7 @@ import * as AnalyticsUtils from "../../utils/analytics";
 import Header from "header";
 import CollapseButton from "collapse/CollapseButton";
 import Tree from "tree";
-import References from "references";
+import Usages from "usages";
 import Definitions from "definitions";
 import HoverListener from "hover/HoverListener";
 import * as GithubLayout from "../../adapters/github/layout";
@@ -26,9 +26,10 @@ class Sidebar extends React.Component {
   }
 
   triggerReflow = () => {
-    const element = document.querySelector(
-      "#mercury-sidebar .sidebar-container"
-    );
+    // To trigger the left slide animation, we follow this:
+    // https://css-tricks.com/restart-css-animation/#article-header-id-0
+    const SELECTOR = "#mercury-sidebar .sidebar-container";
+    const element = document.querySelector(SELECTOR);
     element.classList.remove("will-slide-right");
     element.classList.add("will-slide-left");
   };
@@ -38,12 +39,10 @@ class Sidebar extends React.Component {
   toggleCollapse() {
     const { isSidebarVisible } = this.props.storage;
     if (isSidebarVisible) {
-      // To trigger the left slide animation, we follow this:
-      // https://css-tricks.com/restart-css-animation/#article-header-id-0
       this.triggerReflow();
       setTimeout(() => {
         this.updateStorage({ isSidebarVisible: false });
-      }, 150);
+      }, 100);
       AnalyticsUtils.logSidebarEvent(false);
     } else {
       this.updateStorage({ isSidebarVisible: true });
@@ -78,7 +77,7 @@ class Sidebar extends React.Component {
     />
   );
 
-  renderSidebar = width => (
+  renderFullSidebar = width => (
     <Resizable
       width={width}
       onResize={this.onResize}
@@ -89,11 +88,20 @@ class Sidebar extends React.Component {
       <div className="repo-info-sections">
         <Tree />
         <Definitions />
-        <References />
+        <Usages />
       </div>
       <HoverListener />
     </Resizable>
   );
+
+  renderCollapsedSidebar = width => {
+    return (
+      <div>
+        {this.renderCollapseButton(width)}
+        <HoverListener />
+      </div>
+    );
+  };
 
   getWidth = () =>
     this.props.data.data.sidebarWidth > 0
@@ -119,8 +127,8 @@ class Sidebar extends React.Component {
 
     if (shouldRenderSidebar) {
       renderOutput = isExpanded
-        ? this.renderSidebar(width)
-        : this.renderCollapseButton(width);
+        ? this.renderFullSidebar(width)
+        : this.renderCollapsedSidebar(width);
     }
 
     this.updatePageLayout(shouldRenderSidebar && isExpanded, width);

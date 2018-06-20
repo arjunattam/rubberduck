@@ -3,6 +3,8 @@ import { combineReducers } from "redux";
 import section from "./section";
 import repoDetails from "./repoDetails";
 import fileTree from "./fileTree";
+import definition from "./definition";
+import usages from "./usages";
 import hoverResult from "./hoverResult";
 import session from "./session";
 import fileContents from "./fileContents";
@@ -19,11 +21,13 @@ const data = createReducer(initialState, {
 
 const dataReducer = combineReducers({
   data,
-  fileTree,
   repoDetails,
   section,
-  hoverResult,
   session,
+  fileTree,
+  definition,
+  usages,
+  hoverResult,
   fileContents,
   pjax
 });
