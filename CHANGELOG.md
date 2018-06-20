@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.3
+
+June 20, 2018
+
+- Fix diff parsing which would break files tree for some Bitbucket repos
+- Persist usages and definitions state across open/collapse sidebar
+- Hover is available when the sidebar is collapsed
+
 ## 0.3.2
 
 June 18, 2018
