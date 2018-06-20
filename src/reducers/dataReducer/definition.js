@@ -1,7 +1,5 @@
 import { createReducer } from "redux-create-reducer";
 
-const initialState = {};
-
 const getFilePath = result =>
   result.definition && result.definition.location
     ? result.definition.location.path
@@ -32,21 +30,24 @@ const getDefinitionObject = (apiResult, hoverResult) => {
   };
 };
 
-export default createReducer(initialState, {
-  CALL_DEFINITIONS_PENDING: (state, action) => {
-    const { hoverResult } = action.meta;
-    const definition = { name: hoverResult.name };
-    return {
-      ...definition
-    };
-  },
-  CALL_DEFINITIONS_FULFILLED: (state, action) => {
-    const { result } = action.payload;
-    const { hoverResult } = action.meta;
-    const definition = getDefinitionObject(result, hoverResult);
-    return {
-      ...state,
-      ...definition
-    };
+export default createReducer(
+  {},
+  {
+    CALL_DEFINITIONS_PENDING: (state, action) => {
+      const { hoverResult } = action.meta;
+      const definition = { name: hoverResult.name };
+      return {
+        ...definition
+      };
+    },
+    CALL_DEFINITIONS_FULFILLED: (state, action) => {
+      const { result } = action.payload;
+      const { hoverResult } = action.meta;
+      const definition = getDefinitionObject(result, hoverResult);
+      return {
+        ...state,
+        ...definition
+      };
+    }
   }
-});
+);

@@ -4,6 +4,7 @@ import section from "./section";
 import repoDetails from "./repoDetails";
 import fileTree from "./fileTree";
 import definition from "./definition";
+import usages from "./usages";
 import hoverResult from "./hoverResult";
 import session from "./session";
 import fileContents from "./fileContents";
@@ -25,6 +26,7 @@ const dataReducer = combineReducers({
   session,
   fileTree,
   definition,
+  usages,
   hoverResult,
   fileContents,
   pjax

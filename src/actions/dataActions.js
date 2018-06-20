@@ -153,7 +153,10 @@ export function callUsages(data) {
         AnalyticsUtils.logResponse(ANALYTICS_NAME);
         return response;
       }
-    )
+    ),
+    meta: {
+      hoverResult: data
+    }
   };
 }
 
