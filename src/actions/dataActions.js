@@ -136,7 +136,8 @@ export function callDefinitions(data) {
       }
     ),
     meta: {
-      shouldCollapse: isTreeTooBig() && status === "ready"
+      shouldCollapse: isTreeTooBig() && status === "ready",
+      hoverResult: data
     }
   };
 }
