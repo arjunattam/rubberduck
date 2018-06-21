@@ -23,7 +23,9 @@ const GH_RESERVED_SUB_PAGES = [
   "settings",
   "pulse",
   "wiki",
-  "projects"
+  "projects",
+  "stargazers",
+  "issues"
 ];
 const GH_404_SEL = "#parallax_wrapper";
 const GH_AUTH_FORM_SEL = ".auth-form-body";
