@@ -66,8 +66,17 @@ class Folder extends React.Component {
   };
 
   isCurrentlyOpen = () => {
-    const { path: currentPath } = this.props.data.repoDetails;
-    return currentPath && currentPath.indexOf(this.props.path) >= 0;
+    const { path, data } = this.props;
+    const { path: currentPath } = data.repoDetails;
+    return currentPath && currentPath.indexOf(path) >= 0;
+  };
+
+  isLastOpenFolder = () => {
+    if (this.isCurrentlyOpen()) {
+      const { path, data } = this.props;
+      const { path: currentPath } = data.repoDetails;
+      return currentPath.replace(path, "").split("/").length === 2;
+    }
   };
 
   componentDidMount() {
@@ -82,6 +91,20 @@ class Folder extends React.Component {
     this.setState({
       isCollapsed
     });
+
+    if (this.isLastOpenFolder()) {
+      // Scroll the files tree to show the active file
+      const container = document.querySelector(
+        "#mercury-sidebar div.repo-info-sections"
+      );
+
+      if (this.folderEl && container) {
+        container.scrollTop =
+          this.folderEl.getBoundingClientRect().y -
+          container.getBoundingClientRect().y -
+          50;
+      }
+    }
   }
 
   renderFolderLabel = () => (
@@ -101,7 +124,12 @@ class Folder extends React.Component {
     containerClassName += isCollapsed ? " collapsed" : "";
 
     return (
-      <div className={containerClassName}>
+      <div
+        className={containerClassName}
+        ref={element => {
+          this.folderEl = element;
+        }}
+      >
         {this.renderFolderLabel()}
         {isCollapsed ? null : this.renderFolderStructure()}
       </div>

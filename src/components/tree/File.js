@@ -122,9 +122,8 @@ export default class File extends React.Component {
   };
 
   isSelected = () => {
-    const { path: filePath } = this.props;
-    const { repoDetails } = this.props.data;
-    const { path: currentPath } = repoDetails;
+    const { path: filePath, data } = this.props;
+    const { path: currentPath } = data.repoDetails;
     return currentPath === filePath;
   };
 
