@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4
+
+July 30, 2018
+
+- Scroll files tree to always show the active file
+
 ## 0.3.3
 
 June 20, 2018
