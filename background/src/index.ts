@@ -1,72 +1,31 @@
-const jsLocation = JS_ASSET_LOCATION; // will be replaced with actual location by script
-const cssLocation = CSS_ASSET_LOCATION; // will be replaced with actual location by script
+import { injector } from "./injector";
+import { sendMessageToTab } from "./utils";
+
+const jsLocation = "JS_ASSET_LOCATION"; // will be replaced with actual location by script
+const cssLocation = "CSS_ASSET_LOCATION"; // will be replaced with actual location by script
 
 const INJECTABLE_URLS = ["github.com", "bitbucket.org"];
-
-const DONT_INJECT_PATHS = ["/settings/tokens/new"];
 
 const UNINSTALLATION_FORM_LINK =
   "https://docs.google.com/forms/d/1fK-NaaxlPR2ImacKyTRVilN87NBAWkCgn8lXVbSROEQ";
 
 // This file injects js and css to the github/bitbucket page
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status !== "loading") return;
-
-  // Send message on every URL change to content script
-  if (changeInfo.url) {
-    sendMessageToTab(tabId, "URL_UPDATE", changeInfo.url);
-  }
-
-  // To ensure we don't inject the extension twice
-  const injectFlagCode =
-    "var injected = window.mercuryInjected; window.mercuryInjected = true; injected;";
-
-  if (!tab.url || INJECTABLE_URLS.indexOf(extractHostname(tab.url)) < 0) {
-    // Tab hostname is not in the INJECTABLE_URLS
-    return;
-  }
-
-  if (DONT_INJECT_PATHS.indexOf(extractPath(tab.url)) >= 0) {
-    // We don't inject anything in the github "confirm password" screen
-    // This might not be an exhaustive set of path names
-    return;
-  }
-
-  chrome.tabs.executeScript(
-    tabId,
-    { code: injectFlagCode, runAt: "document_end" },
-    res => {
-      if (chrome.runtime.lastError || res[0])
-        // Don't continue if error (i.e. page isn't in permission list)
-        // Or if the value of `injected` above: we don't want to inject twice
-        return;
-
-      if (jsLocation !== null) {
-        chrome.tabs.executeScript(tabId, {
-          file: jsLocation,
-          runAt: "document_end"
-        });
-      }
-
-      if (cssLocation !== null) {
-        chrome.tabs.insertCSS(tabId, {
-          file: cssLocation,
-          runAt: "document_end"
-        });
-      }
-    }
-  );
+  return injector(tabId, changeInfo, tab, jsLocation, cssLocation);
 });
 
 chrome.storage.onChanged.addListener(function(changes, namespace) {
   let storageChanges = {};
-  for (key in changes) {
+  const keys = Object.keys(changes);
+
+  keys.forEach(key => {
     let storageChange = changes[key];
     storageChanges = {
       ...storageChanges,
       [key]: storageChange.newValue
     };
-  }
+  });
+
   sendMessageToAllTabs("STORAGE_UPDATED", storageChanges);
 });
 
@@ -93,18 +52,6 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
 if (chrome.runtime.setUninstallURL) {
   chrome.runtime.setUninstallURL(UNINSTALLATION_FORM_LINK);
 }
-
-// Helper method to send message to specific tab(by id) in content script.
-const sendMessageToTab = (tabId, action, data) => {
-  chrome.tabs.sendMessage(
-    tabId,
-    {
-      action: action,
-      data: data
-    },
-    res => {}
-  );
-};
 
 const sendMessageToAllTabs = (action, data) => {
   chrome.tabs.query({}, function(tabs) {
@@ -192,7 +139,7 @@ function postAjax(fulldata, success) {
           })
           .join("&");
 
-  var xhr = window.XMLHttpRequest
+  var xhr = (<any>window).XMLHttpRequest
     ? new XMLHttpRequest()
     : new ActiveXObject("Microsoft.XMLHTTP");
   xhr.open("POST", url);
@@ -208,7 +155,7 @@ function postAjax(fulldata, success) {
 
 function getAjax(data, success) {
   const { url } = data;
-  var xhr = window.XMLHttpRequest
+  var xhr = (<any>window).XMLHttpRequest
     ? new XMLHttpRequest()
     : new ActiveXObject("Microsoft.XMLHTTP");
   xhr.open("GET", url);
@@ -218,14 +165,3 @@ function getAjax(data, success) {
   xhr.send();
   return xhr;
 }
-
-// Helper method to extract hostname from url
-const extractHostname = url => {
-  const parsed = new URL(url);
-  return parsed.hostname;
-};
-
-const extractPath = url => {
-  const parsed = new URL(url);
-  return parsed.pathname;
-};

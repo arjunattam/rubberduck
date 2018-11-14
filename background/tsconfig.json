@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "outDir": "../public/background",
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": false,
+    "allowJs": true,
+    "types": ["chrome"],
+    "rootDir": "src"
+  },
+  "include": ["src/**/*"]
+}

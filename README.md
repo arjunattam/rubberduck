@@ -56,9 +56,9 @@ This repo is the chrome extension for the mercury project.
 
 ## Development keys setup
 
-* To be able to pack crx (for production), you need to setup `keys/production_key.pem` in your project directory. Get this key from [here](https://drive.google.com/drive/u/0/folders/1ABADv_hmG2FAsPYJokvv_FBw-z_nMQUT) (needs Google account).
+- To be able to pack crx (for production), you need to setup `keys/production_key.pem` in your project directory. Get this key from [here](https://drive.google.com/drive/u/0/folders/1ABADv_hmG2FAsPYJokvv_FBw-z_nMQUT) (needs Google account).
 
-* This should not be required if we are distributing the extension through the Chrome Store. See below for publishing.
+- This should not be required if we are distributing the extension through the Chrome Store. See below for publishing.
 
 ## Publishing
 
@@ -78,11 +78,22 @@ This repo is the chrome extension for the mercury project.
 
 The extension has three components
 
-1.  [Background page](public/background.js): this is the main page of the extension (also called "event page") in the docs. The background page listens for some chrome events, and injects scripts to the page.
+1.  Background page (see below): this is the main page of the extension (also called "event page") in the docs. The background page listens for some chrome events, and injects scripts to the page.
 
 2.  [Content script](src/index.js): this is the script that is injected in the page using [programmatic injection](https://developer.chrome.com/extensions/content_scripts#pi). Since the injected script renders elements, this is built using React.
 
 3.  [Options page](public/options.html): this is the settings page. Not much to see here.
+
+### Background page
+
+This is generated via typescript src (located at `background/src/index.ts`). Any change in this source needs to be compiled via typescript. This is configured by following [chrome-extension-typescript-starter](https://github.com/chibat/chrome-extension-typescript-starter).
+
+    ```
+    cd background
+    npm run build
+    ```
+
+This will create a file `public/background/index.js` which is then used by the `npm run...` commands.
 
 ### Docs
 

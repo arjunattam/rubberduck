@@ -20,10 +20,11 @@ const stagingManifestKey =
  * @param {*} buildPath
  */
 const updateBackground = buildPath => {
-  const backgroundJS = `${buildPath}/background.js`;
-  const jsPlaceholder = "JS_ASSET_LOCATION";
-  const cssPlaceholder = "CSS_ASSET_LOCATION";
+  const backgroundJS = `${buildPath}/background/index.js`;
+  const jsPlaceholder = '"JS_ASSET_LOCATION"';
+  const cssPlaceholder = '"CSS_ASSET_LOCATION"';
   const assetManifest = `${buildPath}/asset-manifest.json`;
+
   // Get contents to override
   let jsLocation = '"./static/js/bundle.js"';
   let cssLocation = "null";
