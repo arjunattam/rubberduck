@@ -4,11 +4,13 @@ const INJECTABLE_URLS = ["github.com", "bitbucket.org"];
 
 const DONT_INJECT_PATHS = ["/settings/tokens/new"];
 
-export const injector = (tabId, changeInfo, tab, jsLocation, cssLocation) => {
-  console.log("logging location");
-  console.log(jsLocation);
-  console.log(cssLocation);
-
+export const injectScript = (
+  tabId,
+  changeInfo,
+  tab,
+  jsLocation,
+  cssLocation
+) => {
   if (changeInfo.status !== "loading") return;
 
   // Send message on every URL change to content script

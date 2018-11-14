@@ -9,3 +9,11 @@ export const sendMessageToTab = (tabId, action, data) => {
     res => {}
   );
 };
+
+export const sendMessageToAllTabs = (action, data) => {
+  chrome.tabs.query({}, function(tabs) {
+    for (let i = 0; i < tabs.length; ++i) {
+      sendMessageToTab(tabs[i].id, action, data);
+    }
+  });
+};
