@@ -28,3 +28,6 @@ keys/**
 
 # chrome zip bundle
 bundle.zip
+
+# background ts output
+public/background
