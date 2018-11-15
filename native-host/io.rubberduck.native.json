@@ -1,0 +1,7 @@
+{
+  "name": "io.rubberduck.native",
+  "description": "rubberduck-native-host",
+  "path": "/Users/arjun/mercury-extension/native-host/bin/index-macos",
+  "type": "stdio",
+  "allowed_origins": ["chrome-extension://acfcmnpdampidgafadmjcddikildmapg/"]
+}

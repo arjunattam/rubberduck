@@ -2,12 +2,17 @@ import * as http from "./http";
 import * as storage from "./storage";
 import * as permissions from "./permissions";
 import * as auth from "./auth";
-import * as git from "./git";
 
 interface IMessageRequest {
   message: string;
   data: any;
 }
+
+const application = "io.rubberduck.native";
+const port = chrome.runtime.connectNative(application);
+
+port.onMessage.addListener(msg => console.log("on message", msg));
+port.onDisconnect.addListener(() => console.log("port disconnected"));
 
 export const onMessageReceived = (
   req: IMessageRequest,
@@ -15,6 +20,7 @@ export const onMessageReceived = (
   resultCallback
 ) => {
   console.log("Message received", req);
+  port.postMessage({ type: req.message });
 
   // TODO(arjun): handle runtime.lastError for each of these handlers
   // https://developer.chrome.com/apps/runtime#property-lastError

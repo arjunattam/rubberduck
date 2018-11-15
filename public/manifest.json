@@ -26,7 +26,8 @@
     "https://bitbucket.org/*",
     "https://www.codeview.io/*",
     "storage",
-    "identity"
+    "identity",
+    "nativeMessaging"
   ],
   "optional_permissions": ["<all_urls>"],
   "icons": {
