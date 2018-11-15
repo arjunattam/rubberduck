@@ -13,9 +13,14 @@
     "type": "git",
     "url": "https://github.com/chibat/chrome-extension-typescript-starter.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "browserfs": "^1.4.3",
+    "fs-remote": "^0.1.9",
+    "isomorphic-git": "^0.39.4"
+  },
   "devDependencies": {
     "@types/chrome": "^0.0.75",
+    "@types/webpack-env": "^1.13.6",
     "ts-loader": "~5.0.0",
     "typescript": "~3.0.3",
     "webpack": "~4.17.2",

@@ -3,6 +3,7 @@
   "name": "Rubberduck",
   "short_name": "Rubberduck",
   "description": "Code review assistant for GitHub and Bitbucket",
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
   "version": "0.3.4",
   "background": {
     "persistent": false,

@@ -2,13 +2,18 @@ import * as http from "./http";
 import * as storage from "./storage";
 import * as permissions from "./permissions";
 import * as auth from "./auth";
+import * as git from "./git";
 
 interface IMessageRequest {
   message: string;
   data: any;
 }
 
-export const onMessageReceived = (req: IMessageRequest, sender, sendRes) => {
+export const onMessageReceived = (
+  req: IMessageRequest,
+  sender,
+  resultCallback
+) => {
   console.log("Message received", req);
 
   // TODO(arjun): handle runtime.lastError for each of these handlers
@@ -22,7 +27,7 @@ export const onMessageReceived = (req: IMessageRequest, sender, sendRes) => {
     HTTP_POST: http.postAjax,
     PERMISSIONS_UPDATE: permissions.updatePermissions
   };
-  handlers[req.message](req.data, sendRes);
+  handlers[req.message](req.data, resultCallback);
 
   // Return true to inform that we will send response async
   return true;

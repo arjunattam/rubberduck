@@ -5,7 +5,7 @@
     "target": "es6",
     "sourceMap": false,
     "allowJs": true,
-    "types": ["chrome"],
+    "types": ["chrome", "webpack-env"],
     "rootDir": "src"
   },
   "include": ["src/**/*"]

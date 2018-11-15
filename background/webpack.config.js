@@ -9,12 +9,6 @@ module.exports = {
     path: path.join(__dirname, "../public/background"),
     filename: "index.js"
   },
-  optimization: {
-    splitChunks: {
-      name: "vendor",
-      chunks: "initial"
-    }
-  },
   module: {
     rules: [
       {
