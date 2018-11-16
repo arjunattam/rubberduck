@@ -1,6 +1,6 @@
-# mercury-extension
+# Rubberduck
 
-This repo is the chrome extension for the mercury project.
+This repository contains the Rubberduck chrome extension, and the native host app (inside `native-host`).
 
 ## Setup
 
@@ -10,10 +10,10 @@ This repo is the chrome extension for the mercury project.
     yarn
     ```
 
-2.  For development, we will run the dev server, and load an unpacked extension on Chrome from `build/`. See [how to](https://developer.chrome.com/extensions/getstarted#unpacked). Open an [example github url](https://github.com/pallets/flask) to see this in action.
+2.  For development, run this in watch mode. Note: this will require the native host to be configured first (see [native-host/README.md](native-host/README.md))
 
     ```
-    npm run start-local
+    npm run watch
     ```
 
 3.  To distribute binary file, we can pack the extension into a crx file. Generate new crx using the command. Packing needs keys (see below).
@@ -27,32 +27,6 @@ This repo is the chrome extension for the mercury project.
     ```
     yarn test
     ```
-
-## Testing with localhost
-
-1.  Run the local server
-
-    ```
-    python manage.py runserver
-    ```
-
-2.  Run the extension
-
-    ```
-    npm run start-local
-    ```
-
-3.  Load the unpacked extension in your Chrome from the build location: `build-local/`. The production and local builds can co-exist on Chrome, and you can enable/disable through `chrome://extensions`.
-
-## Testing with staging
-
-1.  Run the extension
-
-    ```
-    npm run start-staging
-    ```
-
-2.  Load the unpacked extension in your Chrome from the build location: `build-staging/`. The production and local builds can co-exist on Chrome, and you can enable/disable through `chrome://extensions`.
 
 ## Development keys setup
 
@@ -76,24 +50,13 @@ This repo is the chrome extension for the mercury project.
 
 ## Architecture
 
-The extension has three components
+The extension has three components, which are bundled individually through Webpack.
 
-1.  Background page (see below): this is the main page of the extension (also called "event page") in the docs. The background page listens for some chrome events, and injects scripts to the page.
+1.  Background page: this is the main page of the extension (also called "event page") in the docs. The background page listens for some chrome events, and injects scripts to the page.
 
-2.  [Content script](src/index.js): this is the script that is injected in the page using [programmatic injection](https://developer.chrome.com/extensions/content_scripts#pi). Since the injected script renders elements, this is built using React.
+2.  Content script: this is the script that is injected in the page using [programmatic injection](https://developer.chrome.com/extensions/content_scripts#pi). Since the injected script renders elements, this is built using React.
 
-3.  [Options page](public/options.html): this is the settings page. Not much to see here.
-
-### Background page
-
-This is generated via typescript src (located at `background/src/index.ts`). Any change in this source needs to be compiled via typescript. This is configured by following [chrome-extension-typescript-starter](https://github.com/chibat/chrome-extension-typescript-starter).
-
-    ```
-    cd background
-    npm run build
-    ```
-
-This will create a file `public/background/index.js` which is then used by the `npm run...` commands.
+3.  Options page: this is the settings page. Not much to see here.
 
 ### Docs
 

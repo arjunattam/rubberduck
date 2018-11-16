@@ -7,9 +7,9 @@
   "version": "0.3.4",
   "background": {
     "persistent": false,
-    "scripts": ["background/index.js"]
+    "scripts": ["js/vendor.js", "js/background.js"]
   },
-  "options_page": "options/index.html",
+  "options_page": "options_page.html",
   "web_accessible_resources": ["fonts/*.woff2"],
   "content_scripts": [
     {

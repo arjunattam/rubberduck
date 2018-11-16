@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": false,
+    "allowJs": true,
+    "rootDir": "src",
+    "outDir": "public/js",
+    "noEmitOnError": true,
+    "types": ["chrome", "webpack-env"]
+  },
+  "include": ["src/**/*"],
+  "exclude": [
+    "webpack/*",
+    "public/**/*",
+    "node_modules",
+    "native-host/**/*",
+    "__mocks__/*"
+  ]
+}

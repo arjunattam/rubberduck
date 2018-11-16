@@ -1,12 +1,20 @@
 import { injectScript } from "./injector";
 import { onStorageChanged } from "./storage";
+import { sendMessageToTab } from "./utils";
 import { onMessageReceived } from "./messageHandlers";
 
-const jsLocation = "JS_ASSET_LOCATION"; // will be replaced with actual location by script
-const cssLocation = "CSS_ASSET_LOCATION"; // will be replaced with actual location by script
+// const jsLocation = "js/"; // will be replaced with actual location by script
+// const cssLocation = null;
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  return injectScript(tabId, changeInfo, tab, jsLocation, cssLocation);
+  if (changeInfo.status !== "loading") return;
+
+  if (changeInfo.url) {
+    // Send message on every URL change to content script
+    sendMessageToTab(tabId, "URL_UPDATE", changeInfo.url);
+  }
+
+  return injectScript(tabId, changeInfo, tab);
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
@@ -20,6 +28,6 @@ chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
 const UNINSTALLATION_FORM_LINK =
   "https://docs.google.com/forms/d/1fK-NaaxlPR2ImacKyTRVilN87NBAWkCgn8lXVbSROEQ";
 
-if (chrome.runtime.setUninstallURL) {
+if (!!chrome.runtime.setUninstallURL) {
   chrome.runtime.setUninstallURL(UNINSTALLATION_FORM_LINK);
 }

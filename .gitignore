@@ -7,9 +7,7 @@ node_modules
 /coverage
 
 # production
-/build
-/build-local
-/build-staging
+public/js
 
 # misc
 .DS_Store
@@ -29,5 +27,5 @@ keys/**
 # chrome zip bundle
 bundle.zip
 
-# background ts output
-public/background
+# generated files
+public/manifest.json

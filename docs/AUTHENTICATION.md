@@ -1,5 +1,7 @@
 # Authentication flow
 
+(**NOTE**: this is probably irrelevant for 0.4.0)
+
 Mandatory reading: [unique client id for installation](https://stackoverflow.com/a/23854032/1469222).
 
 ## Extension state
