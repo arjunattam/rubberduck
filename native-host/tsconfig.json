@@ -3,6 +3,7 @@
     "outDir": "build",
     "target": "es5",
     "module": "commonjs",
+    "lib": ["es6"],
     "strict": true,
     "rootDir": "src",
     "types": ["node"],

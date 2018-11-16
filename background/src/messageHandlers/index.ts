@@ -8,19 +8,12 @@ interface IMessageRequest {
   data: any;
 }
 
-const application = "io.rubberduck.native";
-const port = chrome.runtime.connectNative(application);
-
-port.onMessage.addListener(msg => console.log("on message", msg));
-port.onDisconnect.addListener(() => console.log("port disconnected"));
-
 export const onMessageReceived = (
   req: IMessageRequest,
   sender,
   resultCallback
 ) => {
   console.log("Message received", req);
-  port.postMessage({ type: req.message });
 
   // TODO(arjun): handle runtime.lastError for each of these handlers
   // https://developer.chrome.com/apps/runtime#property-lastError
@@ -31,10 +24,43 @@ export const onMessageReceived = (
     STORAGE_GET_ALL: storage.getAllFromStorage,
     HTTP_GET: http.getAjax,
     HTTP_POST: http.postAjax,
-    PERMISSIONS_UPDATE: permissions.updatePermissions
+    PERMISSIONS_UPDATE: permissions.updatePermissions,
+
+    // For native messaging
+    NATIVE_INFO: "",
+    NATIVE_INITIALIZE: "",
+    NATIVE_HOVER: "",
+    NATIVE_DEFINITION: "",
+    NATIVE_REFERENCES: ""
   };
   handlers[req.message](req.data, resultCallback);
 
   // Return true to inform that we will send response async
   return true;
 };
+
+// const testLS = async () => {
+//   port.postMessage({ type: "INFO", payload: {} });
+//   port.postMessage({
+//     type: "INITIALIZE",
+//     payload: { rootUri: "file:///Users/arjun/mercury-extension/native-host" }
+//   });
+
+//   port.postMessage({
+//     type: "DEFINITION",
+//     payload: {
+//       fileUri: "file:///Users/arjun/mercury-extension/native-host/src/index.ts",
+//       line: 0,
+//       character: 11
+//     }
+//   });
+
+//   port.postMessage({
+//     type: "REFERENCES",
+//     payload: {
+//       fileUri: "file:///Users/arjun/mercury-extension/native-host/src/index.ts",
+//       line: 0,
+//       character: 11
+//     }
+//   });
+// };
