@@ -1,18 +1,24 @@
 {
   "name": "rubberduck-native-host",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Native host application for the Rubberduck chrome extension",
   "main": "build/index.js",
   "scripts": {
-    "build": "tsc && npx pkg build/index.js --out-dir bin",
+    "pack": "npx pkg build/index.js -o bin/rubberduck-native -t node9-macos-x64,node9-linux-x64,node9-win-x64",
+    "register": "sh register.sh",
+    "build": "tsc && npm run pack && npm run register",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@types/node": "^10.12.8",
+    "@types/uuid": "^3.4.4",
     "pkg": "4.3.1",
     "typescript": "^3.1.6"
   },
   "dependencies": {
-    "chrome-native-messaging": "^0.2.0"
+    "chrome-native-messaging": "^0.2.0",
+    "javascript-typescript-langserver": "^2.11.1",
+    "typescript-language-server": "^0.3.6",
+    "uuid": "^3.3.2"
   }
 }
