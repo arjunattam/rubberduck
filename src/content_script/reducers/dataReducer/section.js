@@ -49,16 +49,16 @@ export default createReducer(initialState, {
   CALL_TREE_REJECTED: (state, action) =>
     updateIsLoading(state, { tree: false }),
 
-  CALL_DEFINITIONS_PENDING: (state, action) => {
+  CALL_DEFINITION_PENDING: (state, action) => {
     const { shouldCollapse } = action.meta;
     const newOpenSection = shouldCollapse ? { tree: false } : {};
     return updateIsLoading(state, { definitions: true }, newOpenSection);
   },
 
-  CALL_DEFINITIONS_FULFILLED: (state, action) =>
+  CALL_DEFINITION_FULFILLED: (state, action) =>
     updateIsLoading(state, { definitions: false }, { definitions: true }),
 
-  CALL_DEFINITIONS_REJECTED: (state, action) =>
+  CALL_DEFINITION_REJECTED: (state, action) =>
     updateIsLoading(state, { definitions: false }),
 
   CALL_USAGES_PENDING: (state, action) =>

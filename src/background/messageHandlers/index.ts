@@ -2,6 +2,7 @@ import * as http from "./http";
 import * as storage from "./storage";
 import * as permissions from "./permissions";
 import * as auth from "./auth";
+import NativeMessenger from "./native";
 
 interface IMessageRequest {
   message: string;
@@ -27,40 +28,15 @@ export const onMessageReceived = (
     PERMISSIONS_UPDATE: permissions.updatePermissions,
 
     // For native messaging
-    NATIVE_INFO: "",
-    NATIVE_INITIALIZE: "",
-    NATIVE_HOVER: "",
-    NATIVE_DEFINITION: "",
-    NATIVE_REFERENCES: ""
+    NATIVE_INFO: (data, cb) => NativeMessenger.info(data, cb),
+    NATIVE_INITIALIZE: (data, cb) => NativeMessenger.initialize(data, cb),
+    NATIVE_HOVER: (data, cb) => NativeMessenger.hover(data, cb),
+    NATIVE_DEFINITION: (data, cb) => NativeMessenger.definition(data, cb),
+    NATIVE_REFERENCES: (data, cb) => NativeMessenger.references(data, cb),
+    NATIVE_FILE_CONTENTS: (data, cb) => NativeMessenger.contents(data, cb)
   };
   handlers[req.message](req.data, resultCallback);
 
   // Return true to inform that we will send response async
   return true;
 };
-
-// const testLS = async () => {
-//   port.postMessage({ type: "INFO", payload: {} });
-//   port.postMessage({
-//     type: "INITIALIZE",
-//     payload: { rootUri: "file:///Users/arjun/mercury-extension/native-host" }
-//   });
-
-//   port.postMessage({
-//     type: "DEFINITION",
-//     payload: {
-//       fileUri: "file:///Users/arjun/mercury-extension/native-host/src/index.ts",
-//       line: 0,
-//       character: 11
-//     }
-//   });
-
-//   port.postMessage({
-//     type: "REFERENCES",
-//     payload: {
-//       fileUri: "file:///Users/arjun/mercury-extension/native-host/src/index.ts",
-//       line: 0,
-//       character: 11
-//     }
-//   });
-// };

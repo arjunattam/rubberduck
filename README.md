@@ -57,8 +57,3 @@ The extension has three components, which are bundled individually through Webpa
 2.  Content script: this is the script that is injected in the page using [programmatic injection](https://developer.chrome.com/extensions/content_scripts#pi). Since the injected script renders elements, this is built using React.
 
 3.  Options page: this is the settings page. Not much to see here.
-
-### Docs
-
-1.  [Authentication](docs/AUTHENTICATION.md)
-2.  [Development](docs/DEVELOPMENT.md)

@@ -2,10 +2,9 @@ import Store from "../store";
 import { bindActionCreators } from "redux";
 import WebSocketAsPromised from "websocket-as-promised";
 import Authorization from "./authorization";
-import { getGitService } from "../adapters";
 import * as DataActions from "../actions/dataActions";
 import * as CrashReporting from "./crashes";
-import * as AnalyticsUtils from ".//analytics";
+import * as AnalyticsUtils from "./analytics";
 
 function exponentialBackoff(attempt, delay) {
   return Math.floor(Math.random() * Math.pow(2, attempt) * delay);
@@ -29,10 +28,12 @@ class BaseWebSocket {
 
   createWebsocket = onClose => {
     const token = Authorization.getToken();
+
     if (this.wsp === null) {
       const rootUrl = Authorization.getBaseUrl();
       const baseWsUrl = rootUrl.replace("http", "ws");
       const wsUrl = `${baseWsUrl}sessions/?token=${token}`;
+
       this.wsp = new WebSocketAsPromised(wsUrl, {
         packMessage: data => JSON.stringify(data),
         unpackMessage: message => JSON.parse(message),
@@ -84,26 +85,26 @@ class BaseWebSocket {
   };
 
   createPRSession = params => {
-    const { organisation, name, pull_request_id } = params;
+    const { organisation, name, pull_request_id, service } = params;
     return this.sendRequest({
       type: "session.create",
       payload: {
         organisation,
         name,
-        service: getGitService(),
+        service,
         pull_request_id
       }
     });
   };
 
   createCompareSession = params => {
-    const { organisation, name, head_sha, base_sha } = params;
+    const { organisation, name, head_sha, base_sha, service } = params;
     return this.sendRequest({
       type: "session.create",
       payload: {
         organisation,
         name,
-        service: getGitService(),
+        service,
         head_sha,
         base_sha
       }
@@ -317,22 +318,6 @@ class WebSocketManager {
         reject();
       });
     }
-  };
-
-  getHover = (...params) => {
-    return this.getLSCallHelper(this.ws.getHover, ...params);
-  };
-
-  getUsages = (...params) => {
-    return this.getLSCallHelper(this.ws.getUsages, ...params);
-  };
-
-  getDefinition = (...params) => {
-    return this.getLSCallHelper(this.ws.getDefinition, ...params);
-  };
-
-  getFileContents = (...params) => {
-    return this.getLSCallHelper(this.ws.getFileContents, ...params);
   };
 }
 

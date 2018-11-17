@@ -1,5 +1,6 @@
 import { log } from "./logger";
 import { TypeScriptServer, spawnServer } from "./tsServer";
+import { readFile, constructFileUri, constructRootUri, clean } from "./utils";
 const nativeMessage = require("chrome-native-messaging");
 
 const VERSION = "0.1.0";
@@ -9,17 +10,26 @@ enum RequestType {
   Initialize = "INITIALIZE",
   Hover = "HOVER",
   Definition = "DEFINITION",
-  References = "REFERENCES"
+  References = "REFERENCES",
+  FileContents = "FILE_CONTENTS"
 }
 
 interface InitializePayload {
-  rootUri: string;
+  // TODO: add sha support here
+  user: string;
+  repo: string;
+  service: string;
 }
 
 interface LanguageQueryPayload {
-  fileUri: string;
+  path: string;
+  sha: string;
   line: number;
   character: number;
+}
+
+interface FileContentsPayload {
+  path: string;
 }
 
 interface IMessage {
@@ -36,51 +46,68 @@ const tsServer = new TypeScriptServer(serverProcess);
 const transformInput = async (message: IMessage, push: any, done: any) => {
   log(`Received: ${JSON.stringify(message)}`);
 
+  const sendResponse = (response: any) => {
+    const result = clean(response);
+    log(`Responding: ${JSON.stringify(result)}`);
+    push(result);
+  };
+
   switch (message.type) {
     case RequestType.Info:
-      push({ version: VERSION });
+      sendResponse({ version: VERSION, id: message.id });
       done();
       break;
     case RequestType.Initialize:
       const initPayload = <InitializePayload>message.payload;
-      push({
-        result: await tsServer.initialize(message.id, initPayload.rootUri)
-      });
+      sendResponse(
+        await tsServer.initialize(
+          message.id,
+          constructRootUri(initPayload.repo)
+        )
+      );
       done();
       break;
     case RequestType.Hover:
       const hoverPayload = <LanguageQueryPayload>message.payload;
-      push({
-        result: await tsServer.hover(
+      sendResponse(
+        await tsServer.hover(
           message.id,
-          hoverPayload.fileUri,
+          constructFileUri(hoverPayload.path),
           hoverPayload.line,
           hoverPayload.character
         )
-      });
+      );
       done();
       break;
     case RequestType.Definition:
-      const definitionPayload = <LanguageQueryPayload>message.payload;
-      push({
-        result: await tsServer.definition(
+      const defPayload = <LanguageQueryPayload>message.payload;
+      sendResponse(
+        await tsServer.definition(
           message.id,
-          definitionPayload.fileUri,
-          definitionPayload.line,
-          definitionPayload.character
+          constructFileUri(defPayload.path),
+          defPayload.line,
+          defPayload.character
         )
-      });
+      );
       done();
       break;
     case RequestType.References:
       const refsPayload = <LanguageQueryPayload>message.payload;
-      push({
-        result: await tsServer.references(
+      sendResponse(
+        await tsServer.references(
           message.id,
-          refsPayload.fileUri,
+          constructFileUri(refsPayload.path),
           refsPayload.line,
           refsPayload.character
         )
+      );
+      done();
+      break;
+    case RequestType.FileContents:
+      const filePayload = <FileContentsPayload>message.payload;
+      sendResponse({
+        contents: await readFile(constructFileUri(filePayload.path)),
+        id: message.id
       });
       done();
       break;

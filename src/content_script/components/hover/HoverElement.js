@@ -46,11 +46,6 @@ export default class HoverElement extends React.Component {
     return xdiff <= CURSOR_RADIUS && ydiff <= CURSOR_RADIUS;
   };
 
-  getDefinitionPath = result => {
-    const { definition } = result;
-    return definition ? definition.location.path : "";
-  };
-
   callAPI = () => {
     if (!this.isValidResult(this.props.hoverResult)) return;
 
@@ -58,17 +53,13 @@ export default class HoverElement extends React.Component {
     this.DataActions.callHover(this.props.hoverResult).then(response => {
       const { mouseX, mouseY } = this.props.hoverResult;
       const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
-      const { result } = response.value;
+      const { value: result } = response;
 
       if (isForCurrentMouse) {
         // We will set state only if the current
         // mouse location overlaps with the response
-        const apiResult = {
-          ...result,
-          filePath: this.getDefinitionPath(result)
-        };
         this.setState({
-          apiResult,
+          apiResult: result,
           hoverResult: this.props.hoverResult
         });
       }

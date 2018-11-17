@@ -3,9 +3,6 @@ import { onStorageChanged } from "./storage";
 import { sendMessageToTab } from "./utils";
 import { onMessageReceived } from "./messageHandlers";
 
-// const jsLocation = "js/"; // will be replaced with actual location by script
-// const cssLocation = null;
-
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
 

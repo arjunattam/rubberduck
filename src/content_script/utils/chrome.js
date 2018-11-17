@@ -2,9 +2,6 @@
 // This file has utilities for content script to send and receive messages
 // Documentation: https://developer.chrome.com/extensions/messaging
 
-/* Define global to fix linter error */
-/* global chrome */
-
 export const SEND_MESSAGE_TYPES = [
   "AUTH_TRIGGER",
   "STORAGE_GET_ALL",
@@ -12,24 +9,32 @@ export const SEND_MESSAGE_TYPES = [
   "STORAGE_LOCAL_SET",
   "PERMISSIONS_UPDATE",
   "HTTP_POST",
-  "HTTP_GET"
+  "HTTP_GET",
+
+  // Messages for native host
+  "NATIVE_INFO",
+  "NATIVE_INITIALIZE",
+  "NATIVE_HOVER",
+  "NATIVE_DEFINITION",
+  "NATIVE_REFERENCES",
+  "NATIVE_FILE_CONTENTS"
 ];
 
 export const RECEIVE_MESSAGE_TYPES = ["URL_UPDATE"];
 
-export const constructMessage = (type, data) => {
-  // Check if this is a valid type
+const construct = (type, data) => {
   if (SEND_MESSAGE_TYPES.indexOf(type) < 0) {
     throw new Error("Not a valid message type.");
   }
 
   return {
     message: type,
-    data: data
+    data
   };
 };
 
-export const sendMessage = (message, callback) => {
+export const sendMessage = (type, data, callback) => {
+  const message = construct(type, data);
   chrome.runtime.sendMessage(message, function(response) {
     if (callback) {
       callback(response);
@@ -37,7 +42,18 @@ export const sendMessage = (message, callback) => {
   });
 };
 
-// Handler for messages from background.js
+export const sendMessagePromise = (type, data) => {
+  const message = construct(type, data);
+
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(message, result => {
+      // TODO: can potentially handle errors as rejects
+      // Need to define the error payload spec before that
+      resolve(result);
+    });
+  });
+};
+
 export const addChromeListener = cb => {
   chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
     cb(req.action, req.data);

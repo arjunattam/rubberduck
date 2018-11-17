@@ -2,6 +2,7 @@ import * as cp from "child_process";
 import { Reader } from "./wireProtocol";
 import { log } from "../logger";
 import { CallbackMap } from "./callbackMap";
+import { toPath } from "../utils";
 
 // https://github.com/theia-ide/typescript-language-server
 const THEIA_LS_SERVER = {
@@ -21,10 +22,6 @@ export const spawnServer = (): cp.ChildProcess => {
   return cp.spawn(LS_SERVER.binary, LS_SERVER.args, {
     stdio: ["pipe", "pipe", "pipe"]
   });
-};
-
-const toPath = (uriPath: string) => {
-  return uriPath.replace("file://", "");
 };
 
 export class TypeScriptServer {
@@ -51,7 +48,6 @@ export class TypeScriptServer {
   }
 
   sendRequest(requestId: string, method: string, params: object) {
-    // Assumes all requests expect a result
     const request = {
       jsonrpc: "2.0",
       id: requestId,
@@ -101,15 +97,14 @@ export class TypeScriptServer {
   handleMessage(message: any) {
     // Can potentially handle `window/logMessage` type differently for logging
     log(`Server handleMessage: ${JSON.stringify(message)}`);
-
-    const { id: messageId, result } = message;
+    const { id: messageId } = message;
     const callback = this.callbacks.fetch(messageId);
 
     if (!callback) {
       return;
     }
 
-    callback.onSuccess(result);
+    callback.onSuccess(message);
   }
 
   handleExit(code: any) {

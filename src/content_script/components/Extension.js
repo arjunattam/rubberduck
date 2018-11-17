@@ -8,7 +8,7 @@ import * as ChromeUtils from "../utils/chrome";
 import * as StorageUtils from "../utils/storage";
 import * as AnalyticsUtils from "../utils/analytics";
 import Authorization from "./../utils/authorization";
-import { pathAdapter } from "../adapters";
+import { pathAdapter, getGitService } from "../adapters";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 
 let document = window.document;
@@ -123,11 +123,12 @@ class Extension extends React.Component {
         pull_request_id: repoDetails.prId,
         type: repoDetails.type,
         head_sha: repoDetails.headSha || repoDetails.branch,
-        base_sha: repoDetails.baseSha
+        base_sha: repoDetails.baseSha,
+        service: getGitService()
       };
 
       if (this.hasValidToken()) {
-        this.DataActions.createNewSession({ params });
+        this.DataActions.createNewSession(params);
       }
     }
   }

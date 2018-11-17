@@ -1,5 +1,5 @@
 // See docs/AUTHENTICATION.md for documentation
-import { sendMessage, constructMessage } from "../chrome";
+import { sendMessage, sendMessagePromise } from "../chrome";
 import { API } from "../api";
 import { getGitService } from "../../adapters";
 
@@ -34,8 +34,7 @@ export const triggerOAuthFlow = (rootUrl, jwt, cb) => {
     url = `${rootUrl}bitbucket_oauth/?token=${jwt}`;
   }
 
-  const message = constructMessage("AUTH_TRIGGER", { url: url });
-  sendMessage(message, cb);
+  sendMessage("AUTH_TRIGGER", { url }, cb);
 };
 
 export const triggerLogoutFlow = (rootUrl, jwt, cb) => {
@@ -48,8 +47,7 @@ export const triggerLogoutFlow = (rootUrl, jwt, cb) => {
     url = `${rootUrl}bitbucket_oauth_logout/?token=${jwt}`;
   }
 
-  const message = constructMessage("AUTH_TRIGGER", { url: url });
-  sendMessage(message, cb);
+  sendMessage("AUTH_TRIGGER", { url: url }, cb);
 };
 
 export const isTokenValid = token => {
@@ -129,14 +127,5 @@ export const handleTokenState = (clientId, existingToken) => {
  * for a url. See https://developer.chrome.com/extensions/xhr
  */
 export const updateChromePermissions = url => {
-  const message = constructMessage("PERMISSIONS_UPDATE", { url });
-  return new Promise((resolve, reject) => {
-    sendMessage(message, result => {
-      if (result) {
-        resolve(result);
-      } else {
-        reject(result);
-      }
-    });
-  });
+  return sendMessagePromise("PERMISSIONS_UPDATE", { url });
 };

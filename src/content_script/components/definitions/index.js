@@ -11,6 +11,7 @@ import "./Definitions.css";
  */
 class Definitions extends BaseReaderSection {
   sectionName = "definitions";
+
   getSelectionData = hoverResult => {
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&

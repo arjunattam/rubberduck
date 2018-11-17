@@ -39,6 +39,6 @@ export default createReducer(initialState, {
   }),
 
   // We are not updating for usages, since usages and definitions happen together
-  CALL_DEFINITIONS_PENDING: (state, action) => updateNotReady(state, action),
+  CALL_DEFINITION_PENDING: (state, action) => updateNotReady(state, action),
   CALL_HOVER_PENDING: (state, action) => updateNotReady(state, action)
 });
