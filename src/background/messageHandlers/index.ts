@@ -2,7 +2,7 @@ import * as http from "./http";
 import * as storage from "./storage";
 import * as permissions from "./permissions";
 import * as auth from "./auth";
-import NativeMessenger from "./native";
+import NativeHost from "./native";
 
 interface IMessageRequest {
   message: string;
@@ -11,10 +11,11 @@ interface IMessageRequest {
 
 export const onMessageReceived = (
   req: IMessageRequest,
-  sender,
+  sender: chrome.runtime.MessageSender,
   resultCallback
 ) => {
-  console.log("Message received", req);
+  console.log("Message from tab:", req);
+  const tabId = sender.tab ? sender.tab.id : undefined;
 
   // TODO(arjun): handle runtime.lastError for each of these handlers
   // https://developer.chrome.com/apps/runtime#property-lastError
@@ -28,12 +29,12 @@ export const onMessageReceived = (
     PERMISSIONS_UPDATE: permissions.updatePermissions,
 
     // For native messaging
-    NATIVE_INFO: (data, cb) => NativeMessenger.info(data, cb),
-    NATIVE_INITIALIZE: (data, cb) => NativeMessenger.initialize(data, cb),
-    NATIVE_HOVER: (data, cb) => NativeMessenger.hover(data, cb),
-    NATIVE_DEFINITION: (data, cb) => NativeMessenger.definition(data, cb),
-    NATIVE_REFERENCES: (data, cb) => NativeMessenger.references(data, cb),
-    NATIVE_FILE_CONTENTS: (data, cb) => NativeMessenger.contents(data, cb)
+    NATIVE_INFO: (data, cb) => NativeHost.info(tabId, data, cb),
+    NATIVE_INITIALIZE: (data, cb) => NativeHost.initialize(tabId, data, cb),
+    NATIVE_HOVER: (data, cb) => NativeHost.hover(tabId, data, cb),
+    NATIVE_DEFINITION: (data, cb) => NativeHost.definition(tabId, data, cb),
+    NATIVE_REFERENCES: (data, cb) => NativeHost.references(tabId, data, cb),
+    NATIVE_FILE_CONTENTS: (data, cb) => NativeHost.contents(tabId, data, cb)
   };
   handlers[req.message](req.data, resultCallback);
 

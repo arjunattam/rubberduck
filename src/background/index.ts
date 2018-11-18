@@ -2,6 +2,7 @@ import { injectScript } from "./injector";
 import { onStorageChanged } from "./storage";
 import { sendMessageToTab } from "./utils";
 import { onMessageReceived } from "./messageHandlers";
+import NativeHost from "./messageHandlers/native";
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status !== "loading") return;
@@ -12,6 +13,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 
   return injectScript(tabId, changeInfo, tab);
+});
+
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
+  NativeHost.onTabClosed(tabId);
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {

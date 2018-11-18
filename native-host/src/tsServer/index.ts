@@ -3,32 +3,16 @@ import { Reader } from "./wireProtocol";
 import { log } from "../logger";
 import { CallbackMap } from "./callbackMap";
 import { toPath } from "../utils";
-
-// https://github.com/theia-ide/typescript-language-server
-const THEIA_LS_SERVER = {
-  binary: "../node_modules/.bin/typescript-language-server",
-  args: ["--stdio", "--log-level", "4", "--tsserver-log-file=ts-logs.txt"]
-};
-
-// https://github.com/sourcegraph/javascript-typescript-langserver
-const SOURCEGRAPH_LS_SERVER = {
-  binary: "../node_modules/.bin/javascript-typescript-stdio",
-  args: []
-};
-
-const LS_SERVER = SOURCEGRAPH_LS_SERVER;
-
-export const spawnServer = (): cp.ChildProcess => {
-  return cp.spawn(LS_SERVER.binary, LS_SERVER.args, {
-    stdio: ["pipe", "pipe", "pipe"]
-  });
-};
+import { RepoPayload } from "../types";
 
 export class TypeScriptServer {
   private readonly reader: Reader<any>;
   private callbacks = new CallbackMap();
 
-  constructor(private serverProcess: cp.ChildProcess) {
+  constructor(
+    private serverProcess: cp.ChildProcess,
+    private repoInfo: RepoPayload
+  ) {
     this.reader = new Reader<any>(
       this.serverProcess.stdout,
       (msg: any) => this.handleMessage(msg),
@@ -39,30 +23,6 @@ export class TypeScriptServer {
     this.serverProcess.on("error", error => this.handleError(error));
   }
 
-  private write(request: object) {
-    // TODO: handle case when the pipe is closed (process crashed)
-    const msg = `${JSON.stringify(request)}\r\n`;
-    const chunk = `Content-Length: ${msg.length}\r\n\r\n${msg}`;
-    log(`Writing to server: ${chunk}`);
-    this.serverProcess.stdin.write(chunk, "utf8");
-  }
-
-  sendRequest(requestId: string, method: string, params: object) {
-    const request = {
-      jsonrpc: "2.0",
-      id: requestId,
-      method,
-      params
-    };
-    let result = new Promise((resolve, reject) => {
-      this.callbacks.add(requestId, { onSuccess: resolve, onError: reject });
-      // TODO: add a request queue, instead of writing this directly
-      this.write(request);
-    });
-
-    return result;
-  }
-
   initialize(reqId: string, rootUri: string) {
     return this.sendRequest(reqId, "initialize", {
       processId: process.pid,
@@ -71,6 +31,11 @@ export class TypeScriptServer {
       initializationOptions: {},
       capabilities: { streaming: false }
     });
+  }
+
+  kill() {
+    // TODO: send exit message here?
+    this.serverProcess.kill();
   }
 
   hover(reqId: string, fileUri: string, line: number, character: number) {
@@ -94,7 +59,31 @@ export class TypeScriptServer {
     });
   }
 
-  handleMessage(message: any) {
+  private write(request: object) {
+    // TODO: handle case when the pipe is closed (process crashed)
+    const msg = `${JSON.stringify(request)}\r\n`;
+    const chunk = `Content-Length: ${msg.length}\r\n\r\n${msg}`;
+    log(`Writing to server: ${chunk}`);
+    this.serverProcess.stdin.write(chunk, "utf8");
+  }
+
+  private sendRequest(requestId: string, method: string, params: object) {
+    const request = {
+      jsonrpc: "2.0",
+      id: requestId,
+      method,
+      params
+    };
+    let result = new Promise((resolve, reject) => {
+      this.callbacks.add(requestId, { onSuccess: resolve, onError: reject });
+      // TODO: add a request queue, instead of writing this directly
+      this.write(request);
+    });
+
+    return result;
+  }
+
+  private handleMessage(message: any) {
     // Can potentially handle `window/logMessage` type differently for logging
     log(`Server handleMessage: ${JSON.stringify(message)}`);
     const { id: messageId } = message;
@@ -107,11 +96,31 @@ export class TypeScriptServer {
     callback.onSuccess(message);
   }
 
-  handleExit(code: any) {
+  private handleExit(code: any) {
     log(`Server exited with code: ${code}`);
   }
 
-  handleError(error: any) {
+  private handleError(error: any) {
     log(`Server error: ${error}`);
   }
 }
+
+// https://github.com/theia-ide/typescript-language-server
+const THEIA_LS_SERVER = {
+  binary: "../node_modules/.bin/typescript-language-server",
+  args: ["--stdio", "--log-level", "4", "--tsserver-log-file=ts-logs.txt"]
+};
+
+// https://github.com/sourcegraph/javascript-typescript-langserver
+const SOURCEGRAPH_LS_SERVER = {
+  binary: "../node_modules/.bin/javascript-typescript-stdio",
+  args: []
+};
+
+const LS_SERVER = SOURCEGRAPH_LS_SERVER;
+
+export const spawnServer = (): cp.ChildProcess => {
+  return cp.spawn(LS_SERVER.binary, LS_SERVER.args, {
+    stdio: ["pipe", "pipe", "pipe"]
+  });
+};

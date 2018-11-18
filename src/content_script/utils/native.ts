@@ -17,7 +17,7 @@ export const hover = async (
   line,
   character
 ): Promise<HoverResult> => {
-  const data = { path, sha, line, character };
+  const data: LanguageQueryParams = { path, line, character };
   const response = await sendMessagePromise("NATIVE_HOVER", data);
   // Translate LSP response to what our app expects
   const { result } = response;
@@ -55,7 +55,7 @@ export const definition = async (
   line,
   character
 ): Promise<DefinitionResult> => {
-  const data = { path, sha, line, character };
+  const data: LanguageQueryParams = { path, line, character };
   const hover = await sendMessagePromise("NATIVE_HOVER", data);
   const definition = await sendMessagePromise("NATIVE_DEFINITION", data);
   const items = await getItems(definition.result);
@@ -81,7 +81,7 @@ export const references = async (
   line,
   character
 ): Promise<UsageItem[]> => {
-  const data = { path, sha, line, character };
+  const data: LanguageQueryParams = { path, line, character };
   const references = await sendMessagePromise("NATIVE_REFERENCES", data);
   const locations = <Location[]>references.result;
   const uniquePaths = [...new Set(locations.map(location => location.path))];

@@ -10,7 +10,6 @@ interface InitializeParams {
 
 interface LanguageQueryParams {
   path: string;
-  sha: string;
   line: number;
   character: number;
 }

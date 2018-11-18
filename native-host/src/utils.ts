@@ -1,3 +1,4 @@
+import { RepoPayload } from "./types";
 const fs = require("fs");
 
 const URI_PREFIX = "file:///Users/arjun/";
@@ -14,19 +15,19 @@ export const readFile = (fileUri: string): Promise<string> => {
   });
 };
 
-export const clean = (message: any) => {
+export const clean = (message: any, repoInfo: RepoPayload) => {
   // Removes uri full path with relative path
   const str = JSON.stringify(message);
-  // TODO: remove repo name (hardcoded)
-  return JSON.parse(str.replace(`"uri":"${URI_PREFIX}redux/`, '"path":"'));
+  const rootUri = constructRootUri(repoInfo);
+  return JSON.parse(str.replace(`"uri":"${rootUri}/`, '"path":"'));
 };
 
-export const constructRootUri = (repo: string) => {
+export const constructRootUri = (repoInfo: RepoPayload) => {
   // TODO: fix path conventions after git setup
-  return `${URI_PREFIX}${repo}`;
+  return `${URI_PREFIX}${repoInfo.name}`;
 };
 
-export const constructFileUri = (path: string) => {
-  // TODO: fix repo name
-  return `${URI_PREFIX}redux/${path}`;
+export const constructFileUri = (repoInfo: RepoPayload, path: string) => {
+  const rootUri = constructRootUri(repoInfo);
+  return `${rootUri}/${path}`;
 };
