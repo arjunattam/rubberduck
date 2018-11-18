@@ -106,8 +106,13 @@ class NativeMessenger {
     console.log("Message from native:", message);
     const { id } = message;
     const callback = this.callbackMap.get(id);
-    this.callbackMap.delete(id);
-    callback(message);
+
+    if (!!callback) {
+      this.callbackMap.delete(id);
+      callback(message);
+    } else {
+      console.log("No callback found!");
+    }
   }
 
   private onDisconnect() {
