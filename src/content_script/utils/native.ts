@@ -7,6 +7,7 @@ export const info = async () => {
 };
 
 export const initialize = async (params: InitializeParams) => {
+  await sendMessagePromise("NATIVE_CLONE_AND_CHECKOUT", params);
   const response = await sendMessagePromise("NATIVE_INITIALIZE", params);
   return response;
 };

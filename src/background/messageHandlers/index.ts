@@ -30,6 +30,8 @@ export const onMessageReceived = (
 
     // For native messaging
     NATIVE_INFO: (data, cb) => NativeHost.info(tabId, data, cb),
+    NATIVE_CLONE_AND_CHECKOUT: (data, cb) =>
+      NativeHost.cloneAndCheckout(tabId, data, cb),
     NATIVE_INITIALIZE: (data, cb) => NativeHost.initialize(tabId, data, cb),
     NATIVE_HOVER: (data, cb) => NativeHost.hover(tabId, data, cb),
     NATIVE_DEFINITION: (data, cb) => NativeHost.definition(tabId, data, cb),

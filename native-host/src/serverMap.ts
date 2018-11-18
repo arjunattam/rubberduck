@@ -33,6 +33,10 @@ export class LangServersMap {
     }
   }
 
+  info() {
+    return [...this.serversMap.keys()];
+  }
+
   private getKey(payload: RepoPayload): string {
     const { name, user, sha, service } = payload;
     return `${service}:${user}:${name}:${sha}`;

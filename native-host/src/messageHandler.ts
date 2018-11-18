@@ -1,6 +1,7 @@
 import { LangServersMap } from "./serverMap";
 import { readFile, constructFileUri, constructRootUri, clean } from "./utils";
 import { RepoPayload } from "./types";
+import * as git from "./git";
 
 const VERSION = "0.1.0";
 
@@ -28,6 +29,7 @@ interface Message {
 
 enum RequestType {
   Info = "INFO",
+  CloneCheckout = "CLONE_AND_CHECKOUT",
   Initialize = "INITIALIZE",
   Hover = "HOVER",
   Definition = "DEFINITION",
@@ -43,6 +45,11 @@ export class MessageHandler {
     const { type } = message;
 
     switch (type) {
+      case RequestType.Info:
+        return this.handleInfoMessage(message);
+      case RequestType.CloneCheckout:
+        const result = await git.cloneAndCheckout(<RepoPayload>message.payload);
+        return { id: message.id, result };
       case RequestType.Initialize:
         return this.handleInitializeMessage(message);
       case RequestType.Hover:
@@ -55,13 +62,16 @@ export class MessageHandler {
         return this.handleFileContentsMessage(message);
       case RequestType.Exit:
         return this.handleExit(message);
-      case RequestType.Info:
-        return this.handleInfoMessage(message);
     }
   }
 
-  handleInfoMessage(message: Message) {
-    return { version: VERSION, id: message.id };
+  async handleInfoMessage(message: Message) {
+    return {
+      version: VERSION,
+      id: message.id,
+      servers: this.langServers.info(),
+      git: await git.info()
+    };
   }
 
   async handleInitializeMessage(message: Message) {

@@ -1,39 +1,47 @@
-// Saves options to chrome.storage
-function save_options() {
-  chrome.storage.local.set(
-    {
-      hasHoverDebug: document.getElementById("debug").checked,
-      hasMenuApp: document.getElementById("menu").checked,
-      defaultPort: document.getElementById("port").value
-    },
-    function() {
-      // Update status to let user know options were saved.
-      var status = document.getElementById("status");
-      status.textContent = "Options saved.";
-      setTimeout(function() {
-        status.textContent = "";
-      }, 750);
-    }
-  );
+import React from "react";
+import ReactDOM from "react-dom";
+import ReactJson from "react-json-view";
+import { ExistingOptions } from "./config";
+
+class InfoSection extends React.Component {
+  state = {
+    data: undefined
+  };
+
+  componentDidMount() {
+    chrome.runtime.sendMessage({ message: "NATIVE_INFO", data: {} }, result => {
+      this.setState({ data: result });
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <h2>Info</h2>
+        <ReactJson
+          style={{ fontSize: 16 }}
+          src={this.state.data}
+          name={false}
+          enableClipboard={false}
+          displayDataTypes={false}
+        />
+      </div>
+    );
+  }
 }
 
-// Restores select box and checkbox state using the preferences
-// stored in chrome.storage.
-function restore_options() {
-  chrome.storage.local.get(
-    {
-      // Default values
-      hasHoverDebug: false,
-      hasMenuApp: false,
-      defaultPort: 8000
-    },
-    function(items) {
-      document.getElementById("debug").checked = items.hasHoverDebug;
-      document.getElementById("menu").checked = items.hasMenuApp;
-      document.getElementById("port").value = items.defaultPort;
-    }
-  );
+class App extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Rubberduck</h1>
+        <ExistingOptions />
+        <InfoSection />
+      </div>
+    );
+  }
 }
 
-document.addEventListener("DOMContentLoaded", restore_options);
-document.getElementById("save").addEventListener("click", save_options);
+export default App;
+
+ReactDOM.render(<App />, document.getElementById("root"));

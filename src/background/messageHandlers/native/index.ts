@@ -19,12 +19,22 @@ class NativeMessenger {
     this.send("INFO", payload, callback);
   }
 
+  cloneAndCheckout(tabId, payload: InitializeParams, callback) {
+    const repoPayload: RepoPayload = {
+      name: payload.name,
+      user: payload.organisation,
+      service: payload.service,
+      sha: payload.head_sha
+    };
+    this.send("CLONE_AND_CHECKOUT", repoPayload, callback);
+  }
+
   initialize(tabId, payload: InitializeParams, callback) {
     const repoPayload: RepoPayload = {
       name: payload.name,
       user: payload.organisation,
       service: payload.service,
-      sha: "" // TODO: add this
+      sha: payload.head_sha
     };
 
     // TODO: two incorrect assumptions here

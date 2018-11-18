@@ -1,7 +1,8 @@
+import fs from "fs";
 import { RepoPayload } from "./types";
-const fs = require("fs");
+const mkdirp = require("mkdirp");
 
-const URI_PREFIX = "file:///Users/arjun/";
+export const URI_PREFIX = "file:///Users/arjun/local_repos";
 
 export const toPath = (uriPath: string) => {
   return uriPath.replace("file://", "");
@@ -24,10 +25,19 @@ export const clean = (message: any, repoInfo: RepoPayload) => {
 
 export const constructRootUri = (repoInfo: RepoPayload) => {
   // TODO: fix path conventions after git setup
-  return `${URI_PREFIX}${repoInfo.name}`;
+  return `${URI_PREFIX}/${repoInfo.name}`;
 };
 
 export const constructFileUri = (repoInfo: RepoPayload, path: string) => {
   const rootUri = constructRootUri(repoInfo);
   return `${rootUri}/${path}`;
+};
+
+export const mkdir = (path: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    mkdirp(path, (err: any) => {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
 };
