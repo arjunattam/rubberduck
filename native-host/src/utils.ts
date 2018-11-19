@@ -24,8 +24,8 @@ export const clean = (message: any, repoInfo: RepoPayload) => {
 };
 
 export const constructRootUri = (repoInfo: RepoPayload) => {
-  // TODO: fix path conventions after git setup
-  return `${URI_PREFIX}/${repoInfo.name}`;
+  const { name, sha } = repoInfo;
+  return `${URI_PREFIX}/${name}_${sha}`;
 };
 
 export const constructFileUri = (repoInfo: RepoPayload, path: string) => {

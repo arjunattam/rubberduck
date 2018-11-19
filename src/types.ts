@@ -6,6 +6,23 @@ interface RepoReference {
   branch?: string;
 }
 
+// https://stackoverflow.com/a/50511773/1469222
+const enum ViewType {
+  File = "file",
+  Compare = "compare",
+  Commit = "commit",
+  PR = "pull"
+}
+
+interface RemoteView {
+  type: ViewType;
+  isPrivate: boolean;
+  head: RepoReference;
+  base?: RepoReference; // For compare/commit/pull views
+  filePath?: string; // For file views
+  pullRequestId?: string; // For pull views
+}
+
 interface InitializeParams {
   organisation: string;
   name: string;

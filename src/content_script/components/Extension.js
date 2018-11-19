@@ -7,7 +7,7 @@ import Sidebar from "./sidebar";
 import * as ChromeUtils from "../utils/chrome";
 import * as StorageUtils from "../utils/storage";
 import Authorization from "./../utils/authorization";
-import { pathAdapter, getGitService } from "../adapters";
+import { pathAdapterDeprecated, getGitService } from "../adapters";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 import pathAdapterv2 from "../adaptersv2";
 
@@ -54,18 +54,14 @@ class Extension extends React.Component {
   };
 
   async initializeRepoDetails() {
-    const repoDetails = await pathAdapter.fetchRepoDetails();
-    console.log(repoDetails);
-    console.log(await pathAdapterv2.getViewInfo());
-
-    this.DataActions.setRepoDetails(repoDetails);
+    this.DataActions.setRepoDetails(await pathAdapterv2.getViewInfo());
     return repoDetails;
   }
 
   updateSessionAndTree(prevProps, newProps) {
     const { repoDetails: prev } = prevProps.data;
     const { repoDetails: now } = newProps.data;
-    let hasSessionChanged = !pathAdapter.isSameSessionPath(prev, now);
+    let hasSessionChanged = !pathAdapterDeprecated.isSameSessionPath(prev, now);
     const hasAuthChanged = Authorization.hasChanged(
       prevProps.storage,
       newProps.storage

@@ -1,4 +1,4 @@
-import { BasePathAdapter, RemoteView, ViewType } from "./base";
+import { BasePathAdapter } from "./base";
 import API from "../utils/api";
 
 export class GithubPathAdapter extends BasePathAdapter {
@@ -189,21 +189,9 @@ export class GithubPathAdapter extends BasePathAdapter {
     return await API.getPRInfov2(owner, name, pullRequestId);
   }
 
-  isSameSessionPath(prevDetails: any, details: any): boolean {
-    throw new Error("Method not implemented.");
-  }
-
-  hasChangedPath(prevDetails: any, details: any): boolean {
-    throw new Error("Method not implemented.");
-  }
-
-  constructFilePath(
-    path: any,
-    username: any,
-    reponame: any,
-    branch: any
-  ): string {
-    throw new Error("Method not implemented.");
+  constructFullPath(filePath: string, repo: RepoReference): string {
+    const { user, name, branch } = repo;
+    return `/${user}/${name}/blob/${branch}/${filePath}`;
   }
 }
 

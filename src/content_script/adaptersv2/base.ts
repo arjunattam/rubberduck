@@ -1,25 +1,35 @@
-export enum ViewType {
-  File = "file",
-  Compare = "compare",
-  Commit = "commit",
-  PR = "pull"
-}
-
-export interface RemoteView {
-  type: ViewType;
-  isPrivate: boolean;
-  head: RepoReference;
-  base?: RepoReference; // for compare/commit/pull views
-  filePath?: string; // for file views
-  pullRequestId?: string; // for pull views
-}
-
 export abstract class BasePathAdapter {
   abstract getViewInfo(): Promise<RemoteView | undefined>;
 
-  abstract isSameSessionPath(prevDetails, details): boolean;
+  abstract constructFullPath(filePath: string, repo: RepoReference): string;
 
-  abstract hasChangedPath(prevDetails, details): boolean;
+  hasViewChanged(previousView: RemoteView, newView: RemoteView) {
+    if (isEmpty(previousView) && isEmpty(newView)) {
+      // both empty
+      return false;
+    } else if (!isEmpty(previousView) && !isEmpty(newView)) {
+      // both available
+      const hasChangedType = previousView.type !== newView.type;
+      const hasChangedHead = previousView.head.sha !== newView.head.sha;
+      let hasChangedBase = true;
 
-  abstract constructFilePath(path, username, reponame, branch): string;
+      if (previousView.base && newView.base) {
+        // both are available
+        hasChangedBase = previousView.base.sha !== newView.base.sha;
+      } else if (!previousView.base && !newView.base) {
+        // both are undefined
+        hasChangedBase = false;
+      }
+
+      return hasChangedType || hasChangedBase || hasChangedHead;
+    } else {
+      return true;
+    }
+  }
+
+  hasPathChanged(previousView, newView) {
+    return previousView.filePath !== newView.filePath;
+  }
 }
+
+const isEmpty = obj => Object.keys(obj).length === 0;

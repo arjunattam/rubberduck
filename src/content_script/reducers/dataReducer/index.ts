@@ -1,7 +1,7 @@
 import { createReducer } from "redux-create-reducer";
 import { combineReducers } from "redux";
 import section from "./section";
-import repoDetails from "./repoDetails";
+import { repoDetails, view } from "./repoDetails";
 import fileTree from "./fileTree";
 import definition from "./definition";
 import usages from "./usages";
@@ -13,7 +13,7 @@ import pjax from "./pjax";
 const initialState = {};
 
 const data = createReducer(initialState, {
-  UPDATE_DATA: (state, action) => ({
+  UPDATE_DATA: (state, action: any) => ({
     ...state,
     ...action.payload
   })
@@ -21,7 +21,8 @@ const data = createReducer(initialState, {
 
 const dataReducer = combineReducers({
   data,
-  repoDetails,
+  repoDetails, // old repo details (for backward compatibility)
+  view, // new repo details
   section,
   session,
   fileTree,

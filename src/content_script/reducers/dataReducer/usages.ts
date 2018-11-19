@@ -4,7 +4,7 @@ import { pathNearnessSorter } from "../../utils/data";
 export default createReducer(
   {},
   {
-    CALL_USAGES_PENDING: (state, action) => {
+    CALL_USAGES_PENDING: (state, action: any) => {
       const { hoverResult } = action.meta;
       return {
         name: hoverResult.name,
@@ -12,7 +12,7 @@ export default createReducer(
         count: undefined
       };
     },
-    CALL_USAGES_FULFILLED: (state, action) => {
+    CALL_USAGES_FULFILLED: (state, action: any) => {
       const { hoverResult } = action.meta;
       const items = action.payload;
       const count = items.reduce((total, current) => {

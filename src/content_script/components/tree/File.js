@@ -3,9 +3,9 @@ import TreeLabel from "./TreeLabel";
 import {
   getGitService,
   getFileboxSelector,
-  isSplitDiffGithubView,
-  pathAdapter
+  isSplitDiffGithubView
 } from "../../adapters";
+import pathAdapter from "../../adaptersv2";
 import * as AnalyticsUtils from "../../utils/analytics";
 
 const PADDING_CONST = 12; // in pixels -- same as folder
@@ -141,11 +141,9 @@ export default class File extends React.Component {
 
   render() {
     const { isPRFile, path } = this.props;
-    const { repoDetails } = this.props.data;
-    const { username, reponame, branch } = repoDetails;
     const href = isPRFile
       ? this.getFilesChangedUrl()
-      : pathAdapter.constructFilePath(path, username, reponame, branch);
+      : pathAdapter.constructFullPath(path, this.props.data.view.head);
 
     return this.renderFileLabel(href, event => this.clickHandler(href, event));
   }

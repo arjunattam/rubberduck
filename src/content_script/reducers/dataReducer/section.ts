@@ -14,7 +14,7 @@ const initialState = {
   }
 };
 
-function updateIsLoading(state, newIsLoading, newOpenSection) {
+function updateIsLoading(state, newIsLoading, newOpenSection?) {
   return {
     ...state,
     isLoading: {
@@ -29,15 +29,16 @@ function updateIsLoading(state, newIsLoading, newOpenSection) {
 }
 
 export default createReducer(initialState, {
-  SET_OPEN_SECTION: (state, action) =>
+  SET_OPEN_SECTION: (state, action: any) =>
     updateIsLoading(state, {}, action.payload),
 
-  SET_TREE_LOADING: (state, action) =>
+  SET_TREE_LOADING: (state, action: any) =>
     updateIsLoading(state, { tree: action.payload }),
 
-  CALL_TREE_PENDING: (state, action) => updateIsLoading(state, { tree: true }),
+  CALL_TREE_PENDING: (state, action: any) =>
+    updateIsLoading(state, { tree: true }),
 
-  CALL_TREE_FULFILLED: (state, action) =>
+  CALL_TREE_FULFILLED: (state, action: any) =>
     updateIsLoading(state, { tree: false }),
 
   CALL_TREE_PAGES_PENDING: (state, action) =>
@@ -49,7 +50,7 @@ export default createReducer(initialState, {
   CALL_TREE_REJECTED: (state, action) =>
     updateIsLoading(state, { tree: false }),
 
-  CALL_DEFINITION_PENDING: (state, action) => {
+  CALL_DEFINITION_PENDING: (state, action: any) => {
     const { shouldCollapse } = action.meta;
     const newOpenSection = shouldCollapse ? { tree: false } : {};
     return updateIsLoading(state, { definitions: true }, newOpenSection);

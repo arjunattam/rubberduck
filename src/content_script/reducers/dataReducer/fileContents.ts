@@ -6,7 +6,7 @@ const initialState = {
 };
 
 export default createReducer(initialState, {
-  CALL_FILE_CONTENTS_FULFILLED: (state, action) => {
+  CALL_FILE_CONTENTS_FULFILLED: (state, action: any) => {
     const { baseOrHead, filePath, result } = action.payload;
     let newState = { ...state };
     newState[baseOrHead][filePath] = result.contents;

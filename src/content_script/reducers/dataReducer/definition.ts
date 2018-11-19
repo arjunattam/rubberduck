@@ -3,14 +3,14 @@ import { createReducer } from "redux-create-reducer";
 export default createReducer(
   {},
   {
-    CALL_DEFINITION_PENDING: (state, action) => {
+    CALL_DEFINITION_PENDING: (state, action: any) => {
       const { hoverResult } = action.meta;
       const definition = { name: hoverResult.name };
       return {
         ...definition
       };
     },
-    CALL_DEFINITION_FULFILLED: (state, action) => {
+    CALL_DEFINITION_FULFILLED: (state, action: any) => {
       const { hoverResult } = action.meta;
       return {
         ...state,

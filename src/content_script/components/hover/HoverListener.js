@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getPageListener, pathAdapter } from "../../adapters/";
+import { getPageListener } from "../../adapters/";
+import pathAdapter from "../../adaptersv2";
 import HoverElement from "./HoverElement";
 
 /**
@@ -20,15 +21,16 @@ class HoverListener extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const isSameSessionPath = pathAdapter.isSameSessionPath(
-      prevProps.data.repoDetails,
-      this.props.data.repoDetails
+    const hasChangedView = pathAdapter.hasViewChanged(
+      prevProps.data.view,
+      this.props.data.view
     );
-    const hasChangedPath = pathAdapter.hasChangedPath(
-      prevProps.data.repoDetails,
-      this.props.data.repoDetails
+    const hasChangedPath = pathAdapter.hasPathChanged(
+      prevProps.data.view,
+      this.props.data.view
     );
-    if (!isSameSessionPath || hasChangedPath || !this.listener) {
+
+    if (hasChangedView || hasChangedPath || !this.listener) {
       this.setupListeners();
     }
   }
