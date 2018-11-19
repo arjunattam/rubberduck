@@ -103,6 +103,7 @@ const getCompareViewSha = username => {
   const repoLabelElements = Array.from(
     document.querySelectorAll("div.range-cross-repo-pair")
   );
+
   let result = {};
   repoLabelElements.map(element => {
     // each repo label has a branch name and repo name (in case of fork comparison)
@@ -125,6 +126,7 @@ const getCompareViewSha = username => {
     }
     result[match[1] === "compare" ? "head" : match[1]] = `${prefix}${match[2]}`;
   });
+
   return result;
 };
 
@@ -238,8 +240,7 @@ const getRepoFromPath = () => {
 };
 
 export default class GithubPathAdapter {
-  // TODO(arjun): should this not extend the base path adapter?
-  static constructPath = (subPath, orgname, reponame, branch) => {
+  static constructFilePath = (subPath, orgname, reponame, branch) => {
     // return relative path which follows a domain name, like
     // github.com, from given sub-path
     if (branch === undefined || branch === null) {

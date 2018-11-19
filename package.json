@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@octokit/rest": "15.17.0",
     "amplitude-js": "^4.2.1",
     "axios": "^0.17.1",
     "babel-cli": "^6.26.0",

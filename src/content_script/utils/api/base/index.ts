@@ -1,13 +1,12 @@
 import axios from "axios";
-import Moment from "moment";
+import * as Moment from "moment";
 import { bindActionCreators } from "redux";
-import Store from "../../store";
-import * as DataActions from "../../actions/dataActions";
-import Authorization from "../authorization";
-import { hash } from "../data";
-import * as StorageUtils from "../storage";
+import Store from "../../../store";
+import * as DataActions from "../../../actions/dataActions";
+import Authorization from "../../authorization";
+import { hash } from "../../data";
+import * as StorageUtils from "../../storage";
 import BaseRequest from "./base";
-import GitRemoteAPI from "./remote";
 
 const linkParser = require("parse-link-header");
 
@@ -16,13 +15,7 @@ const IS_CACHING_ENABLED = true;
 const BASE_API_PREFIX = "api/v1";
 
 export class BaseAPI {
-  constructor() {
-    this.DataActions = bindActionCreators(DataActions, Store.dispatch);
-  }
-
-  getDecodedToken() {
-    return Authorization.getDecodedToken();
-  }
+  DataActions = bindActionCreators(DataActions, Store.dispatch);
 
   makePostRequest = (uri, body) => {
     const rootUrl = Authorization.getBaseUrl();
@@ -35,7 +28,7 @@ export class BaseAPI {
     const rootUrl = Authorization.getBaseUrl();
     const token = Authorization.getToken();
     const baseRequest = new BaseRequest(rootUrl, token);
-    return baseRequest.fetch(uri);
+    return baseRequest.fetch(uri, undefined);
   };
 
   issueToken(clientId) {
@@ -103,13 +96,16 @@ export class BaseAPI {
       next = parsed.next ? +parsed.next.page : null;
       last = parsed.last ? +parsed.last.page : null;
     }
-    let result = {};
+    let result: any = {};
+
     if (next) {
       result.nextPage = next;
     }
+
     if (last) {
       result.lastPage = last;
     }
+
     return result;
   }
 
@@ -145,7 +141,4 @@ export class BaseAPI {
   }
 }
 
-Object.assign(BaseAPI.prototype, GitRemoteAPI);
-
 export const API = new BaseAPI();
-export { getParameterByName } from "./utils";

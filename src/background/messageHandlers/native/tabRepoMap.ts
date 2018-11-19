@@ -21,7 +21,7 @@ export class TabRepoMap {
     });
   }
 
-  get(tabId): RepoPayload {
+  get(tabId): RepoPayload | undefined {
     const value = this.tabRepos.get(tabId);
     return !!value ? value.data : undefined;
   }

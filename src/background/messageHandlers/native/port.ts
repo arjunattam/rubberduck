@@ -1,8 +1,9 @@
 const applicationId = "io.rubberduck.native";
 
 export class NativePort {
-  port: chrome.runtime.Port;
+  port: chrome.runtime.Port | undefined;
   isConnected: boolean = false;
+
   constructor(private onMessageListener: any) {}
 
   connect() {
@@ -14,7 +15,7 @@ export class NativePort {
 
   info() {
     return {
-      name: this.port.name,
+      name: !!this.port ? this.port.name : undefined,
       isConnected: this.isConnected
     };
   }
@@ -27,7 +28,9 @@ export class NativePort {
 
   send(payload: any) {
     try {
-      return this.port.postMessage(payload);
+      if (!!this.port) {
+        return this.port.postMessage(payload);
+      }
     } catch (error) {
       console.log("error", error);
     }

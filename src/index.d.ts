@@ -1,3 +1,11 @@
+interface RepoReference {
+  user: string;
+  name: string;
+  service: "github" | "bitbucket";
+  sha: string;
+  branch?: string;
+}
+
 interface InitializeParams {
   organisation: string;
   name: string;

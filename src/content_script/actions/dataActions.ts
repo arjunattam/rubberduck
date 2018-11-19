@@ -1,4 +1,4 @@
-import { API } from "../utils/api";
+import API from "../utils/api";
 import * as NativeUtils from "../utils/native";
 import { loadUrl as pjaxLoadUrl } from "../utils/pjax";
 import Store from "../store";
@@ -162,8 +162,10 @@ export function loadUrl({ urlPath }) {
 
 const isTreeTooBig = () => {
   const ACCEPTABLE_TREE_COVERAGE = 0.35;
-  const treeElement = document.querySelector("div.tree-content");
-  const sidebarElement = document.querySelector("div.sidebar-container");
+  const treeElement = <HTMLElement>document.querySelector("div.tree-content");
+  const sidebarElement = <HTMLElement>(
+    document.querySelector("div.sidebar-container")
+  );
 
   if (treeElement && sidebarElement) {
     const treeCoverage = treeElement.offsetHeight / sidebarElement.offsetHeight;

@@ -17,7 +17,7 @@ export const hover = async (
   sha,
   line,
   character
-): Promise<HoverResult> => {
+): Promise<HoverResult | undefined> => {
   const data: LanguageQueryParams = { path, line, character };
   const response = await sendMessagePromise("NATIVE_HOVER", data);
   // Translate LSP response to what our app expects

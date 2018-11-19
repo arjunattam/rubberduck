@@ -6,10 +6,10 @@ import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
 import * as ChromeUtils from "../utils/chrome";
 import * as StorageUtils from "../utils/storage";
-import * as AnalyticsUtils from "../utils/analytics";
 import Authorization from "./../utils/authorization";
 import { pathAdapter, getGitService } from "../adapters";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
+import pathAdapterv2 from "../adaptersv2";
 
 let document = window.document;
 
@@ -44,30 +44,22 @@ class Extension extends React.Component {
       this.setupAuthorization();
     }
 
-    // TODO(arjun): should this happen only after auth has been setup?
+    // TODO: should this happen only after auth has been setup?
     this.updateSessionAndTree(prevProps, this.props);
   }
 
   onPjaxEnd = () => {
-    this.updateRepoDetails();
+    this.initializeRepoDetails();
     setupSpanObserver();
   };
 
-  /**
-   * First time call for repo details. After this, we fire the extension.injected
-   * analytics event.
-   */
-  initializeRepoDetails() {
-    this.updateRepoDetails().then(response => {
-      AnalyticsUtils.logPageView();
-    });
-  }
+  async initializeRepoDetails() {
+    const repoDetails = await pathAdapter.fetchRepoDetails();
+    console.log(repoDetails);
+    console.log(await pathAdapterv2.getViewInfo());
 
-  updateRepoDetails() {
-    return pathAdapter.fetchRepoDetails().then(repoDetails => {
-      this.DataActions.setRepoDetails(repoDetails);
-      return repoDetails;
-    });
+    this.DataActions.setRepoDetails(repoDetails);
+    return repoDetails;
   }
 
   updateSessionAndTree(prevProps, newProps) {

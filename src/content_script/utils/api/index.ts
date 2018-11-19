@@ -1,8 +1,14 @@
 import parse from "diffparser";
+import Authorization from "../authorization";
 import { getGitService } from "../../adapters";
-import * as CrashReporting from "../crashes";
+import { API as BaseAPI } from "./base";
+import * as Octokit from "@octokit/rest";
 
-let BaseGitRemoteAPI = {
+abstract class BaseGitRemoteAPI {
+  getDecodedToken() {
+    return Authorization.getDecodedToken();
+  }
+
   isRemoteAuthorized(isPrivate) {
     const decoded = this.getDecodedToken();
     if (decoded !== null) {
@@ -26,32 +32,27 @@ let BaseGitRemoteAPI = {
     }
 
     return false;
-  },
+  }
 
   makePassthrough(uriPath) {
     const fixedPath = uriPath.replace("?", "%3F");
     const fullUri = `${this.getPassthroughPath()}${fixedPath}/`;
-    return this.makeGetRequest(fullUri)
-      .then(response => {
-        // This is required for non-json responses, as the passthrough api
-        // JSONifies them with the jsonified key
-        const { data, headers } = response;
-        const actual = data.jsonified || data;
-        const { link: linkHeaders } = headers;
-        const next = this.getNextPages(linkHeaders);
-        return { data: actual, ...next };
-      })
-      .catch(error => {
-        CrashReporting.catchException(error);
-      });
-  },
+
+    return BaseAPI.makeGetRequest(fullUri).then(response => {
+      // This is required for non-json responses, as the passthrough api
+      // JSONifies them with the jsonified key
+      const { data, headers } = response;
+      const actual = data.jsonified || data;
+      const { link: linkHeaders } = headers;
+      const next = BaseAPI.getNextPages(linkHeaders);
+      return { data: actual, ...next };
+    });
+  }
 
   makeRemoteCall(uriPath) {
     const fullUri = this.buildUrl(uriPath);
-    return this.cacheOrGet(fullUri).catch(error => {
-      CrashReporting.catchException(error);
-    });
-  },
+    return BaseAPI.cacheOrGet(fullUri);
+  }
 
   makeConditionalGet(uriPath, isPrivate) {
     if (this.isRemoteAuthorized(isPrivate)) {
@@ -63,7 +64,7 @@ let BaseGitRemoteAPI = {
       // for efficient rate limit utilisation.
       return this.makeRemoteCall(uriPath);
     }
-  },
+  }
 
   getTreeCaller(repoDetails, page) {
     const { type } = repoDetails;
@@ -78,44 +79,76 @@ let BaseGitRemoteAPI = {
       default:
         return this.getFilesTree(repoDetails);
     }
-  },
+  }
 
   getTree(repoDetails) {
     return this.getTreeCaller(repoDetails, null);
-  },
+  }
 
   getTreePages(repoDetails, pages) {
     const callers = pages.map(page => this.getTreeCaller(repoDetails, page));
     return Promise.all(callers).then(function(responses) {
       return responses.reduce(
-        (result, current) => result.concat(current.data),
+        (result: any, current: any) => result.concat(current.data),
         []
       );
     });
   }
-};
 
-let GithubAPI = {
+  abstract getRemoteUsername(decoded: string): string;
+
+  abstract getPassthroughPath(): string;
+
+  abstract buildUrl(path: string): string;
+
+  abstract getPRFiles(repoDetails, page): any;
+
+  abstract getFilesTree(repoDetails): any;
+
+  abstract getCompareFiles(repoDetails): any;
+
+  abstract getCommitFiles(repoDetails): any;
+
+  abstract getPRInfov2(
+    owner: string,
+    name: string,
+    pullRequestId: string
+  ): Promise<{ base: RepoReference; head: RepoReference }>;
+  abstract getBranchv2(
+    owner: string,
+    name: string,
+    branch: string
+  ): Promise<RepoReference>;
+  abstract getCommitInfov2(
+    owner: string,
+    name: string,
+    commitId: string
+  ): Promise<{ base: RepoReference; head: RepoReference }>;
+}
+
+class GithubAPI extends BaseGitRemoteAPI {
+  gh = new Octokit();
+
   getRemoteUsername(decoded) {
     return decoded.github_username;
-  },
+  }
 
   getPassthroughPath() {
     return `github_passthrough/`;
-  },
+  }
 
   buildUrl(path) {
     return `https://api.github.com/${path}`;
-  },
+  }
 
   getPrivateErrorCodes() {
     return [401, 404];
-  },
+  }
 
   getUrlBase(repoDetails) {
     const { username, reponame } = repoDetails;
     return `repos/${username}/${reponame}`;
-  },
+  }
 
   getFilesTree(repoDetails) {
     const urlBase = this.getUrlBase(repoDetails);
@@ -124,18 +157,20 @@ let GithubAPI = {
     const nonNullBranch = branch || "master";
     const uriPath = `${urlBase}/git/trees/${nonNullBranch}?recursive=1`;
     return this.makeConditionalGet(uriPath, isPrivate);
-  },
+  }
 
   getPRFiles(repoDetails, page) {
     const urlBase = this.getUrlBase(repoDetails);
     const { prId, isPrivate } = repoDetails;
     let pageParam = "";
+
     if (page) {
       pageParam = `?page=${page}`;
     }
+
     const uriPath = `${urlBase}/pulls/${prId}/files${pageParam}`;
     return this.makeConditionalGet(uriPath, isPrivate);
-  },
+  }
 
   getCommitFiles(repoDetails) {
     const urlBase = this.getUrlBase(repoDetails);
@@ -144,7 +179,7 @@ let GithubAPI = {
     return this.makeConditionalGet(uriPath, isPrivate).then(response => ({
       data: response.data.files
     }));
-  },
+  }
 
   getCompareFiles(repoDetails) {
     const urlBase = this.getUrlBase(repoDetails);
@@ -153,7 +188,7 @@ let GithubAPI = {
     return this.makeConditionalGet(uriPath, isPrivate).then(response => ({
       data: response.data.files
     }));
-  },
+  }
 
   getPRInfo(repoDetails) {
     const urlBase = this.getUrlBase(repoDetails);
@@ -161,24 +196,78 @@ let GithubAPI = {
     const uriPath = `${urlBase}/pulls/${prId}`;
     return this.makeConditionalGet(uriPath, isPrivate);
   }
-};
 
-let BitbucketAPI = {
+  async getPRInfov2(owner, name, pullRequestId: string) {
+    const { data } = await this.gh.pullRequests.get({
+      repo: name,
+      owner,
+      number: +pullRequestId
+    });
+    const service = "github" as "github";
+    return {
+      base: {
+        user: data.base.repo.owner.login,
+        name: data.base.repo.name,
+        service,
+        sha: data.base.sha,
+        branch: data.base.ref
+      },
+      head: {
+        user: data.head.repo.owner.login,
+        name: data.head.repo.name,
+        service,
+        sha: data.head.sha,
+        branch: data.head.ref
+      }
+    };
+  }
+
+  async getBranchv2(owner: string, name: string, branch: string) {
+    const { data } = await this.gh.repos.getBranch({
+      owner,
+      repo: name,
+      branch
+    });
+    return {
+      user: owner,
+      name,
+      service: "github" as "github",
+      sha: data.commit.sha,
+      branch: data.name
+    };
+  }
+
+  async getCommitInfov2(owner: string, name: string, commitSha: string) {
+    const { data } = await this.gh.repos.getCommit({
+      owner,
+      repo: name,
+      sha: commitSha
+    });
+    const service = "github" as "github";
+    return {
+      base: { user: owner, name, service, sha: data.parents[0].sha },
+      head: { user: owner, name, service, sha: data.sha }
+    };
+  }
+}
+
+// class BitbucketAPI extends BaseGitRemoteAPI {
+class BitbucketAPI {
   getRemoteUsername(decoded) {
     return decoded.bitbucket_username;
-  },
+  }
 
   getPassthroughPath() {
     return `bitbucket_passthrough/`;
-  },
+  }
 
   buildUrl(path) {
     return `https://api.bitbucket.org/2.0/${path}`;
-  },
+  }
 
   getPrivateErrorCodes() {
     return [403];
-  },
+  }
 
   getParsedDiff(rawDiff) {
     const parsedDiff = parse(rawDiff);
@@ -202,30 +291,33 @@ let BitbucketAPI = {
         deletions: element.deletions
       };
     });
-  },
+  }
 
-  getPRFiles(repoDetails) {
-    const { username, reponame, prId } = repoDetails;
-    const uriPath = `repositories/${username}/${reponame}/pullrequests/${prId}/diff/`;
-    return this.makeConditionalGet(uriPath).then(response => {
-      return { data: this.getParsedDiff(response.data) };
-    });
-  },
+  // getPRFiles(repoDetails) {
+  //   const { username, reponame, prId, isPrivate } = repoDetails;
+  //   const uriPath = `repositories/${username}/${reponame}/pullrequests/${prId}/diff/`;
+  //   return this.makeConditionalGet(uriPath, isPrivate).then(response => {
+  //     return { data: this.getParsedDiff(response.data) };
+  //   });
+  // }
 
-  getFilesTree(repoDetails) {},
+  getFilesTree(repoDetails) {}
 
   getPRInfo(repoDetails) {}
-};
 
-const getRemote = () => {
-  return process.env.TEST === "true" || getGitService() === "github"
-    ? GithubAPI
-    : BitbucketAPI;
-};
+  getCommitFiles(repoDetails) {}
 
-const RemoteAPI = Object.assign(
-  {},
-  Object.assign({}, BaseGitRemoteAPI, getRemote())
-);
+  getCompareFiles(repoDetails) {}
 
-export default RemoteAPI;
+  getPRInfov2(repo: RepoReference, pullRequestId: string) {}
+}
+
+let remoteAPI: BaseGitRemoteAPI;
+
+const gitService = getGitService();
+// TODO: uncomment after bitbucket is ready to go
+// remoteAPI = gitService === "bitbucket" ? new BitbucketAPI() : new GithubAPI();
+remoteAPI = new GithubAPI();
+
+export default remoteAPI;
+export { getParameterByName } from "./utils";

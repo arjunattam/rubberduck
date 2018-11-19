@@ -7,7 +7,10 @@
     "rootDir": "src",
     "outDir": "public/js",
     "noEmitOnError": true,
-    "types": ["chrome", "webpack-env"]
+    "types": ["chrome", "webpack-env"],
+
+    "strict": true,
+    "noImplicitAny": false
   },
   "include": ["src/**/*"],
   "exclude": [

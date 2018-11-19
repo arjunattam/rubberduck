@@ -24,6 +24,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 });
 
 chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
+  console.log("lastError", chrome.runtime.lastError);
   return onMessageReceived(req, sender, sendRes);
 });
 

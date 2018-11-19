@@ -1,5 +1,5 @@
 export default class BasePathAdapter {
-  static constructPath = (subPath, orgname, reponame, branch) => {
+  static constructFilePath = (subPath, orgname, reponame, branch) => {
     // return relative path which follows a domain name, like
     // github.com, from given sub-path
     if (branch === undefined || branch === null) {

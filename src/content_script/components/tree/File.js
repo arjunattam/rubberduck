@@ -145,7 +145,7 @@ export default class File extends React.Component {
     const { username, reponame, branch } = repoDetails;
     const href = isPRFile
       ? this.getFilesChangedUrl()
-      : pathAdapter.constructPath(path, username, reponame, branch);
+      : pathAdapter.constructFilePath(path, username, reponame, branch);
 
     return this.renderFileLabel(href, event => this.clickHandler(href, event));
   }
