@@ -1,9 +1,9 @@
-import axios from "axios";
-import axiosRetry from "axios-retry";
-
-const RETRY_LIMIT = 100;
+import axios, { AxiosInstance } from "axios";
 
 export default class BaseRequest {
+  rootUrl: string;
+  baseRequest: AxiosInstance;
+
   constructor(rootUrl, token) {
     this.rootUrl = rootUrl;
     let baseURL = this.getAPIUrl();
@@ -11,15 +11,6 @@ export default class BaseRequest {
       baseURL: baseURL
     });
     this.updateDefaultHeader(token);
-
-    // Need to write this in try/catch because it breaks tests (!?)
-    // See: https://github.com/knee-cola/jest-mock-axios/issues/5
-    try {
-      axiosRetry(this.baseRequest, {
-        retryDelay: axiosRetry.exponentialDelay,
-        retries: RETRY_LIMIT
-      });
-    } catch (e) {}
   }
 
   updateDefaultHeader(token) {

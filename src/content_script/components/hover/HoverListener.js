@@ -49,9 +49,9 @@ class HoverListener extends React.Component {
     }
   };
 
-  onMouseOverListener(e, listener) {
-    if (!this.isOnHoverBox(e.x, e.y)) {
-      listener(e, this.receiver, this.props.data.repoDetails.branch);
+  onMouseOverListener(event, listener) {
+    if (!this.isOnHoverBox(event.x, event.y)) {
+      listener(event, this.receiver, this.props.data.repoDetails.branch);
     } else {
       this.setState({ isOnHoverBox: true });
     }
@@ -62,8 +62,8 @@ class HoverListener extends React.Component {
 
     if (this.listener !== null) {
       document.body.onmousemove = null;
-      document.body.onmousemove = e => {
-        this.onMouseOverListener(e, this.listener);
+      document.body.onmousemove = event => {
+        this.onMouseOverListener(event, this.listener);
       };
     } else {
       document.body.onmousemove = null;
@@ -98,8 +98,7 @@ class HoverListener extends React.Component {
 
   isDebugging = () => {
     const { hasHoverDebug } = this.props.storage;
-    // Can never debug in production
-    return hasHoverDebug && process.env.REACT_APP_BACKEND_ENV === "local";
+    return hasHoverDebug;
   };
 
   render() {

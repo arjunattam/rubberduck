@@ -1,22 +1,21 @@
 import { TabRepoMap, RepoPayload } from "./tabRepoMap";
+import { NativePort } from "./port";
 const uuidv4 = require("uuid/v4");
-const applicationId = "io.rubberduck.native";
 
 class NativeMessenger {
-  port: chrome.runtime.Port;
+  port = new NativePort(msg => this.onMessage(msg));
   tabRepoMap = new TabRepoMap();
   callbackMap = new Map<string, any>();
 
   constructor() {
-    this.port = chrome.runtime.connectNative(applicationId);
-
-    // TODO: error handling here - what if we can't connect?
-    this.port.onMessage.addListener(msg => this.onMessage(msg));
-    this.port.onDisconnect.addListener(() => this.onDisconnect());
+    this.port.connect();
   }
 
   info(tabId, payload, callback) {
-    this.send("INFO", payload, callback);
+    const portInfo = this.port.info();
+    this.send("INFO", payload, payload =>
+      callback({ ...payload, port: portInfo })
+    );
   }
 
   cloneAndCheckout(tabId, payload: InitializeParams, callback) {
@@ -99,7 +98,7 @@ class NativeMessenger {
       this.callbackMap.set(requestId, callback);
     }
 
-    this.port.postMessage({ type, payload, id: requestId });
+    this.port.send({ type, payload, id: requestId });
   }
 
   private onMessage(message: any) {
@@ -113,10 +112,6 @@ class NativeMessenger {
     } else {
       console.log("No callback found!");
     }
-  }
-
-  private onDisconnect() {
-    console.log("port disconnected");
   }
 }
 

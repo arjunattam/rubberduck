@@ -50,47 +50,15 @@ export default class Settings extends React.Component {
 
   getAuthState = () => Authorization.getAuthState();
 
-  onPortChange = newValue =>
-    StorageUtils.setInLocalStore({ defaultPort: newValue });
-
-  /**
-   * Whenever our hasMenuApp setting changes, we want to clear the
-   * menu app tokens, because our menu app server instance might have changed.
-   * Right after this, auth store will issue new tokens and update the store.
-   *
-   * At this point, we also check whether chrome permissions to communicate
-   * with the menu app server. This requires "user interaction" and therefore
-   * needs to be done here.
-   */
-  onMenuChange = newMenuApp => {
-    const values = {
-      hasMenuApp: newMenuApp,
-      menuAppTokens: {}
-    };
-    if (newMenuApp) {
-      Authorization.updateChromePermissions().then(response => {
-        StorageUtils.setInLocalStore(values);
-      });
-    } else {
-      StorageUtils.setInLocalStore(values);
-    }
-  };
-
   render() {
-    const { hasMenuApp, defaultPort } = this.props.storage;
     return (
       <SettingsInternal
-        supportLink={this.props.supportLink}
         isVisible={this.props.isVisible}
         isAuthLoading={this.state.isAuthLoading}
         authState={this.getAuthState()}
         serviceUsername={this.getServiceUsername()}
         onLogout={this.launchLogoutFlow}
         onLogin={this.launchOAuthFlow}
-        hasMenuApp={hasMenuApp}
-        defaultPort={defaultPort}
-        onPortChange={this.onPortChange}
-        onMenuChange={this.onMenuChange}
       />
     );
   }

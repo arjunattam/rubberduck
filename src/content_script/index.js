@@ -5,7 +5,6 @@ import Extension from "./components/Extension";
 import store from "./store.js";
 import * as AnalyticsUtils from "./utils/analytics";
 import * as CrashReporting from "./utils/crashes";
-// import registerServiceWorker from "./registerServiceWorker";
 
 const SIDEBAR_CONTAINER_ID = "mercury-sidebar";
 
@@ -33,7 +32,6 @@ const loadAnalytics = () => {
 };
 
 // Content script setup: called right after injection
-// registerServiceWorker();
 loadAnalytics();
 loadCrashReporting();
 createExtensionContainer();

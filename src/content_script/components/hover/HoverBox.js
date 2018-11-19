@@ -31,32 +31,24 @@ const HelperLoader = props => (
   </div>
 );
 
-const ExpandHelper = props => {
-  if (props.isNotReady) {
-    return (
-      <div className="expand-helper">
-        <HelperText textAlign={"left"} action={"getting ready..."} />
-      </div>
-    );
-  } else {
-    return (
-      <div className="expand-helper">
+const ExpandHelper = ({ isHighlighted, isExpandable, isLoading }) => {
+  return (
+    <div className="expand-helper">
+      <HelperText
+        textAlign={"left"}
+        shortcut={isHighlighted ? `click` : `${getMetaKey()} + click`}
+        action={"actions"}
+      />
+      {isExpandable ? (
         <HelperText
-          textAlign={"left"}
-          shortcut={props.isHighlighted ? `click` : `${getMetaKey()} + click`}
-          action={"actions"}
+          textAlign={"right"}
+          shortcut={`${getMetaKey()}`}
+          action={"expand"}
         />
-        {props.isExpandable ? (
-          <HelperText
-            textAlign={"right"}
-            shortcut={`${getMetaKey()}`}
-            action={"expand"}
-          />
-        ) : null}
-        {props.isLoading ? <HelperLoader textAlign={"right"} /> : null}
-      </div>
-    );
-  }
+      ) : null}
+      {isLoading ? <HelperLoader textAlign={"right"} /> : null}
+    </div>
+  );
 };
 
 export default class HoverBox extends React.Component {
@@ -163,7 +155,6 @@ export default class HoverBox extends React.Component {
       isExpandable={this.isDocstringExpandable()}
       isHighlighted={this.props.isHighlighted}
       isLoading={this.props.isLoading}
-      isNotReady={this.props.isNotReady}
     />
   );
 

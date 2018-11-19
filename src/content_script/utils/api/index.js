@@ -24,10 +24,6 @@ export class BaseAPI {
     return Authorization.getDecodedToken();
   }
 
-  isOnMenuApp() {
-    return Authorization.isOnMenuAppEnv;
-  }
-
   makePostRequest = (uri, body) => {
     const rootUrl = Authorization.getBaseUrl();
     const token = Authorization.getToken();

@@ -2,10 +2,10 @@ import React from "react";
 import Octicon from "react-component-octicons";
 import "./Title.css";
 
-const Title = ({ repoDetails, hasMenuApp }) => {
+const Title = ({ repoDetails }) => {
   const { username, reponame } = repoDetails;
   const href = `/${username}/${reponame}`;
-  const icon = hasMenuApp ? "shield" : "server";
+  const icon = "server";
   return (
     <div className="reponame">
       <Octicon name={icon} style={{ height: 18 }} />{" "}

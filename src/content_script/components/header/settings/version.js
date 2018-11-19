@@ -3,7 +3,6 @@ import RubberduckIcon from "../../icon";
 import { VERSION } from "../../../utils/version";
 
 const changelog = "https://www.rubberduck.io/blog";
-const support = "https://www.rubberduck.io/support";
 
 const VersionSection = () => (
   <div className="settings-sub-section">
@@ -13,10 +12,6 @@ const VersionSection = () => (
         <div>
           <a href={changelog} target="_blank">
             Changelog
-          </a>{" "}
-          ·{" "}
-          <a href={support} target="_blank">
-            Support
           </a>
         </div>
       </div>

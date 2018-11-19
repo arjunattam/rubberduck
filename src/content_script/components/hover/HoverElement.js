@@ -46,27 +46,30 @@ export default class HoverElement extends React.Component {
     return xdiff <= CURSOR_RADIUS && ydiff <= CURSOR_RADIUS;
   };
 
-  callAPI = () => {
-    if (!this.isValidResult(this.props.hoverResult)) return;
+  callAPI = async () => {
+    if (!this.isValidResult(this.props.hoverResult)) {
+      return;
+    }
 
     this.clearApiResult();
-    this.DataActions.callHover(this.props.hoverResult).then(response => {
-      const { mouseX, mouseY } = this.props.hoverResult;
-      const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
-      const { value: result } = response;
+    const response = await this.DataActions.callHover(this.props.hoverResult);
+    const { mouseX, mouseY } = this.props.hoverResult;
+    const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
+    const { value: result } = response;
 
-      if (isForCurrentMouse) {
-        // We will set state only if the current
-        // mouse location overlaps with the response
-        this.setState({
-          apiResult: result,
-          hoverResult: this.props.hoverResult
-        });
-      }
-    });
+    if (isForCurrentMouse) {
+      // We will set state only if the current
+      // mouse location overlaps with the response
+      this.setState({
+        apiResult: result,
+        hoverResult: this.props.hoverResult
+      });
+    }
   };
 
-  onClick = event => (this.state.isHighlighted ? this.callActions() : null);
+  onClick = event => {
+    return this.state.isHighlighted ? this.callActions() : null;
+  };
 
   selectElement = element => {
     if (this.isValidElement(element)) {
@@ -77,7 +80,9 @@ export default class HoverElement extends React.Component {
   };
 
   removeSelectedElement = element => {
-    if (element && element.style) element.style.backgroundColor = null;
+    if (element && element.style) {
+      element.style.backgroundColor = null;
+    }
   };
 
   isValidElement = element => {
@@ -133,7 +138,10 @@ export default class HoverElement extends React.Component {
   }
 
   didChangeElement(newResult, oldResult) {
-    if (!newResult.element || !oldResult.element) return true;
+    if (!newResult.element || !oldResult.element) {
+      return true;
+    }
+
     return newResult.element.nodeValue !== oldResult.element.nodeValue;
   }
 
@@ -143,28 +151,42 @@ export default class HoverElement extends React.Component {
     const didChangeMouseOnBox = isOnHoverBox !== prevIsOnBox;
 
     if (didChangeMouseOnBox) {
-      if (isOnHoverBox) this.setState({ isHighlighted: true });
-      else this.setState({ isHighlighted: false });
+      if (isOnHoverBox) {
+        this.setState({ isHighlighted: true });
+      } else {
+        this.setState({ isHighlighted: false });
+      }
     }
   }
 
   clearDebouce = () => {
-    if (this.apiDebFunc !== undefined) this.apiDebFunc.clear();
-    if (this.visibilityDebFunc !== undefined) this.visibilityDebFunc.clear();
+    if (this.debouncedApiCall !== undefined) {
+      this.debouncedApiCall.clear();
+    }
+
+    if (this.debouncedVisibility !== undefined) {
+      this.debouncedVisibility.clear();
+    }
   };
 
   clearApiResult = () => {
-    if (this.state.apiResult.name) this.setState({ apiResult: {} });
+    if (this.state.apiResult.name) {
+      this.setState({ apiResult: {} });
+    }
   };
 
   setupDebounce = () => {
-    this.apiDebFunc = debounce(() => this.callAPI(), API_DEBOUNCE_TIMEOUT);
-    this.visibilityDebFunc = debounce(
+    this.debouncedApiCall = debounce(
+      () => this.callAPI(),
+      API_DEBOUNCE_TIMEOUT
+    );
+    this.debouncedVisibility = debounce(
       () => this.setState({ isVisible: true }),
       VISIBILITY_DEBOUNCE_TIMEOUT
     );
-    this.apiDebFunc();
-    this.visibilityDebFunc();
+
+    this.debouncedApiCall();
+    this.debouncedVisibility();
   };
 
   isLoading = () => this.props.data.section.isLoading.hover;
@@ -203,13 +225,6 @@ export default class HoverElement extends React.Component {
   }
 
   render() {
-    const isNotReady = this.props.data.session.status !== "ready";
-    return (
-      <HoverBox
-        {...this.state}
-        isLoading={this.isLoading()}
-        isNotReady={isNotReady}
-      />
-    );
+    return <HoverBox {...this.state} isLoading={this.isLoading()} />;
   }
 }

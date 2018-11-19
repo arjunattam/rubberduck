@@ -35,9 +35,12 @@ export const isGithubCompareView = () => {
   }
 };
 
-export const isSplitDiffGithubView = () =>
-  getGitService() === "github" &&
-  document.querySelector("table.file-diff-split");
+export const isSplitDiffGithubView = () => {
+  return (
+    getGitService() === "github" &&
+    document.querySelector("table.file-diff-split")
+  );
+};
 
 export const getFileboxSelector = path => {
   const service = getGitService();

@@ -23,27 +23,11 @@ const SectionLoader = () => (
   </div>
 );
 
-const ReportIssue = () => (
-  <div
-    className="section-loader section-report"
-    onClick={e => {
-      window.open(
-        "https://github.com/karigari/rubberduck-issues/issues/new/choose",
-        "_blank"
-      );
-      e.stopPropagation();
-    }}
-  >
-    <Octicon name="report" />
-  </div>
-);
-
 const SectionHeader = props => (
   <div className="section-header" onClick={props.onClick}>
     <SectionHeaderIcon isOpen={props.isVisible} />
     {props.name}
     {props.isLoading ? <SectionLoader /> : null}
-    {props.isVisible && !props.isLoading ? <ReportIssue /> : null}
   </div>
 );
 

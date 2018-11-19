@@ -12,9 +12,6 @@ const initialState = {
   // Settings
   // (chrome.storage.local)
   hasHoverDebug: false,
-  hasMenuApp: false,
-  defaultPort: "9898",
-  menuAppTokens: {},
 
   // API response caching: hash of url is the object key
   // (chrome.storage.local)
@@ -31,28 +28,13 @@ export default createReducer(initialState, {
   },
 
   UPDATE_FROM_CHROME_STORAGE: (state, action) => {
-    if (!action.payload) return { ...state };
-    let modifier = {};
-    let hasChangeEnv = false;
-    const { hasMenuApp: newEnv } = action.payload;
-
-    if (newEnv !== undefined) {
-      hasChangeEnv = state.hasMenuApp !== newEnv;
-    }
-
-    if (hasChangeEnv) {
-      modifier.menuAppTokens = {};
-    } else if (action.payload.menuAppTokens) {
-      modifier.menuAppTokens = {
-        ...state.menuAppTokens,
-        ...action.payload.menuAppTokens
-      };
+    if (!action.payload) {
+      return { ...state };
     }
 
     return {
       ...state,
-      ...action.payload,
-      ...modifier
+      ...action.payload
     };
   }
 });

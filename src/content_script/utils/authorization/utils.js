@@ -121,11 +121,3 @@ export const handleTokenState = (clientId, existingToken) => {
     return issueToken(clientId);
   }
 };
-
-/**
- * Return promise after ensuring that we have CORS permissions
- * for a url. See https://developer.chrome.com/extensions/xhr
- */
-export const updateChromePermissions = url => {
-  return sendMessagePromise("PERMISSIONS_UPDATE", { url });
-};

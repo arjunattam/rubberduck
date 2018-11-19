@@ -8,7 +8,6 @@ import * as CrashReporting from "../crashes";
 import * as AnalyticsUtils from "../analytics";
 import { getGitService } from "../../adapters";
 import { getParameterByName } from "../api";
-import { WS } from "../websocket";
 
 /**
  * The AuthStore manages auth and environment (menu app vs hosted)
@@ -19,21 +18,7 @@ export class AuthStore {
    */
   constructor(store) {
     this.store = store;
-    this.isOnMenuAppEnv = null;
     this.DataActions = bindActionCreators(DataActions, store.dispatch);
-    this.store.subscribe(() => this.updateEnvironment());
-  }
-
-  updateEnvironment() {
-    const hasInit = this.store.getState().storage.initialized;
-    const newMenuApp = this.store.getState().storage.hasMenuApp;
-
-    if (hasInit && newMenuApp !== this.isOnMenuAppEnv) {
-      this.isOnMenuAppEnv = newMenuApp;
-      if (newMenuApp) {
-        WS.tearDown().then(() => this.setup());
-      }
-    }
   }
 
   getToken() {
@@ -51,44 +36,24 @@ export class AuthStore {
       envRootUrl = "http://localhost:8000/";
     }
 
-    if (this.isOnMenuAppEnv) {
-      const { defaultPort } = this.store.getState().storage;
-      envRootUrl = `http://localhost:${defaultPort}/`;
-    }
-
     return envRootUrl;
   };
 
   getTokenFromStorage = storage => {
     let container = storage;
-
-    if (this.isOnMenuAppEnv) {
-      container = storage.menuAppTokens;
-    }
-
     const { token } = container;
     return token;
   };
 
   getClientIdFromStorage = storage => {
     let container = storage;
-
-    if (this.isOnMenuAppEnv) {
-      container = storage.menuAppTokens;
-    }
-
     const { clientId } = container;
     return clientId;
   };
 
   updateTokenStorage = ({ token, clientId }) => {
     const nonNull = _.pickBy({ token, clientId }, _.identity);
-
-    if (this.isOnMenuAppEnv) {
-      StorageUtils.setInLocalStore({ menuAppTokens: nonNull }, () => {});
-    } else {
-      StorageUtils.setInSyncStore(nonNull, () => {});
-    }
+    StorageUtils.setInSyncStore(nonNull, () => {});
   };
 
   hasValidToken() {
@@ -142,8 +107,7 @@ export class AuthStore {
     const prevToken = this.getTokenFromStorage(prevStorage);
     const newToken = this.getTokenFromStorage(newStorage);
     const hasTokenChanged = prevToken !== newToken;
-    const hasEnvChanged = prevStorage.hasMenuApp !== newStorage.hasMenuApp;
-    return hasEnvChanged || hasTokenChanged;
+    return hasTokenChanged;
   }
 
   /**
@@ -211,11 +175,6 @@ export class AuthStore {
         }
       });
     });
-  };
-
-  updateChromePermissions = () => {
-    const url = "http://localhost/*"; // ports don't matter
-    return AuthUtils.updateChromePermissions(url);
   };
 }
 

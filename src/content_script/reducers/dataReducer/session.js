@@ -18,7 +18,6 @@ function updateNotReady(state, action) {
 
 export default createReducer(initialState, {
   CREATE_NEW_SESSION_FULFILLED: (state, action) => {
-    console.log("Session created", action.payload);
     return {
       ...state,
       payload: {
@@ -27,7 +26,6 @@ export default createReducer(initialState, {
     };
   },
   CREATE_NEW_SESSION_REJECTED: (state, action) => {
-    console.log("Session creation failed", action.payload);
     return {
       ...state
     };

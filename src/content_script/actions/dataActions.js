@@ -1,4 +1,3 @@
-import { WS } from "../utils/websocket";
 import { API } from "../utils/api";
 import * as NativeUtils from "../utils/native";
 import { loadUrl as pjaxLoadUrl } from "../utils/pjax";
@@ -20,11 +19,9 @@ export function setOpenSection(data) {
 }
 
 export function createNewSession(params) {
-  NativeUtils.initialize(params);
-
   return {
     type: "CREATE_NEW_SESSION",
-    payload: WS.createNewSession(params)
+    payload: NativeUtils.initialize(params)
   };
 }
 
@@ -103,13 +100,11 @@ export function callHover(data) {
 
 export function callDefinitions(data) {
   const { fileSha, filePath, lineNumber, charNumber } = data;
-  const { status } = Store.getState().data.session;
-
   return {
     type: "CALL_DEFINITION",
     payload: NativeUtils.definition(filePath, fileSha, lineNumber, charNumber),
     meta: {
-      shouldCollapse: isTreeTooBig() && status === "ready",
+      shouldCollapse: isTreeTooBig(),
       hoverResult: data
     }
   };
@@ -169,9 +164,11 @@ const isTreeTooBig = () => {
   const ACCEPTABLE_TREE_COVERAGE = 0.35;
   const treeElement = document.querySelector("div.tree-content");
   const sidebarElement = document.querySelector("div.sidebar-container");
+
   if (treeElement && sidebarElement) {
     const treeCoverage = treeElement.offsetHeight / sidebarElement.offsetHeight;
     return treeCoverage >= ACCEPTABLE_TREE_COVERAGE;
   }
+
   return false;
 };

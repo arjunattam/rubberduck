@@ -1,1 +1,3 @@
-export const VERSION = "0.3.4";
+const manifest = chrome.runtime.getManifest();
+
+export const VERSION = manifest.version;

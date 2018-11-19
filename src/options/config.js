@@ -2,9 +2,7 @@ import React from "react";
 
 export class ExistingOptions extends React.Component {
   state = {
-    hasHoverDebug: false,
-    hasMenuApp: false,
-    defaultPort: 8000
+    hasHoverDebug: false
   };
 
   componentDidMount() {
@@ -21,18 +19,6 @@ export class ExistingOptions extends React.Component {
     });
   }
 
-  onMenuChange() {
-    this.setState({ hasMenuApp: !this.state.hasMenuApp }, () => {
-      chrome.storage.local.set({ hasMenuApp: this.state.hasMenuApp });
-    });
-  }
-
-  onPortChange(event) {
-    this.setState({ defaultPort: event.target.value }, () => {
-      chrome.storage.local.set({ defaultPort: this.state.defaultPort });
-    });
-  }
-
   render() {
     return (
       <div>
@@ -45,26 +31,6 @@ export class ExistingOptions extends React.Component {
               checked={this.state.hasHoverDebug}
             />
             Hover debug mode
-          </label>
-        </p>
-        <p>
-          <label>
-            <input
-              type="checkbox"
-              onChange={() => this.onMenuChange()}
-              checked={this.state.hasMenuApp}
-            />
-            Use with menu bar app
-          </label>
-        </p>
-        <p>
-          <label>
-            Default port
-            <input
-              type="text"
-              value={this.state.defaultPort}
-              onChange={evt => this.onPortChange(evt)}
-            />
           </label>
         </p>
       </div>

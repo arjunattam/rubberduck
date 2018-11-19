@@ -31,7 +31,6 @@ export const setupUser = userInfo => {
 const getEventProps = () => {
   const { repoDetails, session, hoverResult } = Store.getState().data;
   const { isSidebarVisible, sidebarWidth } = Store.getState().storage;
-  const { hasMenuApp, defaultPort } = Store.getState().storage;
   const { status: sessionStatus, progress: sessionProgress } = session;
   return {
     ...repoDetails,
@@ -40,8 +39,6 @@ const getEventProps = () => {
     sessionProgress,
     isSidebarVisible,
     sidebarWidth,
-    hasMenuApp,
-    defaultPort,
     version: VERSION,
     service: getGitService()
   };

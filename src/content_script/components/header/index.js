@@ -4,7 +4,6 @@ import TitleBar from "./title";
 import Settings from "./settings";
 import StatusBar from "./status";
 import BranchInfo from "./branch";
-import { getSupportLink } from "./support";
 
 const HEADER_UPPER_STYLE = {
   backgroundColor: "rgb(250, 251, 252)",
@@ -23,24 +22,17 @@ class Header extends React.Component {
 
   render() {
     const { repoDetails, session } = this.props.data;
-    const { hasMenuApp } = this.props.storage;
     const { isSettingsExpanded } = this.state;
-    const supportLink = getSupportLink(session, hasMenuApp);
     return (
       <div>
         <div className="header-upper" style={HEADER_UPPER_STYLE}>
-          <TitleBar repoDetails={repoDetails} hasMenuApp={hasMenuApp} />
+          <TitleBar repoDetails={repoDetails} />
           <StatusBar
             session={session}
-            supportLink={supportLink}
             onClick={this.toggleSettings}
             isExpanded={isSettingsExpanded}
           />
-          <Settings
-            supportLink={supportLink}
-            isVisible={isSettingsExpanded}
-            {...this.props}
-          />
+          <Settings isVisible={isSettingsExpanded} {...this.props} />
         </div>
         <BranchInfo repoDetails={repoDetails} />
       </div>
