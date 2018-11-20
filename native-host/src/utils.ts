@@ -24,7 +24,7 @@ export const clean = (message: any, repoInfo: RepoPayload) => {
 
 export const constructRootUri = (repoInfo: RepoPayload) => {
   const { name, sha } = repoInfo;
-  return `${URI_PREFIX}/${name}`;
+  return `${URI_PREFIX}/${name}_${sha}`;
 };
 
 export const constructFileUri = (repoInfo: RepoPayload, path: string) => {

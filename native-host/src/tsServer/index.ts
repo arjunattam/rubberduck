@@ -14,9 +14,6 @@ export class TypeScriptServer {
       (msg: any) => this.handleMessage(msg),
       (error: any) => log(`Reader error: ${error}`)
     );
-
-    this.serverProcess.on("exit", code => this.handleExit(code));
-    this.serverProcess.on("error", error => this.handleError(error));
   }
 
   initialize(reqId: string, rootUri: string) {
@@ -90,13 +87,5 @@ export class TypeScriptServer {
     }
 
     callback.onSuccess(message);
-  }
-
-  private handleExit(code: any) {
-    log(`Server exited with code: ${code}`);
-  }
-
-  private handleError(error: any) {
-    log(`Server error: ${error}`);
   }
 }

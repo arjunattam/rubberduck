@@ -17,7 +17,6 @@ const SOURCEGRAPH_LS_SERVER = {
 const LS_SERVER = SOURCEGRAPH_LS_SERVER;
 
 export const spawnServer = (): cp.ChildProcess => {
-  return cp.spawn(LS_SERVER.binary, LS_SERVER.args, {
-    stdio: ["pipe", "pipe", "pipe"]
-  });
+  const { binary, args } = LS_SERVER;
+  return cp.fork(binary, args, { stdio: ["pipe", "pipe", "pipe", "ipc"] });
 };

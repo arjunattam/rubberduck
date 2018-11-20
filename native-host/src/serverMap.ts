@@ -1,5 +1,6 @@
 import { TypeScriptServer } from "./tsServer";
 import { spawnServer } from "./tsServer/spawn";
+import { log } from "./logger";
 
 export class LangServersMap {
   serversMap = new Map<string, TypeScriptServer>();
@@ -13,8 +14,8 @@ export class LangServersMap {
     }
 
     const process = spawnServer();
-    // TODO: listen for case when the ts server dies
-    // on its own
+    process.on("exit", code => this.handleExit(payload, code));
+    process.on("error", error => this.handleError(payload, error));
     const tsServer = new TypeScriptServer(process);
     this.serversMap.set(this.getKey(payload), tsServer);
     return tsServer;
@@ -40,5 +41,14 @@ export class LangServersMap {
   private getKey(payload: RepoPayload): string {
     const { name, user, sha, service } = payload;
     return `${service}:${user}:${name}:${sha}`;
+  }
+
+  private handleExit(repo: RepoPayload, code: any) {
+    log(`Server exit: ${code}`);
+    this.serversMap.delete(this.getKey(repo));
+  }
+
+  private handleError(repo: RepoPayload, error: any) {
+    log(`Server error: ${error}`);
   }
 }
