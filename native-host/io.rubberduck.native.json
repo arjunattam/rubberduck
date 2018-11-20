@@ -3,5 +3,8 @@
   "description": "rubberduck-native-host",
   "path": "/Users/arjun/mercury-extension/native-host/bin/rubberduck-native-macos",
   "type": "stdio",
-  "allowed_origins": ["chrome-extension://acfcmnpdampidgafadmjcddikildmapg/"]
+  "allowed_origins": [
+    "chrome-extension://acfcmnpdampidgafadmjcddikildmapg/",
+    "chrome-extension://nopekhgebkpkbjoclackdlofmcpokgmc/"
+  ]
 }

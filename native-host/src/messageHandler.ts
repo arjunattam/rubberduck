@@ -1,8 +1,9 @@
 import { LangServersMap } from "./serverMap";
 import { readFile, constructFileUri, constructRootUri, clean } from "./utils";
 import * as git from "./git";
+import packageJson from "../package.json";
 
-const VERSION = "0.1.0";
+const VERSION = packageJson.version;
 
 export class MessageHandler {
   langServers = new LangServersMap();

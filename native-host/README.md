@@ -2,6 +2,12 @@
 
 This is the native application for the Rubberduck chrome extension. This uses the [Native Messaging](https://developer.chrome.com/apps/nativeMessaging) APIs.
 
+To install this run:
+
+```
+npm install -g rubberduck-native
+```
+
 To build this run:
 
 ```
