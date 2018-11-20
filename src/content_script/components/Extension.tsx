@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as DataActions from "../actions/dataActions";
@@ -6,14 +6,17 @@ import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
 import * as ChromeUtils from "../utils/chrome";
 import * as StorageUtils from "../utils/storage";
-import Authorization from "./../utils/authorization";
-import { getGitService } from "../adapters";
+import Authorization from "../utils/authorization";
+// import { getGitService } from "../adapters";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 import pathAdapterv2 from "../adaptersv2";
 
 let document = window.document;
 
-class Extension extends React.Component {
+class Extension extends React.Component<any, any> {
+  DataActions: any;
+  StorageActions: any;
+
   constructor(props) {
     super(props);
     this.DataActions = bindActionCreators(DataActions, this.props.dispatch);
@@ -102,23 +105,29 @@ class Extension extends React.Component {
   }
 
   initializeSession() {
-    const repoDetails = this.props.data.repoDetails;
-    const hasSessionParams =
-      repoDetails.prId || repoDetails.headSha || repoDetails.branch;
+    const viewInfo: RemoteView = this.props.data.view;
 
-    if (repoDetails.username && repoDetails.reponame && hasSessionParams) {
-      const params = {
-        organisation: repoDetails.username,
-        name: repoDetails.reponame,
-        pull_request_id: repoDetails.prId,
-        type: repoDetails.type,
-        head_sha: repoDetails.headSha || repoDetails.branch,
-        base_sha: repoDetails.baseSha,
-        service: getGitService()
-      };
-
-      this.DataActions.createNewSession(params);
+    if (!!viewInfo.type) {
+      this.DataActions.createNewSession(viewInfo);
     }
+
+    // const repoDetails = this.props.data.repoDetails;
+    // const hasSessionParams =
+    //   repoDetails.prId || repoDetails.headSha || repoDetails.branch;
+
+    // if (repoDetails.username && repoDetails.reponame && hasSessionParams) {
+    //   const params = {
+    //     organisation: repoDetails.username,
+    //     name: repoDetails.reponame,
+    //     pull_request_id: repoDetails.prId,
+    //     type: repoDetails.type,
+    //     head_sha: repoDetails.headSha || repoDetails.branch,
+    //     base_sha: repoDetails.baseSha,
+    //     service: getGitService()
+    //   };
+
+    //   this.DataActions.createNewSession(params);
+    // }
   }
 
   initializeFileTree() {
@@ -129,10 +138,12 @@ class Extension extends React.Component {
         const { payload } = response.action;
         if (payload && payload.nextPage && payload.lastPage) {
           // We were not able to load the entire tree because API is paginated
-          let pages = [];
+          let pages: any = [];
+
           for (let i = payload.nextPage; i <= payload.lastPage; i++) {
             pages.push(i);
           }
+
           const firstPageRaw = payload.raw;
           this.DataActions.callTreePages(repoDetails, firstPageRaw, pages);
         }

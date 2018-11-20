@@ -110,8 +110,10 @@ export class BaseReaderSection extends BaseSection {
   fetchContents = fileObject => {
     const { filePath, fileSha } = fileObject;
     const baseOrHead = fileSha === "base" ? fileSha : "head";
+    // TODO: setup for base
+    const repoRef = this.props.data.view.head;
     return filePath
-      ? this.DataActions.callFileContents({ baseOrHead, filePath })
+      ? this.DataActions.callFileContents(filePath, baseOrHead, repoRef)
       : null;
   };
 

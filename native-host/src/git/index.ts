@@ -36,6 +36,7 @@ export const checkout = async (repo: RepoPayload) => {
 };
 
 export const cloneAndCheckout = async (repo: RepoPayload) => {
+  // TODO: add optimizations to avoid cloning duplicates
   await clone(repo);
   await checkout(repo);
   const dir = toPath(constructRootUri(repo));

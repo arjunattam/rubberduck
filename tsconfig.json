@@ -8,6 +8,7 @@
     "outDir": "public/js",
     "noEmitOnError": true,
     "types": ["chrome", "webpack-env"],
+    "jsx": "react",
 
     "strict": true,
     "noImplicitAny": false

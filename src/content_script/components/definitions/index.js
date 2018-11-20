@@ -12,15 +12,24 @@ import "./Definitions.css";
 class Definitions extends BaseReaderSection {
   sectionName = "definitions";
 
-  getSelectionData = hoverResult => {
+  getSelectionData = async hoverResult => {
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
-      this.DataActions.callDefinitions(hoverResult).then(response => {
-        this.fetchDefinitionContents();
-      });
+      const params = {
+        // TODO: also setup for base --> check via hoverResult
+        repo: this.props.data.view.head,
+        query: {
+          path: hoverResult.filePath,
+          line: hoverResult.lineNumber,
+          character: hoverResult.charNumber
+        }
+      };
+      await this.DataActions.callDefinitions(params, hoverResult);
+      // TODO: disabled fetching contents here
+      // this.fetchDefinitionContents();
     }
   };
 

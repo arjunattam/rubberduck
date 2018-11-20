@@ -14,15 +14,24 @@ class Usages extends BaseReaderSection {
     hasCollapsedFiles: false
   };
 
-  getSelectionData = hoverResult => {
+  getSelectionData = async hoverResult => {
     const isValidResult =
       hoverResult.hasOwnProperty("fileSha") &&
       hoverResult.hasOwnProperty("lineNumber");
 
     if (isValidResult) {
-      this.DataActions.callUsages(hoverResult).then(response => {
-        this.fetchUsagesContents();
-      });
+      const params = {
+        // TODO: also setup for base --> check via hoverResult
+        repo: this.props.data.view.head,
+        query: {
+          path: hoverResult.filePath,
+          line: hoverResult.lineNumber,
+          character: hoverResult.charNumber
+        }
+      };
+      await this.DataActions.callUsages(params, hoverResult);
+      // TODO: decide when to pull for contents
+      // this.fetchUsagesContents();
     }
   };
 

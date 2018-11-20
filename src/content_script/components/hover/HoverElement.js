@@ -52,7 +52,16 @@ export default class HoverElement extends React.Component {
     }
 
     this.clearApiResult();
-    const response = await this.DataActions.callHover(this.props.hoverResult);
+    const params = {
+      // TODO: this can also be base --> check via hoverResult
+      repo: this.props.data.view.head,
+      query: {
+        path: this.props.hoverResult.filePath,
+        line: this.props.hoverResult.lineNumber,
+        character: this.props.hoverResult.charNumber
+      }
+    };
+    const response = await this.DataActions.callHover(params);
     const { mouseX, mouseY } = this.props.hoverResult;
     const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
     const { value: result } = response;

@@ -34,9 +34,12 @@ interface InitializeParams {
 }
 
 interface LanguageQueryParams {
-  path: string;
-  line: number;
-  character: number;
+  repo: RepoReference;
+  query: {
+    path: string;
+    line: number;
+    character: number;
+  };
 }
 
 interface HoverResult {

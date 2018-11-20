@@ -16,7 +16,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  NativeHost.onTabClosed(tabId);
+  // NativeHost.onTabClosed(tabId);
 });
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
@@ -24,7 +24,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 });
 
 chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
-  console.log("lastError", chrome.runtime.lastError);
   return onMessageReceived(req, sender, sendRes);
 });
 

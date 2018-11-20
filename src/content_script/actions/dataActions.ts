@@ -1,7 +1,6 @@
 import API from "../utils/api";
 import * as NativeUtils from "../utils/native";
 import { loadUrl as pjaxLoadUrl } from "../utils/pjax";
-import Store from "../store";
 import { treeAdapter } from "../adapters";
 
 export function updateData(data) {
@@ -18,7 +17,7 @@ export function setOpenSection(data) {
   };
 }
 
-export function createNewSession(params) {
+export function createNewSession(params: RemoteView) {
   return {
     type: "CREATE_NEW_SESSION",
     payload: NativeUtils.initialize(params)
@@ -90,62 +89,53 @@ export function callTreePages(repoDetails, firstPageData, pageNumbers) {
   };
 }
 
-export function callHover(data) {
-  const { fileSha, filePath, lineNumber, charNumber } = data;
+export function callHover(params: LanguageQueryParams) {
   return {
     type: "CALL_HOVER",
-    payload: NativeUtils.hover(filePath, fileSha, lineNumber, charNumber)
+    payload: NativeUtils.hover(params)
   };
 }
 
-export function callDefinitions(data) {
-  const { fileSha, filePath, lineNumber, charNumber } = data;
+export function callDefinitions(params: LanguageQueryParams, hoverResult) {
   return {
     type: "CALL_DEFINITION",
-    payload: NativeUtils.definition(filePath, fileSha, lineNumber, charNumber),
+    payload: NativeUtils.definition(params),
     meta: {
       shouldCollapse: isTreeTooBig(),
-      hoverResult: data
+      hoverResult
     }
   };
 }
 
-export function callUsages(data) {
-  const { fileSha, filePath, lineNumber, charNumber } = data;
+export function callUsages(params: LanguageQueryParams, hoverResult) {
   return {
     type: "CALL_USAGES",
-    payload: NativeUtils.references(filePath, fileSha, lineNumber, charNumber),
+    payload: NativeUtils.references(params),
     meta: {
-      hoverResult: data
+      hoverResult
     }
   };
 }
 
-export function callFileContents(data) {
+export function callFileContents(
+  filePath: string,
+  baseOrHead,
+  repoReference: RepoReference
+) {
   // TODO: can we remove this if definitions/references fetch their own?
-  const { baseOrHead, filePath } = data;
-  const existingContents = Store.getState().data.fileContents;
-  const fileContents = existingContents[baseOrHead][filePath];
-  const noOpPromise = new Promise((resolve, reject) => {
+  const promise = new Promise(async (resolve, reject) => {
+    const contents = await NativeUtils.contents(filePath, repoReference);
     resolve({
-      ...data,
-      result: { contents: fileContents }
-    });
-  });
-
-  const apiCallPromise = new Promise((resolve, reject) => {
-    NativeUtils.contents(filePath, baseOrHead).then(contents => {
-      resolve({
-        baseOrHead,
-        filePath,
-        result: { contents }
-      });
+      // TODO: remove base or head from here
+      baseOrHead,
+      filePath,
+      result: { contents }
     });
   });
 
   return {
     type: "CALL_FILE_CONTENTS",
-    payload: fileContents ? noOpPromise : apiCallPromise
+    payload: promise
   };
 }
 
