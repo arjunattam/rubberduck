@@ -1,42 +1,8 @@
 import { LangServersMap } from "./serverMap";
 import { readFile, constructFileUri, constructRootUri, clean } from "./utils";
-import { RepoPayload } from "./types";
 import * as git from "./git";
 
 const VERSION = "0.1.0";
-
-interface LanguageQueryPayload {
-  repo: RepoPayload;
-  query: {
-    path: string;
-    line: number;
-    character: number;
-  };
-}
-
-interface FileContentsPayload {
-  repo: RepoPayload;
-  query: {
-    path: string;
-  };
-}
-
-interface Message {
-  id: string;
-  type: RequestType;
-  payload: object;
-}
-
-enum RequestType {
-  Info = "INFO",
-  CloneCheckout = "CLONE_AND_CHECKOUT",
-  Initialize = "INITIALIZE",
-  Hover = "HOVER",
-  Definition = "DEFINITION",
-  References = "REFERENCES",
-  FileContents = "FILE_CONTENTS",
-  Exit = "EXIT"
-}
 
 export class MessageHandler {
   langServers = new LangServersMap();

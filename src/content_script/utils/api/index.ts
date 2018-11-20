@@ -129,6 +129,14 @@ abstract class BaseGitRemoteAPI {
 class GithubAPI extends BaseGitRemoteAPI {
   gh = new Octokit();
 
+  constructor() {
+    super();
+    this.gh.authenticate({
+      type: "token",
+      token: "88d6d887ac9b4c6ecd1c491c189d4b276e96aca5"
+    });
+  }
+
   getRemoteUsername(decoded) {
     return decoded.github_username;
   }

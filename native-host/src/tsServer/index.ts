@@ -3,16 +3,12 @@ import { Reader } from "./wireProtocol";
 import { log } from "../logger";
 import { CallbackMap } from "./callbackMap";
 import { toPath } from "../utils";
-import { RepoPayload } from "../types";
 
 export class TypeScriptServer {
   private readonly reader: Reader<any>;
   private callbacks = new CallbackMap();
 
-  constructor(
-    private serverProcess: cp.ChildProcess,
-    private repoInfo: RepoPayload
-  ) {
+  constructor(private serverProcess: cp.ChildProcess) {
     this.reader = new Reader<any>(
       this.serverProcess.stdout,
       (msg: any) => this.handleMessage(msg),
@@ -104,23 +100,3 @@ export class TypeScriptServer {
     log(`Server error: ${error}`);
   }
 }
-
-// https://github.com/theia-ide/typescript-language-server
-const THEIA_LS_SERVER = {
-  binary: "../node_modules/.bin/typescript-language-server",
-  args: ["--stdio", "--log-level", "4", "--tsserver-log-file=ts-logs.txt"]
-};
-
-// https://github.com/sourcegraph/javascript-typescript-langserver
-const SOURCEGRAPH_LS_SERVER = {
-  binary: "../node_modules/.bin/javascript-typescript-stdio",
-  args: []
-};
-
-const LS_SERVER = SOURCEGRAPH_LS_SERVER;
-
-export const spawnServer = (): cp.ChildProcess => {
-  return cp.spawn(LS_SERVER.binary, LS_SERVER.args, {
-    stdio: ["pipe", "pipe", "pipe"]
-  });
-};

@@ -1,8 +1,8 @@
 import axios from "axios";
 import * as Moment from "moment";
-import { bindActionCreators } from "redux";
+// import { bindActionCreators } from "redux";
 import Store from "../../../store";
-import * as DataActions from "../../../actions/dataActions";
+// import * as DataActions from "../../../actions/dataActions";
 import Authorization from "../../authorization";
 import { hash } from "../../data";
 import * as StorageUtils from "../../storage";
@@ -15,7 +15,7 @@ const IS_CACHING_ENABLED = true;
 const BASE_API_PREFIX = "api/v1";
 
 export class BaseAPI {
-  DataActions = bindActionCreators(DataActions, Store.dispatch);
+  // DataActions = bindActionCreators(DataActions, Store.dispatch);
 
   makePostRequest = (uri, body) => {
     const rootUrl = Authorization.getBaseUrl();

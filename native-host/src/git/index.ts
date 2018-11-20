@@ -1,5 +1,4 @@
 import child_process from "child_process";
-import { RepoPayload } from "../types";
 import { URI_PREFIX, toPath, constructRootUri, mkdir } from "../utils";
 import { log } from "../logger";
 

@@ -7,7 +7,7 @@ import Sidebar from "./sidebar";
 import * as ChromeUtils from "../utils/chrome";
 import * as StorageUtils from "../utils/storage";
 import Authorization from "./../utils/authorization";
-import { pathAdapterDeprecated, getGitService } from "../adapters";
+import { getGitService } from "../adapters";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 import pathAdapterv2 from "../adaptersv2";
 
@@ -41,10 +41,9 @@ class Extension extends React.Component {
 
     if (hasLoadedStorage) {
       // Checking to trigger this only after chrome storage is loaded
-      this.setupAuthorization();
+      // this.setupAuthorization();
     }
 
-    // TODO: should this happen only after auth has been setup?
     this.updateSessionAndTree(prevProps, this.props);
   }
 
@@ -54,19 +53,24 @@ class Extension extends React.Component {
   };
 
   async initializeRepoDetails() {
-    this.DataActions.setRepoDetails(await pathAdapterv2.getViewInfo());
-    return repoDetails;
+    const viewInfo = await pathAdapterv2.getViewInfo();
+    this.DataActions.setRepoDetails(viewInfo);
+    return viewInfo;
   }
 
   updateSessionAndTree(prevProps, newProps) {
-    const { repoDetails: prev } = prevProps.data;
-    const { repoDetails: now } = newProps.data;
-    let hasSessionChanged = !pathAdapterDeprecated.isSameSessionPath(prev, now);
+    // TODO: this is getting called literally on every action
+    // like expanding/collapsing the files tree.
+    const hasViewChanged = pathAdapterv2.hasViewChanged(
+      prevProps.data.view,
+      newProps.data.view
+    );
     const hasAuthChanged = Authorization.hasChanged(
       prevProps.storage,
       newProps.storage
     );
-    if (hasAuthChanged || hasSessionChanged) {
+
+    if (hasAuthChanged || hasViewChanged) {
       this.initializeSession();
       this.initializeFileTree();
     }
@@ -89,15 +93,13 @@ class Extension extends React.Component {
     });
   }
 
-  setupAuthorization() {
-    return Authorization.setup();
-  }
+  // setupAuthorization() {
+  //   return Authorization.setup();
+  // }
 
   handleStorageUpdate(data) {
     this.StorageActions.updateFromChromeStorage(data);
   }
-
-  hasValidToken = () => Authorization.hasValidToken();
 
   initializeSession() {
     const repoDetails = this.props.data.repoDetails;
@@ -115,9 +117,7 @@ class Extension extends React.Component {
         service: getGitService()
       };
 
-      if (this.hasValidToken()) {
-        this.DataActions.createNewSession(params);
-      }
+      this.DataActions.createNewSession(params);
     }
   }
 
@@ -125,20 +125,18 @@ class Extension extends React.Component {
     let repoDetails = this.props.data.repoDetails;
 
     if (repoDetails.username && repoDetails.reponame) {
-      if (this.hasValidToken()) {
-        this.DataActions.callTree(repoDetails).then(response => {
-          const { payload } = response.action;
-          if (payload && payload.nextPage && payload.lastPage) {
-            // We were not able to load the entire tree because API is paginated
-            let pages = [];
-            for (let i = payload.nextPage; i <= payload.lastPage; i++) {
-              pages.push(i);
-            }
-            const firstPageRaw = payload.raw;
-            this.DataActions.callTreePages(repoDetails, firstPageRaw, pages);
+      this.DataActions.callTree(repoDetails).then(response => {
+        const { payload } = response.action;
+        if (payload && payload.nextPage && payload.lastPage) {
+          // We were not able to load the entire tree because API is paginated
+          let pages = [];
+          for (let i = payload.nextPage; i <= payload.lastPage; i++) {
+            pages.push(i);
           }
-        });
-      }
+          const firstPageRaw = payload.raw;
+          this.DataActions.callTreePages(repoDetails, firstPageRaw, pages);
+        }
+      });
     }
   }
 

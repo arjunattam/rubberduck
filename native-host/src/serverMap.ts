@@ -1,5 +1,5 @@
-import { TypeScriptServer, spawnServer } from "./tsServer";
-import { RepoPayload } from "./types";
+import { TypeScriptServer } from "./tsServer";
+import { spawnServer } from "./tsServer/spawn";
 
 export class LangServersMap {
   serversMap = new Map<string, TypeScriptServer>();
@@ -15,7 +15,7 @@ export class LangServersMap {
     const process = spawnServer();
     // TODO: listen for case when the ts server dies
     // on its own
-    const tsServer = new TypeScriptServer(process, payload);
+    const tsServer = new TypeScriptServer(process);
     this.serversMap.set(this.getKey(payload), tsServer);
     return tsServer;
   }

@@ -1,5 +1,4 @@
 import fs from "fs";
-import { RepoPayload } from "./types";
 const mkdirp = require("mkdirp");
 
 export const URI_PREFIX = "file:///Users/arjun/local_repos";
@@ -25,7 +24,7 @@ export const clean = (message: any, repoInfo: RepoPayload) => {
 
 export const constructRootUri = (repoInfo: RepoPayload) => {
   const { name, sha } = repoInfo;
-  return `${URI_PREFIX}/${name}_${sha}`;
+  return `${URI_PREFIX}/${name}`;
 };
 
 export const constructFileUri = (repoInfo: RepoPayload, path: string) => {
