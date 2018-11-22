@@ -31,7 +31,7 @@ export function updateSessionStatus(data) {
   };
 }
 
-export function setRepoDetails(data) {
+export function setRepoDetails(data: RemoteView) {
   return {
     type: "SET_REPO_DETAILS",
     payload: data

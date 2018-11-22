@@ -1,47 +1,60 @@
 import child_process from "child_process";
-import { URI_PREFIX, toPath, constructRootUri, mkdir } from "../utils";
-import { log } from "../logger";
+import {
+  URI_PREFIX,
+  toPath,
+  constructRootUri,
+  constructCloneUri,
+  mkdir
+} from "../utils";
+import { emitter } from "./emitter";
 
 const fs = require("fs");
 const git = require("isomorphic-git");
-const EventEmitter = require("events");
 
-const emitter = new EventEmitter();
 git.plugins.set("fs", fs);
 git.plugins.set("emitter", emitter);
 
-emitter.on("message", (message: any) => {
-  log(`message: ${message}`);
-});
-
-emitter.on("progress", (message: any) => {
-  // message is a ProgressEvent, with the following fields
-  const { loaded, total, lengthComputable } = message;
-});
-
-export const clone = async (repo: RepoPayload) => {
-  const dir = toPath(constructRootUri(repo));
-  await mkdir(dir);
-  await git.clone({
-    dir,
-    url: `https://github.com/${repo.user}/${repo.name}`,
-    singleBranch: true,
-    depth: 1
-  });
+const getTempSuffix = (path: string) => {
+  const temp = Math.random()
+    .toString(36)
+    .substring(7);
+  return `${path}_temp_${temp}`;
 };
 
-export const checkout = async (repo: RepoPayload) => {
-  const dir = toPath(constructRootUri(repo));
-  await git.checkout({ dir, ref: repo.sha });
-};
+export class GitManager {
+  clonePath: string;
+  finalPath: string;
+  cloneUrl: string;
 
-export const cloneAndCheckout = async (repo: RepoPayload) => {
-  // TODO: add optimizations to avoid cloning duplicates
-  await clone(repo);
-  await checkout(repo);
-  const dir = toPath(constructRootUri(repo));
-  return fs.readdirSync(dir);
-};
+  constructor(private repo: RepoPayload) {
+    this.clonePath = toPath(constructCloneUri(repo));
+    this.finalPath = toPath(constructRootUri(repo));
+    this.cloneUrl = `https://github.com/${repo.user}/${repo.name}`;
+  }
+
+  async clone() {
+    await mkdir(this.clonePath);
+    await git.clone({
+      gitdir: this.clonePath,
+      url: this.cloneUrl,
+      noCheckout: true
+    });
+  }
+
+  async checkout() {
+    await git.checkout({
+      gitdir: this.clonePath,
+      dir: this.finalPath,
+      ref: this.repo.sha
+    });
+  }
+
+  async cloneAndCheckout() {
+    await this.clone();
+    await this.checkout();
+    return fs.readdirSync(this.finalPath);
+  }
+}
 
 export const info = async () => {
   return new Promise(resolve => {

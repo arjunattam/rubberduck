@@ -57,8 +57,11 @@ class Extension extends React.Component<any, any> {
 
   async initializeRepoDetails() {
     const viewInfo = await pathAdapterv2.getViewInfo();
-    this.DataActions.setRepoDetails(viewInfo);
-    return viewInfo;
+
+    if (!!viewInfo) {
+      this.DataActions.setRepoDetails(viewInfo);
+      return viewInfo;
+    }
   }
 
   updateSessionAndTree(prevProps, newProps) {

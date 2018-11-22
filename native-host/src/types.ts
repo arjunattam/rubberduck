@@ -3,6 +3,7 @@ interface RepoPayload {
   name: string;
   service: string;
   sha: string;
+  branch?: string;
 }
 
 interface LanguageQueryPayload {

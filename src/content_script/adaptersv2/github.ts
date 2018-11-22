@@ -169,6 +169,10 @@ export class GithubPathAdapter extends BasePathAdapter {
         return this.getPullRefs(owner, name, pullRequestId);
       case ViewType.File:
         return this.getFileRefs(owner, name);
+      default:
+        // When we open a tree view (like at github.com/reduxjs/redux)
+        // type is not infered.
+        return this.getFileRefs(owner, name);
     }
   }
 

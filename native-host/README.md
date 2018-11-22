@@ -19,3 +19,17 @@ Internally, the following 3 steps are executed:
 1. Compile code using `tsc`
 2. Package the output into a binary file with `pkg`
 3. Register the native app manifest with Google Chrome (macOS only)
+
+## Development
+
+To compile and build a binary:
+
+```
+tsc && npm run build
+```
+
+To register the binary with Chrome (use `-b` to specify the binary location):
+
+```
+node register -b /Users/arjun/mercury-extension/native-host/bin/rubberduck-native
+```

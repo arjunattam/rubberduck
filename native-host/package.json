@@ -1,16 +1,16 @@
 {
   "name": "rubberduck-native",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "description": "Native host application for the Rubberduck browser extension",
   "main": "build/src/index.js",
   "scripts": {
-    "postinstall": "npm run build",
-    "prepare": "npm run compile",
+    "postinstall": "npm run build && npm run register",
+    "prepublishOnly": "npm run compile",
     "pack:all": "npx pkg build/src/index.js -o bin/rubberduck-native -t node9-macos-x64,node9-linux-x64,node9-win-x64",
     "pack:current": "npx pkg build/src/index.js -o bin/rubberduck-native",
     "register": "node register.js",
     "compile": "tsc",
-    "build": "npm run pack:current && npm run register",
+    "build": "npm run pack:current",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
@@ -22,6 +22,7 @@
     "chrome-native-messaging": "^0.2.0",
     "isomorphic-git": "^0.39.4",
     "javascript-typescript-langserver": "^2.11.1",
+    "meow": "^5.0.0",
     "mkdirp": "^0.5.1",
     "pkg": "4.3.1",
     "typescript-language-server": "^0.3.6"

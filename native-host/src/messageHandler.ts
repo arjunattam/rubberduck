@@ -15,7 +15,8 @@ export class MessageHandler {
       case RequestType.Info:
         return this.handleInfoMessage(message);
       case RequestType.CloneCheckout:
-        const result = await git.cloneAndCheckout(<RepoPayload>message.payload);
+        const gitManager = new git.GitManager(<RepoPayload>message.payload);
+        const result = await gitManager.cloneAndCheckout();
         return { id: message.id, result };
       case RequestType.Initialize:
         return this.handleInitializeMessage(message);
