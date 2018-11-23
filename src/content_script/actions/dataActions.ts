@@ -1,4 +1,4 @@
-import API from "../utils/api";
+import { remoteAPI } from "../utils/api";
 import * as NativeUtils from "../utils/native";
 import { loadUrl as pjaxLoadUrl } from "../utils/pjax";
 import { treeAdapter } from "../adapters";
@@ -69,7 +69,7 @@ export function callTree(repoDetails) {
 
   return {
     type: "CALL_TREE",
-    payload: API.getTree(repoDetails).then(response => {
+    payload: remoteAPI.getTree(repoDetails).then(response => {
       return {
         ...response,
         data: handler(response.data),
@@ -83,7 +83,7 @@ export function callTreePages(repoDetails, firstPageData, pageNumbers) {
   const handler = getTreeResponseHandler(repoDetails);
   return {
     type: "CALL_TREE_PAGES",
-    payload: API.getTreePages(repoDetails, pageNumbers).then(response => {
+    payload: remoteAPI.getTreePages(repoDetails, pageNumbers).then(response => {
       return handler(response.concat(firstPageData));
     })
   };

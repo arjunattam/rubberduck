@@ -22,6 +22,11 @@ interface FileContentsPayload {
   };
 }
 
+interface GitClonePayload {
+  repo: RepoPayload;
+  cloneUrl: string;
+}
+
 interface Message {
   id: string;
   type: RequestType;

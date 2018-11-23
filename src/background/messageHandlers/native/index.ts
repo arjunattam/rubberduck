@@ -16,7 +16,7 @@ class NativeMessenger {
     );
   }
 
-  cloneAndCheckout(tabId, payload: RepoReference, callback) {
+  cloneAndCheckout(tabId, payload, callback) {
     this.send("CLONE_AND_CHECKOUT", payload, callback);
   }
 

@@ -2,8 +2,7 @@ import { createReducer } from "redux-create-reducer";
 
 const initialState = {
   initialized: false,
-  clientId: null,
-  token: null,
+  githubAccessToken: undefined,
 
   // Sidebar props
   isSidebarVisible: true,

@@ -1,5 +1,5 @@
 import { BasePathAdapter } from "./base";
-import API from "../utils/api";
+import { remoteAPI } from "../utils/api";
 
 export class GithubPathAdapter extends BasePathAdapter {
   async getViewInfo(): Promise<RemoteView | undefined> {
@@ -10,13 +10,14 @@ export class GithubPathAdapter extends BasePathAdapter {
       return undefined;
     }
 
-    const { user, name, type, pullRequestId, commitId } = parsedUrl;
+    const { user, name, type, pullRequestId, commitId, shaInUrl } = parsedUrl;
     const refs = await this.getHeadAndBase(
       user,
       name,
       type,
       pullRequestId,
-      commitId
+      commitId,
+      shaInUrl
     );
 
     if (!!refs) {
@@ -48,8 +49,6 @@ export class GithubPathAdapter extends BasePathAdapter {
     const user = match[1];
     const name = match[2];
     const type = match[3];
-    const pullRequestId = type === "pull" ? match[4] : undefined;
-    const commitId = type === "commit" ? match[4] : undefined;
 
     if (
       ~GH_RESERVED_USER_NAMES.indexOf(user) ||
@@ -63,14 +62,19 @@ export class GithubPathAdapter extends BasePathAdapter {
     }
 
     // Check if this is a Tree/Blob view
-    const isFileView = type === null || type === "tree" || type === "blob";
+    const isFileView = type === undefined || type === "tree" || type === "blob";
+    const finalType = <ViewType>(isFileView ? "file" : type);
+    const pullRequestId = finalType === "pull" ? match[4] : undefined;
+    const commitId = finalType === "commit" ? match[4] : undefined;
+    const shaInUrl = finalType === "file" ? match[4] : undefined;
 
     return {
       user,
       name,
-      type: <ViewType>(isFileView ? "file" : type),
+      type: finalType,
       pullRequestId,
-      commitId
+      commitId,
+      shaInUrl
     };
   }
 
@@ -142,10 +146,17 @@ export class GithubPathAdapter extends BasePathAdapter {
     let menuBranch;
 
     if (!!branchMenuDiv) {
-      const innerSpan = branchMenuDiv.querySelector("span.js-select-button");
+      const buttonElement = branchMenuDiv.querySelector(
+        "button.select-menu-button"
+      );
 
-      if (!!innerSpan) {
-        menuBranch = innerSpan.textContent;
+      if (!!buttonElement && buttonElement.textContent) {
+        const label = buttonElement.textContent.trim().toLowerCase();
+        const innerSpan = branchMenuDiv.querySelector("span.js-select-button");
+
+        if (!!innerSpan && label.startsWith("branch")) {
+          menuBranch = innerSpan.textContent;
+        }
       }
     }
 
@@ -157,7 +168,8 @@ export class GithubPathAdapter extends BasePathAdapter {
     name: string,
     type: ViewType,
     pullRequestId,
-    commitId
+    commitId,
+    shaInUrl
   ): Promise<{ base?: RepoReference; head: RepoReference } | undefined> {
     switch (type) {
       case ViewType.Commit:
@@ -168,17 +180,25 @@ export class GithubPathAdapter extends BasePathAdapter {
       case ViewType.PR:
         return this.getPullRefs(owner, name, pullRequestId);
       case ViewType.File:
-        return this.getFileRefs(owner, name);
-      default:
-        // When we open a tree view (like at github.com/reduxjs/redux)
-        // type is not infered.
-        return this.getFileRefs(owner, name);
+        return this.getFileRefs(owner, name, shaInUrl);
     }
   }
 
-  private async getFileRefs(owner: string, name: string) {
+  private async getFileRefs(owner: string, name: string, shaInUrl: string) {
     const branchName = this.getBranchName();
-    const head = await API.getBranchv2(owner, name, branchName);
+    let head: RepoReference;
+
+    if (!!branchName) {
+      head = await remoteAPI.getBranchv2(owner, name, branchName);
+    } else {
+      head = {
+        user: owner,
+        name,
+        sha: shaInUrl,
+        service: "github"
+      };
+    }
+
     return {
       head,
       base: undefined
@@ -186,11 +206,11 @@ export class GithubPathAdapter extends BasePathAdapter {
   }
 
   private async getCommitRefs(owner, name, commitSha) {
-    return await API.getCommitInfov2(owner, name, commitSha);
+    return await remoteAPI.getCommitInfov2(owner, name, commitSha);
   }
 
   private async getPullRefs(owner, name, pullRequestId) {
-    return await API.getPRInfov2(owner, name, pullRequestId);
+    return await remoteAPI.getPRInfov2(owner, name, pullRequestId);
   }
 
   constructFullPath(filePath: string, repo: RepoReference): string {

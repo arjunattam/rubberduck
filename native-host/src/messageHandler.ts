@@ -10,12 +10,14 @@ export class MessageHandler {
 
   async handle(message: Message) {
     const { type } = message;
+    // TODO: add a try-catch that returns an error to the client
 
     switch (type) {
       case RequestType.Info:
         return this.handleInfoMessage(message);
       case RequestType.CloneCheckout:
-        const gitManager = new git.GitManager(<RepoPayload>message.payload);
+        const { repo, cloneUrl } = <GitClonePayload>message.payload;
+        const gitManager = new git.GitManager(repo, cloneUrl);
         const result = await gitManager.cloneAndCheckout();
         return { id: message.id, result };
       case RequestType.Initialize:

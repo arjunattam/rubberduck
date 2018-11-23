@@ -9,6 +9,7 @@ import * as StorageUtils from "../utils/storage";
 import { AuthUtils } from "../utils/authorization";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 import pathAdapterv2 from "../adaptersv2";
+import { remoteAPI } from "../utils/api";
 
 let document = window.document;
 
@@ -28,8 +29,6 @@ class Extension extends React.Component<any, any> {
   componentDidMount() {
     this.setupChromeListener();
     this.initializeStorage();
-    this.initializeRepoDetails();
-    setupSpanObserver();
 
     // We can't use our own redux handler for pjax because that
     // is restricted to pjax calls from the sidebar.
@@ -42,11 +41,15 @@ class Extension extends React.Component<any, any> {
     const hasLoadedStorage = !prevInitialized && newInitialized;
 
     if (hasLoadedStorage) {
-      // Checking to trigger this only after chrome storage is loaded
-      // this.setupAuthorization();
+      // Called when the chrome.storage has been loaded into redux store
+      remoteAPI.initialize();
+      this.initializeRepoDetails();
+      setupSpanObserver();
     }
 
-    this.updateSessionAndTree(prevProps, this.props);
+    if (newInitialized) {
+      this.updateSessionAndTree(prevProps, this.props);
+    }
   }
 
   onPjaxEnd = () => {

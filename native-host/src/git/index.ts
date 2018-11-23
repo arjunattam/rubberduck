@@ -24,12 +24,10 @@ const getTempSuffix = (path: string) => {
 export class GitManager {
   clonePath: string;
   finalPath: string;
-  cloneUrl: string;
 
-  constructor(private repo: RepoPayload) {
+  constructor(private repo: RepoPayload, private cloneUrl: string) {
     this.clonePath = toPath(constructCloneUri(repo));
     this.finalPath = toPath(constructRootUri(repo));
-    this.cloneUrl = `https://github.com/${repo.user}/${repo.name}`;
   }
 
   async clone() {

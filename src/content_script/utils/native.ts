@@ -1,17 +1,34 @@
 import { sendMessagePromise } from "./chrome";
 import { encodeToBase64 } from "./data";
+import { AuthUtils } from "./authorization";
 
 export const info = async () => {
   const response = await sendMessagePromise("NATIVE_INFO", {});
   return response;
 };
 
+const getCloneUrl = (repo: RepoReference) => {
+  const { token } = AuthUtils.getGithubHeader();
+  let baseUrl = `https://github.com`;
+
+  if (!!token) {
+    baseUrl = `https://${token}:x-oauth-basic@github.com`;
+  }
+
+  return `${baseUrl}/${repo.user}/${repo.name}`;
+};
+
 export const initialize = async (params: RemoteView) => {
   // This will first clone both head and base, and then
   // initialize the language servers
   // TODO: implement for base
+  // TODO: cloning fails silently for private code, if token is not
+  // available --> show helpful error message to the user
   const { head } = params;
-  await sendMessagePromise("NATIVE_CLONE_AND_CHECKOUT", head);
+  await sendMessagePromise("NATIVE_CLONE_AND_CHECKOUT", {
+    repo: head,
+    cloneUrl: getCloneUrl(head)
+  });
   const response = await sendMessagePromise("NATIVE_INITIALIZE", head);
   return response;
 };

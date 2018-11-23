@@ -5,69 +5,14 @@ import { API as BaseAPI } from "./base";
 import * as Octokit from "@octokit/rest";
 
 abstract class BaseGitRemoteAPI {
-  getDecodedToken() {
-    return AuthUtils.getDecodedToken();
-  }
-
-  isRemoteAuthorized(isPrivate) {
-    const decoded = this.getDecodedToken();
-
-    if (decoded !== null) {
-      // Oauth case: github + bitbucket. If username exists,
-      // then remote is definitely authorized.
-      const username = this.getRemoteUsername(decoded);
-
-      if (username !== "" && username !== undefined) {
-        return true;
-      }
-    }
-
-    // Now this could be the github app scenario, where
-    // the decoded JWT does not have the Oauth username, but
-    // remote is still authorized via an app installation.
-    if (getGitService() === "github" && isPrivate) {
-      // Here, if the repo is public, we can return false. But if the
-      // repo is private, we should try reaching the server, just in case
-      // authentication is available.
-      return true;
-    }
-
-    return false;
-  }
-
-  async makePassthrough(uriPath) {
-    const fixedPath = uriPath.replace("?", "%3F");
-    const fullUri = `${this.getPassthroughPath()}${fixedPath}/`;
-
-    let response = await BaseAPI.makeGetRequest(fullUri);
-    // This is required for non-json responses, as the passthrough api
-    // JSONifies them with the jsonified key
-    const { data, headers } = response;
-    const actual = data.jsonified || data;
-    const { link: linkHeaders } = headers;
-    const next = BaseAPI.getNextPages(linkHeaders);
-    return { data: actual, ...next };
-  }
-
   makeRemoteCall(uriPath) {
+    const authHeader = this.getAuthHeader();
     const fullUri = this.buildUrl(uriPath);
-    return BaseAPI.cacheOrGet(fullUri);
+    return BaseAPI.get(fullUri, authHeader);
   }
 
   makeConditionalGet(uriPath, isPrivate) {
     return this.makeRemoteCall(uriPath);
-
-    // Old auth logic
-    //
-    // if (this.isRemoteAuthorized(isPrivate)) {
-    //   // If user is logged in with remote, we will send
-    //   // this API call to pass through via backend.
-    //   return this.makePassthrough(uriPath);
-    // } else {
-    //   // Make call directly to remote using client IP address
-    //   // for efficient rate limit utilisation.
-    //   return this.makeRemoteCall(uriPath);
-    // }
   }
 
   getTreeCaller(repoDetails, page) {
@@ -90,6 +35,8 @@ abstract class BaseGitRemoteAPI {
   }
 
   async getTreePages(repoDetails, pages) {
+    // TODO: make this a private method that is
+    // subsumed by the getTree data action
     const callers = pages.map(page => this.getTreeCaller(repoDetails, page));
     const responses = await Promise.all(callers);
     return responses.reduce(
@@ -112,6 +59,7 @@ abstract class BaseGitRemoteAPI {
 
   abstract getCommitFiles(repoDetails): any;
 
+  abstract getAuthHeader();
   abstract getPRInfov2(
     owner: string,
     name: string,
@@ -127,18 +75,27 @@ abstract class BaseGitRemoteAPI {
     name: string,
     commitId: string
   ): Promise<{ base: RepoReference; head: RepoReference }>;
+
+  abstract initialize();
 }
 
 class GithubAPI extends BaseGitRemoteAPI {
   gh = new Octokit();
+  authHeader: string | undefined;
 
-  constructor() {
-    super();
-    // TODO: remove this token
+  initialize() {
+    const githubAuth = AuthUtils.getGithubHeader();
+    console.log("gh", githubAuth);
+    const { type, token } = githubAuth;
+    this.authHeader = `${type} ${token}`;
     this.gh.authenticate({
-      type: "token",
-      token: "88d6d887ac9b4c6ecd1c491c189d4b276e96aca5"
+      type,
+      token
     });
+  }
+
+  getAuthHeader() {
+    return this.authHeader;
   }
 
   getRemoteUsername(decoded) {
@@ -324,12 +281,9 @@ class BitbucketAPI {
   getPRInfov2(repo: RepoReference, pullRequestId: string) {}
 }
 
-let remoteAPI: BaseGitRemoteAPI;
+export let remoteAPI: BaseGitRemoteAPI;
 
 const gitService = getGitService();
 // TODO: uncomment after bitbucket is ready to go
 // remoteAPI = gitService === "bitbucket" ? new BitbucketAPI() : new GithubAPI();
 remoteAPI = new GithubAPI();
-
-export default remoteAPI;
-export { getParameterByName } from "./utils";
