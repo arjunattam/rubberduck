@@ -1,5 +1,5 @@
-import React from "react";
-import Octicon from "react-component-octicons";
+import * as React from "react";
+import Octicon, { OcticonSymbol } from "react-component-octicons";
 import "status-indicator/styles.css";
 import "./index.css";
 
@@ -82,7 +82,8 @@ const StatusText = ({ session }) => {
 };
 
 const SettingsLink = ({ text, onClick }) => {
-  let icon = "gear";
+  let icon: OcticonSymbol = "gear";
+
   switch (text) {
     case "collapse":
       icon = "x";
@@ -93,6 +94,7 @@ const SettingsLink = ({ text, onClick }) => {
     default:
       icon = "gear";
   }
+
   return (
     <div className="session-status-link" onClick={onClick}>
       {text} <Octicon name={icon} style={{ height: 14 }} />
@@ -100,7 +102,7 @@ const SettingsLink = ({ text, onClick }) => {
   );
 };
 
-export default class StatusBar extends React.Component {
+export default class StatusBar extends React.Component<any, any> {
   state = {
     showNotReady: null,
     isShowingWarning: false

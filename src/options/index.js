@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import ReactJson from "react-json-view";
 import { ExistingOptions } from "./config";
+import { AuthSection } from "./auth";
 
 class InfoSection extends React.Component {
   state = {
@@ -36,6 +37,7 @@ class App extends React.Component {
       <div>
         <h1>Rubberduck</h1>
         <ExistingOptions />
+        <AuthSection />
         <InfoSection />
       </div>
     );

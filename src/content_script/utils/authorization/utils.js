@@ -1,5 +1,5 @@
 // See docs/AUTHENTICATION.md for documentation
-import { sendMessage, sendMessagePromise } from "../chrome";
+import { sendMessage } from "../chrome";
 import { API } from "../api";
 import { getGitService } from "../../adapters";
 

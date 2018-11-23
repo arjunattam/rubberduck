@@ -8,7 +8,7 @@ export class ExistingOptions extends React.Component {
   componentDidMount() {
     chrome.storage.local.get({ ...this.state }, items => {
       this.setState({
-        ...items
+        hasHoverDebug: items.hasHoverDebug
       });
     });
   }

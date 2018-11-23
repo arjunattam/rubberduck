@@ -50,9 +50,22 @@ export class GitManager {
   }
 
   async cloneAndCheckout() {
-    await this.clone();
-    await this.checkout();
+    const isAvailable = await this.isAlreadyCheckedOut();
+
+    if (!isAvailable) {
+      await this.clone();
+      await this.checkout();
+    }
+
     return fs.readdirSync(this.finalPath);
+  }
+
+  async isAlreadyCheckedOut() {
+    return new Promise((resolve, reject) => {
+      fs.readdir(this.finalPath, (err: any, files: any) => {
+        resolve(files && files.length > 0);
+      });
+    });
   }
 }
 

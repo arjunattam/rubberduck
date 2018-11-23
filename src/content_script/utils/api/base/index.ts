@@ -1,32 +1,23 @@
 import axios from "axios";
-import * as Moment from "moment";
-// import { bindActionCreators } from "redux";
-import Store from "../../../store";
-// import * as DataActions from "../../../actions/dataActions";
-import Authorization from "../../authorization";
-import { hash } from "../../data";
-import * as StorageUtils from "../../storage";
+import { AuthUtils } from "../../authorization";
+import { apiResponsesCache } from "./cache";
 import BaseRequest from "./base";
 
 const linkParser = require("parse-link-header");
 
-const CACHED_EXPIRY = 3; // hours
-const IS_CACHING_ENABLED = true;
 const BASE_API_PREFIX = "api/v1";
 
 export class BaseAPI {
-  // DataActions = bindActionCreators(DataActions, Store.dispatch);
-
   makePostRequest = (uri, body) => {
-    const rootUrl = Authorization.getBaseUrl();
-    const token = Authorization.getToken();
+    const rootUrl = AuthUtils.getBaseUrl();
+    const token = AuthUtils.getToken();
     const baseRequest = new BaseRequest(rootUrl, token);
     return baseRequest.post(uri, body);
   };
 
   makeGetRequest = uri => {
-    const rootUrl = Authorization.getBaseUrl();
-    const token = Authorization.getToken();
+    const rootUrl = AuthUtils.getBaseUrl();
+    const token = AuthUtils.getToken();
     const baseRequest = new BaseRequest(rootUrl, token);
     return baseRequest.fetch(uri, undefined);
   };
@@ -43,50 +34,6 @@ export class BaseAPI {
     return this.makePostRequest(uri, { token: token }).then(
       response => response.data
     );
-  }
-
-  getCached(uri) {
-    const encoded = hash(uri);
-    const { storage } = Store.getState();
-    return storage.apiResponses[encoded] || {};
-  }
-
-  clearCache(existingCache) {
-    const now = Moment.now();
-
-    let filteredObject = Object.keys(existingCache).reduce((res, key) => {
-      const keyExpiry = existingCache[key].expiry;
-      const isValid = Moment(keyExpiry).isAfter(now);
-      if (isValid) res[key] = existingCache[key];
-      return res;
-    }, {});
-
-    return filteredObject;
-  }
-
-  updateCache(uri, lastModified) {
-    const encoded = hash(uri);
-    const { storage } = Store.getState();
-    let apiResponses = storage.apiResponses;
-    apiResponses[encoded] = { ...apiResponses[encoded], lastModified };
-    StorageUtils.setInLocalStore({ apiResponses }, () => {});
-  }
-
-  setCached(uri, response) {
-    const encoded = hash(uri);
-    const lastModified = response.headers["last-modified"];
-    const link = response.headers["link"];
-    const { data } = response;
-    const expiry = Moment()
-      .add(CACHED_EXPIRY, "hours")
-      .format();
-    const { storage } = Store.getState();
-
-    if (lastModified && data) {
-      let apiResponses = this.clearCache(storage.apiResponses);
-      apiResponses[encoded] = { lastModified, data, expiry, link };
-      StorageUtils.setInLocalStore({ apiResponses }, () => {});
-    }
   }
 
   getNextPages(linkHeaders) {
@@ -109,14 +56,15 @@ export class BaseAPI {
     return result;
   }
 
-  cacheOrGet(uri) {
-    const cached = this.getCached(uri);
+  async cacheOrGet(uri) {
+    const cached = apiResponsesCache.get(uri);
     const { lastModified, link, data: cachedResponse } = cached;
+
     // The authorization header needs to be reset because axios.create
     // is setting a default header. (Can clean this up)
     let headers = { Authorization: "" };
 
-    if (lastModified && cachedResponse && IS_CACHING_ENABLED) {
+    if (lastModified && cachedResponse) {
       headers["If-Modified-Since"] = lastModified;
     }
 
@@ -125,19 +73,19 @@ export class BaseAPI {
       validateStatus: status => status < 400
     };
 
-    return axios.get(uri, options).then(response => {
-      if (response.status === 304) {
-        const lastModified = response.headers["last-modified"];
-        this.updateCache(uri, lastModified);
-        const next = this.getNextPages(link);
-        return { data: cachedResponse, ...next };
-      } else {
-        this.setCached(uri, response);
-        const { link: linkHeaders } = response.headers;
-        const next = this.getNextPages(linkHeaders);
-        return { data: response.data, ...next };
-      }
-    });
+    const response = await axios.get(uri, options);
+
+    if (response.status === 304) {
+      const lastModified = response.headers["last-modified"];
+      await apiResponsesCache.update(uri, lastModified);
+      const next = this.getNextPages(link);
+      return { data: cachedResponse, ...next };
+    } else {
+      await apiResponsesCache.set(uri, response);
+      const { link: linkHeaders } = response.headers;
+      const next = this.getNextPages(linkHeaders);
+      return { data: response.data, ...next };
+    }
   }
 }
 

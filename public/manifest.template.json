@@ -10,21 +10,16 @@
     "scripts": ["js/vendor.js", "js/background.js"]
   },
   "options_page": "options.html",
-  "web_accessible_resources": ["fonts/*.woff2"],
+  "web_accessible_resources": ["fonts/*.woff2", "options.html"],
   "content_scripts": [
     {
-      "matches": [
-        "https://github.com/*",
-        "https://bitbucket.org/*",
-        "https://www.codeview.io/*"
-      ],
+      "matches": ["https://github.com/*", "https://bitbucket.org/*"],
       "css": ["css/fileicon.css"]
     }
   ],
   "permissions": [
     "https://github.com/*",
     "https://bitbucket.org/*",
-    "https://www.codeview.io/*",
     "storage",
     "identity",
     "nativeMessaging"

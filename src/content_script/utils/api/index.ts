@@ -1,16 +1,17 @@
 import parse from "diffparser";
-import Authorization from "../authorization";
+import { AuthUtils } from "../authorization";
 import { getGitService } from "../../adapters";
 import { API as BaseAPI } from "./base";
 import * as Octokit from "@octokit/rest";
 
 abstract class BaseGitRemoteAPI {
   getDecodedToken() {
-    return Authorization.getDecodedToken();
+    return AuthUtils.getDecodedToken();
   }
 
   isRemoteAuthorized(isPrivate) {
     const decoded = this.getDecodedToken();
+
     if (decoded !== null) {
       // Oauth case: github + bitbucket. If username exists,
       // then remote is definitely authorized.
@@ -34,19 +35,18 @@ abstract class BaseGitRemoteAPI {
     return false;
   }
 
-  makePassthrough(uriPath) {
+  async makePassthrough(uriPath) {
     const fixedPath = uriPath.replace("?", "%3F");
     const fullUri = `${this.getPassthroughPath()}${fixedPath}/`;
 
-    return BaseAPI.makeGetRequest(fullUri).then(response => {
-      // This is required for non-json responses, as the passthrough api
-      // JSONifies them with the jsonified key
-      const { data, headers } = response;
-      const actual = data.jsonified || data;
-      const { link: linkHeaders } = headers;
-      const next = BaseAPI.getNextPages(linkHeaders);
-      return { data: actual, ...next };
-    });
+    let response = await BaseAPI.makeGetRequest(fullUri);
+    // This is required for non-json responses, as the passthrough api
+    // JSONifies them with the jsonified key
+    const { data, headers } = response;
+    const actual = data.jsonified || data;
+    const { link: linkHeaders } = headers;
+    const next = BaseAPI.getNextPages(linkHeaders);
+    return { data: actual, ...next };
   }
 
   makeRemoteCall(uriPath) {
@@ -55,15 +55,19 @@ abstract class BaseGitRemoteAPI {
   }
 
   makeConditionalGet(uriPath, isPrivate) {
-    if (this.isRemoteAuthorized(isPrivate)) {
-      // If user is logged in with remote, we will send
-      // this API call to pass through via backend.
-      return this.makePassthrough(uriPath);
-    } else {
-      // Make call directly to remote using client IP address
-      // for efficient rate limit utilisation.
-      return this.makeRemoteCall(uriPath);
-    }
+    return this.makeRemoteCall(uriPath);
+
+    // Old auth logic
+    //
+    // if (this.isRemoteAuthorized(isPrivate)) {
+    //   // If user is logged in with remote, we will send
+    //   // this API call to pass through via backend.
+    //   return this.makePassthrough(uriPath);
+    // } else {
+    //   // Make call directly to remote using client IP address
+    //   // for efficient rate limit utilisation.
+    //   return this.makeRemoteCall(uriPath);
+    // }
   }
 
   getTreeCaller(repoDetails, page) {
@@ -85,14 +89,13 @@ abstract class BaseGitRemoteAPI {
     return this.getTreeCaller(repoDetails, null);
   }
 
-  getTreePages(repoDetails, pages) {
+  async getTreePages(repoDetails, pages) {
     const callers = pages.map(page => this.getTreeCaller(repoDetails, page));
-    return Promise.all(callers).then(function(responses) {
-      return responses.reduce(
-        (result: any, current: any) => result.concat(current.data),
-        []
-      );
-    });
+    const responses = await Promise.all(callers);
+    return responses.reduce(
+      (result: any, current: any) => result.concat(current.data),
+      []
+    );
   }
 
   abstract getRemoteUsername(decoded: string): string;

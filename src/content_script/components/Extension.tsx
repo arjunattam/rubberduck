@@ -6,8 +6,7 @@ import * as StorageActions from "../actions/storageActions";
 import Sidebar from "./sidebar";
 import * as ChromeUtils from "../utils/chrome";
 import * as StorageUtils from "../utils/storage";
-import Authorization from "../utils/authorization";
-// import { getGitService } from "../adapters";
+import { AuthUtils } from "../utils/authorization";
 import { setupObserver as setupSpanObserver } from "../adapters/base/codespan";
 import pathAdapterv2 from "../adaptersv2";
 
@@ -71,7 +70,7 @@ class Extension extends React.Component<any, any> {
       prevProps.data.view,
       newProps.data.view
     );
-    const hasAuthChanged = Authorization.hasChanged(
+    const hasAuthChanged = AuthUtils.hasChanged(
       prevProps.storage,
       newProps.storage
     );
@@ -93,10 +92,9 @@ class Extension extends React.Component<any, any> {
     });
   }
 
-  initializeStorage() {
-    StorageUtils.getAllFromStore(storageData => {
-      this.StorageActions.setFromChromeStorage(storageData);
-    });
+  async initializeStorage() {
+    const storageData = await StorageUtils.getAllFromStore();
+    this.StorageActions.setFromChromeStorage(storageData);
   }
 
   // setupAuthorization() {
@@ -109,28 +107,14 @@ class Extension extends React.Component<any, any> {
 
   initializeSession() {
     const viewInfo: RemoteView = this.props.data.view;
+    console.log("view info", viewInfo);
 
     if (!!viewInfo.type) {
+      // TODO: this condition is not satisfied when we visit
+      // the repo home page, since tree view is not detected as
+      // file view type. (eg, https://github.com/karigari/rubberduck)
       this.DataActions.createNewSession(viewInfo);
     }
-
-    // const repoDetails = this.props.data.repoDetails;
-    // const hasSessionParams =
-    //   repoDetails.prId || repoDetails.headSha || repoDetails.branch;
-
-    // if (repoDetails.username && repoDetails.reponame && hasSessionParams) {
-    //   const params = {
-    //     organisation: repoDetails.username,
-    //     name: repoDetails.reponame,
-    //     pull_request_id: repoDetails.prId,
-    //     type: repoDetails.type,
-    //     head_sha: repoDetails.headSha || repoDetails.branch,
-    //     base_sha: repoDetails.baseSha,
-    //     service: getGitService()
-    //   };
-
-    //   this.DataActions.createNewSession(params);
-    // }
   }
 
   initializeFileTree() {
