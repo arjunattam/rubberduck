@@ -33,8 +33,9 @@ class Definitions extends BaseReaderSection {
     }
   };
 
-  fetchDefinitionContents = () =>
-    this.fetchContents(this.props.data.definition);
+  fetchDefinitionContents = () => {
+    return this.fetchContents(this.props.data.definition);
+  };
 
   renderItems = () => {
     const fileObject = this.props.data.definition;

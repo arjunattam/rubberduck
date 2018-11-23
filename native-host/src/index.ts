@@ -4,9 +4,19 @@ const nativeMessage = require("chrome-native-messaging");
 
 const messageHandler = new MessageHandler();
 
-const transformInput = async (message: any, push: any, done: any) => {
+const transformInput = async (message: Message, push: any, done: any) => {
   log(`Received: ${JSON.stringify(message)}`);
-  const response = await messageHandler.handle(message);
+  let response;
+
+  try {
+    response = await messageHandler.handle(message);
+  } catch (error) {
+    response = {
+      id: message.id,
+      error: `error`
+    };
+  }
+
   log(`Responding: ${JSON.stringify(response)}`);
   push(response);
   done();

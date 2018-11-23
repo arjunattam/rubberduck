@@ -7,6 +7,7 @@ import {
   mkdir
 } from "../utils";
 import { emitter } from "./emitter";
+import { log } from "../logger";
 
 const fs = require("fs");
 const git = require("isomorphic-git");
@@ -40,6 +41,8 @@ export class GitManager {
   }
 
   async checkout() {
+    log(`Attempting to checkout at ${this.finalPath}`);
+    await mkdir(this.finalPath);
     await git.checkout({
       gitdir: this.clonePath,
       dir: this.finalPath,

@@ -10,7 +10,6 @@ export class MessageHandler {
 
   async handle(message: Message) {
     const { type } = message;
-    // TODO: add a try-catch that returns an error to the client
 
     switch (type) {
       case RequestType.Info:

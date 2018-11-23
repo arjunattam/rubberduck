@@ -17,8 +17,9 @@ export default class Title extends React.Component {
     urlLoader: PropTypes.func.isRequired
   };
 
-  getFileLink = () =>
-    appendLineNumber(this.props.baseLink, this.props.currentLineNumber);
+  getFileLink = () => {
+    return appendLineNumber(this.props.baseLink, this.props.currentLineNumber);
+  };
 
   hasFileinCompareView = () => {
     return document.querySelector(getFileboxSelector(this.props.filePath))
