@@ -97,8 +97,8 @@ export default class Codebox extends React.Component {
           language={this.getLanguage()}
           showLineNumbers={true}
           startingLineNumber={this.props.startLineNumber + 1}
-          lineStyle={lineNo => {
-            return this.getHighligtedLineStyle(lineNo);
+          lineProps={lineNumber => {
+            return { style: this.getHighligtedLineStyle(lineNumber) };
           }}
         />
       </div>

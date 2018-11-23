@@ -85,7 +85,6 @@ class GithubAPI extends BaseGitRemoteAPI {
 
   initialize() {
     const githubAuth = AuthUtils.getGithubHeader();
-    console.log("gh", githubAuth);
     const { type, token } = githubAuth;
     this.authHeader = `${type} ${token}`;
     this.gh.authenticate({

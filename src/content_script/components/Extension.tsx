@@ -110,7 +110,6 @@ class Extension extends React.Component<any, any> {
 
   initializeSession() {
     const viewInfo: RemoteView = this.props.data.view;
-    console.log("view info", viewInfo);
 
     if (!!viewInfo.type) {
       // TODO: this condition is not satisfied when we visit
