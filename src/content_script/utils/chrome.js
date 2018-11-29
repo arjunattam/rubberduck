@@ -22,9 +22,12 @@ export const sendMessagePromise = (type, data) => {
 
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(message, result => {
-      // TODO: can potentially handle errors as rejects
-      // Need to define the error payload spec before that
-      resolve(result);
+      if (!!result && !!result.error) {
+        reject(result);
+      } else {
+        // eg, STORAGE_LOCAL_SET can return `null` result
+        resolve(result);
+      }
     });
   });
 };

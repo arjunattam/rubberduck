@@ -176,12 +176,29 @@ export class GithubPathAdapter extends BasePathAdapter {
         return this.getCommitRefs(owner, name, commitId);
       case ViewType.Compare:
         // TODO: add support for compare
-        throw new Error(`compare type not supported.`);
+        // return this.getCompareRefs(owner, name);
+        throw new Error(`compare page not supported.`);
       case ViewType.PR:
         return this.getPullRefs(owner, name, pullRequestId);
       case ViewType.File:
         return this.getFileRefs(owner, name, shaInUrl);
     }
+  }
+
+  private async getCompareRefs(owner: string, name: string) {
+    let base, head;
+
+    const compareElements = Array.from(
+      document.querySelectorAll("div.range-cross-repo-pair")
+    );
+    compareElements.forEach(element => {
+      const branchElement = element.querySelector(
+        "div.commitish-suggester span.js-select-button"
+      );
+      const repoElement = element.querySelector(
+        "div.fork-suggester span.js-select-button"
+      );
+    });
   }
 
   private async getFileRefs(owner: string, name: string, shaInUrl: string) {

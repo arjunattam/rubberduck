@@ -13,7 +13,7 @@ const transformInput = async (message: Message, push: any, done: any) => {
   } catch (error) {
     response = {
       id: message.id,
-      error: `error`
+      error
     };
   }
 

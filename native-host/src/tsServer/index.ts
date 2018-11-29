@@ -27,7 +27,6 @@ export class TypeScriptServer {
   }
 
   kill() {
-    // TODO: send exit message here?
     this.serverProcess.kill();
   }
 
@@ -69,7 +68,6 @@ export class TypeScriptServer {
     };
     let result = new Promise((resolve, reject) => {
       this.callbacks.add(requestId, { onSuccess: resolve, onError: reject });
-      // TODO: add a request queue, instead of writing this directly
       this.write(request);
     });
 

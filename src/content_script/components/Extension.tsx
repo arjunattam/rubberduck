@@ -112,9 +112,6 @@ class Extension extends React.Component<any, any> {
     const viewInfo: RemoteView = this.props.data.view;
 
     if (!!viewInfo.type) {
-      // TODO: this condition is not satisfied when we visit
-      // the repo home page, since tree view is not detected as
-      // file view type. (eg, https://github.com/karigari/rubberduck)
       this.DataActions.createNewSession(viewInfo);
     }
   }

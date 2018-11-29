@@ -11,7 +11,6 @@ export const triggerAuthFlow = (data, callback) => {
       // We could potentially just consume it here, but for now
       // the background is kept to be lightweight.
       callback(redirectUrl);
-      // TODO(arjun): if there is an error, refresh the JWT
     }
   );
 };
