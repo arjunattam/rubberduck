@@ -32,3 +32,6 @@ process.stdin
   .pipe(transform)
   .pipe(output)
   .pipe(process.stdout);
+
+// On connection -- ack the connection
+output.write({ status: "CONNECTED" });

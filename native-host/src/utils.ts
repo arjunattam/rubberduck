@@ -1,7 +1,8 @@
 import fs from "fs";
 const mkdirp = require("mkdirp");
 
-export const URI_PREFIX = "file:///Users/arjun/local_repos";
+// TODO: remove hard coded repos location
+export const BASE_REPOS_URI = "file:///Users/arjun/local_repos";
 
 export const toPath = (uriPath: string) => {
   return uriPath.replace("file://", "");
@@ -24,12 +25,12 @@ export const clean = (message: any, repoInfo: RepoPayload) => {
 };
 
 export const constructCloneUri = (repoInfo: RepoPayload) => {
-  return `${URI_PREFIX}/${repoInfo.name}.git`;
+  return `${BASE_REPOS_URI}/${repoInfo.name}.git`;
 };
 
 export const constructRootUri = (repoInfo: RepoPayload) => {
   const { name, sha } = repoInfo;
-  return `${URI_PREFIX}/${name}_${sha.substring(0, 7)}`;
+  return `${BASE_REPOS_URI}/${name}_${sha.substring(0, 7)}`;
 };
 
 export const constructFileUri = (repoInfo: RepoPayload, path: string) => {

@@ -1,28 +1,20 @@
 # Rubberduck native host
 
-This is the native application for the Rubberduck chrome extension. This uses the [Native Messaging](https://developer.chrome.com/apps/nativeMessaging) APIs.
+This is the native host application for the Rubberduck browser extension. The native host manages git repositories on your file system, and runs a language server to give usages and definitions.
 
-To install this run:
+[![npm version](https://badge.fury.io/js/rubberduck-native.svg)](https://badge.fury.io/js/rubberduck-native)
+
+To install the native application, run:
 
 ```
 npm install -g rubberduck-native
 ```
 
-To build this run:
-
-```
-npm run build
-```
-
-Internally, the following 3 steps are executed:
-
-1. Compile code using `tsc`
-2. Package the output into a binary file with `pkg`
-3. Register the native app manifest with Google Chrome (macOS only)
-
 ## Development
 
-To compile and build a binary:
+The native host uses message passing to communicate with the browser extension, built over the [Native Messaging](https://developer.chrome.com/apps/nativeMessaging) APIs.
+
+To compile and build a binary, run the following. The build step packages the output into a binary file with `pkg`.
 
 ```
 tsc && npm run build

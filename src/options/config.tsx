@@ -1,6 +1,6 @@
-import React from "react";
+import * as React from "react";
 
-export class ExistingOptions extends React.Component {
+export class InternalConfig extends React.Component<{}, any> {
   state = {
     hasHoverDebug: false
   };

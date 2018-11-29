@@ -1,3 +1,6 @@
+import { sendMessageToAllTabs } from "../../utils";
+
+const RECONNECT_DURATION = 30 * 1000; // seconds
 const applicationId = "io.rubberduck.native";
 
 export class NativePort {
@@ -6,11 +9,24 @@ export class NativePort {
 
   constructor(private onMessageListener: any) {}
 
-  connect() {
-    this.port = chrome.runtime.connectNative(applicationId);
-    this.isConnected = true;
-    this.port.onMessage.addListener(this.onMessageListener);
-    this.port.onDisconnect.addListener(() => this.onDisconnect());
+  async connect() {
+    return new Promise((resolve, reject) => {
+      this.port = chrome.runtime.connectNative(applicationId);
+      this.port.onDisconnect.addListener(() => this.onDisconnect());
+
+      this.port.onMessage.addListener(message => {
+        console.log("Message from native:", message);
+
+        if (message.status === "CONNECTED") {
+          // handle for the ack message
+          this.isConnected = true;
+          sendMessageToAllTabs("NATIVE_CONNECTED", {});
+          resolve();
+        } else {
+          this.onMessageListener(message);
+        }
+      });
+    });
   }
 
   info() {
@@ -23,16 +39,21 @@ export class NativePort {
   onDisconnect() {
     this.isConnected = false;
     console.log("Disconnected to native port, attempting reconnection");
-    this.connect(); // TODO: if binary is not available --> infinite loop
+    sendMessageToAllTabs("NATIVE_DISCONNECTED", {});
+    setTimeout(() => this.connect(), RECONNECT_DURATION);
   }
 
-  send(payload: any) {
-    try {
-      if (!!this.port) {
+  async send(payload: any) {
+    if (!this.isConnected) {
+      await this.connect();
+    }
+
+    if (!!this.port) {
+      try {
         return this.port.postMessage(payload);
+      } catch (error) {
+        console.log("error", error);
       }
-    } catch (error) {
-      console.log("error", error);
     }
   }
 }

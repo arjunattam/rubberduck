@@ -3,6 +3,8 @@ import Octicon, { OcticonSymbol } from "react-component-octicons";
 import "status-indicator/styles.css";
 import "./index.css";
 
+const SETTINGS_URL = `chrome-extension://${chrome.runtime.id}/options.html`;
+
 /*
 Possible values for status
 - connecting
@@ -23,14 +25,12 @@ Possible values for status
 - no_access
 */
 
-const ProgressBar = ({ session }) => {
-  const { progress } = session;
-  const width = `${progress}%`;
+const ProgressBar = ({ progressValue }) => {
+  const width = `${progressValue}%`;
   return <div className="session-progress-bar" style={{ width }} />;
 };
 
-const Indicator = ({ session }) => {
-  const { status } = session;
+const Indicator = ({ status }) => {
   switch (status) {
     case "ready":
       return <status-indicator positive />;
@@ -46,8 +46,7 @@ const Indicator = ({ session }) => {
   }
 };
 
-const StatusText = ({ session }) => {
-  const { status } = session;
+const StatusText = ({ status }) => {
   let text = status;
   switch (status) {
     case "creating":
@@ -81,81 +80,35 @@ const StatusText = ({ session }) => {
   return <span className="session-status-text">{text}</span>;
 };
 
-const SettingsLink = ({ text, onClick }) => {
+const SettingsLink = () => {
   let icon: OcticonSymbol = "gear";
-
-  switch (text) {
-    case "collapse":
-      icon = "x";
-      break;
-    case "help":
-      icon = "question";
-      break;
-    default:
-      icon = "gear";
-  }
-
   return (
-    <div className="session-status-link" onClick={onClick}>
-      {text} <Octicon name={icon} style={{ height: 14 }} />
+    <div
+      className="session-status-link"
+      onClick={() => window.open(SETTINGS_URL)}
+    >
+      {"settings"} <Octicon name={icon} style={{ height: 14 }} />
     </div>
   );
 };
 
-export default class StatusBar extends React.Component<any, any> {
-  state = {
-    showNotReady: null,
-    isShowingWarning: false
-  };
-
-  componentWillReceiveProps(newProps) {
-    if (newProps.session.showNotReady !== this.state.showNotReady) {
-      this.setState({
-        showNotReady: newProps.session.showNotReady,
-        isShowingWarning: true
-      });
-      setTimeout(() => {
-        this.setState({ isShowingWarning: false });
-      }, 1500);
-    }
-  }
-
-  renderNormal = () => {
-    const { supportLink, session, onClick, isExpanded } = this.props;
-    let linkText = supportLink ? "help" : "settings";
-    linkText = isExpanded ? "collapse" : linkText;
-    return (
+export const StatusBar = ({
+  status,
+  progress
+}: {
+  status: string;
+  progress: number;
+}) => {
+  return (
+    <div className="session-status-container">
       <div className="session-status">
         <div className="session-status-name">
-          <Indicator session={session} />
-          <StatusText session={session} />
+          <Indicator status={status} />
+          <StatusText status={status} />
         </div>
-        <SettingsLink text={linkText} onClick={onClick} />
+        <SettingsLink />
       </div>
-    );
-  };
-
-  renderWarning = () => {
-    return (
-      <div className="session-status not-ready">
-        <div>Waiting for ready</div>
-      </div>
-    );
-  };
-
-  renderStatus = () => {
-    return this.state.isShowingWarning
-      ? this.renderWarning()
-      : this.renderNormal();
-  };
-
-  render() {
-    const { session } = this.props;
-    return (
-      <div className="session-status-container">
-        {this.renderStatus()}
-        <ProgressBar session={session} />
-      </div>
-    );
-  }
-}
+      <ProgressBar progressValue={progress} />
+    </div>
+  );
+};

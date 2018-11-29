@@ -3,26 +3,15 @@ import { createReducer } from "redux-create-reducer";
 const initialState = {
   payload: {},
   status: "",
-  progress: null,
-  showNotReady: null
+  progress: null
 };
-
-function updateNotReady(state, action) {
-  const newNotReady =
-    state.status !== "ready" ? { showNotReady: new Date() } : {};
-  return {
-    ...state,
-    ...newNotReady
-  };
-}
 
 export default createReducer(initialState, {
   CREATE_NEW_SESSION_FULFILLED: (state, action: any) => {
     return {
       ...state,
-      payload: {
-        ...action.payload
-      }
+      payload: { ...action.payload },
+      status: "ready"
     };
   },
   CREATE_NEW_SESSION_REJECTED: (state, action: any) => {
@@ -34,9 +23,5 @@ export default createReducer(initialState, {
     ...state,
     status: action.payload.status,
     progress: action.payload.progress
-  }),
-
-  // We are not updating for usages, since usages and definitions happen together
-  CALL_DEFINITION_PENDING: (state, action) => updateNotReady(state, action),
-  CALL_HOVER_PENDING: (state, action) => updateNotReady(state, action)
+  })
 });

@@ -1,6 +1,6 @@
-import React from "react";
+import * as React from "react";
 
-export class AuthSection extends React.Component {
+export class AuthSection extends React.Component<{}, any> {
   state = {
     githubAccessToken: ""
   };
@@ -29,6 +29,7 @@ export class AuthSection extends React.Component {
         <p>
           <input
             onChange={e => this.onTokenChange(e)}
+            type="password"
             value={this.state.githubAccessToken}
           />
         </p>

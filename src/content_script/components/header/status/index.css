@@ -12,10 +12,6 @@
   overflow: hidden;
 }
 
-.not-ready {
-  background-color: #ffeea991;
-}
-
 .session-progress-bar {
   height: 5px;
   background-color: #c8e1ff;

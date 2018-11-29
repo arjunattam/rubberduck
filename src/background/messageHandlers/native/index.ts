@@ -10,10 +10,10 @@ class NativeMessenger {
   }
 
   info(tabId, payload, callback) {
-    const portInfo = this.port.info();
-    this.send("INFO", payload, payload =>
-      callback({ ...payload, port: portInfo })
-    );
+    this.send("INFO", payload, payload => {
+      const portInfo = this.port.info();
+      callback({ ...payload, port: portInfo });
+    });
   }
 
   cloneAndCheckout(tabId, payload, callback) {
@@ -40,18 +40,17 @@ class NativeMessenger {
     this.send("FILE_CONTENTS", payload, callback);
   }
 
-  private send(type: string, payload: any, callback) {
+  private async send(type: string, payload: any, callback) {
     const requestId = uuidv4();
 
     if (!!callback) {
       this.callbackMap.set(requestId, callback);
     }
 
-    this.port.send({ type, payload, id: requestId });
+    await this.port.send({ type, payload, id: requestId });
   }
 
   private onMessage(message: any) {
-    console.log("Message from native:", message);
     const { id } = message;
     const callback = this.callbackMap.get(id);
 

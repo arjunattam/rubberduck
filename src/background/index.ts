@@ -8,7 +8,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
   if (changeInfo.url) {
     // Send message on every URL change to content script
-    sendMessageToTab(tabId, "URL_UPDATE", changeInfo.url);
+    sendMessageToTab(tabId, "URL_UPDATED", changeInfo.url);
   }
 
   return injectScript(tabId, changeInfo, tab);

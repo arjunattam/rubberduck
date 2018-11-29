@@ -17,7 +17,7 @@ export const sendMessage = (type, data, callback) => {
   });
 };
 
-export const sendMessagePromise = (type, data) => {
+export const sendMessagePromise = (type, data): Promise<any> => {
   const message = construct(type, data);
 
   return new Promise((resolve, reject) => {

@@ -24,10 +24,14 @@ export function createNewSession(params: RemoteView) {
   };
 }
 
-export function updateSessionStatus(data) {
+export function updateSessionStatus(status: ISessionStatus) {
   return {
     type: "UPDATE_SESSION_STATUS",
-    payload: data
+    payload: {
+      status,
+      // TODO: calculate progress
+      progress: 10
+    }
   };
 }
 

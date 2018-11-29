@@ -1,6 +1,6 @@
 import child_process from "child_process";
 import {
-  URI_PREFIX,
+  BASE_REPOS_URI,
   toPath,
   constructRootUri,
   constructCloneUri,
@@ -72,12 +72,12 @@ export class GitManager {
 
 export const info = async () => {
   return new Promise(resolve => {
-    const cmd = `du -sh ${toPath(URI_PREFIX)}`;
+    const cmd = `du -sh ${toPath(BASE_REPOS_URI)}`;
     child_process.exec(cmd, (error: any, stdout: any, stderr: any) => {
       resolve({
-        location: URI_PREFIX,
+        location: BASE_REPOS_URI,
         size: stdout,
-        repos: fs.readdirSync(toPath(URI_PREFIX))
+        repos: fs.readdirSync(toPath(BASE_REPOS_URI))
       });
     });
   });

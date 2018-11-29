@@ -85,12 +85,19 @@ class Extension extends React.Component<any, any> {
   }
 
   setupChromeListener() {
-    ChromeUtils.addChromeListener((action, data) => {
-      if (action === "URL_UPDATE") {
+    ChromeUtils.addChromeListener((messageType, data) => {
+      if (messageType === "URL_UPDATED") {
         // This has been replaced by pjax:complete event listener
         // Keeping this event just in case we need it
-      } else if (action === "STORAGE_UPDATED") {
+      } else if (messageType === "STORAGE_UPDATED") {
         this.handleStorageUpdate(data);
+      } else if (messageType === "NATIVE_DISCONNECTED") {
+        // TODO: if this happens, my view is no longer initialized, and so
+        // we need to re-do all that after a new connection has been
+        // established
+        this.DataActions.updateSessionStatus("disconnected");
+      } else if (messageType === "NATIVE_CONNECTED") {
+        this.DataActions.updateSessionStatus("connected");
       }
     });
   }

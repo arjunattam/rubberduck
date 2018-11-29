@@ -83,3 +83,30 @@ interface Position {
   line: number;
   character: number;
 }
+
+interface INativeInfoMessage {
+  id: string;
+  version: string;
+  servers: string[];
+  port: IPortInfo;
+  git: IGitInfo;
+}
+
+interface IGitInfo {
+  location: string;
+  size: string;
+  repos: string[];
+}
+
+interface IPortInfo {
+  name: string;
+  isConnected: boolean;
+}
+
+enum ISessionStatus {
+  // Combination of native host connectivity and
+  // initialization statuses
+  Disconnected = "disconnected",
+  Connected = "connected",
+  Ready = "ready"
+}
