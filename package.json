@@ -19,7 +19,6 @@
     "react": "^16.2.0",
     "react-component-octicons": "1.6.0",
     "react-dom": "^16.2.0",
-    "react-json-view": "^1.19.1",
     "react-markdown": "^3.3.0",
     "react-redux": "^5.0.6",
     "react-rnd": "^7.4.0",

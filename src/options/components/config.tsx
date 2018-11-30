@@ -1,4 +1,5 @@
 import * as React from "react";
+import { BaseSection } from "./base";
 
 export class InternalConfig extends React.Component<{}, any> {
   state = {
@@ -21,19 +22,21 @@ export class InternalConfig extends React.Component<{}, any> {
 
   render() {
     return (
-      <div>
-        <h2>Configuration</h2>
-        <p>
-          <label>
-            <input
-              type="checkbox"
-              onChange={() => this.onHoverChange()}
-              checked={this.state.hasHoverDebug}
-            />
-            Hover debug mode
+      <BaseSection title={"Debugging options"}>
+        <div className="form-check">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            value=""
+            id="defaultCheck1"
+            onChange={() => this.onHoverChange()}
+            checked={this.state.hasHoverDebug}
+          />
+          <label className="form-check-label" htmlFor="defaultCheck1">
+            Enable hover debug mode
           </label>
-        </p>
-      </div>
+        </div>
+      </BaseSection>
     );
   }
 }

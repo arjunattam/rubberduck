@@ -14,11 +14,13 @@ export class MessageHandler {
     switch (type) {
       case RequestType.Info:
         return this.handleInfoMessage(message);
-      case RequestType.CloneCheckout:
+      case RequestType.GitCloneCheckout:
         const { repo, cloneUrl } = <GitClonePayload>message.payload;
         const gitManager = new git.GitManager(repo, cloneUrl);
         const result = await gitManager.cloneAndCheckout();
         return { id: message.id, result };
+      case RequestType.GitRemoveAll:
+        return { id: message.id, result: await git.removeAll() };
       case RequestType.Initialize:
         return this.handleInitializeMessage(message);
       case RequestType.Hover:

@@ -28,13 +28,7 @@ class Definitions extends BaseReaderSection {
         }
       };
       await this.DataActions.callDefinitions(params, hoverResult);
-      // TODO: disabled fetching contents here
-      // this.fetchDefinitionContents();
     }
-  };
-
-  fetchDefinitionContents = () => {
-    return this.fetchContents(this.props.data.definition);
   };
 
   renderItems = () => {

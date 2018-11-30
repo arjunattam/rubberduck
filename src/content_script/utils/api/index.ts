@@ -81,16 +81,19 @@ abstract class BaseGitRemoteAPI {
 
 class GithubAPI extends BaseGitRemoteAPI {
   gh = new Octokit();
-  authHeader: string | undefined;
+  authHeader: string = "";
 
   initialize() {
     const githubAuth = AuthUtils.getGithubHeader();
     const { type, token } = githubAuth;
-    this.authHeader = `${type} ${token}`;
-    this.gh.authenticate({
-      type,
-      token
-    });
+
+    if (!!token) {
+      this.authHeader = `${type} ${token}`;
+      this.gh.authenticate({
+        type,
+        token
+      });
+    }
   }
 
   getAuthHeader() {

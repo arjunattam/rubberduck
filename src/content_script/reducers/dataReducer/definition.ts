@@ -15,7 +15,8 @@ export default createReducer(
       return {
         ...state,
         ...action.payload,
-        // Overwriting name with hoverResult. TODO: clean up this mess.
+        // Overwriting name with hoverResult
+        // TODO: clean up this mess.
         name: hoverResult.name
       };
     }

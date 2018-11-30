@@ -17,7 +17,11 @@ class NativeMessenger {
   }
 
   cloneAndCheckout(tabId, payload, callback) {
-    this.send("CLONE_AND_CHECKOUT", payload, callback);
+    this.send("GIT_CLONE_AND_CHECKOUT", payload, callback);
+  }
+
+  removeAll(tabId, payload, callback) {
+    this.send("GIT_REMOVE_ALL", payload, callback);
   }
 
   initialize(tabId, payload: RepoReference, callback) {

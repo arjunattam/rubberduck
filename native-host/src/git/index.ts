@@ -9,6 +9,7 @@ import {
 import { emitter } from "./emitter";
 import { log } from "../logger";
 
+const rimraf = require("rimraf");
 const fs = require("fs");
 const git = require("isomorphic-git");
 
@@ -79,6 +80,15 @@ export const info = async () => {
         size: stdout,
         repos: fs.readdirSync(toPath(BASE_REPOS_URI))
       });
+    });
+  });
+};
+
+export const removeAll = async () => {
+  return new Promise((resolve, reject) => {
+    rimraf(toPath(BASE_REPOS_URI), async () => {
+      await mkdir(toPath(BASE_REPOS_URI));
+      resolve();
     });
   });
 };

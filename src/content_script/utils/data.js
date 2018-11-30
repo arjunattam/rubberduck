@@ -1,6 +1,10 @@
 import { Base64 } from "js-base64";
 
-export const encodeToBase64 = string => Base64.encode(string);
+export const encodeToBase64 = string => {
+  if (!!string) {
+    return Base64.encode(string);
+  }
+};
 
 export const decodeBase64 = string => Base64.decode(string);
 

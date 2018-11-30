@@ -1,8 +1,13 @@
 {
   "name": "rubberduck-native",
-  "version": "0.2.2",
+  "version": "0.4.0",
   "description": "Native host application for the Rubberduck browser extension",
   "main": "build/src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/karigari/rubberduck.git"
+  },
+  "homepage": "https://github.com/karigari/rubberduck/tree/master/native-host#readme",
   "scripts": {
     "postinstall": "npm run build && npm run register",
     "prepublishOnly": "npm run compile",
@@ -25,6 +30,7 @@
     "meow": "^5.0.0",
     "mkdirp": "^0.5.1",
     "pkg": "4.3.1",
+    "rimraf": "^2.6.2",
     "typescript-language-server": "^0.3.6"
   }
 }

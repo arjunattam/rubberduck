@@ -5,8 +5,6 @@ import { UsageFileSection } from "../section/FileSection";
 import InlineButton from "../common/InlineButton";
 import "./index.css";
 
-const MAX_FILES_TO_PREFETCH = 3;
-
 class Usages extends BaseReaderSection {
   sectionName = "usages";
 
@@ -30,15 +28,7 @@ class Usages extends BaseReaderSection {
         }
       };
       await this.DataActions.callUsages(params, hoverResult);
-      // TODO: decide when to pull for contents
-      // this.fetchUsagesContents();
     }
-  };
-
-  fetchUsagesContents = () => {
-    const usagesCopy = [].concat(this.props.data.usages.items);
-    const fetchable = usagesCopy.splice(0, MAX_FILES_TO_PREFETCH);
-    fetchable.forEach(fileObject => this.fetchContents(fileObject));
   };
 
   renderItems = () => {
