@@ -25,6 +25,7 @@ class App extends React.Component<{}, any> {
           break;
         case "NATIVE_CONNECTED":
           this.setState({ isNativeConnected: true });
+          this.fetchNativeInfo();
           break;
       }
     });
@@ -49,6 +50,13 @@ class App extends React.Component<{}, any> {
     );
   };
 
+  installUpdate = () => {
+    chrome.runtime.sendMessage(
+      { message: "NATIVE_INSTALL_UPDATE", data: {} },
+      () => console.log("update callback")
+    );
+  };
+
   clearAllRepos = () => {
     return new Promise((resolve, reject) => {
       chrome.runtime.sendMessage(
@@ -69,6 +77,7 @@ class App extends React.Component<{}, any> {
           isConnected={this.state.isNativeConnected}
           currentVersion={this.state.currentVersion}
           latestVersion={this.state.latestVersion}
+          onInstallUpdate={() => this.installUpdate()}
         />
         <ReposSection
           data={this.state.gitInfoData}

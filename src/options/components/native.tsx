@@ -6,7 +6,8 @@ const NPM_LINK = "https://www.npmjs.com/package/rubberduck-native";
 export const NativeAppSection = ({
   isConnected,
   currentVersion,
-  latestVersion
+  latestVersion,
+  onInstallUpdate
 }) => {
   let text = `Native host is connected and up to date (version ${currentVersion})`;
   let alertClass = `alert-success`;
@@ -29,6 +30,7 @@ export const NativeAppSection = ({
       <CustomButton onClick={() => window.open(NPM_LINK)}>
         Setup native host
       </CustomButton>
+      <CustomButton onClick={onInstallUpdate}>Install update</CustomButton>
     </BaseSection>
   );
 };

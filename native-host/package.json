@@ -1,6 +1,6 @@
 {
   "name": "rubberduck-native",
-  "version": "0.4.0",
+  "version": "0.3.2",
   "description": "Native host application for the Rubberduck browser extension",
   "main": "build/src/index.js",
   "repository": {
@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "chrome-native-messaging": "^0.2.0",
+    "cli-autoupdate": "^2.0.4",
     "isomorphic-git": "^0.39.4",
     "javascript-typescript-langserver": "^2.11.1",
     "meow": "^5.0.0",

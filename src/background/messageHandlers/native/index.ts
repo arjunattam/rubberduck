@@ -16,6 +16,10 @@ class NativeMessenger {
     });
   }
 
+  installUpdate(tabId, payload, callback) {
+    this.send("INSTALL_UPDATE", payload, callback);
+  }
+
   cloneAndCheckout(tabId, payload, callback) {
     this.send("GIT_CLONE_AND_CHECKOUT", payload, callback);
   }

@@ -35,6 +35,7 @@ interface Message {
 
 const enum RequestType {
   Info = "INFO",
+  InstallUpdate = "INSTALL_UPDATE",
   GitCloneCheckout = "GIT_CLONE_AND_CHECKOUT",
   GitRemoveAll = "GIT_REMOVE_ALL",
   Initialize = "INITIALIZE",

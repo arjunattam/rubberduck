@@ -2,6 +2,7 @@ import { LangServersMap } from "./serverMap";
 import { readFile, constructFileUri, constructRootUri, clean } from "./utils";
 import * as git from "./git";
 import packageJson from "../package.json";
+import { installUpdate } from "./updater";
 
 const VERSION = packageJson.version;
 
@@ -14,6 +15,10 @@ export class MessageHandler {
     switch (type) {
       case RequestType.Info:
         return this.handleInfoMessage(message);
+      case RequestType.InstallUpdate:
+        const response = await installUpdate();
+        // setTimeout(() => process.exit(), 500); // Kill self to start new process
+        return { id: message.id, result: response };
       case RequestType.GitCloneCheckout:
         const { repo, cloneUrl } = <GitClonePayload>message.payload;
         const gitManager = new git.GitManager(repo, cloneUrl);

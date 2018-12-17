@@ -30,6 +30,8 @@ export const onMessageReceived = (
 
     // For native messaging
     NATIVE_INFO: (data, cb) => NativeHost.info(tabId, data, cb),
+    NATIVE_INSTALL_UPDATE: (data, cb) =>
+      NativeHost.installUpdate(tabId, data, cb),
     NATIVE_CLONE_AND_CHECKOUT: (data, cb) =>
       NativeHost.cloneAndCheckout(tabId, data, cb),
     NATIVE_REMOVE_ALL: (data, cb) => NativeHost.removeAll(tabId, data, cb),
