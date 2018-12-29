@@ -18,17 +18,21 @@ This repository contains the Rubberduck chrome extension, and the native host ap
     npm run watch
     ```
 
-3.  To distribute binary file, we can pack the extension into a crx file. Generate new crx using the command. Packing needs keys (see below).
-
-    ```
-    npm run pack
-    ```
-
-4.  Run tests with (defaults to watch mode).
+3.  Run tests with (defaults to watch mode).
 
     ```
     yarn test
     ```
+
+## Packing a crx
+
+While we have a script to pack a crx file for distribution, it has stopped working after the webpack changes.
+
+```
+npm run pack
+```
+
+As an alternative, you can use the Chrome's pack an extension utility. Remember to add the `keys/local_key.pem` file to maintain the development extension id.
 
 ## Development keys setup
 
