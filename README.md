@@ -1,59 +1,31 @@
 # Rubberduck
 
-This repository contains the Rubberduck chrome extension, and the native host app (inside `native-host`).
+<img width="100" height="100" align="right" src="./src/logo.svg" />
+
+Rubberduck is a browser extension to improve code navigation on GitHub, to:
+
+- **Speed up code comprehension**: find symbol usages and definitions
+- **Reduce context switches**: see documentation inline, on hovering on symbols
+- **Navigate in control**: use the files tree to navigate diffs and code pages
+
+See it in action on [our website](https://www.rubberduck.io/).
+
+Rubberduck is completely open source, and runs entirely on your personal machine (without any external server dependencies). We feel these two are critical design decisions for you to be comfortable using it [on your private repos](#using-on-private-repos).
 
 ## Setup
 
-1.  Install dependencies
+1. **Install the native host**: The browser extension relies on a native host application, which manages git repos, and runs the language analysis to find usages and definitions. The native host source is in the [`native-host` dir](./native-host/README.md). To install, run:
 
-    ```
-    yarn
-    ```
+```
+npm install -g rubberduck-native
+```
 
-2.  For development, run this in watch mode. Note: this will require the native host to be configured first (see [native-host/README.md](native-host/README.md))
+2. **Install the browser extension**: The browser extension is available on [the Chrome Store](https://chrome.google.com/webstore/detail/rubberduck/nopekhgebkpkbjoclackdlofmcpokgmc).
 
-    ```
-    npm run watch
-    ```
+## Using on private repos
 
-3.  To distribute binary file, we can pack the extension into a crx file. Generate new crx using the command. Packing needs keys (see below).
+TODO - add docs
 
-    ```
-    npm run pack
-    ```
+## Contributions and support
 
-4.  Run tests with (defaults to watch mode).
-
-    ```
-    yarn test
-    ```
-
-## Development keys setup
-
-- To be able to pack crx (for production), you need to setup `keys/production_key.pem` in your project directory. Get this key from [here](https://drive.google.com/drive/u/0/folders/1ABADv_hmG2FAsPYJokvv_FBw-z_nMQUT) (needs Google account).
-
-- This should not be required if we are distributing the extension through the Chrome Store. See below for publishing.
-
-## Publishing
-
-1.  To publish the extension, ensure that your account on the [Chrome developer dashboard](https://chrome.google.com/webstore/developer/dashboard) is setup.
-
-2.  Bump the version -- open `manifest.json` and bump the version depending on your changes.
-
-3.  Generate the zip file for uploading using the following. This also uploads the source maps to Sentry.
-
-    ```
-    npm run chrome-build
-    ```
-
-4.  Upload the generated zip file (`bundle.zip`) on the Chrome dashboard.
-
-## Architecture
-
-The extension has three components, which are bundled individually through Webpack.
-
-1.  Background page: this is the main page of the extension (also called "event page") in the docs. The background page listens for some chrome events, and injects scripts to the page.
-
-2.  Content script: this is the script that is injected in the page using [programmatic injection](https://developer.chrome.com/extensions/content_scripts#pi). Since the injected script renders elements, this is built using React.
-
-3.  Options page: this is the settings page. Not much to see here.
+Rubberduck is very new, actively developed and you might run into issues here and there. Please help us out by [filing an issue](https://github.com/karigari/rubberduck/issues) when you run into one.

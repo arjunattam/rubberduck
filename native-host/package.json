@@ -1,6 +1,6 @@
 {
   "name": "rubberduck-native",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Native host application for the Rubberduck browser extension",
   "main": "build/src/index.js",
   "repository": {

@@ -1,8 +1,8 @@
 # Rubberduck native host
 
-This is the native host application for the Rubberduck browser extension. The native host manages git repositories on your file system, and runs a language server to give usages and definitions.
-
 [![npm version](https://badge.fury.io/js/rubberduck-native.svg)](https://badge.fury.io/js/rubberduck-native)
+
+This is the native host application for the Rubberduck browser extension. The native host manages git repositories on your file system, and runs a language server to give usages and definitions.
 
 To install the native application, run:
 

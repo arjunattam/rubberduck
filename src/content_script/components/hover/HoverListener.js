@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { getPageListener } from "../../adapters/";
 import pathAdapter from "../../adaptersv2";
 import HoverElement from "./HoverElement";
+import { HoverDebugger } from "./HoverDebug";
 
 /**
  * This component sets up the mouse event listeners.
@@ -76,38 +77,21 @@ class HoverListener extends React.Component {
     document.body.onmousemove = null;
   }
 
-  renderDebugger = () => {
-    const entries = Object.entries(this.state.hoverResult);
-    const liElements = entries.map(tuple => {
-      let value = "";
-      if (tuple.length > 1 && tuple[1]) {
-        value = tuple[1].outerHTML ? tuple[1].outerHTML : tuple[1];
-      }
-
-      return (
-        <li key={tuple[0]}>
-          <strong>{tuple[0]}</strong> {value}
-        </li>
-      );
-    });
-
-    return (
-      <div className="hover-debugger">
-        <ul>{liElements}</ul>
-      </div>
-    );
-  };
-
   isDebugging = () => {
     const { hasHoverDebug } = this.props.storage;
     return hasHoverDebug;
   };
 
   render() {
+    const isDebugging = this.isDebugging();
+
     return (
       <div>
         <HoverElement {...this.props} {...this.state} />
-        {this.isDebugging() ? this.renderDebugger() : null}
+
+        {isDebugging ? (
+          <HoverDebugger hoverResult={this.state.hoverResult} />
+        ) : null}
       </div>
     );
   }

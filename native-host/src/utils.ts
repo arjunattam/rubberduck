@@ -1,8 +1,8 @@
 import fs from "fs";
 const mkdirp = require("mkdirp");
 
-// TODO: remove hard coded repos location
-export const BASE_REPOS_URI = "file:///Users/arjun/local_repos";
+const homeDir = process.env.HOME;
+export const BASE_REPOS_URI = `file://${homeDir}/rubberduck-local-repos`;
 
 export const toPath = (uriPath: string) => {
   return uriPath.replace("file://", "");

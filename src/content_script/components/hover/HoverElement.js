@@ -33,7 +33,9 @@ export default class HoverElement extends React.Component {
   };
 
   callActions = () => {
-    if (!this.isValidResult(this.state.hoverResult)) return;
+    if (!this.isValidResult(this.state.hoverResult)) {
+      return;
+    }
 
     const { hoverResult } = this.state;
     this.DataActions.setHoverResult(hoverResult);
@@ -61,6 +63,7 @@ export default class HoverElement extends React.Component {
         character: this.props.hoverResult.charNumber
       }
     };
+
     const response = await this.DataActions.callHover(params);
     const { mouseX, mouseY } = this.props.hoverResult;
     const isForCurrentMouse = this.isOverlappingWithCurrent(mouseX, mouseY);
