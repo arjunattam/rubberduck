@@ -1,6 +1,6 @@
 {
   "name": "rubberduck-native",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "Native host application for the Rubberduck browser extension",
   "main": "build/src/index.js",
   "repository": {
@@ -13,14 +13,14 @@
     "prepublishOnly": "npm run compile",
     "register": "node register.js",
     "compile": "tsc",
-    "postcompile": "npx nexe -i build/src/index.js -o bin/rubberduck-native-mac",
+    "postcompile": "npx pkg build/src/index.js -o bin/rubberduck-native-mac -t node8-macos-x64",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
     "@types/node": "^10.12.8",
     "@types/uuid": "^3.4.4",
-    "typescript": "^3.1.6",
-    "nexe": "^2.0.0-rc.34"
+    "pkg": "^4.3.5",
+    "typescript": "^3.1.6"
   },
   "dependencies": {
     "chrome-native-messaging": "^0.2.0",
