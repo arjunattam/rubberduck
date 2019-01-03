@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 const fs = require("fs");
 const cp = require("child_process");
 const mkdirp = require("mkdirp");
@@ -18,13 +17,11 @@ let BINARY = argsBinaryLocation;
 if (!argsBinaryLocation) {
   const command = cp.spawnSync("npm", ["-g", "root"]);
   const NPM_ROOT = command.stdout.toString().trim();
-
-  BINARY = `${NPM_ROOT}\/${PACKAGE_NAME}\/bin\/rubberduck-native`;
+  BINARY = `${NPM_ROOT}\/${PACKAGE_NAME}\/bin\/rubberduck-native-mac`;
 }
 
 mkdirp(CHROME_PATH, (err, done) => {
   const finalPath = `${CHROME_PATH}/${MANIFEST}`;
-
   const manifest = JSON.parse(fs.readFileSync(MANIFEST, "utf8"));
   manifest.path = BINARY;
   fs.writeFileSync(finalPath, JSON.stringify(manifest, null, 4));
