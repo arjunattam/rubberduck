@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "chrome-native-messaging": "^0.2.0",
-    "isomorphic-git": "^0.39.4",
+    "isomorphic-git": "^1.8.2",
     "javascript-typescript-langserver": "^2.11.1",
     "meow": "^5.0.0",
     "mkdirp": "^0.5.1",
