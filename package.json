@@ -13,7 +13,7 @@
     "js-base64": "^2.4.3",
     "jsonwebtoken": "^8.1.1",
     "moment": "^2.20.1",
-    "parse-link-header": "^1.0.1",
+    "parse-link-header": "^2.0.0",
     "pjax": "https://github.com/karigari/pjax.git#karigari",
     "raven-js": "^3.23.3",
     "react": "^16.2.0",
