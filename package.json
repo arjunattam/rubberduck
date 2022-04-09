@@ -12,7 +12,7 @@
     "diffparser": "^2.0.1",
     "js-base64": "^2.4.3",
     "jsonwebtoken": "^8.1.1",
-    "moment": "^2.20.1",
+    "moment": "^2.29.2",
     "parse-link-header": "^1.0.1",
     "pjax": "https://github.com/karigari/pjax.git#karigari",
     "raven-js": "^3.23.3",
